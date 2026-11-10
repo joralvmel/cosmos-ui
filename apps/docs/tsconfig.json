@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "types": ["node"]
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "test/**/*", "scripts/**/*", "astro.config.mjs"],
+  "exclude": ["dist"]
+}

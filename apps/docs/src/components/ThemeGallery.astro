@@ -1,0 +1,81 @@
+---
+import { builtInThemes, resolveTheme, validateTheme } from '@joralvmel/cosmos-tokens';
+
+const swatches = [
+  'bg',
+  'surface',
+  'fg',
+  'fg-muted',
+  'border-strong',
+  'primary',
+  'accent',
+  'success',
+  'warning',
+  'danger',
+  'info',
+] as const;
+const charts = Array.from({ length: 8 }, (_, i) => `chart-${i + 1}`);
+const isEs = Astro.currentLocale === 'es';
+const themes = builtInThemes.map(definition => {
+  const report = validateTheme(resolveTheme(definition));
+  return {
+    definition,
+    contrast: report.contrast.filter(check => check.pass).length,
+    total: report.contrast.length,
+    cvd: report.deficiencies.every(check => check.pass),
+  };
+});
+---
+
+{
+  themes.map(({ definition, contrast, total, cvd }) => (
+    <section class="not-content cosm-gallery-theme">
+      <h3>{definition.label}</h3>
+      <p class="cosm-gallery-report">
+        {isEs ? 'Contraste WCAG 2.2 AA' : 'WCAG 2.2 AA contrast'}: {contrast}/{total} ·{' '}
+        {isEs ? 'Daltonismo' : 'Color vision deficiencies'}: {cvd ? 'OK' : '✗'}
+      </p>
+      <div class="cosm-gallery-modes">
+        {(['light', 'dark'] as const).map(mode => (
+          <div
+            class="cosm-preview cosm-gallery-panel"
+            data-cosm-preview
+            data-fixed
+            data-fixed-mode
+            data-theme={definition.name}
+            data-mode={mode}
+          >
+            <p class="cosm-gallery-mode">{mode}</p>
+            <div class="cosm-gallery-swatches">
+              {swatches.map(name => (
+                <div class="cosm-swatch">
+                  <span style={`background: var(--cosm-${name})`} />
+                  <code>{name}</code>
+                </div>
+              ))}
+            </div>
+            <div class="cosm-gallery-chart" aria-hidden="true">
+              {charts.map(name => (
+                <span style={`background: var(--cosm-${name})`} />
+              ))}
+            </div>
+            <div class="cosm-gallery-actions">
+              <cosm-button>{isEs ? 'Guardar' : 'Save'}</cosm-button>
+              <cosm-button variant="soft">{isEs ? 'Borrador' : 'Draft'}</cosm-button>
+              <cosm-button variant="outline" tone="neutral">
+                {isEs ? 'Cancelar' : 'Cancel'}
+              </cosm-button>
+              <cosm-button tone="danger" variant="ghost">
+                {isEs ? 'Eliminar' : 'Delete'}
+              </cosm-button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  ))
+}
+
+<script>
+  import '@joralvmel/cosmos-elements';
+</script>

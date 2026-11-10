@@ -1,0 +1,72 @@
+---
+title: Button
+description: Triggers an action or submits a form. Web Component, React, Angular and React Native.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+
+`<cosm-button>` triggers an action. It follows the
+[WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/), renders a native
+`<button>` and takes part in forms (`type="submit"` / `type="reset"`).
+
+## Playground
+
+<Playground name="button" content="Save changes" />
+
+## Variants and tones
+
+<Preview>
+  <cosm-button>Solid</cosm-button>
+  <cosm-button variant="soft">Soft</cosm-button>
+  <cosm-button variant="outline">Outline</cosm-button>
+  <cosm-button variant="ghost">Ghost</cosm-button>
+  <cosm-button tone="neutral">Neutral</cosm-button>
+  <cosm-button tone="danger">Delete</cosm-button>
+</Preview>
+
+```html
+<cosm-button variant="soft">Soft</cosm-button>
+<cosm-button tone="danger">Delete</cosm-button>
+```
+
+## Sizes and states
+
+<Preview>
+  <cosm-button size="sm">Small</cosm-button>
+  <cosm-button>Medium</cosm-button>
+  <cosm-button size="lg">Large</cosm-button>
+  <cosm-button loading>Saving</cosm-button>
+  <cosm-button disabled>Disabled</cosm-button>
+</Preview>
+
+`loading` keeps the button focusable, sets `aria-busy` and ignores presses. `disabled` removes it from
+the tab order.
+
+## Usage per platform
+
+```tsx
+// React
+<Button variant="soft" onPress={event => save(event.detail.source)}>Save</Button>
+```
+
+```html
+<!-- Angular -->
+<cosm-button variant="soft" (press)="save($event.detail.source)">Save</cosm-button>
+```
+
+```tsx
+// React Native
+<Button variant="soft" onPress={({ source }) => save(source)}>Save</Button>
+```
+
+## Accessibility
+
+- Give icon-only buttons a `label`; it becomes the accessible name.
+- Use `tone="danger"` together with explicit text for destructive actions; color is never the only cue.
+- On React Native, small buttons extend their touch area to 44 points.
+
+## API
+
+<ApiTable name="button" />

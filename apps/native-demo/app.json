@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Cosmos UI Demo",
+    "slug": "cosmos-ui-demo",
+    "scheme": "cosmos-demo",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

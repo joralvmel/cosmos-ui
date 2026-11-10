@@ -1,0 +1,72 @@
+---
+title: Button
+description: Ejecuta una acción o envía un formulario. Web Component, React, Angular y React Native.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+
+`<cosm-button>` ejecuta una acción. Sigue el
+[patrón de botón de WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/button/), renderiza un
+`<button>` nativo y participa en formularios (`type="submit"` / `type="reset"`).
+
+## Playground
+
+<Playground name="button" content="Guardar cambios" />
+
+## Variantes y tonos
+
+<Preview>
+  <cosm-button>Solid</cosm-button>
+  <cosm-button variant="soft">Soft</cosm-button>
+  <cosm-button variant="outline">Outline</cosm-button>
+  <cosm-button variant="ghost">Ghost</cosm-button>
+  <cosm-button tone="neutral">Neutral</cosm-button>
+  <cosm-button tone="danger">Eliminar</cosm-button>
+</Preview>
+
+```html
+<cosm-button variant="soft">Soft</cosm-button>
+<cosm-button tone="danger">Eliminar</cosm-button>
+```
+
+## Tamaños y estados
+
+<Preview>
+  <cosm-button size="sm">Pequeño</cosm-button>
+  <cosm-button>Mediano</cosm-button>
+  <cosm-button size="lg">Grande</cosm-button>
+  <cosm-button loading>Guardando</cosm-button>
+  <cosm-button disabled>Deshabilitado</cosm-button>
+</Preview>
+
+`loading` mantiene el botón enfocable, establece `aria-busy` e ignora las pulsaciones. `disabled` lo
+saca del orden de tabulación.
+
+## Uso por plataforma
+
+```tsx
+// React
+<Button variant="soft" onPress={event => guardar(event.detail.source)}>Guardar</Button>
+```
+
+```html
+<!-- Angular -->
+<cosm-button variant="soft" (press)="guardar($event.detail.source)">Guardar</cosm-button>
+```
+
+```tsx
+// React Native
+<Button variant="soft" onPress={({ source }) => guardar(source)}>Guardar</Button>
+```
+
+## Accesibilidad
+
+- Da a los botones solo con icono un `label`; se convierte en el nombre accesible.
+- Usa `tone="danger"` junto con un texto explícito en acciones destructivas; el color nunca es la única señal.
+- En React Native, los botones pequeños amplían su área táctil a 44 puntos.
+
+## API
+
+<ApiTable name="button" />

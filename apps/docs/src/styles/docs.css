@@ -1,0 +1,108 @@
+/* Docs chrome only. Component styles come from Cosmos tokens inside .cosm-preview areas. */
+
+.cosm-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cosm-space-md);
+  margin-block: 1rem;
+  padding: var(--cosm-space-xl);
+  border: 1px solid var(--cosm-border);
+  border-radius: var(--cosm-radius-lg);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
+  font-family: var(--cosm-font-sans);
+}
+
+.cosm-playground-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+}
+
+.cosm-playground-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: var(--sl-text-sm);
+}
+
+.cosm-playground-controls label:has(input[type="checkbox"]) {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.cosm-playground-code-title {
+  font-weight: 600;
+}
+
+.cosm-gallery-theme {
+  margin-block: 2rem;
+}
+
+.cosm-gallery-report {
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+}
+
+.cosm-gallery-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.cosm-gallery-panel {
+  flex-direction: column;
+  align-items: stretch;
+  margin: 0;
+}
+
+.cosm-gallery-mode {
+  margin: 0;
+  color: var(--cosm-fg-muted);
+  text-transform: uppercase;
+  font-size: var(--cosm-text-xs);
+  letter-spacing: 0.08em;
+}
+
+.cosm-gallery-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+  gap: var(--cosm-space-sm);
+}
+
+.cosm-swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--cosm-space-xs);
+  font-size: var(--cosm-text-xs);
+}
+
+.cosm-swatch span {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border: 1px solid var(--cosm-border);
+  border-radius: var(--cosm-radius-sm);
+}
+
+.cosm-gallery-chart {
+  display: flex;
+  block-size: 0.75rem;
+  border-radius: var(--cosm-radius-sm);
+  overflow: hidden;
+}
+
+.cosm-gallery-chart span {
+  flex: 1;
+}
+
+.cosm-gallery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cosm-space-sm);
+}

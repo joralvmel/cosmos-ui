@@ -1,0 +1,26 @@
+# Cosmos UI
+
+> Themeable design system. One typed contract per component (`@joralvmel/cosmos-core`) implemented as
+> Web Components (Lit), React and Angular wrappers, and React Native components. Themes are generated
+> in OKLCH with light and dark modes and validated for WCAG 2.2 AA contrast and color vision deficiencies.
+
+Status: pre-release (0.x). Not published to npm yet.
+
+## Rules for assistants
+
+- Style with Cosmos tokens (`var(--cosm-*)`) or the Tailwind v4 theme (`bg-primary`, `text-fg-muted`,
+  `rounded-md`); never hard-code colors.
+- Web: `<cosm-*>` elements, DOM events `cosm-*` (`CustomEvent`, `detail` typed in core).
+- React: `onPress`, `onChange`… receive the original `CustomEvent`. Angular: `(press)`, `(valueChange)`….
+  React Native: `onPress(detail)`.
+- Theme and mode: `data-theme="<name>"` + `data-mode="light|dark|system"` on the same element.
+
+## References
+
+- [Tokens and themes](packages/tokens/llms.md)
+- [Tailwind theme](packages/tailwind/llms.md)
+- [Contracts and headless logic](packages/core/llms.md)
+- [Web Components](packages/elements/llms.md)
+- [React](packages/react/llms.md)
+- [Angular](packages/angular/llms.md)
+- [React Native](packages/native/llms.md)

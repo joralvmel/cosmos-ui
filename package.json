@@ -1,0 +1,50 @@
+{
+  "name": "cosmos-ui",
+  "private": true,
+  "description": "Cosmos UI: themeable design system with Web Components, React, Angular and React Native.",
+  "type": "module",
+  "packageManager": "npm@11.19.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "tools",
+    "tools/generator"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "biome check . && node tools/check-terms.mjs",
+    "lint:fix": "biome check --write .",
+    "check-terms": "node tools/check-terms.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
+    "release": "turbo run build --filter=./packages/* && changeset publish",
+    "generate": "node tools/generator/src/cli.mjs",
+    "docs": "turbo run dev --filter=@joralvmel/cosmos-docs...",
+    "prepare": "node tools/git/install-hooks.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joralvmel/cosmos-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joralvmel/cosmos-ui/issues"
+  },
+  "homepage": "https://github.com/joralvmel/cosmos-ui#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "^24.19.2",
+    "happy-dom": "^21.0.4",
+    "turbo": "^2.11.10",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

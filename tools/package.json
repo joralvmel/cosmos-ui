@@ -1,0 +1,10 @@
+{
+  "name": "@joralvmel/cosmos-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Repository checks of Cosmos UI: blocked terms, Git identity and commit messages.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  }
+}

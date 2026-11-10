@@ -1,0 +1,60 @@
+---
+import Default from '@astrojs/starlight/components/ThemeSelect.astro';
+import { builtInThemes } from '@joralvmel/cosmos-tokens';
+import { t } from './i18n';
+
+const s = t(Astro.currentLocale);
+---
+
+<div class="cosm-theme-select">
+  <label>
+    <span class="sr-only">{s.theme}</span>
+    <select data-cosm-theme-select aria-label={s.theme}>
+      {builtInThemes.map(theme => <option value={theme.name}>{theme.label}</option>)}
+    </select>
+  </label>
+  <Default />
+</div>
+
+<script>
+  // Previews use the Cosmos theme picked here and follow the site's light/dark mode.
+  const KEY = 'cosmos-docs:theme';
+  const html = document.documentElement;
+
+  const apply = () => {
+    const theme = localStorage.getItem(KEY) ?? 'cosmos';
+    const mode = html.dataset.theme === 'dark' ? 'dark' : 'light';
+    for (const preview of document.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
+      if (!preview.hasAttribute('data-fixed')) preview.dataset.theme = theme;
+      if (!preview.hasAttribute('data-fixed-mode')) preview.dataset.mode = mode;
+    }
+    for (const select of document.querySelectorAll<HTMLSelectElement>('[data-cosm-theme-select]')) {
+      select.value = theme;
+    }
+  };
+
+  for (const select of document.querySelectorAll<HTMLSelectElement>('[data-cosm-theme-select]')) {
+    select.addEventListener('change', () => {
+      localStorage.setItem(KEY, select.value);
+      apply();
+    });
+  }
+  new MutationObserver(apply).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+  apply();
+</script>
+
+<style>
+  .cosm-theme-select {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  select {
+    background: transparent;
+    color: var(--sl-color-gray-1);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--sl-text-sm);
+  }
+</style>

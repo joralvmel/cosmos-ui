@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks commits with the wrong identity or blocked terms. Never bypass with --no-verify.
+node tools/git/check-identity.mjs || exit 1
+node tools/check-terms.mjs --staged || exit 1

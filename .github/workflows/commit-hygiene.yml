@@ -1,0 +1,59 @@
+name: Commit hygiene
+
+# Commit emails must not contain blocked terms (list in the COSMOS_BLOCKED_TERMS secret), and pull
+# request titles become squash-merge commits, so they must follow Conventional Commits.
+# Runs on pushes and on pull requests from this repository (forks do not receive secrets).
+# Bots (Dependabot, Changesets "Version Packages", GitHub web merges) are skipped.
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    name: Commit emails and PR title
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'push' ||
+       (github.event.pull_request.head.repo.full_name == github.repository &&
+        github.head_ref != 'changeset-release/main'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Commit emails of the pull request
+        if: github.event_name == 'pull_request'
+        run: node tools/git/check-identity.mjs --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+        env:
+          COSMOS_BLOCKED_TERMS: ${{ secrets.COSMOS_BLOCKED_TERMS }}
+
+      - name: Commit emails of the push
+        if: github.event_name == 'push'
+        run: |
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            node tools/git/check-identity.mjs --range "$AFTER"
+          else
+            node tools/git/check-identity.mjs --range "$BEFORE..$AFTER"
+          fi
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          COSMOS_BLOCKED_TERMS: ${{ secrets.COSMOS_BLOCKED_TERMS }}
+
+      - name: Pull request title (Conventional Commits)
+        if: github.event_name == 'pull_request'
+        run: |
+          printf '%s\n' "$PR_TITLE" > "$RUNNER_TEMP/title.txt"
+          node tools/git/check-commit-msg.mjs "$RUNNER_TEMP/title.txt"
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}

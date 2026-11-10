@@ -1,0 +1,11 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["COSMOS_DOCS_URL"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/llms.txt", "$TURBO_ROOT$/packages/*/llms.md"],
+      "outputs": ["dist/**"]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+---
+title: Temas
+description: Temas incluidos en Cosmos en modo light y dark, con su informe de accesibilidad.
+---
+
+import ThemeGallery from '../../../../components/ThemeGallery.astro';
+
+Cada tema se genera a partir de colores semilla y una armonía de color con `defineTheme`. El motor crea
+escalas OKLCH de 12 pasos, un modo dark con su propia curva de luminosidad, colores de estado que
+conservan su significado y una paleta de 8 colores para gráficas. Cada tema se valida con WCAG 2.2 AA
+(normativo), APCA (informativo) y simulaciones de protanopia, deuteranopia y tritanopia.
+
+<ThemeGallery />
+
+## Crear un tema
+
+```ts
+import { defineTheme, resolveTheme, toCss, validateTheme } from '@joralvmel/cosmos-tokens';
+
+const aurora = defineTheme({
+  name: 'aurora',
+  seeds: { primary: 'oklch(0.56 0.15 165)' },
+  harmony: 'triadic',
+  radius: 'pill',
+});
+
+const resolved = resolveTheme(aurora);
+console.log(validateTheme(resolved).pass);
+const css = toCss([resolved]);
+```
+
+Un tema no puede llamarse `light`, `dark` ni `system`; son nombres de modo.

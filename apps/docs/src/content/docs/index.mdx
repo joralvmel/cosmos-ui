@@ -1,0 +1,33 @@
+---
+title: Cosmos UI
+description: Themeable design system with Web Components, React, Angular and React Native built from one contract per component.
+template: splash
+hero:
+  tagline: One contract per component. Web Components, React, Angular and React Native. Themes generated in OKLCH and checked for accessibility.
+  actions:
+    - text: Get started
+      link: getting-started/introduction/
+      icon: right-arrow
+    - text: Explore themes
+      link: theming/themes/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Contracts first" icon="puzzle">
+    Every component starts as a typed contract: props, events, slots, keyboard and ARIA. Web, React,
+    Angular and React Native implementations are tested against it.
+  </Card>
+  <Card title="Themes you can generate" icon="seti:color">
+    Pick seed colors and a harmony; Cosmos builds light and dark palettes in OKLCH and verifies WCAG
+    contrast and color vision deficiencies.
+  </Card>
+  <Card title="Tailwind friendly" icon="seti:css">
+    Utilities like `bg-primary` or `rounded-md` map to Cosmos tokens through a Tailwind CSS v4 theme.
+  </Card>
+  <Card title="AI ready" icon="rocket">
+    Machine-readable references (`llms.txt`) and an MCP server keep assistants aligned with the real API.
+  </Card>
+</CardGrid>

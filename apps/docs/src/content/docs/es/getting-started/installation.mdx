@@ -1,0 +1,92 @@
+---
+title: Instalación
+description: Instala Cosmos UI para web, React, Angular, React Native y Tailwind CSS.
+---
+
+import { TabItem, Tabs } from '@astrojs/starlight/components';
+
+Cosmos UI aún no está publicado. Cuando se publique, los paquetes se instalarán desde npm.
+
+<Tabs syncKey="platform">
+  <TabItem label="Web Components">
+    ```bash
+    npm install @joralvmel/cosmos-elements @joralvmel/cosmos-tokens
+    ```
+
+    ```js
+    import '@joralvmel/cosmos-tokens/tokens.css';
+    import '@joralvmel/cosmos-elements/button';
+    ```
+
+  </TabItem>
+  <TabItem label="React">
+    ```bash
+    npm install @joralvmel/cosmos-react @joralvmel/cosmos-tokens
+    ```
+
+    ```tsx
+    import '@joralvmel/cosmos-tokens/tokens.css';
+    import { Button } from '@joralvmel/cosmos-react';
+
+    export const Guardar = () => <Button onPress={event => console.log(event.detail.source)}>Guardar</Button>;
+    ```
+
+  </TabItem>
+  <TabItem label="Angular">
+    ```bash
+    npm install @joralvmel/cosmos-angular @joralvmel/cosmos-tokens
+    ```
+
+    ```ts
+    import { Component } from '@angular/core';
+    import { CosmButtonComponent } from '@joralvmel/cosmos-angular';
+
+    @Component({
+      selector: 'app-guardar',
+      imports: [CosmButtonComponent],
+      template: `<cosm-button (press)="guardar()">Guardar</cosm-button>`,
+    })
+    export class GuardarComponent {
+      guardar() {}
+    }
+    ```
+
+  </TabItem>
+  <TabItem label="React Native">
+    ```bash
+    npm install @joralvmel/cosmos-native
+    ```
+
+    ```tsx
+    import { Button, CosmosThemeProvider } from '@joralvmel/cosmos-native';
+
+    export default function App() {
+      return (
+        <CosmosThemeProvider theme="nebula" mode="system">
+          <Button onPress={({ source }) => console.log(source)}>Guardar</Button>
+        </CosmosThemeProvider>
+      );
+    }
+    ```
+
+  </TabItem>
+</Tabs>
+
+## Tema y modo
+
+Define el tema y el modo en cualquier elemento (normalmente `<html>`). `data-mode="system"` sigue al
+sistema operativo; sin `data-mode` se usa el modo light.
+
+```html
+<html data-theme="nebula" data-mode="system"></html>
+```
+
+## Tailwind CSS v4 (opcional)
+
+```css
+@import "tailwindcss";
+@import "@joralvmel/cosmos-tailwind";
+```
+
+Utilidades como `bg-primary`, `text-fg-muted`, `rounded-md`, `dark:bg-surface` o
+`theme-nebula:text-accent` usan los tokens de Cosmos.

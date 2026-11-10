@@ -1,0 +1,29 @@
+---
+title: Introducción
+description: Qué es Cosmos UI y cómo encajan sus paquetes.
+---
+
+Cosmos UI es un sistema de diseño que ofrece los mismos componentes en la web (Web Components, React,
+Angular) y en React Native. Cada componente se define una vez como **contrato** en
+`@joralvmel/cosmos-core`; cada implementación de plataforma se prueba contra ese contrato y sus escenarios
+de comportamiento compartidos.
+
+## Paquetes
+
+| Paquete | Propósito |
+| --- | --- |
+| `@joralvmel/cosmos-tokens` | Motor de temas y tokens de diseño (variables CSS, JSON, valores para React Native) |
+| `@joralvmel/cosmos-tailwind` | Tema de Tailwind CSS v4 asociado a los tokens |
+| `@joralvmel/cosmos-core` | Contratos, escenarios compartidos y lógica headless |
+| `@joralvmel/cosmos-elements` | Web Components construidos con Lit |
+| `@joralvmel/cosmos-react` | Wrappers de React |
+| `@joralvmel/cosmos-angular` | Componentes standalone de Angular |
+| `@joralvmel/cosmos-native` | Componentes de React Native |
+
+Gráficas, iconos, i18n, el servidor MCP y la CLI están en desarrollo inicial.
+
+## Principios
+
+- **Primero el contrato**: props, eventos, slots, teclado y roles ARIA se deciden antes del código.
+- **Solo tokens**: los componentes se estilan con variables `--cosm-*`, así funcionan todos los temas y modos.
+- **Accesible por defecto**: patrones WAI-ARIA, foco visible, movimiento reducido y contraste verificado.

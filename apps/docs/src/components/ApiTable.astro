@@ -1,0 +1,102 @@
+---
+import { type ComponentContract, contracts } from '@joralvmel/cosmos-core';
+import { t, toAttribute } from './i18n';
+
+interface Props {
+  name: keyof typeof contracts;
+}
+
+const contract: ComponentContract = contracts[Astro.props.name];
+const s = t(Astro.currentLocale);
+const typeOf = (spec: ComponentContract['props'][string]) =>
+  spec.type === 'enum' ? spec.values.map(v => `'${v}'`).join(' | ') : spec.type;
+---
+
+<h3>{s.props}</h3>
+<table>
+  <thead>
+    <tr><th>{s.name}</th><th>{s.type}</th><th>{s.default}</th><th>{s.platforms}</th><th>{s.description}</th></tr>
+  </thead>
+  <tbody>
+    {
+      Object.entries(contract.props).map(([name, spec]) => (
+        <tr>
+          <td>
+            <code>{name}</code>
+            {toAttribute(name) !== name && <><br /><code>{toAttribute(name)}</code></>}
+          </td>
+          <td><code>{typeOf(spec)}</code></td>
+          <td>{spec.default !== undefined ? <code>{String(spec.default)}</code> : '—'}</td>
+          <td>{spec.platforms ? spec.platforms.join(', ') : s.all}</td>
+          <td>{spec.description}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+{
+  Object.keys(contract.events).length > 0 && (
+    <>
+      <h3>{s.events}</h3>
+      <table>
+        <thead>
+          <tr><th>DOM</th><th>React</th><th>Angular</th><th>React Native</th><th>{s.detail}</th><th>{s.description}</th></tr>
+        </thead>
+        <tbody>
+          {Object.values(contract.events).map(event => (
+            <tr>
+              <td><code>{event.names.dom}</code></td>
+              <td><code>{event.names.react}</code></td>
+              <td><code>({event.names.angular})</code></td>
+              <td><code>{event.names.native}</code></td>
+              <td><code>{event.detail}</code></td>
+              <td>{event.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  )
+}
+
+{
+  [
+    [s.slots, contract.slots],
+    [s.parts, contract.parts],
+    [s.cssProperties, contract.cssProperties],
+  ].map(([title, entries]) =>
+    Object.keys(entries as object).length > 0 && (
+      <>
+        <h3>{title as string}</h3>
+        <table>
+          <thead><tr><th>{s.name}</th><th>{s.description}</th></tr></thead>
+          <tbody>
+            {Object.entries(entries as Record<string, string>).map(([name, text]) => (
+              <tr><td><code>{name || s.defaultSlot}</code></td><td>{text}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </>
+    )
+  )
+}
+
+{
+  contract.keyboard.length > 0 && (
+    <>
+      <h3>{s.keyboard}</h3>
+      <table>
+        <thead><tr><th>{s.keys}</th><th>{s.action}</th></tr></thead>
+        <tbody>
+          {contract.keyboard.map(entry => (
+            <tr>
+              <td>{entry.keys.map(key => <kbd>{key}</kbd>)}</td>
+              <td>{entry.action}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  )
+}
