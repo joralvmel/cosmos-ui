@@ -1,0 +1,46 @@
+---
+title: React Native y Expo
+description: Usa los componentes y temas de Cosmos UI en apps de React Native con Expo.
+sidebar:
+  order: 5
+---
+
+import SetupSteps from '../../../../components/SetupSteps.astro';
+
+`@joralvmel/cosmos-native` implementa los mismos contratos de componentes con primitivas de React Native
+y usa los mismos temas que la web.
+
+## Instalación
+
+<SetupSteps stack="react-native" />
+
+## Tema y modo
+
+`CosmosThemeProvider` acepta `theme` (`cosmos`, `nebula`…) y `mode` (`light`, `dark` o `system`, que
+sigue la apariencia del dispositivo).
+
+## Tus propios estilos con el tema
+
+```tsx
+import { useTheme } from '@joralvmel/cosmos-native';
+import { Text, View } from 'react-native';
+
+export function Tarjeta({ titulo }: { titulo: string }) {
+  const theme = useTheme();
+  return (
+    <View style={{ backgroundColor: theme.colors.surface, borderRadius: theme.radius.lg, padding: theme.space.lg }}>
+      <Text style={{ color: theme.colors.fg, fontSize: theme.text.lg }}>{titulo}</Text>
+    </View>
+  );
+}
+```
+
+## Accesibilidad
+
+Los componentes definen `accessibilityRole`, `accessibilityState` y etiquetas, y los controles
+pequeños amplían su área táctil a 44 puntos. Prueba con TalkBack y VoiceOver.
+
+## App de demo
+
+El repositorio incluye una app con Expo Router con una pantalla por componente: ver
+[Contribuir → Primeros pasos](../../contribute/getting-started/#demo-nativa).

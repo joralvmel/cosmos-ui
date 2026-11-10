@@ -1,6 +1,6 @@
 ---
 name: update-ai-references
-description: 'Regenerates and validates llms.md, llms.txt and the MCP tools so AI assistants match the real API.'
+description: 'Keeps every AI reference in sync with the code: llms.md blocks (npm run llms), docs .md pages, /llms.txt, /llms-full.txt, the MCP server data and tools, and cosmos init-ai.'
 argument-hint: 'Packages or components changed'
 agent: agent
 ---

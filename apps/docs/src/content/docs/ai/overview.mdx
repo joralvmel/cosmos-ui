@@ -1,0 +1,52 @@
+---
+title: Use Cosmos UI with AI
+description: Give AI assistants the real Cosmos API with init-ai, llms.txt, Markdown pages and the MCP server.
+sidebar:
+  order: 1
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+AI assistants write better UI code when they know the real components, props, events and tokens. Cosmos
+gives them that knowledge in three ways, all generated from the component contracts.
+
+## 1. Prepare your project with `init-ai`
+
+<Steps>
+
+1. Run it in your project folder with your stack (`react`, `next`, `angular`, `html` or `react-native`):
+
+   ```bash
+   npx @joralvmel/cosmos-cli init-ai --stack react
+   ```
+
+2. It writes a marked block with the Cosmos rules into `.github/copilot-instructions.md` and
+   `AGENTS.md` (add `--claude` for `CLAUDE.md`), registers the MCP server in `.vscode/mcp.json` and
+   prints the installation steps. Run it again at any time: only the marked block is replaced.
+
+3. Ask your assistant to install Cosmos UI (see the [ready-made prompts](../prompts/)).
+
+</Steps>
+
+## 2. Reference files
+
+| Resource | Use |
+| --- | --- |
+| [`/llms.txt`](../../llms.txt) | Index of every package reference and page, for assistants that read `llms.txt`. |
+| [`/llms-full.txt`](../../llms-full.txt) | The whole documentation and every package reference in one file. |
+| `/<page>.md` | Every page as Markdown (button **Copy page for AI** below each title). |
+| `node_modules/@joralvmel/cosmos-*/llms.md` | Reference of each installed package: setup, components with props, events and examples, themes and rules. |
+
+## 3. MCP server
+
+The [MCP server](../mcp/) answers questions about components, themes, tokens and setup with data that
+matches the installed version.
+
+## Install with AI (copy and paste)
+
+```text
+Install Cosmos UI in this project. First run `npx @joralvmel/cosmos-cli init-ai --stack <my stack>`,
+then follow the steps it prints. Use the cosmos-ui MCP server (get_setup, list_components,
+get_component) or https://joralvmel.github.io/cosmos-ui/llms.txt to check every component and prop
+before using it. Style only with Cosmos tokens or the Cosmos Tailwind theme.
+```

@@ -1,6 +1,13 @@
-import { buttonContract, type ComponentContract, defineContract } from '@joralvmel/cosmos-core';
 import { describe, expect, it } from 'vitest';
-import { activeProps, generateSnippets, supportsTarget, toAttribute } from '../src/lib/codegen';
+import {
+  activeProps,
+  buttonContract,
+  type ComponentContract,
+  defineContract,
+  generateSnippets,
+  supportsTarget,
+  toAttribute,
+} from '../src/index.js';
 
 const defaults = Object.fromEntries(
   Object.entries(buttonContract.props as ComponentContract['props']).map(([name, spec]) => [

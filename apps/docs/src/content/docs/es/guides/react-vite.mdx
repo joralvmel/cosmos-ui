@@ -1,0 +1,54 @@
+---
+title: React (Vite)
+description: Usa Cosmos UI en una app de React 19 construida con Vite.
+sidebar:
+  order: 1
+---
+
+import SetupSteps from '../../../../components/SetupSteps.astro';
+
+`@joralvmel/cosmos-react` envuelve los Web Components de Cosmos para React 19. Las props se asignan
+como propiedades del elemento y las props de eventos reciben el `CustomEvent` original.
+
+## Instalación
+
+<SetupSteps stack="react" />
+
+## Eventos
+
+Las props de eventos siguen los nombres del contrato (`onPress`, `onChange`, `onOpenChange`…). Lee el
+contenido en `event.detail`; su tipo se exporta desde `@joralvmel/cosmos-core`.
+
+```tsx
+import type { ButtonPressDetail } from '@joralvmel/cosmos-core';
+import { Button } from '@joralvmel/cosmos-react';
+
+function Guardar() {
+  const onPress = (event: CustomEvent<ButtonPressDetail>) => console.log(event.detail.source);
+  return <Button onPress={onPress}>Guardar</Button>;
+}
+```
+
+## Estado controlado y no controlado
+
+Los componentes con estado (valor, abierto, pestaña seleccionada…) funcionan sin controlar por
+defecto. Pasa la prop de estado para controlarlo: el componente propone cambios con su evento y espera
+a que le pases el nuevo valor
+([ADR 0003](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/adr/0003-state-ownership-and-events.md)).
+
+## Cambiar tema y modo
+
+```tsx
+import { setMode, setTheme } from '@joralvmel/cosmos-tokens/runtime';
+
+setTheme('nebula');
+setMode('dark'); // 'light' | 'dark' | 'system'
+```
+
+La elección se guarda en `localStorage`. Para restaurarla antes del primer pintado, añade a `<head>`
+el script que devuelve `themeInitScript()` (ver la [guía de Next.js](../nextjs/)).
+
+## Siguientes pasos
+
+- Estila tu propia interfaz con tokens o con el [tema de Tailwind](../tailwind/).
+- Explora los [componentes](../../components/status/) y sus playgrounds.

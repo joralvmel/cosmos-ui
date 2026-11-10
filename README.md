@@ -22,8 +22,8 @@ dark modes and verified for WCAG 2.2 AA contrast and color vision deficiencies.
 | [`@joralvmel/cosmos-charts-native`](packages/charts-native) | React Native charts (in progress)                                  |
 | [`@joralvmel/cosmos-icons`](packages/icons)                 | Icon definitions (in progress)                                     |
 | [`@joralvmel/cosmos-i18n`](packages/i18n)                   | Message formatting and `Intl` helpers                              |
-| [`@joralvmel/cosmos-mcp`](packages/mcp)                     | MCP server for AI assistants (in progress)                         |
-| [`@joralvmel/cosmos-cli`](packages/cli)                     | Command line (in progress)                                         |
+| [`@joralvmel/cosmos-mcp`](packages/mcp)                     | MCP server for AI assistants (components, snippets, themes, setup, docs search) |
+| [`@joralvmel/cosmos-cli`](packages/cli)                     | Command line: `init-ai` prepares a project for AI assistants       |
 
 ## Quick look
 

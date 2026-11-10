@@ -43,6 +43,11 @@ try {
       stdio: 'inherit',
     });
     if (result.status !== 0) console.warn('Biome reported issues; run `npm run lint:fix`.');
+    if (target === 'component' || target === 'native') {
+      // The AI references (llms.md) are generated from the contracts: rebuild core and refresh them.
+      const llms = spawnSync('npm run llms --silent', { cwd: root, stdio: 'inherit', shell: true });
+      if (llms.status !== 0) console.warn('Could not refresh llms.md; run `npm run llms`.');
+    }
     console.log('\nNext: resolve every TODO(generator) marker, then run');
     console.log('  npx biome ci . && npx turbo run typecheck test build');
   }

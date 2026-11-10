@@ -1,12 +1,12 @@
-import type { ComponentContract } from '@joralvmel/cosmos-core';
 import {
+  type ComponentContract,
   type ControlValues,
   generateSnippets,
   type SnippetTarget,
   snippetTargets,
   supportsTarget,
   toAttribute,
-} from './codegen';
+} from '@joralvmel/cosmos-core';
 
 export interface PlaygroundLabels {
   controls: string;

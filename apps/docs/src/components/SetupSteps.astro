@@ -1,0 +1,44 @@
+---
+import { Code, Steps } from '@astrojs/starlight/components';
+import { type Stack, setupGuide } from '@joralvmel/cosmos-core';
+import { t } from './i18n';
+
+interface Props {
+  stack: Stack;
+}
+
+/** Setup steps of a stack, rendered from `setupGuide()` in core (same data as MCP and init-ai). */
+const guide = setupGuide(Astro.props.stack);
+const s = t(Astro.currentLocale);
+const title = (value: string) => (s.setupTitles as Record<string, string>)[value] ?? value;
+---
+
+<Steps>
+  <ol>
+    {
+      guide.install.length > 0 && (
+        <li>
+          <p>{s.install}</p>
+          <Code code={guide.install.join('\n')} lang="bash" />
+        </li>
+      )
+    }
+    {
+      guide.steps.map(step => (
+        <li>
+          <p>
+            {title(step.title)}
+            {step.file && (
+              <>
+                {' '}
+                (<code>{step.file}</code>)
+              </>
+            )}
+          </p>
+          {step.text && <p>{step.text}</p>}
+          {step.code && <Code code={step.code} lang={step.language ?? 'txt'} />}
+        </li>
+      ))
+    }
+  </ol>
+</Steps>

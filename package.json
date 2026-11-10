@@ -21,6 +21,7 @@
     "lint": "biome check . && node tools/check-terms.mjs",
     "lint:fix": "biome check --write .",
     "check-terms": "node tools/check-terms.mjs",
+    "llms": "turbo run build --filter=@joralvmel/cosmos-core --filter=@joralvmel/cosmos-tokens --output-logs=none && node tools/ai/llms.mjs",
     "status": "turbo run build --filter=@joralvmel/cosmos-core --output-logs=none && node tools/status/component-status.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",

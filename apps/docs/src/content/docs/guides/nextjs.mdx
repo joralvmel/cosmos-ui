@@ -1,0 +1,43 @@
+---
+title: Next.js
+description: Use Cosmos UI with the Next.js App Router, Server and Client Components.
+sidebar:
+  order: 2
+---
+
+import SetupSteps from '../../../components/SetupSteps.astro';
+
+Cosmos components are Web Components wrapped for React. They work with the App Router as long as they
+are rendered from **Client Components**.
+
+## Setup
+
+<SetupSteps stack="next" />
+
+## Server and Client Components
+
+- The wrappers set element properties and listen to events in effects, so the file that imports
+  `@joralvmel/cosmos-react` must start with `'use client'`.
+- Server Components can render those Client Components and pass serializable props (strings,
+  numbers, booleans). Handlers stay inside the Client Component.
+- The server HTML contains the custom element tag and its text; the element upgrades in the browser.
+
+```tsx
+// app/page.tsx (Server Component)
+import { SaveButton } from './save-button';
+
+export default function Page() {
+  return <SaveButton />;
+}
+```
+
+## Avoiding a theme flash
+
+`themeInitScript()` returns a small, validated inline script that restores the theme and mode stored by
+`setTheme()` / `setMode()` before the first paint. Load it with `next/script` and
+`strategy="beforeInteractive"` as shown above, and keep `suppressHydrationWarning` on `<html>` because
+the script may change `data-theme` / `data-mode` before hydration.
+
+## Tailwind
+
+Use `@tailwindcss/postcss` with the [Cosmos Tailwind theme](../tailwind/).

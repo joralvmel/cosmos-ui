@@ -1,15 +1,26 @@
 # @joralvmel/cosmos-cli
 
-Command line for [Cosmos UI](../../README.md).
+Command line of [Cosmos UI](../../README.md).
 
-> Status: early development. The API below is the current skeleton.
+## `init-ai`
 
-`cosmos` command line. Available: `help`, `version`. Planned: `init-ai` (AI assistant setup for
-consumer projects) and `theme create` (custom themes).
+Prepares a project for AI assistants:
 
 ```bash
-npx @joralvmel/cosmos-cli help
+npx @joralvmel/cosmos-cli init-ai --stack react   # react | next | angular | html | react-native | tailwind
 ```
+
+- Writes a marked, regenerable block with the Cosmos rules and references into
+  `.github/copilot-instructions.md` and `AGENTS.md` (`--claude` also writes `CLAUDE.md`).
+- Registers the Cosmos MCP server in `.vscode/mcp.json`, keeping other servers.
+- Prints the installation steps of the stack.
+
+Options: `--no-copilot`, `--no-agents`, `--no-mcp`, `--dry-run`, `--cwd <dir>`. Running it again only
+replaces the marked block.
+
+## Other commands
+
+`help`, `version`.
 
 ## License
 

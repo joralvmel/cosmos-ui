@@ -1,0 +1,57 @@
+---
+title: Usar Cosmos UI con IA
+description: Da a los asistentes de IA la API real de Cosmos con init-ai, llms.txt, páginas en Markdown y el servidor MCP.
+sidebar:
+  order: 1
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Los asistentes de IA escriben mejor código de interfaz cuando conocen los componentes, props, eventos y
+tokens reales. Cosmos les da ese conocimiento de tres formas, todas generadas desde los contratos de
+los componentes.
+
+## 1. Prepara tu proyecto con `init-ai`
+
+<Steps>
+
+1. Ejecútalo en la carpeta de tu proyecto con tu stack (`react`, `next`, `angular`, `html` o
+   `react-native`):
+
+   ```bash
+   npx @joralvmel/cosmos-cli init-ai --stack react
+   ```
+
+2. Escribe un bloque marcado con las reglas de Cosmos en `.github/copilot-instructions.md` y
+   `AGENTS.md` (añade `--claude` para `CLAUDE.md`), registra el servidor MCP en `.vscode/mcp.json` e
+   imprime los pasos de instalación. Puedes repetirlo cuando quieras: solo se reemplaza el bloque marcado.
+
+3. Pide a tu asistente que instale Cosmos UI (ver los [prompts listos](../prompts/)).
+
+</Steps>
+
+## 2. Archivos de referencia
+
+| Recurso | Uso |
+| --- | --- |
+| [`/llms.txt`](../../../llms.txt) | Índice de todas las referencias de paquetes y páginas, para asistentes que leen `llms.txt`. |
+| [`/llms-full.txt`](../../../llms-full.txt) | Toda la documentación y todas las referencias de paquetes en un solo archivo. |
+| `/<página>.md` | Cada página en Markdown (botón **Copiar página para IA** bajo cada título). |
+| `node_modules/@joralvmel/cosmos-*/llms.md` | Referencia de cada paquete instalado: instalación, componentes con props, eventos y ejemplos, temas y reglas. |
+
+## 3. Servidor MCP
+
+El [servidor MCP](../mcp/) responde preguntas sobre componentes, temas, tokens e instalación con datos
+que coinciden con la versión instalada.
+
+## Instalar con IA (copiar y pegar)
+
+```text
+Install Cosmos UI in this project. First run `npx @joralvmel/cosmos-cli init-ai --stack <my stack>`,
+then follow the steps it prints. Use the cosmos-ui MCP server (get_setup, list_components,
+get_component) or https://joralvmel.github.io/cosmos-ui/llms.txt to check every component and prop
+before using it. Style only with Cosmos tokens or the Cosmos Tailwind theme.
+```
+
+Los prompts están en inglés porque los asistentes y la referencia de Cosmos lo están; puedes
+escribirlos en español y funcionarán igual.

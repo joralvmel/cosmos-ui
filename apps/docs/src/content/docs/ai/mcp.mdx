@@ -1,0 +1,55 @@
+---
+title: MCP server
+description: Connect AI assistants to the Cosmos UI MCP server to query components, themes, tokens and setup.
+sidebar:
+  order: 3
+---
+
+import { TabItem, Tabs } from '@astrojs/starlight/components';
+
+`@joralvmel/cosmos-mcp` is a [Model Context Protocol](https://modelcontextprotocol.io/) server
+(stdio). It ships the contracts, snippets, status, themes and docs of its version, so the answers match
+what you install.
+
+## Connect
+
+<Tabs syncKey="assistant">
+  <TabItem label="VS Code">
+    `npx @joralvmel/cosmos-cli init-ai` does it for you, or add to `.vscode/mcp.json`:
+
+    ```json
+    {
+      "servers": {
+        "cosmos-ui": { "type": "stdio", "command": "npx", "args": ["-y", "@joralvmel/cosmos-mcp"] }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Claude Code">
+    ```bash
+    claude mcp add cosmos-ui -- npx -y @joralvmel/cosmos-mcp
+    ```
+  </TabItem>
+  <TabItem label="Other clients">
+    Run the command `npx -y @joralvmel/cosmos-mcp` as a stdio server in your client configuration.
+  </TabItem>
+</Tabs>
+
+## Tools
+
+| Tool | Arguments | Returns |
+| --- | --- | --- |
+| `list_components` | `status?` (`planned`, `in-progress`, `stable`) | Every catalog component with category, platforms, dependencies and status. |
+| `get_component` | `name` | Contract (props, events per platform, slots, parts, keyboard), API table, snippets for HTML, React, Angular and React Native, imports and status. |
+| `list_themes` | — | Built-in themes and their modes. |
+| `get_tokens` | `theme?`, `mode?` | Semantic color tokens and radii of a theme and mode. |
+| `get_setup` | `framework` (`react`, `next`, `angular`, `html`, `react-native`, `tailwind`) | Install commands, setup code and rules. |
+| `search_docs` | `query`, `limit?` | Matching docs pages and package references with an excerpt. |
+
+Resources: `cosmos://llms/<package>` returns the `llms.md` of each package.
+
+## Example questions
+
+- "Which Cosmos components are stable, and which ones can I use for a form?"
+- "Show me the Angular code for a danger outline button that is loading."
+- "What are the dark-mode tokens of the nebula theme?"

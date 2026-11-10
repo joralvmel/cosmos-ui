@@ -22,6 +22,7 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/joralvmel/cosmos-ui' }],
       customCss: ['@joralvmel/cosmos-tokens/tokens.css', './src/styles/docs.css'],
       components: {
+        PageTitle: './src/components/PageTitle.astro',
         ThemeSelect: './src/components/ThemeSelect.astro',
       },
       lastUpdated: false,
@@ -35,6 +36,11 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Guides',
+          translations: { es: 'Guías' },
+          items: [{ autogenerate: { directory: 'guides' } }],
+        },
+        {
           label: 'Theming',
           translations: { es: 'Temas' },
           items: [{ autogenerate: { directory: 'theming' } }],
@@ -43,6 +49,11 @@ export default defineConfig({
           label: 'Components',
           translations: { es: 'Componentes' },
           items: [{ autogenerate: { directory: 'components' } }],
+        },
+        {
+          label: 'Use with AI',
+          translations: { es: 'Uso con IA' },
+          items: [{ autogenerate: { directory: 'ai' } }],
         },
         {
           label: 'Contribute',

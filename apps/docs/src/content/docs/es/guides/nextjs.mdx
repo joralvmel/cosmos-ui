@@ -1,0 +1,44 @@
+---
+title: Next.js
+description: Usa Cosmos UI con el App Router de Next.js, Server Components y Client Components.
+sidebar:
+  order: 2
+---
+
+import SetupSteps from '../../../../components/SetupSteps.astro';
+
+Los componentes de Cosmos son Web Components envueltos para React. Funcionan con el App Router siempre
+que se rendericen desde **Client Components**.
+
+## Instalación
+
+<SetupSteps stack="next" />
+
+## Server Components y Client Components
+
+- Los wrappers asignan propiedades y escuchan eventos en efectos, así que el archivo que importa
+  `@joralvmel/cosmos-react` debe empezar por `'use client'`.
+- Los Server Components pueden renderizar esos Client Components y pasarles props serializables
+  (texto, números, booleanos). Los handlers se quedan dentro del Client Component.
+- El HTML del servidor contiene la etiqueta del custom element y su texto; el elemento se activa en el
+  navegador.
+
+```tsx
+// app/page.tsx (Server Component)
+import { SaveButton } from './save-button';
+
+export default function Page() {
+  return <SaveButton />;
+}
+```
+
+## Evitar el parpadeo de tema
+
+`themeInitScript()` devuelve un script inline pequeño y validado que restaura el tema y el modo
+guardados por `setTheme()` / `setMode()` antes del primer pintado. Cárgalo con `next/script` y
+`strategy="beforeInteractive"` como arriba, y mantén `suppressHydrationWarning` en `<html>` porque el
+script puede cambiar `data-theme` / `data-mode` antes de la hidratación.
+
+## Tailwind
+
+Usa `@tailwindcss/postcss` con el [tema de Tailwind de Cosmos](../tailwind/).

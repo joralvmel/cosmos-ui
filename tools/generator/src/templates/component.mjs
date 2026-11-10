@@ -418,19 +418,6 @@ export default function ${n.pascal}Screen() {
 export const nativeScreenEntry = n =>
   `  { route: '/${n.kebab}', title: '${n.title}', description: 'TODO(generator): short description.' },\n`;
 
-export const elementsLlms = n => `
-## \`<${n.tag}>\`
-
-TODO(generator): one-line purpose. Import: \`import '@joralvmel/cosmos-elements/${n.kebab}';\`
-Props: \`disabled\`. Events: none. React \`<${n.pascal}>\`, Angular \`Cosm${n.pascal}Component\`.
-`;
-
-export const nativeLlms = n => `
-## \`${n.pascal}\`
-
-TODO(generator): one-line purpose. \`import { ${n.pascal} } from '@joralvmel/cosmos-native';\` Props: \`disabled\`.
-`;
-
 const docsBody = (n, locale, web) => {
   const es = locale === 'es';
   const up = es ? '../../../../components' : '../../../components';

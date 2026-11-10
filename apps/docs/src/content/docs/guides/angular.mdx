@@ -1,0 +1,56 @@
+---
+title: Angular
+description: Use Cosmos UI in Angular with standalone components, signals and forms.
+sidebar:
+  order: 3
+---
+
+import SetupSteps from '../../../components/SetupSteps.astro';
+
+`@joralvmel/cosmos-angular` provides one standalone component per Web Component, with the same
+selector (`cosm-button`…). Inputs set element properties; outputs re-emit the original `CustomEvent`.
+
+## Setup
+
+<SetupSteps stack="angular" />
+
+## Inputs, outputs and signals
+
+```ts
+import { Component, signal } from '@angular/core';
+import { CosmButtonComponent } from '@joralvmel/cosmos-angular';
+
+@Component({
+  selector: 'app-save',
+  imports: [CosmButtonComponent],
+  template: `
+    <cosm-button [loading]="saving()" variant="soft" (press)="save()">Save</cosm-button>
+  `,
+})
+export class SaveComponent {
+  readonly saving = signal(false);
+
+  save() {
+    this.saving.set(true);
+  }
+}
+```
+
+- Boolean inputs accept attributes (`loading`, `fullWidth`) and bindings (`[loading]="saving()"`).
+- Outputs use the contract names: `(press)`, `(valueChange)`, `(openChange)`… Read `$event.detail`.
+- The components work in zoneless applications.
+
+## Forms
+
+`<cosm-button type="submit">` submits the surrounding `<form>`. Form controls (text field, checkbox…)
+ship `ControlValueAccessor`s so they work with `formControlName` and `[(ngModel)]` as they become
+available (see the [component status](../../components/status/)).
+
+## All components at once
+
+```ts
+import { COSMOS_COMPONENTS } from '@joralvmel/cosmos-angular';
+
+@Component({ imports: [...COSMOS_COMPONENTS], template: '…' })
+export class Page {}
+```

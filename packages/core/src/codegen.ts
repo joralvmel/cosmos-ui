@@ -1,4 +1,4 @@
-import type { ComponentContract, Platform, PropSpec } from '@joralvmel/cosmos-core';
+import type { ComponentContract, Platform, PropSpec } from './contract.js';
 
 /** Code tabs of the Playground. */
 export const snippetTargets = ['html', 'react', 'angular', 'native'] as const;

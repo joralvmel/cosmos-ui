@@ -108,7 +108,6 @@ export function plan(target, n, options = {}) {
           path: `packages/elements/test/${n.kebab}.test.ts`,
           content: component.elementTest(n),
         },
-        { type: 'append', path: 'packages/elements/llms.md', content: component.elementsLlms(n) },
         {
           type: 'create',
           path: `packages/react/src/components/${n.kebab}.ts`,
@@ -147,7 +146,6 @@ export function plan(target, n, options = {}) {
           content: component.angularTest(n),
         },
         ...nativeOps(n),
-        { type: 'append', path: 'packages/native/llms.md', content: component.nativeLlms(n) },
         ...docsOps(n, true),
         { type: 'create', path: `.changeset/add-${n.kebab}.md`, content: component.changeset(n) },
       ];
@@ -155,7 +153,6 @@ export function plan(target, n, options = {}) {
       return [
         ...coreOps(n, ['native']),
         ...nativeOps(n),
-        { type: 'append', path: 'packages/native/llms.md', content: component.nativeLlms(n) },
         ...docsOps(n, false),
         {
           type: 'create',

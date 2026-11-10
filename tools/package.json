@@ -2,18 +2,23 @@
   "name": "@joralvmel/cosmos-tools",
   "version": "0.0.0",
   "private": true,
-  "description": "Repository tools of Cosmos UI: blocked terms, commit hygiene, GitHub setup, releases and component status.",
+  "description": "Repository tools of Cosmos UI: blocked terms, commit hygiene, GitHub setup, releases, component status and AI references.",
   "type": "module",
   "exports": {
     "./status": {
       "types": "./status/component-status.d.mts",
       "default": "./status/component-status.mjs"
+    },
+    "./ai": {
+      "types": "./ai/page-markdown.d.mts",
+      "default": "./ai/page-markdown.mjs"
     }
   },
   "scripts": {
     "test": "vitest run"
   },
   "devDependencies": {
-    "@joralvmel/cosmos-core": "^0.0.0"
+    "@joralvmel/cosmos-core": "^0.0.0",
+    "@joralvmel/cosmos-tokens": "^0.0.0"
   }
 }

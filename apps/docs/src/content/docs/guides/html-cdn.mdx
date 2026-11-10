@@ -1,0 +1,51 @@
+---
+title: HTML and CDN
+description: Use Cosmos UI Web Components in plain HTML, from a CDN or with any bundler.
+sidebar:
+  order: 4
+---
+
+import SetupSteps from '../../../components/SetupSteps.astro';
+
+The Web Components of `@joralvmel/cosmos-elements` work in any page: no framework needed.
+
+## Setup
+
+<SetupSteps stack="html" />
+
+## With a bundler
+
+```bash
+npm install @joralvmel/cosmos-elements @joralvmel/cosmos-tokens
+```
+
+```js
+import '@joralvmel/cosmos-tokens/tokens.css';
+import '@joralvmel/cosmos-elements/button'; // one import per component
+```
+
+## Properties, attributes and events
+
+- Styling props are attributes in kebab-case (`full-width`, `variant="soft"`); every prop is also a
+  JavaScript property (`button.fullWidth = true`).
+- Events are `cosm-*` `CustomEvent`s that bubble and cross shadow roots, so you can listen on a parent.
+- Theme hooks: `--cosm-<component>-*` custom properties and `::part()` selectors (see each component API).
+
+```html
+<form>
+  <cosm-button type="submit">Send</cosm-button>
+</form>
+<script type="module">
+  document.addEventListener('cosm-press', event => console.log(event.target, event.detail));
+</script>
+```
+
+## Switching theme and mode
+
+```html
+<script type="module">
+  import { setMode, setTheme } from 'https://esm.sh/@joralvmel/cosmos-tokens/runtime';
+  setTheme('nebula');
+  setMode('dark');
+</script>
+```

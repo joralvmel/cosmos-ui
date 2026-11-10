@@ -1,0 +1,34 @@
+---
+title: Tailwind CSS
+description: Style your app with Tailwind CSS v4 utilities mapped to Cosmos tokens and themes.
+sidebar:
+  order: 6
+---
+
+import SetupSteps from '../../../components/SetupSteps.astro';
+
+`@joralvmel/cosmos-tailwind` turns the Cosmos tokens into a Tailwind CSS v4 theme. Every utility follows
+the active theme and mode, and Cosmos components keep working without Tailwind.
+
+## Setup
+
+<SetupSteps stack="tailwind" />
+
+Plugins: Vite uses `@tailwindcss/vite`; Next.js and Angular use `@tailwindcss/postcss`.
+
+## Utilities
+
+| Group | Examples |
+| --- | --- |
+| Colors | `bg-bg`, `bg-surface`, `text-fg`, `text-fg-muted`, `bg-primary text-primary-fg`, `bg-danger-subtle text-danger-text`, `border-border`, `ring-focus-ring` |
+| Scales | `bg-primary-3`, `text-neutral-11` (steps 1–12) |
+| Spacing | `p-4` (= 4 × `--cosm-space-unit`), `gap-sm`, `px-lg` |
+| Shape | `rounded-sm` … `rounded-xl`, `rounded-full`, `shadow-sm` / `shadow-md` / `shadow-lg` |
+| Typography | `text-xs` … `text-4xl`, `font-semibold`, `leading-tight` |
+
+Default Tailwind colors (`bg-blue-500`…) are disabled so only theme colors are used.
+
+## Variants
+
+- `dark:` applies in dark mode, including `data-mode="system"` when the OS is dark.
+- `theme-<name>:` targets one theme, e.g. `theme-nebula:rounded-none`.

@@ -1,0 +1,55 @@
+---
+title: Servidor MCP
+description: Conecta asistentes de IA al servidor MCP de Cosmos UI para consultar componentes, temas, tokens e instalación.
+sidebar:
+  order: 3
+---
+
+import { TabItem, Tabs } from '@astrojs/starlight/components';
+
+`@joralvmel/cosmos-mcp` es un servidor [Model Context Protocol](https://modelcontextprotocol.io/)
+(stdio). Incluye los contratos, snippets, estado, temas y documentación de su versión, así que las
+respuestas coinciden con lo que instalas.
+
+## Conexión
+
+<Tabs syncKey="assistant">
+  <TabItem label="VS Code">
+    `npx @joralvmel/cosmos-cli init-ai` lo hace por ti, o añade a `.vscode/mcp.json`:
+
+    ```json
+    {
+      "servers": {
+        "cosmos-ui": { "type": "stdio", "command": "npx", "args": ["-y", "@joralvmel/cosmos-mcp"] }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Claude Code">
+    ```bash
+    claude mcp add cosmos-ui -- npx -y @joralvmel/cosmos-mcp
+    ```
+  </TabItem>
+  <TabItem label="Otros clientes">
+    Ejecuta el comando `npx -y @joralvmel/cosmos-mcp` como servidor stdio en la configuración de tu cliente.
+  </TabItem>
+</Tabs>
+
+## Herramientas
+
+| Herramienta | Argumentos | Devuelve |
+| --- | --- | --- |
+| `list_components` | `status?` (`planned`, `in-progress`, `stable`) | Todos los componentes del catálogo con categoría, plataformas, dependencias y estado. |
+| `get_component` | `name` | Contrato (props, eventos por plataforma, slots, partes, teclado), tabla de API, snippets para HTML, React, Angular y React Native, imports y estado. |
+| `list_themes` | — | Temas incluidos y sus modos. |
+| `get_tokens` | `theme?`, `mode?` | Tokens de color semánticos y radios de un tema y modo. |
+| `get_setup` | `framework` (`react`, `next`, `angular`, `html`, `react-native`, `tailwind`) | Comandos de instalación, código de configuración y reglas. |
+| `search_docs` | `query`, `limit?` | Páginas y referencias de paquetes que coinciden, con un extracto. |
+
+Recursos: `cosmos://llms/<paquete>` devuelve el `llms.md` de cada paquete.
+
+## Preguntas de ejemplo
+
+- "¿Qué componentes de Cosmos son estables y cuáles puedo usar para un formulario?"
+- "Enséñame el código Angular de un botón outline de tono danger en estado loading."
+- "¿Cuáles son los tokens del modo oscuro del tema nebula?"

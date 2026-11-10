@@ -1,0 +1,57 @@
+---
+title: Angular
+description: Usa Cosmos UI en Angular con componentes standalone, signals y formularios.
+sidebar:
+  order: 3
+---
+
+import SetupSteps from '../../../../components/SetupSteps.astro';
+
+`@joralvmel/cosmos-angular` ofrece un componente standalone por cada Web Component, con el mismo
+selector (`cosm-button`…). Los inputs asignan propiedades del elemento y los outputs reemiten el
+`CustomEvent` original.
+
+## Instalación
+
+<SetupSteps stack="angular" />
+
+## Inputs, outputs y signals
+
+```ts
+import { Component, signal } from '@angular/core';
+import { CosmButtonComponent } from '@joralvmel/cosmos-angular';
+
+@Component({
+  selector: 'app-guardar',
+  imports: [CosmButtonComponent],
+  template: `
+    <cosm-button [loading]="guardando()" variant="soft" (press)="guardar()">Guardar</cosm-button>
+  `,
+})
+export class GuardarComponent {
+  readonly guardando = signal(false);
+
+  guardar() {
+    this.guardando.set(true);
+  }
+}
+```
+
+- Los inputs booleanos aceptan atributos (`loading`, `fullWidth`) y bindings (`[loading]="guardando()"`).
+- Los outputs usan los nombres del contrato: `(press)`, `(valueChange)`, `(openChange)`… Lee `$event.detail`.
+- Los componentes funcionan en aplicaciones zoneless.
+
+## Formularios
+
+`<cosm-button type="submit">` envía el `<form>` que lo contiene. Los controles de formulario (campo de
+texto, checkbox…) incluyen `ControlValueAccessor` para funcionar con `formControlName` y `[(ngModel)]`
+a medida que estén disponibles (ver el [estado de los componentes](../../components/status/)).
+
+## Todos los componentes a la vez
+
+```ts
+import { COSMOS_COMPONENTS } from '@joralvmel/cosmos-angular';
+
+@Component({ imports: [...COSMOS_COMPONENTS], template: '…' })
+export class Page {}
+```

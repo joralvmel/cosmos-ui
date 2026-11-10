@@ -83,16 +83,12 @@ describe('component target', () => {
     expect(catalog.match(/name: 'date-picker'/g)).toHaveLength(1);
   });
 
-  it('adds a catalog entry and llms.md sections for components that are not planned yet', () => {
+  it('adds a catalog entry for components that are not planned yet', () => {
     const root = copyRepoFiles();
     apply(root, plan('component', names('chip')));
     expect(readFileSync(join(root, 'packages/core/src/catalog.ts'), 'utf8')).toContain(
       "entry({ name: 'chip', title: 'Chip'"
     );
-    expect(readFileSync(join(root, 'packages/elements/llms.md'), 'utf8')).toContain(
-      '`<cosm-chip>`'
-    );
-    expect(readFileSync(join(root, 'packages/native/llms.md'), 'utf8')).toContain('`Chip`');
   });
 
   it('generates files that follow the component anatomy', () => {

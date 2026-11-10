@@ -1,0 +1,59 @@
+---
+title: Prompts listos
+description: Prompts para copiar y construir interfaces con Cosmos en React, Next.js, Angular, HTML y React Native.
+sidebar:
+  order: 2
+---
+
+import { TabItem, Tabs } from '@astrojs/starlight/components';
+
+Copia un prompt, sustituye la parte entre ángulos y pégalo en tu asistente. Suponen que ejecutaste
+[`init-ai`](../overview/) o que el asistente puede leer `llms.txt` o el servidor MCP.
+
+<Tabs syncKey="platform">
+  <TabItem label="React">
+    ```text
+    Usando Cosmos UI (@joralvmel/cosmos-react) en esta app de React + Vite, construye <una página de
+    ajustes con un formulario y un botón de guardar>. Comprueba cada componente con el servidor MCP
+    cosmos-ui (get_component) antes de usarlo, gestiona los eventos con event.detail, estila el layout con
+    tokens de Cosmos o su tema de Tailwind, soporta modo claro y oscuro y mantén el acceso por teclado.
+    ```
+  </TabItem>
+  <TabItem label="Next.js">
+    ```text
+    Usando Cosmos UI (@joralvmel/cosmos-react) en este proyecto Next.js con App Router, construye <una
+    cabecera de panel con acciones>. Pon los componentes de Cosmos en Client Components ('use client'),
+    deja las páginas como Server Components, carga @joralvmel/cosmos-tokens/tokens.css en app/layout.tsx y
+    usa themeInitScript() para evitar el parpadeo de tema. Comprueba las props con el servidor MCP cosmos-ui.
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```text
+    Usando Cosmos UI (@joralvmel/cosmos-angular) en esta app Angular standalone, construye <un formulario
+    de perfil>. Importa los componentes standalone de Cosmos que necesites, enlaza inputs con signals,
+    escucha outputs con $event.detail y mantén los formularios accesibles. Comprueba cada componente con el
+    servidor MCP cosmos-ui.
+    ```
+  </TabItem>
+  <TabItem label="HTML">
+    ```text
+    Construye <una sección de landing> en HTML con los Web Components de Cosmos UI desde un CDN
+    (@joralvmel/cosmos-elements y @joralvmel/cosmos-tokens). Usa elementos <cosm-*>, escucha eventos
+    cosm-*, define data-theme y data-mode en <html> y usa solo tokens var(--cosm-*) en el CSS propio.
+    ```
+  </TabItem>
+  <TabItem label="React Native">
+    ```text
+    Usando Cosmos UI (@joralvmel/cosmos-native) en esta app de Expo, construye <una pantalla de login>.
+    Envuelve la app en CosmosThemeProvider con mode="system", usa useTheme() para estilos propios,
+    mantén áreas táctiles de al menos 44 puntos y etiquetas de accesibilidad. Comprueba cada componente
+    con el servidor MCP cosmos-ui.
+    ```
+  </TabItem>
+</Tabs>
+
+## Prompts para la propia librería
+
+Para añadir o cambiar componentes en el repositorio de Cosmos, usa los agentes y prompts del
+repositorio (`/create-component`, `/component-status`…): ver
+[Trabajar con agentes](../../contribute/working-with-agents/).

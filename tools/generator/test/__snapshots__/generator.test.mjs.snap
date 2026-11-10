@@ -11,18 +11,7 @@ export {
   chipScenariosFor,
 } from './specs/chip.scenarios.js';
 ",
-  "append packages/elements/llms.md": "
-## \`<cosm-chip>\`
-
-TODO(generator): one-line purpose. Import: \`import '@joralvmel/cosmos-elements/chip';\`
-Props: \`disabled\`. Events: none. React \`<Chip>\`, Angular \`CosmChipComponent\`.
-",
   "append packages/elements/src/index.ts": "export { CosmChip } from './components/chip/cosm-chip.js';
-",
-  "append packages/native/llms.md": "
-## \`Chip\`
-
-TODO(generator): one-line purpose. \`import { Chip } from '@joralvmel/cosmos-native';\` Props: \`disabled\`.
 ",
   "append packages/native/src/index.ts": "export { Chip, type ChipProps, chipPropNames } from './components/chip.js';
 ",

@@ -25,7 +25,7 @@ Names below use `chip` as example: kebab `chip`, Pascal `Chip`, camel `chip`, ta
 | React Native tests | `packages/native/test/chip.test.tsx` | native |
 | Native demo screen | `apps/native-demo/app/chip.tsx` (+ entry in `src/screens.ts`) | native |
 | Docs pages | `apps/docs/src/content/docs/components/chip.mdx` and `…/es/components/chip.mdx` | all |
-| AI reference | a `cosm-chip` section in `packages/elements/llms.md` (web) / `Chip` in `packages/native/llms.md` (native) | all |
+| AI reference | generated from the contract into `packages/*/llms.md` by `npm run llms` (the generator runs it) | all |
 | Changeset | `.changeset/add-chip.md` | all |
 
 ## 2. Order inside each file

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/*/llms.md",
+        "$TURBO_ROOT$/packages/*/src/**",
+        "$TURBO_ROOT$/packages/*/test/**",
+        "$TURBO_ROOT$/apps/docs/src/content/**",
+        "$TURBO_ROOT$/apps/native-demo/app/**",
+        "$TURBO_ROOT$/.changeset/*.md",
+        "$TURBO_ROOT$/tools/status/**",
+        "$TURBO_ROOT$/tools/ai/**"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": []
+    }
+  }
+}

@@ -1,8 +1,9 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { contracts, supports } from '@joralvmel/cosmos-core';
+import { contracts, setupGuide, stacks, supports } from '@joralvmel/cosmos-core';
 import { describe, expect, it } from 'vitest';
+import { t } from '../src/components/i18n';
 
 const docs = fileURLToPath(new URL('../src/content/docs/', import.meta.url));
 
@@ -13,6 +14,27 @@ function pages(dir: string): string[] {
     return /\.mdx?$/.test(entry.name) ? [relative(docs, path).replaceAll('\\', '/')] : [];
   });
 }
+
+describe('framework guides', () => {
+  it('exist for every stack in English and Spanish and render the shared setup steps', () => {
+    for (const stack of stacks) {
+      const slug = setupGuide(stack).guide.replace(/\/$/, '');
+      for (const locale of ['', 'es/']) {
+        const file = join(docs, `${locale}${slug}.mdx`);
+        expect(existsSync(file), file).toBe(true);
+        expect(readFileSync(file, 'utf8')).toContain(`<SetupSteps stack="${stack}" />`);
+      }
+    }
+  });
+
+  it('translate every setup step title', () => {
+    const titles = t('es').setupTitles as Record<string, string>;
+    for (const stack of stacks) {
+      for (const step of setupGuide(stack).steps)
+        expect(titles[step.title], step.title).toBeTruthy();
+    }
+  });
+});
 
 describe('docs content', () => {
   it('has a Spanish page for every English page', () => {

@@ -9,5 +9,6 @@
   exactly: the tests generate `chip` and `bottom-sheet` in a sandbox, run the anatomy checker
   (`tools/status/anatomy.mjs`) and compare the output with a snapshot
   (`test/__snapshots__/`). Update the snapshot with `npx vitest run -u` only for intended changes.
-- Components not yet in `packages/core/src/catalog.ts` get a catalog entry; `llms.md` gets a section.
+- Components not yet in `packages/core/src/catalog.ts` get a catalog entry. After writing, the CLI
+  runs `npm run llms` so the AI references (`packages/*/llms.md`) include the new contract.
 - Keep templates in sync with the conventions in `.github/instructions/`.
