@@ -1,6 +1,8 @@
 ---
-import { type ComponentContract, contracts } from '@joralvmel/cosmos-core';
-import { t, toAttribute } from './i18n';
+import { type ComponentContract, contracts, supports } from '@joralvmel/cosmos-core';
+import { builtInThemes } from '@joralvmel/cosmos-tokens';
+import { getStatusReport } from '@joralvmel/cosmos-tools/status';
+import { t } from './i18n';
 
 interface Props {
   name: keyof typeof contracts;
@@ -13,76 +15,47 @@ const contract: ComponentContract = contracts[name];
 const s = t(Astro.currentLocale);
 // Dynamic custom element tag; typed as a generic element for the Astro checker.
 const Element = contract.tag as unknown as 'div';
-const controls = Object.entries(contract.props).filter(
-  ([, spec]) => !spec.platforms || spec.platforms.includes('web')
-);
+const web = supports(contract, 'web');
+const hasDemo = getStatusReport().components.find(item => item.name === name)?.pieces.nativeDemo;
+const nativeDemoUrl = hasDemo
+  ? `https://github.com/joralvmel/cosmos-ui/blob/develop/apps/native-demo/app/${name}.tsx`
+  : '';
+const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.label }));
 ---
 
-<div class="cosm-playground" data-playground data-tag={contract.tag} data-content={content}>
-  <div class="cosm-preview not-content" data-cosm-preview data-theme="cosmos" data-mode="light">
-    <Element data-playground-target>{content}</Element>
-  </div>
-  <fieldset class="cosm-playground-controls not-content">
-    <legend>{s.controls}</legend>
-    {
-      controls.map(([prop, spec]) => (
-        <label>
-          <span>{prop}</span>
-          {spec.type === 'enum' ? (
-            <select data-prop={prop} data-attr={toAttribute(prop)} data-default={spec.default}>
-              {spec.values.map(value => (
-                <option value={value} selected={value === spec.default}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          ) : spec.type === 'boolean' ? (
-            <input type="checkbox" data-prop={prop} data-attr={toAttribute(prop)} />
-          ) : (
-            <input
-              type={spec.type === 'number' ? 'number' : 'text'}
-              data-prop={prop}
-              data-attr={toAttribute(prop)}
-            />
-          )}
-        </label>
-      ))
-    }
-  </fieldset>
-  <p class="cosm-playground-code-title">{s.code}</p>
-  <pre class="cosm-playground-code"><code data-playground-code /></pre>
+<div
+  class="cosm-playground"
+  data-playground
+  data-name={name}
+  data-content={content}
+  data-labels={JSON.stringify(s.playground)}
+  data-themes={JSON.stringify(themes)}
+  data-native-demo={nativeDemoUrl}
+>
+  {
+    web && (
+      <div class="cosm-preview not-content" data-cosm-preview data-theme="cosmos" data-mode="light">
+        <Element data-playground-target>{content}</Element>
+      </div>
+    )
+  }
+  <noscript><p>{s.playground.noScript}</p></noscript>
 </div>
 
 <script>
   import '@joralvmel/cosmos-elements';
+  import { contracts } from '@joralvmel/cosmos-core';
+  import { initPlayground } from '../lib/playground';
 
-  // Builds the markup snippet with textContent only (no HTML injection).
   for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
-    const tag = root.dataset.tag ?? '';
-    const target = root.querySelector<HTMLElement>('[data-playground-target]');
-    const code = root.querySelector('[data-playground-code]');
-    const inputs = [...root.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-prop]')];
-    if (!target || !code) continue;
-
-    const update = () => {
-      const attributes: string[] = [];
-      for (const input of inputs) {
-        const prop = input.dataset.prop ?? '';
-        const attr = input.dataset.attr ?? prop;
-        if (input instanceof HTMLInputElement && input.type === 'checkbox') {
-          Reflect.set(target, prop, input.checked);
-          if (input.checked) attributes.push(attr);
-        } else if (input.value === '' || input.value === input.dataset.default) {
-          Reflect.set(target, prop, input.dataset.default ?? undefined);
-        } else {
-          Reflect.set(target, prop, input instanceof HTMLInputElement && input.type === 'number' ? Number(input.value) : input.value);
-          attributes.push(`${attr}="${input.value}"`);
-        }
-      }
-      const open = [tag, ...attributes].join(' ');
-      code.textContent = `<${open}>${root.dataset.content ?? ''}</${tag}>`;
-    };
-    for (const input of inputs) input.addEventListener('input', update);
-    update();
+    const contract = contracts[root.dataset.name as keyof typeof contracts];
+    if (!contract) continue;
+    initPlayground(root, {
+      contract,
+      content: root.dataset.content ?? '',
+      labels: JSON.parse(root.dataset.labels ?? '{}'),
+      themes: JSON.parse(root.dataset.themes ?? '[]'),
+      nativeDemoUrl: root.dataset.nativeDemo || undefined,
+    });
   }
 </script>

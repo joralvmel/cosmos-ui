@@ -1,6 +1,6 @@
 ---
 name: add-playground
-description: 'Adds or extends an interactive playground for a component in the docs, driven by its contract.'
+description: 'Adds the interactive Playground to a component page: controls generated from the contract, code tabs for HTML, React, Angular and React Native, copy button, theme/mode pickers and the native demo link.'
 argument-hint: 'Component name'
 agent: agent
 ---
