@@ -1,0 +1,73 @@
+# Labels applied to pull requests by changed paths (.github/workflows/labeler.yml).
+# Every label must exist in tools/github/labels.mjs.
+
+"pkg:tokens":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/tokens/**"]
+"pkg:tailwind":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/tailwind/**"]
+"pkg:core":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/core/**"]
+"pkg:elements":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/elements/**"]
+"pkg:react":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/react/**"]
+"pkg:angular":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/angular/**"]
+"pkg:native":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/native/**"]
+"pkg:charts-core":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/charts-core/**"]
+"pkg:charts":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/charts/**"]
+"pkg:charts-native":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/charts-native/**"]
+"pkg:icons":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/icons/**"]
+"pkg:i18n":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/i18n/**"]
+"pkg:mcp":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/mcp/**"]
+"pkg:cli":
+  - changed-files:
+      - any-glob-to-any-file: ["packages/cli/**"]
+"app:docs":
+  - changed-files:
+      - any-glob-to-any-file: ["apps/docs/**"]
+"app:native-demo":
+  - changed-files:
+      - any-glob-to-any-file: ["apps/native-demo/**"]
+"area:tools":
+  - changed-files:
+      - any-glob-to-any-file: ["tools/**"]
+"area:ai-layer":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/agents/**"
+          - ".github/skills/**"
+          - ".github/prompts/**"
+          - ".github/instructions/**"
+          - ".github/copilot-instructions.md"
+          - "AGENTS.md"
+          - "**/AGENTS.md"
+          - "**/llms.md"
+          - "llms.txt"
+"ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          [".github/workflows/**", ".github/dependabot.yml", ".github/labeler.yml"]
+"type:docs":
+  - changed-files:
+      - any-glob-to-any-file: ["docs/**", "README.md", "CONTRIBUTING.md"]

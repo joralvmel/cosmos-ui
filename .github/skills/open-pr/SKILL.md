@@ -1,6 +1,6 @@
 ---
 name: open-pr
-description: 'Opens a pull request against develop with the template, after verifying identity and pushing the branch.'
+description: 'Opens a pull request for an existing pushed branch (develop for work branches, main only for release PRs). Prefer finish-work, which validates first.'
 ---
 
 # open-pr
@@ -15,8 +15,9 @@ Main agent: `github-ops`. Read `AGENTS.md` first.
 ## Steps
 
 1. Run `verify-identity` (including the `gh` account and remote).
-2. Push the branch (`git push -u origin <branch>`); never force-push without confirmation.
-3. Open the PR against `develop` with `.github/pull_request_template.md`, linking issues and listing validation.
+2. Choose the base: `develop` for `feat|fix|docs|chore|refactor|test/*` branches; `main` only for `develop` (use `release-pr`).
+3. Push if needed (`git push -u origin <branch>`); never force-push without confirmation.
+4. `gh pr create --base <base>` with `.github/pull_request_template.md` filled, linked issues and the validation that was run.
 
 ## Files
 
@@ -24,6 +25,7 @@ Main agent: `github-ops`. Read `AGENTS.md` first.
 
 ## Checklist
 
+- [ ] Correct base branch
 - [ ] Template complete
 - [ ] CI started
 

@@ -1,6 +1,6 @@
 ---
 name: open-pr
-description: 'Opens a pull request against develop with the template, after verifying identity and pushing the branch.'
+description: 'Opens a pull request for an existing pushed branch (develop for work branches, main only for release PRs). Prefer finish-work, which validates first.'
 argument-hint: 'Branch'
 agent: agent
 ---

@@ -1,0 +1,44 @@
+name: Component request
+description: Propose a new component or a new capability of an existing one.
+labels: ["type:component", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Check the [component status](https://joralvmel.github.io/cosmos-ui/components/status/) first; the component may already be planned.
+  - type: input
+    id: name
+    attributes:
+      label: Component name
+      description: kebab-case, without the `cosm-` prefix.
+      placeholder: date-range-picker
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose
+      description: What problem does it solve? When should (and should not) it be used?
+    validations:
+      required: true
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Platforms
+      options:
+        - label: Web Component (and React / Angular wrappers)
+        - label: React Native
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API (optional)
+      description: Props, events, slots, keyboard interaction.
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: WAI-ARIA APG pattern, specifications or public libraries with similar components.
+  - type: input
+    id: design
+    attributes:
+      label: Design (optional)
+      description: Figma link or image URL.

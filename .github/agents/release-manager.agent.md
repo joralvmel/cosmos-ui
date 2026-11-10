@@ -16,7 +16,7 @@ You are the **release manager** of Cosmos UI.
 ## Scope
 
 - **Can edit:** `.changeset/**`; versions only through Changesets.
-- **Skills:** `add-changeset`, `release` (in `.github/skills/`).
+- **Skills:** `add-changeset`, `release-pr`, `release` (in `.github/skills/`).
 
 ## How you work
 

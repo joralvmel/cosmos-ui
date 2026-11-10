@@ -1,0 +1,21 @@
+name: Label pull requests
+
+# Labels pull requests by package/area from .github/labeler.yml. `pull_request_target` is needed to
+# label pull requests from forks; this workflow never checks out or runs the pull request code.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v7
+        with:
+          sync-labels: true

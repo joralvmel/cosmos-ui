@@ -1,0 +1,63 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      # TypeScript, Angular and Expo/React Native are pinned on purpose (see AGENTS.md): only patches.
+      pinned-stack:
+        patterns:
+          - "typescript"
+          - "@angular/*"
+          - "expo"
+          - "expo-*"
+          - "@expo/*"
+          - "react-native"
+          - "react-native-*"
+          - "react"
+          - "react-dom"
+        update-types: ["patch"]
+      tooling:
+        patterns:
+          - "@biomejs/*"
+          - "turbo"
+          - "vitest"
+          - "happy-dom"
+          - "@changesets/*"
+          - "@types/*"
+          - "astro"
+          - "@astrojs/*"
+        update-types: ["minor", "patch"]
+      runtime:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-native"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: "expo"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    labels: ["dependencies", "ci"]
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
