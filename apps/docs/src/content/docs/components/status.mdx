@@ -1,0 +1,26 @@
+---
+title: Component status
+description: Inventory of every planned Cosmos component, with what exists on each platform.
+sidebar:
+  order: 0
+---
+
+import StatusTable from '../../../components/StatusTable.astro';
+
+This page is generated from the repository on every build: the canonical list lives in
+`packages/core/src/catalog.ts` and `npm run status` detects which pieces exist for each component
+(contract, scenarios, each platform, tests, docs, AI reference and changeset).
+
+- **Stable**: every piece exists for every platform of the component.
+- **In progress**: some pieces exist.
+- **Planned**: nothing exists yet. A planned component can start when its dependencies are stable.
+
+<StatusTable />
+
+Run it locally:
+
+```bash
+npm run status              # table
+npm run status -- --markdown
+npm run status -- --json
+```

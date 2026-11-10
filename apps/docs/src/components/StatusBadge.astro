@@ -1,0 +1,25 @@
+---
+import { getStatusReport } from '@joralvmel/cosmos-tools/status';
+import { t } from './i18n';
+
+interface Props {
+  name: string;
+}
+
+/** Status badge of a component, computed from the repository at build time. */
+const s = t(Astro.currentLocale);
+const item = getStatusReport().components.find(component => component.name === Astro.props.name);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const prefix = Astro.currentLocale === 'es' ? '/es' : '';
+---
+
+{
+  item && (
+    <p class="cosm-status-line not-content">
+      <a href={`${base}${prefix}/components/status/`} class="cosm-status-badge" data-status={item.status}>
+        {s.status}: {s.statusLabels[item.status]}
+      </a>
+      <span class="cosm-status-platforms">{item.platforms.join(' · ')}</span>
+    </p>
+  )
+}

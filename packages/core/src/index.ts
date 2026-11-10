@@ -1,4 +1,12 @@
 export {
+  buildOrder,
+  type CatalogEntry,
+  type ComponentCategory,
+  type ComponentStatus,
+  catalog,
+  catalogEntry,
+} from './catalog.js';
+export {
   type ComponentContract,
   type ContractProps,
   defaults,

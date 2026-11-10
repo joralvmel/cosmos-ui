@@ -1,0 +1,65 @@
+---
+import { getStatusReport, PIECES, type PieceKey } from '@joralvmel/cosmos-tools/status';
+import { t } from './i18n';
+
+/** Component status table, computed from the repository at build time (`npm run status`). */
+const s = t(Astro.currentLocale);
+const report = getStatusReport();
+const keys = Object.keys(PIECES) as PieceKey[];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const prefix = Astro.currentLocale === 'es' ? '/es' : '';
+const mark = (value: boolean | undefined) => (value === undefined ? '—' : value ? '✓' : '✗');
+const label = (value: boolean | undefined) =>
+  value === undefined ? s.notApplicable : value ? '✓' : '✗';
+---
+
+<p class="cosm-status-summary">
+  {s.summary(report.summary.stable, report.summary.inProgress, report.summary.planned)}
+</p>
+<p>
+  <strong>{s.next}:</strong>{' '}
+  {report.next.map((name, index) => <>{index > 0 && ', '}<code>{name}</code></>)}
+</p>
+
+<div class="cosm-status-table">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">{s.component}</th>
+        <th scope="col">{s.status}</th>
+        <th scope="col">{s.priority}</th>
+        {keys.map(key => <th scope="col">{PIECES[key]}</th>)}
+        <th scope="col">{s.dependsOn}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        report.components.map(item => (
+          <tr>
+            <th scope="row">
+              {item.pieces.docsEn ? (
+                <a href={`${base}${prefix}/components/${item.name}/`}>{item.title}</a>
+              ) : (
+                item.title
+              )}
+            </th>
+            <td>
+              <span class="cosm-status-badge" data-status={item.status}>
+                {s.statusLabels[item.status]}
+              </span>
+            </td>
+            <td>{item.priority}</td>
+            {keys.map(key => (
+              <td>
+                <span aria-label={`${PIECES[key]}: ${label(item.pieces[key])}`}>
+                  {mark(item.pieces[key])}
+                </span>
+              </td>
+            ))}
+            <td>{item.dependsOn.join(', ') || '—'}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

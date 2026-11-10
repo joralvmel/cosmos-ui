@@ -1,0 +1,27 @@
+---
+title: Estado de los componentes
+description: Inventario de todos los componentes planificados de Cosmos y de lo que existe en cada plataforma.
+sidebar:
+  order: 0
+---
+
+import StatusTable from '../../../../components/StatusTable.astro';
+
+Esta página se genera desde el repositorio en cada build: la lista canónica está en
+`packages/core/src/catalog.ts` y `npm run status` detecta qué piezas existen para cada componente
+(contrato, escenarios, cada plataforma, tests, documentación, referencia para IA y changeset).
+
+- **Estable**: existen todas las piezas para todas las plataformas del componente.
+- **En progreso**: existen algunas piezas.
+- **Planificado**: todavía no existe nada. Un componente planificado puede empezar cuando sus
+  dependencias son estables.
+
+<StatusTable />
+
+Ejecútalo en local:
+
+```bash
+npm run status              # tabla
+npm run status -- --markdown
+npm run status -- --json
+```

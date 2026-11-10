@@ -4,7 +4,16 @@
   "tasks": {
     "build": {
       "env": ["COSMOS_DOCS_URL"],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/llms.txt", "$TURBO_ROOT$/packages/*/llms.md"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/llms.txt",
+        "$TURBO_ROOT$/packages/*/llms.md",
+        "$TURBO_ROOT$/packages/*/src/**",
+        "$TURBO_ROOT$/packages/*/test/**",
+        "$TURBO_ROOT$/apps/native-demo/app/**",
+        "$TURBO_ROOT$/.changeset/*.md",
+        "$TURBO_ROOT$/tools/status/**"
+      ],
       "outputs": ["dist/**"]
     }
   }

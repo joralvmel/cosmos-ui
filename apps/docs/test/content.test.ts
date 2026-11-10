@@ -29,6 +29,7 @@ describe('docs content', () => {
         const content = readFileSync(file, 'utf8');
         expect(content).toContain(`<ApiTable name="${name}" />`);
         expect(content).toContain(`<Playground name="${name}"`);
+        expect(content).toContain(`<StatusBadge name="${name}" />`);
       }
     }
   });

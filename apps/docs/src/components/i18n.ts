@@ -20,6 +20,15 @@ const strings = {
     theme: 'Cosmos theme',
     controls: 'Controls',
     code: 'Code',
+    component: 'Component',
+    status: 'Status',
+    priority: 'Priority',
+    dependsOn: 'Depends on',
+    next: 'Suggested next',
+    statusLabels: { stable: 'Stable', 'in-progress': 'In progress', planned: 'Planned' },
+    summary: (stable: number, progress: number, planned: number) =>
+      `${stable} stable · ${progress} in progress · ${planned} planned`,
+    notApplicable: 'Not applicable',
   },
   es: {
     props: 'Propiedades',
@@ -41,6 +50,15 @@ const strings = {
     theme: 'Tema Cosmos',
     controls: 'Controles',
     code: 'Código',
+    component: 'Componente',
+    status: 'Estado',
+    priority: 'Prioridad',
+    dependsOn: 'Depende de',
+    next: 'Siguientes sugeridos',
+    statusLabels: { stable: 'Estable', 'in-progress': 'En progreso', planned: 'Planificado' },
+    summary: (stable: number, progress: number, planned: number) =>
+      `${stable} estables · ${progress} en progreso · ${planned} planificados`,
+    notApplicable: 'No aplica',
   },
 } as const;
 

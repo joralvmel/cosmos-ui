@@ -38,6 +38,9 @@ npm run lint                              # Biome + blocked-terms check
 npm run lint:fix                          # Biome autofix
 npx biome ci . && npx turbo run typecheck test build                     # what CI runs
 npm run generate -- <component|native|chart|theme> <kebab-name> [--dry-run]
+npm run status                            # component inventory (--json, --markdown)
+npm run check-packs                       # publishable manifests + npm pack --dry-run
+npm run setup-repo                        # GitHub settings dry run (--apply to change them)
 npm run docs                              # docs site on http://localhost:4321
 ```
 
@@ -65,6 +68,10 @@ with `npx vitest run` (Turborepo filters do it for you).
 10. **Identity.** Commits use the identity of the collaborator; the personal control is local
     (`.local/git-identity.json`, checked by the `pre-commit` hook and the `verify-identity` skill);
     never `--no-verify`.
+11. **Inventory first.** `packages/core/src/catalog.ts` lists every planned component and
+    `npm run status` reports what exists. Before using a component inside another, check it: if it is
+    stable, use it; if not, use the accessible native primitive, add the dependency to the catalog
+    entry (`dependsOn`) and a traceable note (`notes`). Never leave TODOs in component code.
 
 ## 4. Workflow for any change
 

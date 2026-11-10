@@ -2,9 +2,18 @@
   "name": "@joralvmel/cosmos-tools",
   "version": "0.0.0",
   "private": true,
-  "description": "Repository checks of Cosmos UI: blocked terms, Git identity and commit messages.",
+  "description": "Repository tools of Cosmos UI: blocked terms, commit hygiene, GitHub setup, releases and component status.",
   "type": "module",
+  "exports": {
+    "./status": {
+      "types": "./status/component-status.d.mts",
+      "default": "./status/component-status.mjs"
+    }
+  },
   "scripts": {
     "test": "vitest run"
+  },
+  "devDependencies": {
+    "@joralvmel/cosmos-core": "^0.0.0"
   }
 }
