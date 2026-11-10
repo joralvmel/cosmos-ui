@@ -46,7 +46,7 @@
     "@biomejs/biome": "^2.6.6",
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.6",
     "happy-dom": "^21.0.4",
     "turbo": "^2.11.10",
     "typescript": "~6.0.3",
