@@ -15,6 +15,7 @@ export const requiredChecks = [
   'Lint, terms, typecheck, test & build',
   'Changeset present',
   'Commit emails and PR title',
+  'Build docs',
 ];
 
 export const MANUAL_STEPS = [

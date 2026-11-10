@@ -44,6 +44,11 @@ export default defineConfig({
           translations: { es: 'Componentes' },
           items: [{ autogenerate: { directory: 'components' } }],
         },
+        {
+          label: 'Contribute',
+          translations: { es: 'Contribuir' },
+          items: [{ autogenerate: { directory: 'contribute' } }],
+        },
       ],
     }),
   ],

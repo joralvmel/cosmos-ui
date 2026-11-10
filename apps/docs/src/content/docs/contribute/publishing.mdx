@@ -1,0 +1,95 @@
+---
+title: Release and publishing
+description: How Cosmos UI is versioned and published to npm, and the one-time setup for maintainers.
+sidebar:
+  order: 6
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Cosmos UI uses [Changesets](https://github.com/changesets/changesets) for versions and changelogs and
+publishes to the public npm registry with
+[trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC, no npm token) and
+[provenance](https://docs.npmjs.com/generating-provenance-statements).
+
+## How releases work
+
+<Steps>
+
+1. Every pull request that changes `packages/*` adds a changeset (`npm run changeset`).
+2. When `develop` is ready, a maintainer opens the release pull request `develop → main`
+   (skill `release-pr`) and merges it with a **merge commit**.
+3. On `main`, the `Release` workflow opens or updates the **Version Packages** pull request: it bumps
+   versions and writes the changelogs.
+4. Merging **Version Packages** runs `changeset publish`: new versions go to npm with provenance, Git
+   tags are pushed and a GitHub Release is created per package.
+5. The `Docs` workflow deploys the documentation site from `main`.
+
+</Steps>
+
+Prereleases: run the `Release` workflow manually on `develop` (Actions → Release → Run workflow). It
+publishes a snapshot such as `0.2.0-next-20261110120000` with the dist-tag `next`:
+
+```bash
+npm install @joralvmel/cosmos-react@next
+```
+
+## One-time setup (maintainers)
+
+The skill `publish-setup` walks an agent through the same checklist.
+
+<Steps>
+
+1. **npm account.** Create an account on [npmjs.com](https://www.npmjs.com/signup), verify the email
+   and enable two-factor authentication (Account → Two-Factor Authentication, "Authorization and
+   writes"). The scope `@joralvmel` is the account's user scope.
+
+2. **Check the packages.**
+
+   ```bash
+   npm ci
+   npm run check-packs     # builds, validates manifests and runs npm pack --dry-run
+   npm run publish-order   # dependencies first
+   ```
+
+3. **First publication by hand.** Trusted publishing can only be configured for packages that exist.
+   Publish the current version of every package once, in the order printed above:
+
+   ```bash
+   npm login
+   cd packages/core && npm publish --access public --otp <code> && cd ../..
+   # …repeat for each package in publish order
+   ```
+
+   The first version is a placeholder (`0.0.0`); you can mark it with
+   `npm deprecate @joralvmel/cosmos-core@0.0.0 "placeholder"`.
+
+4. **Trusted publisher per package.** On npmjs.com open each package → Settings → Trusted Publisher →
+   GitHub Actions and enter: owner `joralvmel`, repository `cosmos-ui`, workflow `release.yml`,
+   environment `npm`. Then, under "Publishing access", choose
+   "Require two-factor authentication and disallow tokens".
+
+5. **GitHub.** In the repository settings:
+   - Environments → create `npm` (optionally with required reviewers).
+   - Secrets and variables → Actions → Variables: `COSMOS_PUBLISH_ENABLED` = `true`.
+   - For the docs site: Pages → Source "GitHub Actions" and the variable `COSMOS_DOCS_ENABLED` = `true`.
+
+6. **Verify** after the first automated release:
+
+   ```bash
+   npm view @joralvmel/cosmos-core versions dist-tags
+   npm audit signatures   # inside a project that installed the packages
+   ```
+
+   The package page on npmjs.com shows the provenance badge linking to the workflow run.
+
+</Steps>
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| `E404` / `ENEEDAUTH` on publish | The trusted publisher does not match: check owner, repository, workflow file name and environment. |
+| No "Version Packages" pull request | Allow GitHub Actions to create pull requests (`npm run setup-repo -- --apply` does it). |
+| Workflow skipped | `COSMOS_PUBLISH_ENABLED` is not `true`. |
+| `check-packs` fails | A manifest misses `publishConfig.access`, `files`, `exports`, `repository`, `license` or `llms.md`. |

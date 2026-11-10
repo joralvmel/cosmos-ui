@@ -26,6 +26,8 @@
     "release": "turbo run build --filter=./packages/* && changeset publish",
     "generate": "node tools/generator/src/cli.mjs",
     "setup-repo": "node tools/github/setup-repo.mjs",
+    "publish-order": "node tools/release/packages.mjs --order",
+    "check-packs": "turbo run build --filter=./packages/* && node tools/release/packages.mjs --check",
     "docs": "turbo run dev --filter=@joralvmel/cosmos-docs...",
     "prepare": "node tools/git/install-hooks.mjs"
   },

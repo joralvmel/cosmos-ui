@@ -51,6 +51,9 @@ jobs:
         env:
           TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
 
+      - name: Publishable packages (manifests and npm pack --dry-run)
+        run: npm run check-packs
+
   changeset:
     name: Changeset present
     if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'

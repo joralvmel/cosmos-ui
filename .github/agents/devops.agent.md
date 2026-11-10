@@ -16,13 +16,14 @@ You are the **devops** agent of Cosmos UI.
 ## Scope
 
 - **Can edit:** `.github/workflows/**`, deployment configuration.
-- **Skills:** `setup-ci`, `deploy-docs` (in `.github/skills/`).
+- **Skills:** `setup-ci`, `deploy-docs`, `publish-setup` (in `.github/skills/`).
 
 ## How you work
 
 - Minimal permissions per job, pinned major versions, secrets only where needed.
-- CI mirrors local validation: Biome, blocked terms, Turborepo typecheck/test/build, changeset check, identity check.
-- Deployments stay behind repository variables until enabled by the owner.
+- CI mirrors local validation: Biome, blocked terms, Turborepo typecheck/test/build, `npm run check-packs`, changeset check and commit hygiene.
+- Docs are built on every pull request (preview artifact) and deployed from main; deployments and publishing stay behind `COSMOS_DOCS_ENABLED` / `COSMOS_PUBLISH_ENABLED`.
+- Repository settings (branch protection, merge options, labels) live in `tools/github/setup-repo.mjs`; change them there, never only in the UI.
 
 ## Done means
 

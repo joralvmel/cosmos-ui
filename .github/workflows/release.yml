@@ -1,22 +1,39 @@
 name: Release
 
-# Publishing is disabled until the pre-release checklist is complete: set the repository
-# variable COSMOS_PUBLISH_ENABLED=true and configure npm trusted publishing (OIDC).
+# Push to main (after a release pull request develop → main):
+#   1. Changesets opens or updates the "Version Packages" pull request (versions + changelogs).
+#   2. When that pull request is merged, `changeset publish` publishes the new versions to npm with
+#      provenance (npm trusted publishing, OIDC; no npm token), pushes tags and creates GitHub Releases.
+# Manual run on develop: snapshot prerelease with the dist-tag `next` (e.g. 0.2.0-next-20261110…).
+#
+# Everything is disabled until the repository variable COSMOS_PUBLISH_ENABLED is "true" and every
+# package has a trusted publisher on npmjs.com (see the Publishing guide and `publish-setup` skill).
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+    inputs:
+      snapshot:
+        description: Publish a snapshot with the dist-tag "next" (run from develop)
+        type: boolean
+        default: true
 
 concurrency:
-  group: release
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
   contents: read
 
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+
 jobs:
   release:
     name: Version or publish
-    if: vars.COSMOS_PUBLISH_ENABLED == 'true'
+    if: vars.COSMOS_PUBLISH_ENABLED == 'true' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    environment: npm
     permissions:
       contents: write
       pull-requests: write
@@ -32,13 +49,48 @@ jobs:
 
       - run: npm ci
 
-      - name: Create version PR or publish
+      - name: Check publishable packages
+        run: npm run check-packs
+
+      - name: Version Packages pull request or publish
         uses: changesets/action@v2
         with:
           version: npm run version-packages
           publish: npm run release
           title: "chore: version packages"
           commit: "chore: version packages"
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+
+  snapshot:
+    name: Snapshot (next)
+    if: >-
+      vars.COSMOS_PUBLISH_ENABLED == 'true' && github.event_name == 'workflow_dispatch' &&
+      inputs.snapshot && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: Snapshot versions
+        run: npx changeset version --snapshot next
+
+      - name: Build and publish with the dist-tag next
+        run: |
+          npx turbo run build --filter=./packages/*
+          npx changeset publish --tag next --no-git-tag
+        env:
           NPM_CONFIG_PROVENANCE: true

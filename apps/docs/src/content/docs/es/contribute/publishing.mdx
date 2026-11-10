@@ -1,0 +1,96 @@
+---
+title: Versiones y publicación
+description: Cómo se versiona y publica Cosmos UI en npm, y la configuración inicial para mantenedores.
+sidebar:
+  order: 6
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Cosmos UI usa [Changesets](https://github.com/changesets/changesets) para las versiones y los
+changelogs, y publica en el registro público de npm con
+[trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC, sin token de npm) y
+[provenance](https://docs.npmjs.com/generating-provenance-statements).
+
+## Cómo funcionan las releases
+
+<Steps>
+
+1. Cada pull request que cambia `packages/*` añade un changeset (`npm run changeset`).
+2. Cuando `develop` está listo, un mantenedor abre el pull request de release `develop → main`
+   (skill `release-pr`) y lo integra con un **merge commit**.
+3. En `main`, el workflow `Release` abre o actualiza el pull request **Version Packages**: sube las
+   versiones y escribe los changelogs.
+4. Al integrar **Version Packages** se ejecuta `changeset publish`: las nuevas versiones se publican en
+   npm con provenance, se suben los tags de Git y se crea una GitHub Release por paquete.
+5. El workflow `Docs` despliega el sitio de documentación desde `main`.
+
+</Steps>
+
+Prereleases: ejecuta a mano el workflow `Release` sobre `develop` (Actions → Release → Run workflow).
+Publica un snapshot como `0.2.0-next-20261110120000` con el dist-tag `next`:
+
+```bash
+npm install @joralvmel/cosmos-react@next
+```
+
+## Configuración inicial (mantenedores)
+
+La skill `publish-setup` guía a un agente por la misma lista.
+
+<Steps>
+
+1. **Cuenta de npm.** Crea una cuenta en [npmjs.com](https://www.npmjs.com/signup), verifica el email y
+   activa la autenticación en dos pasos (Account → Two-Factor Authentication, "Authorization and
+   writes"). El scope `@joralvmel` es el scope de usuario de la cuenta.
+
+2. **Comprueba los paquetes.**
+
+   ```bash
+   npm ci
+   npm run check-packs     # compila, valida los manifiestos y ejecuta npm pack --dry-run
+   npm run publish-order   # primero las dependencias
+   ```
+
+3. **Primera publicación a mano.** Trusted publishing solo se puede configurar en paquetes que ya
+   existen. Publica una vez la versión actual de cada paquete, en el orden mostrado:
+
+   ```bash
+   npm login
+   cd packages/core && npm publish --access public --otp <código> && cd ../..
+   # …repite para cada paquete en orden
+   ```
+
+   La primera versión es un marcador (`0.0.0`); puedes marcarla con
+   `npm deprecate @joralvmel/cosmos-core@0.0.0 "placeholder"`.
+
+4. **Trusted publisher por paquete.** En npmjs.com abre cada paquete → Settings → Trusted Publisher →
+   GitHub Actions e indica: owner `joralvmel`, repositorio `cosmos-ui`, workflow `release.yml`, entorno
+   `npm`. Después, en "Publishing access", elige
+   "Require two-factor authentication and disallow tokens".
+
+5. **GitHub.** En la configuración del repositorio:
+   - Environments → crea `npm` (opcionalmente con revisores obligatorios).
+   - Secrets and variables → Actions → Variables: `COSMOS_PUBLISH_ENABLED` = `true`.
+   - Para el sitio de docs: Pages → Source "GitHub Actions" y la variable `COSMOS_DOCS_ENABLED` = `true`.
+
+6. **Verifica** tras la primera release automática:
+
+   ```bash
+   npm view @joralvmel/cosmos-core versions dist-tags
+   npm audit signatures   # dentro de un proyecto que haya instalado los paquetes
+   ```
+
+   La página del paquete en npmjs.com muestra la insignia de provenance enlazada a la ejecución del
+   workflow.
+
+</Steps>
+
+## Solución de problemas
+
+| Síntoma | Solución |
+| --- | --- |
+| `E404` / `ENEEDAUTH` al publicar | El trusted publisher no coincide: revisa owner, repositorio, nombre del workflow y entorno. |
+| No aparece el pull request "Version Packages" | Permite que GitHub Actions cree pull requests (`npm run setup-repo -- --apply` lo hace). |
+| Workflow omitido | `COSMOS_PUBLISH_ENABLED` no es `true`. |
+| Falla `check-packs` | A un manifiesto le falta `publishConfig.access`, `files`, `exports`, `repository`, `license` o `llms.md`. |
