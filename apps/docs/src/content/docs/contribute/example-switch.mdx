@@ -1,0 +1,183 @@
+---
+title: 'Example: from issue to release'
+description: A complete walkthrough that creates the cosm-switch component with the agents and skills, from the issue to the npm release.
+sidebar:
+  order: 3
+---
+
+This walkthrough adds `cosm-switch` (WAI-ARIA switch) on every platform. Each step names the skill to
+run (as a `/prompt` in VS Code or by asking the agent) and shows the commands it runs and the expected
+output.
+
+## 1. Check the inventory — `component-status`
+
+```bash
+npm run status
+```
+
+```text
+Components: 38 · stable 1 · in progress 0 · planned 37
+…
+planned      1  switch
+…
+Next suggested: icon, badge, avatar, divider, listbox
+```
+
+`switch` is planned, priority 1 and has no dependencies, so it can start now.
+
+## 2. Issue and branch — `start-work`
+
+```bash
+gh issue create --template component_request.yml --title "Component: switch"
+# → https://github.com/joralvmel/cosmos-ui/issues/12
+gh issue develop 12 --base develop --name feat/elements-switch --checkout
+```
+
+```text
+github.com/joralvmel/cosmos-ui/tree/feat/elements-switch
+Switched to a new branch 'feat/elements-switch'
+```
+
+## 3. Research — `research-reference`
+
+The `researcher` agent summarizes the
+[APG switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/): role `switch`,
+`aria-checked`, <kbd>Space</kbd> toggles, visible label, and recommends a native
+`<input type="checkbox" role="switch">` inside the Web Component (form participation for free).
+
+## 4. Contract — `define-contract`
+
+The `architect` agent writes `packages/core/src/specs/switch.ts` (props `checked`, `disabled`,
+`required`, `name`, `value`, `label`; event `change` → DOM `cosm-change`, React `onChange`, Angular
+`(checkedChange)`, React Native `onCheckedChange`; state `checked` with `defaultChecked`) and the shared
+scenarios (toggle by pointer and keyboard, disabled, controlled proposal without commit).
+
+## 5. Visual spec — `design-component`
+
+The `design-system` agent writes `docs/design/switch.md`: track and thumb sizes per `size`, states
+(hover, focus-visible, checked, disabled, invalid), tokens (`--cosm-primary`, `--cosm-border-strong`,
+`--cosm-surface`), motion with `prefers-reduced-motion`, and checks contrast in every theme.
+
+## 6. Generate — `create-component`
+
+```bash
+npm run generate -- component switch
+```
+
+```text
+Wrote 21 files:
+  packages/core/src/specs/switch.ts
+  packages/core/src/specs/switch.scenarios.ts
+  packages/core/src/index.ts
+  packages/elements/src/components/switch/cosm-switch.ts
+  …
+  apps/docs/src/content/docs/es/components/switch.mdx
+  .changeset/add-switch.md
+
+Next: resolve every TODO(generator) marker, then run
+  npx biome ci . && npx turbo run typecheck test build
+```
+
+`component-builder` replaces the generated placeholders with the real contract, the Lit
+implementation (anatomy order: imports, types, styles, class, registration), the React events map and
+the Angular inputs and `(checkedChange)` output with a `ControlValueAccessor`.
+
+## 7. React Native — `create-native-component`
+
+`native-expert` implements `Switch` with `Pressable`, `accessibilityRole="switch"`,
+`accessibilityState={{ checked, disabled }}`, a 44-point touch area and `useTheme()` colors, and
+finishes the demo screen `apps/native-demo/app/switch.tsx`.
+
+## 8. Tests — `add-contract-tests`
+
+```bash
+npx turbo run test --filter=...@joralvmel/cosmos-core
+cd tools && npx vitest run test/structure.test.mjs test/status.test.mjs
+```
+
+```text
+ Tasks:    N successful, N total
+ ✓ test/structure.test.mjs
+ ✓ test/status.test.mjs
+```
+
+## 9. Docs and AI references — `add-docs-page`, `add-playground`, `update-ai-references`
+
+The pages follow the anatomy order (status, Playground, variants, states, accessibility, API, events by
+platform) in English and Spanish. The Playground already shows HTML, React, Angular and React Native
+code from the contract.
+
+```bash
+npm run llms
+npm run status
+```
+
+```text
+stable       1  switch
+```
+
+When every piece exists, `component-builder` sets `status: 'stable'` in the catalog entry.
+
+## 10. Changeset — `add-changeset`
+
+```md
+---
+'@joralvmel/cosmos-core': minor
+'@joralvmel/cosmos-elements': minor
+'@joralvmel/cosmos-react': minor
+'@joralvmel/cosmos-angular': minor
+'@joralvmel/cosmos-native': minor
+---
+
+Add the Switch component (`cosm-switch`) on every platform.
+```
+
+## 11. Pull request — `finish-work`
+
+```bash
+npx biome ci . && npx turbo run typecheck test build && npm run check-terms
+git push -u origin HEAD
+gh pr create --base develop --title "feat(elements): add cosm-switch" --body-file pr.md --label type:component
+```
+
+```text
+https://github.com/joralvmel/cosmos-ui/pull/13
+```
+
+CI runs lint, terms, typecheck, tests and build, the docs build (preview artifact), the changeset check
+and commit hygiene; the labeler adds `pkg:core`, `pkg:elements`, `pkg:react`, `pkg:angular`,
+`pkg:native`, `app:docs` and `app:native-demo`.
+
+## 12. Review and merge
+
+Ask the `reviewer` agent for a review, address the comments and wait for the code owner approval. Merge
+with **Squash and merge** (the PR title becomes the commit message); the branch is deleted
+automatically.
+
+## 13. Back to develop — `sync-after-merge`
+
+```bash
+git switch develop && git pull --prune --ff-only && git branch -D feat/elements-switch
+```
+
+## 14. Release pull request — `release-pr`
+
+```bash
+npx changeset status --since=origin/main
+gh pr create --base main --head develop --title "chore(release): switch" --label release
+```
+
+Merge it with **Create a merge commit**.
+
+## 15. Publish — `release`
+
+The `Release` workflow opens **Version Packages** on main (versions `0.2.0`, changelogs). Merging it
+publishes to npm with provenance and creates the GitHub Releases:
+
+```bash
+npm view @joralvmel/cosmos-elements version
+```
+
+```text
+0.2.0
+```

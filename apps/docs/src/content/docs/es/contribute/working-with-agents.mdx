@@ -1,0 +1,77 @@
+---
+title: Trabajar con agentes
+description: Qué hace cada agente y skill de IA del repositorio, cómo usarlos en VS Code y qué pedirles.
+sidebar:
+  order: 2
+---
+
+import AgentsTable from '../../../../components/AgentsTable.astro';
+
+El repositorio incluye un equipo de agentes especializados (`.github/agents/`) y skills paso a paso
+(`.github/skills/`, cada una con un prompt en `.github/prompts/`). Siguen `AGENTS.md`, las reglas de
+`.github/instructions/` y la [anatomía de componentes](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-anatomy.md).
+
+## Cómo usarlos en VS Code
+
+1. Abre el repositorio en VS Code con GitHub Copilot y abre la vista **Chat**.
+2. **Agentes**: elige uno en el selector de agentes del chat (por ejemplo `component-builder`) y
+   describe la tarea. El agente carga sus reglas y usa sus skills.
+3. **Prompts**: escribe `/` y el nombre de la skill, por ejemplo `/create-component`,
+   `/component-status` o `/start-work`. El prompt pide sus datos y ejecuta la skill con el agente
+   adecuado.
+4. Añade contexto con `#` (un archivo, una carpeta o un enlace de Figma) cuando ayude.
+
+Otros asistentes (Codex, Claude Code, Cursor…) leen `AGENTS.md`; indícales una skill, por ejemplo
+"sigue `.github/skills/create-component/SKILL.md` para `switch`".
+
+## Agentes
+
+Las descripciones están en inglés, como los archivos de los agentes.
+
+<AgentsTable kind="agents" />
+
+## Skills
+
+<AgentsTable kind="skills" />
+
+## Qué pedirles
+
+- **Una tarea cada vez**, con el resultado que esperas: "Crea el componente `switch` para todas las
+  plataformas" mejor que "trabaja en formularios".
+- **Da referencias**: un número de issue, un enlace de Figma, un patrón de la WAI-ARIA APG.
+- **Déjales validar**: cada skill termina con tests y `npx biome ci . && npx turbo run typecheck test
+  build`; pide la salida si tienes dudas.
+- **Revisa antes de integrar**: pide a `reviewer` una revisión de la rama.
+
+## Prompts para copiar
+
+```text
+/component-status all — y dime qué tres componentes debería crear después y por qué.
+```
+
+```text
+/start-work feat elements switch, enlazada al issue #12
+```
+
+```text
+Usa el agente component-builder: crea el componente "switch" (patrón switch de WAI-ARIA) para web,
+React, Angular y React Native, con estado `checked` controlado y no controlado y un evento
+`cosm-change`. Sigue la skill create-component y termina con el test de estructura.
+```
+
+```text
+/component-from-design https://www.figma.com/design/<archivo>?node-id=<nodo> como "chip"
+```
+
+```text
+Usa el agente design-system: añade un tema llamado "aurora" con primario verde azulado y armonía
+triádica; debe pasar la validación de accesibilidad en claro y oscuro.
+```
+
+```text
+Usa el agente reviewer: revisa la rama actual frente a develop y lista solo problemas de alta confianza.
+```
+
+```text
+/finish-work "feat(elements): add cosm-switch" cierra #12
+```

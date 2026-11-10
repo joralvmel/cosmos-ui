@@ -1,0 +1,75 @@
+---
+title: Working with agents
+description: What each AI agent and skill of the repository does, how to use them in VS Code and what to ask.
+sidebar:
+  order: 2
+---
+
+import AgentsTable from '../../../components/AgentsTable.astro';
+
+The repository ships a team of specialized agents (`.github/agents/`) and step-by-step skills
+(`.github/skills/`, each with a prompt in `.github/prompts/`). They follow `AGENTS.md`, the rules in
+`.github/instructions/` and the [component anatomy](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-anatomy.md).
+
+## How to use them in VS Code
+
+1. Open the repository in VS Code with GitHub Copilot and open the **Chat** view.
+2. **Agents**: pick one in the agent selector of the chat (for example `component-builder`), then
+   describe the task. The agent loads its rules and uses its skills.
+3. **Prompts**: type `/` and the skill name, e.g. `/create-component`, `/component-status`,
+   `/start-work`. The prompt asks for its inputs and runs the skill with the right agent.
+4. Attach context with `#` (a file, a folder or a Figma link) when it helps.
+
+Other assistants (Codex, Claude Code, Cursor…) read `AGENTS.md`; point them to a skill file, e.g.
+"follow `.github/skills/create-component/SKILL.md` for `switch`".
+
+## Agents
+
+<AgentsTable kind="agents" />
+
+## Skills
+
+<AgentsTable kind="skills" />
+
+## What to ask
+
+- **One task at a time**, with the outcome you expect: "Create the `switch` component for all
+  platforms" rather than "work on forms".
+- **Give references**: an issue number, a Figma link, a pattern of the WAI-ARIA APG.
+- **Let them validate**: every skill ends with tests and `npx biome ci . && npx turbo run typecheck test
+  build`; ask for the output when in doubt.
+- **Review before merging**: ask `reviewer` for a review of the branch.
+
+## Copyable prompts
+
+```text
+/component-status all — and tell me which three components I should build next and why.
+```
+
+```text
+/start-work feat elements switch, linked to issue #12
+```
+
+```text
+Use the component-builder agent: create the "switch" component (WAI-ARIA switch pattern) for web,
+React, Angular and React Native, with controlled and uncontrolled `checked` state and a `cosm-change`
+event. Follow the create-component skill and finish with the structure test.
+```
+
+```text
+/component-from-design https://www.figma.com/design/<file>?node-id=<node> as "chip"
+```
+
+```text
+Use the design-system agent: add a theme called "aurora" with a teal primary and a triadic harmony;
+it must pass the accessibility validation in light and dark.
+```
+
+```text
+Use the reviewer agent: review the current branch against develop and list only high-confidence
+problems.
+```
+
+```text
+/finish-work "feat(elements): add cosm-switch" closes #12
+```

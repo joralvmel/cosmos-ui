@@ -1,0 +1,56 @@
+---
+title: Recetas
+description: Guías cortas para crear un tema, añadir un token, crear un componente desde Figma, modificar un componente y crear una gráfica.
+sidebar:
+  order: 4
+---
+
+Cada receta indica la skill que la automatiza (ejecútala como `/prompt` o pídesela a su agente).
+
+## Crear un tema — `add-theme`
+
+```bash
+npm run generate -- theme aurora --seed "oklch(0.58 0.14 165)"
+npx turbo run test build --filter=@joralvmel/cosmos-tokens...
+```
+
+1. Ajusta la definición en `packages/tokens/src/themes.ts`: semillas (OKLCH), `harmony`, tinte de los
+   neutros y `radius`. Añade overrides por modo solo cuando sea imprescindible.
+2. Los tests de tokens comprueban WCAG 2.2 AA y el daltonismo en claro y oscuro. Nunca bajes los
+   umbrales; cambia las semillas.
+3. El tema aparece en la galería, en el selector de la cabecera, en Tailwind (`theme-aurora:`) y en
+   `CosmosThemeProvider`.
+
+## Añadir un token — `add-token`
+
+1. Color semántico: añádelo a `semanticColors` (`packages/tokens/src/types.ts`), derívalo en
+   `generate.ts` y añade parejas de contraste en `validate.ts` si lleva texto o interfaz.
+2. Token base (espaciado, radio, movimiento…): añádelo a `base.ts`; asígnalo en `toTailwindTheme` /
+   `toNative`.
+3. Actualiza los tests de tokens y de Tailwind y ejecuta `npm run llms`.
+
+## Componente desde Figma — `component-from-design`
+
+1. Comparte con el agente `design-system` el enlace de Figma del frame (`?node-id=`) o una captura.
+2. Extrae la anatomía, variantes y estados y asigna cada valor a tokens existentes; un token nuevo pasa
+   por `add-token`.
+3. `architect` escribe el contrato y `component-builder` ejecuta `create-component`.
+
+## Modificar un componente — `modify-component`
+
+1. `component-status` del componente y de los componentes que vaya a usar.
+2. Cambia primero el contrato y los escenarios; decide el salto de versión con `architect`.
+3. Actualiza todas las plataformas, los tests y la documentación; respeta la anatomía (lo comprueba el
+   test de estructura).
+4. `npm run llms` y un changeset (`major` con nota de migración si rompe compatibilidad).
+
+## Crear una gráfica — `create-chart`
+
+```bash
+npm run generate -- chart sparkline
+```
+
+1. Implementa el layout puro en `packages/charts-core/src/sparkline-layout.ts` y pruébalo sin DOM.
+2. Renderiza SVG en `packages/charts` y React Native en `packages/charts-native` con el mismo layout.
+3. Usa los colores de gráficas del tema (`--cosm-chart-1..8`), añade una descripción en texto y una
+   tabla de datos alternativa.

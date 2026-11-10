@@ -10,7 +10,8 @@ import {
   snippetsMarkdown,
 } from '@joralvmel/cosmos-core';
 import { builtInThemes } from '@joralvmel/cosmos-tokens';
-import { getStatusReport, toMarkdown } from '../status/component-status.mjs';
+import { findRoot, getStatusReport, toMarkdown } from '../status/component-status.mjs';
+import { agentsMarkdown, skillsMarkdown } from './agents.mjs';
 
 /** Splits `---` frontmatter (simple `key: value` lines) from the body. */
 export function splitFrontmatter(source) {
@@ -100,6 +101,13 @@ export function mdxToMarkdown(source, { report } = {}) {
     if (trimmed.startsWith('<EventsTable')) {
       const contract = contractOf(trimmed);
       if (contract) output.push(eventsMarkdown(contract));
+      continue;
+    }
+    if (trimmed.startsWith('<AgentsTable')) {
+      const root = findRoot(process.cwd()) ?? process.cwd();
+      output.push(
+        attribute(trimmed, 'kind') === 'skills' ? skillsMarkdown(root) : agentsMarkdown(root)
+      );
       continue;
     }
     if (trimmed.startsWith('<SetupSteps')) {

@@ -1,0 +1,95 @@
+---
+title: Primeros pasos
+description: Prepara el repositorio de Cosmos UI, ejecuta la documentación y la demo nativa, y resuelve problemas habituales.
+sidebar:
+  order: 1
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+## Requisitos
+
+- **Node.js 24** (ver `.nvmrc`; `nvm use` o `fnm use`) y **npm 11**.
+- Git y la [GitHub CLI](https://cli.github.com/) (`gh`) para las skills de ramas y pull requests.
+- VS Code con GitHub Copilot para usar los [agentes](../working-with-agents/) (opcional).
+- Para la demo nativa: la app Expo Go en un móvil, Android Studio (emulador) o Xcode (simulador de iOS,
+  solo en macOS).
+
+## Primera ejecución
+
+<Steps>
+
+1. Clona e instala. `npm ci` también configura Git para usar los hooks de `.githooks`:
+
+   ```bash
+   git clone https://github.com/joralvmel/cosmos-ui.git
+   cd cosmos-ui
+   npm ci
+   ```
+
+2. Compila, prueba y valida todo (los mismos comandos que la CI):
+
+   ```bash
+   npx biome ci . && npx turbo run typecheck test build
+   ```
+
+   Turborepo guarda en caché los resultados: la segunda ejecución tarda segundos.
+
+3. Abre la documentación en http://localhost:4321:
+
+   ```bash
+   npm run docs
+   ```
+
+4. Consulta qué existe y qué viene después:
+
+   ```bash
+   npm run status
+   ```
+
+</Steps>
+
+## Demo nativa
+
+La app con Expo Router de `apps/native-demo` tiene una pantalla por componente de React Native y un
+selector de tema y modo.
+
+```bash
+npm run build                                   # la demo usa los paquetes compilados
+npm run dev --workspace=@joralvmel/cosmos-native-demo
+```
+
+- **Expo Go** (cualquier sistema): escanea el código QR con la app Expo Go (Android) o con la cámara
+  (iOS). El móvil y el ordenador deben estar en la misma red.
+- **Emulador de Android**: instala Android Studio, crea un dispositivo virtual, arráncalo y pulsa `a` en
+  la terminal de Expo.
+- **Simulador de iOS** (macOS): instala Xcode y sus herramientas de línea de comandos y pulsa `i`.
+
+## Estructura del repositorio
+
+| Carpeta | Contenido |
+| --- | --- |
+| `packages/*` | Paquetes publicables (`tokens`, `tailwind`, `core`, `elements`, `react`, `angular`, `native`, gráficas, `icons`, `i18n`, `mcp`, `cli`) |
+| `apps/docs` | Este sitio (Astro + Starlight, inglés y español) |
+| `apps/native-demo` | App de demo con Expo |
+| `tools/` | Generador, estado de componentes, referencias para IA, comprobaciones de Git y GitHub, ayudas de publicación |
+| `docs/adr`, `docs/conventions` | Decisiones de arquitectura y anatomía de componentes |
+| `.github/` | Workflows, agentes, skills, prompts e instrucciones por ruta |
+
+## Tests en navegador
+
+Los tests unitarios y de comportamiento se ejecutan en Vitest con happy-dom, así que no hace falta un
+navegador. Las comprobaciones en navegador (Playwright con axe) están previstas para el teclado y la
+accesibilidad; cuando lleguen necesitarán `npx playwright install` una vez.
+
+## Solución de problemas
+
+| Problema | Solución |
+| --- | --- |
+| `EBADENGINE` / motor no soportado | Usa Node.js 24 (`nvm use`). |
+| `EBUSY: resource busy or locked` en Windows durante `npm ci` | Un editor o un servidor de lenguaje bloquea un archivo de `node_modules`; cierra el proyecto en otros IDE y repite. |
+| `File content differs from formatting output` | `npm run lint:fix` (Biome formatea con finales de línea LF). |
+| Los hooks no se ejecutan | `npm ci` con `ignore-scripts` omite `prepare`: ejecuta `node tools/git/install-hooks.mjs`. |
+| `Commit blocked: the Git identity does not match` | Tu `.local/git-identity.json` espera otra identidad; corrige `git config --local user.*` o el archivo. |
+| `llms.md files are outdated` | `npm run llms` (las referencias para IA se generan desde los contratos). |
+| Resultados en caché extraños | `npx turbo run build --force`. |

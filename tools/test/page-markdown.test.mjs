@@ -30,7 +30,7 @@ describe('MDX to Markdown', () => {
     expect(markdown).toMatch(/^# \S/);
     expect(markdown).not.toMatch(/^import .*(\.astro|@astrojs\/starlight\/components)';$/m);
     expect(markdown).not.toMatch(
-      /<(?:Playground|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
+      /<(?:Playground|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
     );
   });
 

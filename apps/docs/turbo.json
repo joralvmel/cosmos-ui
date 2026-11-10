@@ -12,6 +12,9 @@
         "$TURBO_ROOT$/packages/*/test/**",
         "$TURBO_ROOT$/apps/native-demo/app/**",
         "$TURBO_ROOT$/.changeset/*.md",
+        "$TURBO_ROOT$/.github/agents/**",
+        "$TURBO_ROOT$/.github/skills/**",
+        "$TURBO_ROOT$/tools/ai/**",
         "$TURBO_ROOT$/tools/status/**"
       ],
       "outputs": ["dist/**"]

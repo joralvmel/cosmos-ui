@@ -1,0 +1,53 @@
+---
+title: Recipes
+description: Short guides to create a theme, add a token, build a component from Figma, change a component and create a chart.
+sidebar:
+  order: 4
+---
+
+Each recipe names the skill that automates it (run it as a `/prompt` or ask its agent).
+
+## Create a theme — `add-theme`
+
+```bash
+npm run generate -- theme aurora --seed "oklch(0.58 0.14 165)"
+npx turbo run test build --filter=@joralvmel/cosmos-tokens...
+```
+
+1. Tune the definition in `packages/tokens/src/themes.ts`: seeds (OKLCH), `harmony`, neutral tint and
+   `radius`. Add mode overrides only when unavoidable.
+2. The tokens tests check WCAG 2.2 AA and color vision deficiencies in light and dark. Never lower the
+   thresholds; change the seeds instead.
+3. The theme appears in the theme gallery, the header picker, Tailwind (`theme-aurora:`) and
+   `CosmosThemeProvider`.
+
+## Add a token — `add-token`
+
+1. Semantic color: add it to `semanticColors` (`packages/tokens/src/types.ts`), derive it in
+   `generate.ts` and add contrast pairs in `validate.ts` when it carries text or UI.
+2. Base token (spacing, radius, motion…): add it to `base.ts`; map it in `toTailwindTheme` / `toNative`.
+3. Update the tokens and Tailwind tests, then `npm run llms`.
+
+## Component from Figma — `component-from-design`
+
+1. Share the Figma link of the frame (`?node-id=`) or a screenshot with the `design-system` agent.
+2. It extracts anatomy, variants and states and maps every value to existing tokens; a new token goes
+   through `add-token`.
+3. `architect` writes the contract and `component-builder` runs `create-component`.
+
+## Change a component — `modify-component`
+
+1. `component-status` for the component and for any component it will use.
+2. Change the contract and scenarios first; decide the semver bump with `architect`.
+3. Update every platform, tests and docs; keep the anatomy (the structure test checks it).
+4. `npm run llms` and a changeset (`major` with a migration note when breaking).
+
+## Create a chart — `create-chart`
+
+```bash
+npm run generate -- chart sparkline
+```
+
+1. Implement the pure layout in `packages/charts-core/src/sparkline-layout.ts` and test it without DOM.
+2. Render SVG in `packages/charts` and React Native in `packages/charts-native` with the same layout.
+3. Use theme chart colors (`--cosm-chart-1..8`), add a text description and a data table alternative.

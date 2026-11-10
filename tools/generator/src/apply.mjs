@@ -7,11 +7,14 @@ import { dirname, join } from 'node:path';
  */
 export function apply(root, operations, { dryRun = false } = {}) {
   const files = new Map();
+  const originals = new Map();
   const read = path => {
     if (!files.has(path)) {
       const full = join(root, path);
       if (!existsSync(full)) throw new Error(`Missing file: ${path}`);
-      files.set(path, readFileSync(full, 'utf8').replace(/\r\n/g, '\n'));
+      const content = readFileSync(full, 'utf8').replace(/\r\n/g, '\n');
+      originals.set(path, content);
+      files.set(path, content);
     }
     return files.get(path);
   };
@@ -51,11 +54,12 @@ export function apply(root, operations, { dryRun = false } = {}) {
     }
   }
 
+  const changed = [...files].filter(([path, content]) => originals.get(path) !== content);
   if (!dryRun) {
-    for (const [path, content] of files) {
+    for (const [path, content] of changed) {
       mkdirSync(dirname(join(root, path)), { recursive: true });
       writeFileSync(join(root, path), content);
     }
   }
-  return [...files.keys()];
+  return changed.map(([path]) => path);
 }

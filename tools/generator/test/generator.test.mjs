@@ -81,6 +81,7 @@ describe('component target', () => {
     expect(screens).toContain("route: '/date-picker'");
     const catalog = readFileSync(join(root, 'packages/core/src/catalog.ts'), 'utf8');
     expect(catalog.match(/name: 'date-picker'/g)).toHaveLength(1);
+    expect(files).not.toContain('packages/core/src/catalog.ts');
   });
 
   it('adds a catalog entry for components that are not planned yet', () => {

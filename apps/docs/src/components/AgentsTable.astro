@@ -1,0 +1,56 @@
+---
+import { listAgents, listSkills } from '@joralvmel/cosmos-tools/agents';
+import { findRoot } from '@joralvmel/cosmos-tools/status';
+
+interface Props {
+  kind: 'agents' | 'skills';
+}
+
+/** Agents or skills of the repository, read from .github/ at build time. */
+const root = findRoot(process.cwd()) ?? process.cwd();
+const es = Astro.currentLocale === 'es';
+const agents = listAgents(root);
+const skills = listSkills(root);
+---
+
+{
+  Astro.props.kind === 'agents' ? (
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">{es ? 'Agente' : 'Agent'}</th>
+          <th scope="col">{es ? 'Qué hace' : 'What it does'}</th>
+          <th scope="col">Skills</th>
+        </tr>
+      </thead>
+      <tbody>
+        {agents.map(agent => (
+          <tr>
+            <td><code>{agent.name}</code></td>
+            <td>{agent.description}</td>
+            <td>{agent.skills.map((skill, index) => <>{index > 0 && ', '}<code>{skill}</code></>)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">{es ? 'Skill (prompt)' : 'Skill (prompt)'}</th>
+          <th scope="col">{es ? 'Agente principal' : 'Main agent'}</th>
+          <th scope="col">{es ? 'Qué hace' : 'What it does'}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {skills.map(skill => (
+          <tr>
+            <td><code>/{skill.name}</code></td>
+            <td><code>{skill.agent}</code></td>
+            <td>{skill.description}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}

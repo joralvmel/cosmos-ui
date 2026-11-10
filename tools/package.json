@@ -12,6 +12,10 @@
     "./ai": {
       "types": "./ai/page-markdown.d.mts",
       "default": "./ai/page-markdown.mjs"
+    },
+    "./agents": {
+      "types": "./ai/agents.d.mts",
+      "default": "./ai/agents.mjs"
     }
   },
   "scripts": {

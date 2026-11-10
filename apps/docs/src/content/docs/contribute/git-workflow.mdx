@@ -1,0 +1,52 @@
+---
+title: Git workflow
+description: Branches, commits, pull requests, reviews and releases in Cosmos UI.
+sidebar:
+  order: 5
+---
+
+## Branches
+
+| Branch | Purpose | How changes arrive |
+| --- | --- | --- |
+| `main` | Released code; every push runs the release and docs deployment | Merge commit from `develop` (release pull request) |
+| `develop` | Integration, default branch | Squash merge of work branches |
+| `<type>/<scope>-<description>` | One task | Created from `develop`, deleted after merge |
+
+Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`. Scope: package or area (`elements`, `tokens`,
+`docs`…). Example: `feat/elements-switch`. Contributors without write access fork the repository and
+open the pull request from their fork.
+
+## Commits
+
+- [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): summary`, several scopes
+  separated by commas (`feat(mcp,cli): …`). The `commit-msg` hook checks it.
+- Use your own Git identity; prefer your GitHub noreply email. Sign off with `git commit -s`
+  ([DCO](https://developercertificate.org/)) if you can.
+- Never use `--no-verify`.
+
+## Pull requests
+
+1. `start-work` → work → `finish-work` (validates, pushes and opens the pull request to `develop`).
+2. Required: green checks (lint, terms, typecheck, tests, build, packs, docs build, changeset, commit
+   hygiene) and one approval from a code owner.
+3. Squash merge: the pull request title must be a Conventional Commit (checked by CI).
+4. `sync-after-merge` cleans up the local branch.
+
+## Releases
+
+`release-pr` opens `develop → main` with the pending changesets; merge it with a merge commit. The
+[Release and publishing](../publishing/) page explains the rest.
+
+## Repository settings
+
+Branch protection, merge options and labels are code: `npm run setup-repo` shows the changes and
+`npm run setup-repo -- --apply` applies them with the GitHub CLI. Settings that only exist in the
+GitHub UI are printed at the end of the command.
+
+## Personal safeguards (optional)
+
+On a computer with several GitHub accounts, create `.local/git-identity.json` (ignored by Git) with
+your name, email and GitHub login: the `pre-commit` hook and the `verify-identity` skill then block
+commits and pushes with another identity. On a computer with a single personal account nothing is
+needed.

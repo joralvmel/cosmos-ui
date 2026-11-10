@@ -1,0 +1,51 @@
+---
+title: Flujo de Git
+description: Ramas, commits, pull requests, revisiones y releases en Cosmos UI.
+sidebar:
+  order: 5
+---
+
+## Ramas
+
+| Rama | Propósito | Cómo llegan los cambios |
+| --- | --- | --- |
+| `main` | Código publicado; cada push ejecuta la release y el despliegue de la documentación | Merge commit desde `develop` (pull request de release) |
+| `develop` | Integración, rama por defecto | Squash merge de las ramas de trabajo |
+| `<tipo>/<ámbito>-<descripción>` | Una tarea | Se crea desde `develop` y se borra tras integrarla |
+
+Tipos: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`. Ámbito: paquete o área (`elements`, `tokens`,
+`docs`…). Ejemplo: `feat/elements-switch`. Quien no tiene permisos de escritura hace un fork y abre el
+pull request desde él.
+
+## Commits
+
+- [Conventional Commits](https://www.conventionalcommits.org/): `tipo(ámbito): resumen`, varios ámbitos
+  separados por comas (`feat(mcp,cli): …`). Lo comprueba el hook `commit-msg`.
+- Usa tu propia identidad de Git; mejor tu email noreply de GitHub. Firma con `git commit -s`
+  ([DCO](https://developercertificate.org/)) si puedes.
+- Nunca uses `--no-verify`.
+
+## Pull requests
+
+1. `start-work` → trabajo → `finish-work` (valida, hace push y abre el pull request a `develop`).
+2. Obligatorio: checks en verde (lint, términos, typecheck, tests, build, paquetes, build de la
+   documentación, changeset, higiene de commits) y una aprobación de un code owner.
+3. Squash merge: el título del pull request debe ser un Conventional Commit (lo comprueba la CI).
+4. `sync-after-merge` limpia la rama local.
+
+## Releases
+
+`release-pr` abre `develop → main` con los changesets pendientes; intégralo con un merge commit. La
+página [Versiones y publicación](../publishing/) explica el resto.
+
+## Configuración del repositorio
+
+La protección de ramas, las opciones de merge y las etiquetas son código: `npm run setup-repo` muestra
+los cambios y `npm run setup-repo -- --apply` los aplica con la GitHub CLI. Los ajustes que solo existen
+en la interfaz de GitHub se imprimen al final del comando.
+
+## Protecciones personales (opcional)
+
+En un ordenador con varias cuentas de GitHub, crea `.local/git-identity.json` (ignorado por Git) con tu
+nombre, email y login de GitHub: el hook `pre-commit` y la skill `verify-identity` bloquean entonces los
+commits y pushes con otra identidad. En un ordenador con una sola cuenta personal no hace falta nada.

@@ -28,5 +28,16 @@ Thanks for helping! The full guide lives in the docs site:
 | Generate a component, chart or theme | `npm run generate -- <target> <kebab-name>` |
 | Docs site | `npm run docs` |
 
+## Guides (docs site, English and Spanish)
+
+| Guide | Source |
+| --- | --- |
+| Getting started (setup, native demo, troubleshooting) | [`getting-started.mdx`](apps/docs/src/content/docs/contribute/getting-started.mdx) |
+| Working with agents (agents, skills, prompts) | [`working-with-agents.mdx`](apps/docs/src/content/docs/contribute/working-with-agents.mdx) |
+| Example: from issue to release (`cosm-switch`) | [`example-switch.mdx`](apps/docs/src/content/docs/contribute/example-switch.mdx) |
+| Recipes (theme, token, Figma, modify a component, chart) | [`recipes.mdx`](apps/docs/src/content/docs/contribute/recipes.mdx) |
+| Git workflow | [`git-workflow.mdx`](apps/docs/src/content/docs/contribute/git-workflow.mdx) |
+| Release and publishing | [`publishing.mdx`](apps/docs/src/content/docs/contribute/publishing.mdx) |
+
 More: [AGENTS.md](AGENTS.md) (also for AI agents), [architecture decisions](docs/adr),
 [component anatomy](docs/conventions/component-anatomy.md) and [SECURITY.md](SECURITY.md).
