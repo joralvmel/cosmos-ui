@@ -32,6 +32,7 @@ export function apply(root, operations, { dryRun = false } = {}) {
         break;
       case 'insert': {
         const content = read(op.path);
+        if (op.unless?.test(content)) break;
         const match = op.before.exec(content);
         if (!match) throw new Error(`Anchor ${op.before} not found in ${op.path}`);
         files.set(

@@ -1,5 +1,6 @@
-// Templates for `npm run generate -- component <name>`. Every TODO(generator) marker must be resolved
-// before the work is considered done (see .github/skills/create-component/SKILL.md).
+// Templates for `npm run generate -- component|native <name>`. They follow
+// docs/conventions/component-anatomy.md exactly. Every TODO(generator) marker must be resolved
+// before the work is done (see .github/skills/create-component/SKILL.md).
 
 export const contract = (n, platforms) => `import { defineContract } from '../contract.js';
 
@@ -38,7 +39,7 @@ export interface ${n.pascal}Scenario {
   platforms?: readonly Platform[];
 }
 
-/** Shared behavior scenarios, run by the web and native tests. TODO(generator) add real behavior. */
+/** Shared behavior scenarios, run by the web, React and native tests. TODO(generator) add behavior. */
 export const ${n.camel}Scenarios: readonly ${n.pascal}Scenario[] = [
   { name: 'is enabled by default', props: {}, expected: { disabled: false } },
   { name: 'can be disabled', props: { disabled: true }, expected: { disabled: true } },
@@ -56,6 +57,9 @@ export {
 } from './specs/${n.kebab}.scenarios.js';
 `;
 
+export const catalogEntry = (n, platforms) =>
+  `  entry({ name: '${n.kebab}', title: '${n.title}', category: 'data-display', batch: 'B', priority: 2, dependsOn: [], pattern: 'TODO(generator): APG pattern or HTML spec URL'${platforms ? `, platforms: [${platforms.map(p => `'${p}'`).join(', ')}]` : ''} }),\n`;
+
 export const element =
   n => `import { type ContractProps, ${n.camel}Contract } from '@joralvmel/cosmos-core';
 import { css, html } from 'lit';
@@ -64,6 +68,17 @@ import { define } from '../../internal/define.js';
 import { boxSizing } from '../../internal/styles.js';
 
 type Props = Required<ContractProps<typeof ${n.camel}Contract, 'web'>>;
+
+const styles = css\`
+  :host {
+    display: inline-block;
+    color: var(--cosm-fg, oklch(0.24 0.01 268));
+    font-family: var(--cosm-font-sans, system-ui, sans-serif);
+  }
+  :host([disabled]) {
+    opacity: 0.5;
+  }
+\`;
 
 /**
  * TODO(generator): describe the component.
@@ -77,6 +92,8 @@ export class Cosm${n.pascal} extends CosmElement {
     disabled: { type: Boolean, reflect: true },
   };
 
+  static override styles = [boxSizing, styles];
+
   declare disabled: Props['disabled'];
 
   constructor() {
@@ -89,20 +106,6 @@ export class Cosm${n.pascal} extends CosmElement {
       <slot></slot>
     </div>\`;
   }
-
-  static override styles = [
-    boxSizing,
-    css\`
-      :host {
-        display: inline-block;
-        color: var(--cosm-fg, oklch(0.24 0.01 268));
-        font-family: var(--cosm-font-sans, system-ui, sans-serif);
-      }
-      :host([disabled]) {
-        opacity: 0.5;
-      }
-    \`,
-  ];
 }
 
 define('${n.tag}', Cosm${n.pascal});
@@ -114,9 +117,12 @@ declare global {
 }
 `;
 
+export const elementExports = n =>
+  `export { Cosm${n.pascal} } from './components/${n.kebab}/${n.tag}.js';\n`;
+
 export const elementTest =
-  n => `import { ${n.camel}Contract, ${n.camel}ScenariosFor, propNames } from '@joralvmel/cosmos-core';
-import { afterEach, describe, expect, it } from 'vitest';
+  n => `import { ${n.camel}Contract, ${n.camel}ScenariosFor, eventNames, propNames } from '@joralvmel/cosmos-core';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Cosm${n.pascal} } from '../src/components/${n.kebab}/${n.tag}.js';
 import { cleanup, fixture } from './fixture.js';
 
@@ -140,11 +146,22 @@ describe('${n.tag}: contract drift', () => {
       propNames(${n.camel}Contract, 'web').sort()
     );
   });
+
+  it('dispatches only the DOM events of the contract', async () => {
+    const el = await fixture<Cosm${n.pascal}>('<${n.tag}>Content</${n.tag}>');
+    const listener = vi.fn();
+    for (const name of eventNames(${n.camel}Contract, 'dom')) el.addEventListener(name, listener);
+    expect(eventNames(${n.camel}Contract, 'dom').every(name => name.startsWith('cosm-'))).toBe(true);
+  });
+});
+
+describe('${n.tag}', () => {
+  it('reflects styling props', async () => {
+    const el = await fixture<Cosm${n.pascal}>('<${n.tag} disabled>Content</${n.tag}>');
+    expect(el.hasAttribute('disabled')).toBe(true);
+  });
 });
 `;
-
-export const elementExports = n =>
-  `export { Cosm${n.pascal} } from './components/${n.kebab}/${n.tag}.js';\n`;
 
 export const react = n => `import { Cosm${n.pascal} } from '@joralvmel/cosmos-elements/${n.kebab}';
 import { createComponent } from '@lit/react';
@@ -169,13 +186,50 @@ export const reactExports = n =>
   `export { ${n.pascal}, type ${n.pascal}Props, ${n.camel}Events } from './components/${n.kebab}.js';\n`;
 
 export const reactTest =
-  n => `import { eventNames, ${n.camel}Contract } from '@joralvmel/cosmos-core';
-import { describe, expect, it } from 'vitest';
-import { ${n.camel}Events } from '../src/index.js';
+  n => `import { ${n.camel}Contract, ${n.camel}ScenariosFor, eventNames, propNames } from '@joralvmel/cosmos-core';
+import type { Cosm${n.pascal} } from '@joralvmel/cosmos-elements/${n.kebab}';
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, describe, expect, it } from 'vitest';
+import { ${n.pascal}, type ${n.pascal}Props, ${n.camel}Events } from '../src/index.js';
+
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+let root: Root | undefined;
+let container: HTMLElement | undefined;
+
+async function render(props: ${n.pascal}Props) {
+  container = document.createElement('div');
+  document.body.append(container);
+  root = createRoot(container);
+  await act(async () => root?.render(<${n.pascal} {...props}>${n.title}</${n.pascal}>));
+  const el = container.querySelector('${n.tag}') as Cosm${n.pascal};
+  await el.updateComplete;
+  return el;
+}
+
+afterEach(async () => {
+  await act(async () => root?.unmount());
+  container?.remove();
+});
+
+describe('${n.pascal}: shared scenarios', () => {
+  for (const scenario of ${n.camel}ScenariosFor('react')) {
+    it(scenario.name, async () => {
+      const el = await render(scenario.props);
+      expect(el.disabled).toBe(scenario.expected.disabled);
+    });
+  }
+});
 
 describe('${n.pascal}: contract drift', () => {
   it('maps every contract event to its React name', () => {
     expect(Object.keys(${n.camel}Events)).toEqual(eventNames(${n.camel}Contract, 'react'));
+  });
+
+  it('forwards every contract prop to the element', async () => {
+    const el = await render({});
+    for (const name of propNames(${n.camel}Contract, 'react')) expect(name in el, name).toBe(true);
   });
 });
 `;
@@ -191,7 +245,13 @@ export const angular = n => `import {
 import type { Cosm${n.pascal} } from '@joralvmel/cosmos-elements/${n.kebab}';
 import '@joralvmel/cosmos-elements/${n.kebab}';
 
-/** Angular proxy of \`<${n.tag}>\`. TODO(generator) add contract inputs and outputs. */
+/**
+ * Angular proxy of \`<${n.tag}>\`. TODO(generator) add contract inputs and outputs.
+ *
+ * \`\`\`html
+ * <${n.tag} [disabled]="busy">${n.title}</${n.tag}>
+ * \`\`\`
+ */
 @Component({
   selector: '${n.tag}',
   template: '<ng-content />',
@@ -206,10 +266,34 @@ export class Cosm${n.pascal}Component {
 }
 `;
 
-export const angularTest =
-  n => `import { eventNames, ${n.camel}Contract, propNames } from '@joralvmel/cosmos-core';
-import { describe, expect, it } from 'vitest';
+export const angularTest = n => `import { Component } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { ${n.camel}Contract, eventNames, propNames } from '@joralvmel/cosmos-core';
+import type { Cosm${n.pascal} } from '@joralvmel/cosmos-elements/${n.kebab}';
+import { afterEach, describe, expect, it } from 'vitest';
 import { COSMOS_COMPONENTS, Cosm${n.pascal}Component } from '../src/index.js';
+
+@Component({
+  imports: [Cosm${n.pascal}Component],
+  template: '<${n.tag} disabled>${n.title}</${n.tag}>',
+})
+class HostComponent {}
+
+afterEach(() => TestBed.resetTestingModule());
+
+describe('Cosm${n.pascal}Component', () => {
+  it('forwards inputs as element properties', async () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    await fixture.whenStable();
+    const el = fixture.nativeElement.querySelector('${n.tag}') as Cosm${n.pascal};
+    await el.updateComplete;
+    expect(el.disabled).toBe(true);
+  });
+
+  it('is part of COSMOS_COMPONENTS', () => {
+    expect(COSMOS_COMPONENTS).toContain(Cosm${n.pascal}Component);
+  });
+});
 
 describe('Cosm${n.pascal}Component: contract drift', () => {
   it('declares exactly the contract inputs and outputs', () => {
@@ -217,10 +301,6 @@ describe('Cosm${n.pascal}Component: contract drift', () => {
       .ɵcmp;
     expect(Object.keys(def.inputs).sort()).toEqual(propNames(${n.camel}Contract, 'angular').sort());
     expect(Object.keys(def.outputs)).toEqual(eventNames(${n.camel}Contract, 'angular'));
-  });
-
-  it('is part of COSMOS_COMPONENTS', () => {
-    expect(COSMOS_COMPONENTS).toContain(Cosm${n.pascal}Component);
   });
 });
 `;
@@ -270,9 +350,42 @@ export const nativeExports = n =>
   `export { ${n.pascal}, type ${n.pascal}Props, ${n.camel}PropNames } from './components/${n.kebab}.js';\n`;
 
 export const nativeTest =
-  n => `import { ${n.camel}Contract, propNames } from '@joralvmel/cosmos-core';
-import { describe, expect, it } from 'vitest';
-import { ${n.camel}PropNames } from '../src/index.js';
+  n => `import { ${n.camel}Contract, ${n.camel}ScenariosFor, propNames } from '@joralvmel/cosmos-core';
+import { act, type ReactNode } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, describe, expect, it } from 'vitest';
+import { ${n.pascal}, ${n.camel}PropNames } from '../src/index.js';
+
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+let root: Root | undefined;
+let container: HTMLElement | undefined;
+
+async function render(node: ReactNode) {
+  container = document.createElement('div');
+  document.body.append(container);
+  root = createRoot(container);
+  await act(async () => root?.render(node));
+  return container.querySelector('[data-testid="subject"]');
+}
+
+afterEach(async () => {
+  await act(async () => root?.unmount());
+  container?.remove();
+});
+
+describe('${n.pascal} (native): shared scenarios', () => {
+  for (const scenario of ${n.camel}ScenariosFor('native')) {
+    it(scenario.name, async () => {
+      const subject = await render(
+        <${n.pascal} {...scenario.props} testID="subject">
+          ${n.title}
+        </${n.pascal}>
+      );
+      expect(subject?.getAttribute('aria-disabled') === 'true').toBe(scenario.expected.disabled);
+    });
+  }
+});
 
 describe('${n.pascal} (native): contract drift', () => {
   it('handles exactly the native props of the contract', () => {
@@ -305,42 +418,67 @@ export default function ${n.pascal}Screen() {
 export const nativeScreenEntry = n =>
   `  { route: '/${n.kebab}', title: '${n.title}', description: 'TODO(generator): short description.' },\n`;
 
-const docsBody = (n, locale) => {
+export const elementsLlms = n => `
+## \`<${n.tag}>\`
+
+TODO(generator): one-line purpose. Import: \`import '@joralvmel/cosmos-elements/${n.kebab}';\`
+Props: \`disabled\`. Events: none. React \`<${n.pascal}>\`, Angular \`Cosm${n.pascal}Component\`.
+`;
+
+export const nativeLlms = n => `
+## \`${n.pascal}\`
+
+TODO(generator): one-line purpose. \`import { ${n.pascal} } from '@joralvmel/cosmos-native';\` Props: \`disabled\`.
+`;
+
+const docsBody = (n, locale, web) => {
   const es = locale === 'es';
   const up = es ? '../../../../components' : '../../../components';
+  const heading = es
+    ? ['Variantes', 'Estados', 'Accesibilidad', 'Eventos por plataforma']
+    : ['Variants', 'States', 'Accessibility', 'Events by platform'];
+  const todo = es ? 'TODO(generator)' : 'TODO(generator)';
   return `---
 title: ${n.title}
 description: ${es ? 'TODO(generator) descripción breve.' : 'TODO(generator) short description.'}
 ---
 
 import ApiTable from '${up}/ApiTable.astro';
-import Playground from '${up}/Playground.astro';
-import Preview from '${up}/Preview.astro';
+import EventsTable from '${up}/EventsTable.astro';
+${web ? `import Playground from '${up}/Playground.astro';\nimport Preview from '${up}/Preview.astro';\n` : ''}import StatusBadge from '${up}/StatusBadge.astro';
 
-${es ? 'TODO(generator): cuándo usar' : 'TODO(generator): when to use'} \`<${n.tag}>\`.
+<StatusBadge name="${n.kebab}" />
+
+${es ? `${todo}: qué es y cuándo usar` : `${todo}: what it is and when to use`} \`<${n.tag}>\`.
 
 ## Playground
 
-<Playground name="${n.kebab}" content="${n.title}" />
+${web ? `<Playground name="${n.kebab}" content="${n.title}" />` : `${todo}: ${es ? 'pantalla del demo nativo' : 'native demo screen'} \`apps/native-demo/app/${n.kebab}.tsx\`.`}
 
-## ${es ? 'Ejemplos' : 'Examples'}
+## ${heading[0]}
 
-<Preview>
-  <${n.tag}>${n.title}</${n.tag}>
-</Preview>
+${web ? `<Preview>\n  <${n.tag}>${n.title}</${n.tag}>\n</Preview>` : `${todo}`}
 
-## ${es ? 'Accesibilidad' : 'Accessibility'}
+## ${heading[1]}
 
-- TODO(generator)
+${web ? `<Preview>\n  <${n.tag} disabled>${n.title}</${n.tag}>\n</Preview>` : `${todo}`}
+
+## ${heading[2]}
+
+- ${todo}
 
 ## API
 
 <ApiTable name="${n.kebab}" />
+
+## ${heading[3]}
+
+<EventsTable name="${n.kebab}" />
 `;
 };
 
-export const docsEn = n => docsBody(n, 'en');
-export const docsEs = n => docsBody(n, 'es');
+export const docsEn = (n, web = true) => docsBody(n, 'en', web);
+export const docsEs = (n, web = true) => docsBody(n, 'es', web);
 
 export const changeset = n => `---
 '@joralvmel/cosmos-core': minor
@@ -358,5 +496,5 @@ export const nativeOnlyChangeset = n => `---
 '@joralvmel/cosmos-native': minor
 ---
 
-Add the native-only ${n.title} component with its contract.
+Add the native-only ${n.title} component (\`${n.pascal}\`) with its contract.
 `;

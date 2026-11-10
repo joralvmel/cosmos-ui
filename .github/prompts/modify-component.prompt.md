@@ -1,6 +1,6 @@
 ---
 name: modify-component
-description: 'Changes the API or behavior of an existing component while keeping parity: contract → Lit → wrappers → React Native → scenarios → docs → llms.md → changeset.'
+description: 'Changes the API or behavior of an existing component while keeping parity and the anatomy: contract → Lit → wrappers → React Native → scenarios → docs → llms.md → changeset.'
 argument-hint: 'Component name'
 agent: agent
 ---

@@ -1,6 +1,6 @@
 ---
 name: create-component
-description: 'Creates a new Cosmos component end-to-end with the generator: contract and scenarios, Lit Web Component, React and Angular wrappers, React Native component, tests, docs pages (EN/ES) and changeset.'
+description: 'Creates a new Cosmos component end-to-end following docs/conventions/component-anatomy.md: contract and scenarios, Lit Web Component, React and Angular wrappers, React Native component and demo, tests, docs pages (EN/ES), llms.md and changeset.'
 ---
 
 # create-component
@@ -14,30 +14,28 @@ Main agent: `component-builder`. Read `AGENTS.md` first.
 
 ## Steps
 
-1. Write the API plan (props, events and ownership, slots, parts, keyboard, ARIA). Ask `researcher` for references if needed.
-2. Run `npm run generate -- component <name>` (use `--dry-run` first to preview).
-3. Complete the contract and scenarios (`define-contract`).
-4. Implement the Web Component; use core headless helpers; style with the visual spec (`design-component`).
-5. Complete the React events map and Angular inputs/outputs from the contract.
-6. Implement the native component (`create-native-component` steps) and its demo screen.
-7. Write tests: scenarios + drift on every platform, plus platform specifics.
-8. Write the docs pages (EN + ES) and update the package `llms.md`.
-9. Edit the generated changeset summary and remove every `TODO(generator)` marker.
+1. Run `component-status` for the component: it must be in the catalog and its `dependsOn` must be stable (otherwise build the dependencies first or use native primitives and record a catalog note).
+2. Start a branch with `start-work` (`feat/<package>-<name>`). Ask `researcher` for references when the behavior is new (`research-reference`).
+3. Write the API plan and the contract with `define-contract` (props, events and ownership, slots, parts, keyboard, ARIA).
+4. Run `npm run generate -- component <name>` (`--dry-run` first to preview). It creates every file of the anatomy, the catalog entry if missing, `llms.md` sections and a changeset.
+5. Implement the Web Component with core headless helpers, keeping the section order of the anatomy; apply the visual spec (`design-component`).
+6. Complete the React events map and the Angular inputs/outputs from the contract.
+7. Implement the native component and its demo screen (`create-native-component` steps 3-6).
+8. Write tests on every platform: shared scenarios, drift tests and platform specifics (`add-contract-tests`).
+9. Write the docs pages (EN + ES) in the anatomy order and update `llms.md` (`add-docs-page`, `add-playground`).
+10. Edit the generated changeset and remove every `TODO(generator)` marker (`npm run status` keeps the component "in progress" while markers remain).
+11. Finish with the structure test and the full validation: `npx vitest run test/structure.test.mjs` in `tools/`, then `npx biome ci . && npx turbo run typecheck test build`. When `npm run status` shows every piece, set `status: 'stable'` in the catalog entry.
 
 ## Files
 
-- `packages/core/src/specs/<name>*.ts`
-- `packages/elements/src/components/<name>/`
-- `packages/react/src/components/<name>.ts`
-- `packages/angular/src/components/<name>.component.ts`
-- `packages/native/src/components/<name>.tsx`
-- `apps/docs/src/content/docs/{,es/}components/<name>.mdx`
-- `apps/native-demo/app/<name>.tsx`
-- `.changeset/add-<name>.md`
+- See docs/conventions/component-anatomy.md (contract, scenarios, Web Component, React, Angular, React Native, demo, tests, docs, llms.md, changeset)
+- `packages/core/src/catalog.ts`
 
 ## Checklist
 
+- [ ] Dependencies stable (or noted in the catalog)
 - [ ] No `TODO(generator)` left
+- [ ] Structure test green
 - [ ] Drift tests green on 4 platforms
 - [ ] Docs EN + ES
 - [ ] Changeset

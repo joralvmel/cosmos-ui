@@ -3,8 +3,9 @@ import * as component from './templates/component.mjs';
 import * as theme from './templates/theme.mjs';
 
 const key = n => (n.kebab.includes('-') ? `'${n.kebab}'` : n.kebab);
+const catalogAnchor = /\];\n\n\/\*\* Catalog entry by name/;
 
-/** Files touched by the core part of a component: contract, scenarios, exports and registry. */
+/** Contract, scenarios, core exports, registry and catalog entry (when not planned yet). */
 function coreOps(n, platforms) {
   return [
     {
@@ -28,6 +29,13 @@ function coreOps(n, platforms) {
       type: 'prepend',
       path: 'packages/core/src/index.ts',
       content: `import { ${n.camel}Contract } from './specs/${n.kebab}.js';\n`,
+    },
+    {
+      type: 'insert',
+      path: 'packages/core/src/catalog.ts',
+      before: catalogAnchor,
+      unless: new RegExp(`name: '${n.kebab}'`),
+      content: component.catalogEntry(n, platforms),
     },
   ];
 }
@@ -59,6 +67,21 @@ function nativeOps(n) {
   ];
 }
 
+function docsOps(n, web) {
+  return [
+    {
+      type: 'create',
+      path: `apps/docs/src/content/docs/components/${n.kebab}.mdx`,
+      content: component.docsEn(n, web),
+    },
+    {
+      type: 'create',
+      path: `apps/docs/src/content/docs/es/components/${n.kebab}.mdx`,
+      content: component.docsEs(n, web),
+    },
+  ];
+}
+
 /** Returns the list of file operations for a target, without touching the disk. */
 export function plan(target, n, options = {}) {
   switch (target) {
@@ -85,6 +108,7 @@ export function plan(target, n, options = {}) {
           path: `packages/elements/test/${n.kebab}.test.ts`,
           content: component.elementTest(n),
         },
+        { type: 'append', path: 'packages/elements/llms.md', content: component.elementsLlms(n) },
         {
           type: 'create',
           path: `packages/react/src/components/${n.kebab}.ts`,
@@ -93,7 +117,7 @@ export function plan(target, n, options = {}) {
         { type: 'append', path: 'packages/react/src/index.ts', content: component.reactExports(n) },
         {
           type: 'create',
-          path: `packages/react/test/${n.kebab}.test.ts`,
+          path: `packages/react/test/${n.kebab}.test.tsx`,
           content: component.reactTest(n),
         },
         {
@@ -123,22 +147,16 @@ export function plan(target, n, options = {}) {
           content: component.angularTest(n),
         },
         ...nativeOps(n),
-        {
-          type: 'create',
-          path: `apps/docs/src/content/docs/components/${n.kebab}.mdx`,
-          content: component.docsEn(n),
-        },
-        {
-          type: 'create',
-          path: `apps/docs/src/content/docs/es/components/${n.kebab}.mdx`,
-          content: component.docsEs(n),
-        },
+        { type: 'append', path: 'packages/native/llms.md', content: component.nativeLlms(n) },
+        ...docsOps(n, true),
         { type: 'create', path: `.changeset/add-${n.kebab}.md`, content: component.changeset(n) },
       ];
     case 'native':
       return [
         ...coreOps(n, ['native']),
         ...nativeOps(n),
+        { type: 'append', path: 'packages/native/llms.md', content: component.nativeLlms(n) },
+        ...docsOps(n, false),
         {
           type: 'create',
           path: `.changeset/add-${n.kebab}.md`,

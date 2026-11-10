@@ -31,6 +31,8 @@ export interface ComponentReport {
   notes: string[];
   status: ComponentStatus;
   pieces: Pieces;
+  /** Files that still contain TODO(generator) markers (keep the component in progress). */
+  todos: string[];
   missing: PieceKey[];
   blockedBy: string[];
 }

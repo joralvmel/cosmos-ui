@@ -40,8 +40,17 @@ export function Text({ children, style }: AnyProps) {
   return createElement('span', { 'data-style': JSON.stringify(flatten(style)) }, children);
 }
 
-export function View({ children }: AnyProps) {
-  return createElement('div', null, children);
+export function View({ children, ...props }: AnyProps) {
+  const state = props.accessibilityState as { disabled?: boolean; busy?: boolean } | undefined;
+  return createElement(
+    'div',
+    {
+      'data-testid': props.testID,
+      'aria-disabled': state?.disabled ? 'true' : undefined,
+      'aria-busy': state?.busy ? 'true' : undefined,
+    },
+    children
+  );
 }
 
 export function ActivityIndicator() {

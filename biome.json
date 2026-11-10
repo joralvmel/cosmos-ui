@@ -75,6 +75,14 @@
           "correctness": { "noUnusedVariables": "off", "noUnusedImports": "off" }
         }
       }
+    },
+    {
+      "includes": ["packages/native/test/**"],
+      "linter": {
+        "rules": {
+          "correctness": { "noReactNativeRawText": "off" }
+        }
+      }
     }
   ]
 }

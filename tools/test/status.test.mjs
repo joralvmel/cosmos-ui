@@ -46,7 +46,9 @@ describe('component status', () => {
   });
 
   it('marks pieces that do not apply to native-only components', () => {
-    const sheet = report.components.find(item => item.name === 'bottom-sheet');
+    const base = catalog.find(item => item.name === 'bottom-sheet');
+    if (!base) throw new Error('bottom-sheet missing from the catalog');
+    const [sheet] = getStatusReport(ROOT, [{ ...base, name: 'not-implemented-sheet' }]).components;
     expect(sheet?.pieces.web).toBeUndefined();
     expect(sheet?.pieces.native).toBe(false);
   });

@@ -29,6 +29,10 @@ const strings = {
     summary: (stable: number, progress: number, planned: number) =>
       `${stable} stable · ${progress} in progress · ${planned} planned`,
     notApplicable: 'Not applicable',
+    noEvents: 'This component has no events.',
+    cancelable: 'cancelable',
+    eventsNote:
+      'DOM events are CustomEvents that bubble and cross shadow roots. React and Angular receive the original CustomEvent (use event.detail); React Native callbacks receive the detail directly.',
   },
   es: {
     props: 'Propiedades',
@@ -59,6 +63,10 @@ const strings = {
     summary: (stable: number, progress: number, planned: number) =>
       `${stable} estables · ${progress} en progreso · ${planned} planificados`,
     notApplicable: 'No aplica',
+    noEvents: 'Este componente no tiene eventos.',
+    cancelable: 'cancelable',
+    eventsNote:
+      'Los eventos DOM son CustomEvent que burbujean y atraviesan los shadow roots. React y Angular reciben el CustomEvent original (usa event.detail); los callbacks de React Native reciben directamente el detail.',
   },
 } as const;
 

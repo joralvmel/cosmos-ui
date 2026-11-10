@@ -62,5 +62,5 @@ export const buttonScenarios: readonly ButtonScenario[] = [
   },
 ];
 
-export const scenariosFor = (platform: Platform) =>
+export const buttonScenariosFor = (platform: Platform) =>
   buttonScenarios.filter(scenario => !scenario.platforms || scenario.platforms.includes(platform));

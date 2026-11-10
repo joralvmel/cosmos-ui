@@ -16,6 +16,139 @@ export type ButtonTone = Props['tone'];
 export type ButtonSize = Props['size'];
 export type ButtonType = Props['type'];
 
+const styles = css`
+  :host {
+    --_solid: var(--cosm-primary, oklch(0.55 0.2 268));
+    --_on-solid: var(--cosm-primary-fg, oklch(1 0 0));
+    --_subtle: var(--cosm-primary-subtle, oklch(0.945 0.048 268));
+    --_text: var(--cosm-primary-text, oklch(0.44 0.18 268));
+    --_height: var(--cosm-control-md, 2.5rem);
+    --_padding: var(--cosm-space-lg, 1rem);
+    --_font-size: var(--cosm-text-sm, 0.875rem);
+    display: inline-flex;
+    vertical-align: middle;
+  }
+  :host([tone='neutral']) {
+    --_solid: var(--cosm-fg, oklch(0.24 0.01 268));
+    --_on-solid: var(--cosm-bg, oklch(0.985 0.007 268));
+    --_subtle: var(--cosm-neutral-3, oklch(0.945 0.01 268));
+    --_text: var(--cosm-fg, oklch(0.24 0.01 268));
+  }
+  :host([tone='danger']) {
+    --_solid: var(--cosm-danger, oklch(0.55 0.16 19));
+    --_on-solid: var(--cosm-danger-fg, oklch(1 0 0));
+    --_subtle: var(--cosm-danger-subtle, oklch(0.945 0.038 19));
+    --_text: var(--cosm-danger-text, oklch(0.44 0.144 19));
+  }
+  :host([size='sm']) {
+    --_height: var(--cosm-control-sm, 2rem);
+    --_padding: var(--cosm-space-md, 0.75rem);
+    --_font-size: var(--cosm-text-sm, 0.875rem);
+  }
+  :host([size='lg']) {
+    --_height: var(--cosm-control-lg, 3rem);
+    --_padding: var(--cosm-space-xl, 1.5rem);
+    --_font-size: var(--cosm-text-md, 1rem);
+  }
+  :host([full-width]) {
+    display: flex;
+    width: 100%;
+  }
+  :host([disabled]) {
+    pointer-events: none;
+  }
+
+  .base {
+    --_bg: var(--_solid);
+    --_fg: var(--_on-solid);
+    --_border: transparent;
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cosm-button-gap, var(--cosm-space-sm, 0.5rem));
+    min-height: var(--_height);
+    padding: 0 var(--_padding);
+    border: 1px solid var(--_border);
+    border-radius: var(--cosm-button-radius, var(--cosm-radius-md, 0.5rem));
+    background: var(--_bg);
+    color: var(--_fg);
+    font: inherit;
+    font-family: var(--cosm-font-sans, system-ui, sans-serif);
+    font-size: var(--_font-size);
+    font-weight: var(--cosm-button-font-weight, var(--cosm-weight-semibold, 600));
+    line-height: var(--cosm-leading-tight, 1.25);
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease),
+      border-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
+  }
+  .base:hover {
+    --_bg: color-mix(in oklab, var(--_solid), var(--_on-solid) 14%);
+  }
+  .base:active {
+    --_bg: color-mix(in oklab, var(--_solid), var(--_on-solid) 24%);
+  }
+  :host([variant='soft']) .base {
+    --_bg: var(--_subtle);
+    --_fg: var(--_text);
+  }
+  :host([variant='soft']) .base:hover {
+    --_bg: color-mix(in oklab, var(--_subtle), var(--_text) 10%);
+  }
+  :host([variant='outline']) .base {
+    --_bg: transparent;
+    --_fg: var(--_text);
+    --_border: var(--cosm-border-strong, oklch(0.64 0.01 268));
+  }
+  :host([variant='ghost']) .base {
+    --_bg: transparent;
+    --_fg: var(--_text);
+  }
+  :host([variant='outline']) .base:hover,
+  :host([variant='ghost']) .base:hover {
+    --_bg: var(--_subtle);
+  }
+  .base:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .base[aria-busy='true'] {
+    cursor: progress;
+  }
+  .label {
+    display: inline-flex;
+    align-items: center;
+  }
+  ::slotted(svg),
+  ::slotted([slot='start']),
+  ::slotted([slot='end']) {
+    flex-shrink: 0;
+  }
+  .spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-inline-end-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .base {
+      transition: none;
+    }
+    .spinner {
+      animation-duration: 2.4s;
+    }
+  }
+`;
+
 /**
  * Triggers an action or submits a form. Renders a native `<button>` (WAI-ARIA APG button
  * pattern) and is form-associated, so `type="submit"` and `type="reset"` work inside forms.
@@ -50,6 +183,8 @@ export class CosmButton extends CosmElement {
     type: {},
     label: {},
   };
+
+  static override styles = [boxSizing, focusRing, styles];
 
   declare variant: ButtonVariant;
   declare tone: ButtonTone;
@@ -133,143 +268,6 @@ export class CosmButton extends CosmElement {
       <slot name="end"></slot>
     </button>`;
   }
-
-  static override styles = [
-    boxSizing,
-    focusRing,
-    css`
-      :host {
-        --_solid: var(--cosm-primary, oklch(0.55 0.2 268));
-        --_on-solid: var(--cosm-primary-fg, oklch(1 0 0));
-        --_subtle: var(--cosm-primary-subtle, oklch(0.945 0.048 268));
-        --_text: var(--cosm-primary-text, oklch(0.44 0.18 268));
-        --_height: var(--cosm-control-md, 2.5rem);
-        --_padding: var(--cosm-space-lg, 1rem);
-        --_font-size: var(--cosm-text-sm, 0.875rem);
-        display: inline-flex;
-        vertical-align: middle;
-      }
-      :host([tone='neutral']) {
-        --_solid: var(--cosm-fg, oklch(0.24 0.01 268));
-        --_on-solid: var(--cosm-bg, oklch(0.985 0.007 268));
-        --_subtle: var(--cosm-neutral-3, oklch(0.945 0.01 268));
-        --_text: var(--cosm-fg, oklch(0.24 0.01 268));
-      }
-      :host([tone='danger']) {
-        --_solid: var(--cosm-danger, oklch(0.55 0.16 19));
-        --_on-solid: var(--cosm-danger-fg, oklch(1 0 0));
-        --_subtle: var(--cosm-danger-subtle, oklch(0.945 0.038 19));
-        --_text: var(--cosm-danger-text, oklch(0.44 0.144 19));
-      }
-      :host([size='sm']) {
-        --_height: var(--cosm-control-sm, 2rem);
-        --_padding: var(--cosm-space-md, 0.75rem);
-        --_font-size: var(--cosm-text-sm, 0.875rem);
-      }
-      :host([size='lg']) {
-        --_height: var(--cosm-control-lg, 3rem);
-        --_padding: var(--cosm-space-xl, 1.5rem);
-        --_font-size: var(--cosm-text-md, 1rem);
-      }
-      :host([full-width]) {
-        display: flex;
-        width: 100%;
-      }
-      :host([disabled]) {
-        pointer-events: none;
-      }
-
-      .base {
-        --_bg: var(--_solid);
-        --_fg: var(--_on-solid);
-        --_border: transparent;
-        display: inline-flex;
-        flex: 1;
-        align-items: center;
-        justify-content: center;
-        gap: var(--cosm-button-gap, var(--cosm-space-sm, 0.5rem));
-        min-height: var(--_height);
-        padding: 0 var(--_padding);
-        border: 1px solid var(--_border);
-        border-radius: var(--cosm-button-radius, var(--cosm-radius-md, 0.5rem));
-        background: var(--_bg);
-        color: var(--_fg);
-        font: inherit;
-        font-family: var(--cosm-font-sans, system-ui, sans-serif);
-        font-size: var(--_font-size);
-        font-weight: var(--cosm-button-font-weight, var(--cosm-weight-semibold, 600));
-        line-height: var(--cosm-leading-tight, 1.25);
-        cursor: pointer;
-        user-select: none;
-        transition:
-          background-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease),
-          border-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
-      }
-      .base:hover {
-        --_bg: color-mix(in oklab, var(--_solid), var(--_on-solid) 14%);
-      }
-      .base:active {
-        --_bg: color-mix(in oklab, var(--_solid), var(--_on-solid) 24%);
-      }
-      :host([variant='soft']) .base {
-        --_bg: var(--_subtle);
-        --_fg: var(--_text);
-      }
-      :host([variant='soft']) .base:hover {
-        --_bg: color-mix(in oklab, var(--_subtle), var(--_text) 10%);
-      }
-      :host([variant='outline']) .base {
-        --_bg: transparent;
-        --_fg: var(--_text);
-        --_border: var(--cosm-border-strong, oklch(0.64 0.01 268));
-      }
-      :host([variant='ghost']) .base {
-        --_bg: transparent;
-        --_fg: var(--_text);
-      }
-      :host([variant='outline']) .base:hover,
-      :host([variant='ghost']) .base:hover {
-        --_bg: var(--_subtle);
-      }
-      .base:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
-      .base[aria-busy='true'] {
-        cursor: progress;
-      }
-      .label {
-        display: inline-flex;
-        align-items: center;
-      }
-      ::slotted(svg),
-      ::slotted([slot='start']),
-      ::slotted([slot='end']) {
-        flex-shrink: 0;
-      }
-      .spinner {
-        width: 1em;
-        height: 1em;
-        border: 2px solid currentColor;
-        border-inline-end-color: transparent;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(1turn);
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .base {
-          transition: none;
-        }
-        .spinner {
-          animation-duration: 2.4s;
-        }
-      }
-    `,
-  ];
 }
 
 define('cosm-button', CosmButton);

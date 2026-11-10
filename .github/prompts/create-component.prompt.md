@@ -1,6 +1,6 @@
 ---
 name: create-component
-description: 'Creates a new Cosmos component end-to-end with the generator: contract and scenarios, Lit Web Component, React and Angular wrappers, React Native component, tests, docs pages (EN/ES) and changeset.'
+description: 'Creates a new Cosmos component end-to-end following docs/conventions/component-anatomy.md: contract and scenarios, Lit Web Component, React and Angular wrappers, React Native component and demo, tests, docs pages (EN/ES), llms.md and changeset.'
 argument-hint: 'Component name (kebab-case, without `cosm-`)'
 agent: agent
 ---

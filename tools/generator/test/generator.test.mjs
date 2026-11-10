@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
+import { checkAnatomy } from '../../status/anatomy.mjs';
 import { apply } from '../src/apply.mjs';
 import { names } from '../src/names.mjs';
 import { plan } from '../src/plan.mjs';
@@ -10,11 +11,14 @@ import { plan } from '../src/plan.mjs';
 const repo = fileURLToPath(new URL('../../../', import.meta.url));
 const anchored = [
   'packages/core/src/index.ts',
+  'packages/core/src/catalog.ts',
   'packages/elements/src/index.ts',
   'packages/elements/package.json',
+  'packages/elements/llms.md',
   'packages/react/src/index.ts',
   'packages/angular/src/index.ts',
   'packages/native/src/index.ts',
+  'packages/native/llms.md',
   'packages/charts-core/src/index.ts',
   'packages/tokens/src/themes.ts',
   'apps/native-demo/src/screens.ts',
@@ -75,6 +79,38 @@ describe('component target', () => {
     expect(Object.keys(pkg.exports)).toContain('./date-picker');
     const screens = readFileSync(join(root, 'apps/native-demo/src/screens.ts'), 'utf8');
     expect(screens).toContain("route: '/date-picker'");
+    const catalog = readFileSync(join(root, 'packages/core/src/catalog.ts'), 'utf8');
+    expect(catalog.match(/name: 'date-picker'/g)).toHaveLength(1);
+  });
+
+  it('adds a catalog entry and llms.md sections for components that are not planned yet', () => {
+    const root = copyRepoFiles();
+    apply(root, plan('component', names('chip')));
+    expect(readFileSync(join(root, 'packages/core/src/catalog.ts'), 'utf8')).toContain(
+      "entry({ name: 'chip', title: 'Chip'"
+    );
+    expect(readFileSync(join(root, 'packages/elements/llms.md'), 'utf8')).toContain(
+      '`<cosm-chip>`'
+    );
+    expect(readFileSync(join(root, 'packages/native/llms.md'), 'utf8')).toContain('`Chip`');
+  });
+
+  it('generates files that follow the component anatomy', () => {
+    const root = copyRepoFiles();
+    apply(root, plan('component', names('chip')));
+    expect(checkAnatomy(root, 'chip', ['web', 'react', 'angular', 'native'])).toEqual([]);
+    const nativeRoot = copyRepoFiles();
+    apply(nativeRoot, plan('native', names('bottom-sheet')));
+    expect(checkAnatomy(nativeRoot, 'bottom-sheet', ['native'])).toEqual([]);
+  });
+
+  it('keeps the component templates stable (snapshot)', () => {
+    const created = Object.fromEntries(
+      plan('component', names('chip'))
+        .filter(op => op.type === 'create' || op.type === 'append' || op.type === 'prepend')
+        .map(op => [`${op.type} ${op.path}`, op.content])
+    );
+    expect(created).toMatchSnapshot();
   });
 
   it('marks generated code with TODO(generator)', () => {
@@ -120,7 +156,7 @@ describe('other targets', () => {
     const files = apply(root, plan('native', names('bottom-sheet')));
     expect(files).toContain('packages/native/src/components/bottom-sheet.tsx');
     expect(files.some(file => file.startsWith('packages/elements'))).toBe(false);
-    expect(files.some(file => file.startsWith('apps/docs'))).toBe(false);
+    expect(files).toContain('apps/docs/src/content/docs/components/bottom-sheet.mdx');
     const contract = plan('native', names('bottom-sheet')).find(op =>
       op.path.endsWith('specs/bottom-sheet.ts')
     );

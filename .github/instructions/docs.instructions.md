@@ -4,6 +4,7 @@ applyTo: 'apps/docs/**'
 
 # Docs site (Astro 7 + Starlight)
 
+- Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - Every English page in `src/content/docs/` has a Spanish twin in `src/content/docs/es/` (a test checks
   it). Write natural text for each language; do not machine-translate code.
 - Component pages: introduction, `<Playground name="<name>" />`, examples in `<Preview>`, usage per

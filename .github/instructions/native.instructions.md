@@ -4,6 +4,7 @@ applyTo: 'packages/native/**,packages/charts-native/**,apps/native-demo/**'
 
 # React Native (0.88, Expo SDK 58)
 
+- Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - Components are written for React Native (no Web Components, no DOM). Props derive from the contract
   (`ContractProps<typeof contract, 'native'>`) and a `<name>PropNames` array is checked by the drift
   test.

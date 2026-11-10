@@ -1,6 +1,6 @@
 ---
 name: create-native-component
-description: 'Creates a React Native component on a contract, core logic and tokens, with shared scenarios, drift test and a screen in the Expo demo.'
+description: 'Creates a React Native component on a contract, core logic and tokens, with shared scenarios, drift test, demo screen and docs, following the component anatomy.'
 argument-hint: 'Component name'
 agent: agent
 ---

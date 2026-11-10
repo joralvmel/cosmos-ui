@@ -1,0 +1,50 @@
+---
+import { type ComponentContract, contracts } from '@joralvmel/cosmos-core';
+import { t } from './i18n';
+
+interface Props {
+  name: keyof typeof contracts;
+}
+
+/** Event names of a component on every platform (ADR 0003), read from its contract. */
+const contract: ComponentContract = contracts[Astro.props.name];
+const s = t(Astro.currentLocale);
+const events = Object.values(contract.events);
+---
+
+{
+  events.length === 0 ? (
+    <p>{s.noEvents}</p>
+  ) : (
+    <>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">DOM</th>
+            <th scope="col">React</th>
+            <th scope="col">Angular</th>
+            <th scope="col">React Native</th>
+            <th scope="col">{s.detail}</th>
+            <th scope="col">{s.description}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map(event => (
+            <tr>
+              <td><code>{event.names.dom}</code></td>
+              <td><code>{event.names.react}</code></td>
+              <td><code>({event.names.angular})</code></td>
+              <td><code>{event.names.native}</code></td>
+              <td><code>{event.detail}</code></td>
+              <td>
+                {event.description}
+                {event.cancelable && <> ({s.cancelable})</>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>{s.eventsNote}</p>
+    </>
+  )
+}

@@ -4,6 +4,7 @@ applyTo: 'packages/react/**'
 
 # React wrappers (React 19)
 
+- Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - One file per component in `src/components/<name>.ts`, created with `@lit/react` `createComponent`.
 - Export an events map (`<name>Events`) whose keys are the contract React names (`onPress`,
   `onChange`, `onOpenChange`) and values the DOM events typed with `EventName<CustomEvent<Detail>>`.

@@ -4,6 +4,7 @@ applyTo: '**/test/**'
 
 # Tests (Vitest 5)
 
+- Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - Tests live in each package's `test/` folder as `*.test.ts(x)` (`*.test.mjs` in `tools`). Run them with
   `npx turbo run test --filter=@joralvmel/cosmos-<pkg>...` or `npx vitest run` inside the package.
 - DOM packages use `happy-dom`; pure packages use `node`.

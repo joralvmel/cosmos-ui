@@ -4,6 +4,7 @@ description: Triggers an action or submits a form. Web Component, React, Angular
 ---
 
 import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
 import Playground from '../../../components/Playground.astro';
 import Preview from '../../../components/Preview.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
@@ -12,13 +13,17 @@ import StatusBadge from '../../../components/StatusBadge.astro';
 
 `<cosm-button>` triggers an action. It follows the
 [WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/), renders a native
-`<button>` and takes part in forms (`type="submit"` / `type="reset"`).
+`<button>` and takes part in forms (`type="submit"` / `type="reset"`). Use it for actions; use a link
+for navigation.
 
 ## Playground
 
 <Playground name="button" content="Save changes" />
 
-## Variants and tones
+## Variants
+
+`variant` sets the emphasis and `tone` the color role. Use one `solid` button per view for the main
+action.
 
 <Preview>
   <cosm-button>Solid</cosm-button>
@@ -29,43 +34,26 @@ import StatusBadge from '../../../components/StatusBadge.astro';
   <cosm-button tone="danger">Delete</cosm-button>
 </Preview>
 
-```html
-<cosm-button variant="soft">Soft</cosm-button>
-<cosm-button tone="danger">Delete</cosm-button>
-```
-
-## Sizes and states
-
 <Preview>
   <cosm-button size="sm">Small</cosm-button>
   <cosm-button>Medium</cosm-button>
   <cosm-button size="lg">Large</cosm-button>
+</Preview>
+
+## States
+
+<Preview>
   <cosm-button loading>Saving</cosm-button>
   <cosm-button disabled>Disabled</cosm-button>
 </Preview>
 
-`loading` keeps the button focusable, sets `aria-busy` and ignores presses. `disabled` removes it from
-the tab order.
-
-## Usage per platform
-
-```tsx
-// React
-<Button variant="soft" onPress={event => save(event.detail.source)}>Save</Button>
-```
-
-```html
-<!-- Angular -->
-<cosm-button variant="soft" (press)="save($event.detail.source)">Save</cosm-button>
-```
-
-```tsx
-// React Native
-<Button variant="soft" onPress={({ source }) => save(source)}>Save</Button>
-```
+- `loading` keeps the button focusable, sets `aria-busy` and ignores presses.
+- `disabled` removes it from the tab order and ignores presses.
+- Hover, active and `:focus-visible` states use the theme tokens of the selected tone.
 
 ## Accessibility
 
+- Native `<button>` semantics: <kbd>Enter</kbd> and <kbd>Space</kbd> activate it.
 - Give icon-only buttons a `label`; it becomes the accessible name.
 - Use `tone="danger"` together with explicit text for destructive actions; color is never the only cue.
 - On React Native, small buttons extend their touch area to 44 points.
@@ -73,3 +61,7 @@ the tab order.
 ## API
 
 <ApiTable name="button" />
+
+## Events by platform
+
+<EventsTable name="button" />

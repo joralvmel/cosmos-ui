@@ -31,7 +31,7 @@ export {
   type ButtonAction,
   type ButtonScenario,
   buttonScenarios,
-  scenariosFor as buttonScenariosFor,
+  buttonScenariosFor,
 } from './specs/button.scenarios.js';
 
 import { buttonContract } from './specs/button.js';

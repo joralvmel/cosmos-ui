@@ -146,7 +146,11 @@ export function getStatusReport(root = ROOT, entries = catalog) {
   const changesets = changesetTexts(root);
   const components = entries.map(entry => {
     const pieces = detectPieces(root, entry, changesets);
-    const status = computeStatus(pieces);
+    const todos = Object.values(piecePaths(entry.name)).filter(path =>
+      read(root, path).includes('TODO(generator)')
+    );
+    const detected = computeStatus(pieces);
+    const status = detected === 'stable' && todos.length > 0 ? 'in-progress' : detected;
     return {
       name: entry.name,
       title: entry.title,
@@ -161,6 +165,8 @@ export function getStatusReport(root = ROOT, entries = catalog) {
       notes: [...(entry.notes ?? [])],
       status,
       pieces,
+      /** Files that still contain TODO(generator) markers. */
+      todos,
       missing: Object.entries(pieces)
         .filter(([, value]) => value === false)
         .map(([key]) => key),
@@ -231,7 +237,9 @@ function toText(report) {
           ? item.blockedBy.length
             ? `  (blocked by ${item.blockedBy.join(', ')})`
             : ''
-          : `  missing: ${item.missing.join(', ')}`;
+          : item.missing.length > 0
+            ? `  missing: ${item.missing.join(', ')}`
+            : `  TODO(generator) markers in ${item.todos.length} file(s)`;
     lines.push(`${item.status.padEnd(12)} ${String(item.priority).padEnd(2)} ${item.name}${extra}`);
   }
   lines.push('', `Next suggested: ${report.next.join(', ') || '—'}`);

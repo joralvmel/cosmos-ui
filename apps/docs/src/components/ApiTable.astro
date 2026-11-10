@@ -36,31 +36,6 @@ const typeOf = (spec: ComponentContract['props'][string]) =>
 </table>
 
 {
-  Object.keys(contract.events).length > 0 && (
-    <>
-      <h3>{s.events}</h3>
-      <table>
-        <thead>
-          <tr><th>DOM</th><th>React</th><th>Angular</th><th>React Native</th><th>{s.detail}</th><th>{s.description}</th></tr>
-        </thead>
-        <tbody>
-          {Object.values(contract.events).map(event => (
-            <tr>
-              <td><code>{event.names.dom}</code></td>
-              <td><code>{event.names.react}</code></td>
-              <td><code>({event.names.angular})</code></td>
-              <td><code>{event.names.native}</code></td>
-              <td><code>{event.detail}</code></td>
-              <td>{event.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
-  )
-}
-
-{
   [
     [s.slots, contract.slots],
     [s.parts, contract.parts],

@@ -4,6 +4,7 @@ description: Ejecuta una acción o envía un formulario. Web Component, React, A
 ---
 
 import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
 import Playground from '../../../../components/Playground.astro';
 import Preview from '../../../../components/Preview.astro';
 import StatusBadge from '../../../../components/StatusBadge.astro';
@@ -12,13 +13,17 @@ import StatusBadge from '../../../../components/StatusBadge.astro';
 
 `<cosm-button>` ejecuta una acción. Sigue el
 [patrón de botón de WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/button/), renderiza un
-`<button>` nativo y participa en formularios (`type="submit"` / `type="reset"`).
+`<button>` nativo y participa en formularios (`type="submit"` / `type="reset"`). Úsalo para acciones;
+para navegar usa un enlace.
 
 ## Playground
 
 <Playground name="button" content="Guardar cambios" />
 
-## Variantes y tonos
+## Variantes
+
+`variant` define el énfasis y `tone` el rol de color. Usa un único botón `solid` por vista para la
+acción principal.
 
 <Preview>
   <cosm-button>Solid</cosm-button>
@@ -29,47 +34,35 @@ import StatusBadge from '../../../../components/StatusBadge.astro';
   <cosm-button tone="danger">Eliminar</cosm-button>
 </Preview>
 
-```html
-<cosm-button variant="soft">Soft</cosm-button>
-<cosm-button tone="danger">Eliminar</cosm-button>
-```
-
-## Tamaños y estados
-
 <Preview>
   <cosm-button size="sm">Pequeño</cosm-button>
   <cosm-button>Mediano</cosm-button>
   <cosm-button size="lg">Grande</cosm-button>
+</Preview>
+
+## Estados
+
+<Preview>
   <cosm-button loading>Guardando</cosm-button>
   <cosm-button disabled>Deshabilitado</cosm-button>
 </Preview>
 
-`loading` mantiene el botón enfocable, establece `aria-busy` e ignora las pulsaciones. `disabled` lo
-saca del orden de tabulación.
-
-## Uso por plataforma
-
-```tsx
-// React
-<Button variant="soft" onPress={event => guardar(event.detail.source)}>Guardar</Button>
-```
-
-```html
-<!-- Angular -->
-<cosm-button variant="soft" (press)="guardar($event.detail.source)">Guardar</cosm-button>
-```
-
-```tsx
-// React Native
-<Button variant="soft" onPress={({ source }) => guardar(source)}>Guardar</Button>
-```
+- `loading` mantiene el botón enfocable, establece `aria-busy` e ignora las pulsaciones.
+- `disabled` lo saca del orden de tabulación e ignora las pulsaciones.
+- Los estados hover, activo y `:focus-visible` usan los tokens del tema según el tono elegido.
 
 ## Accesibilidad
 
+- Semántica nativa de `<button>`: <kbd>Enter</kbd> y <kbd>Espacio</kbd> lo activan.
 - Da a los botones solo con icono un `label`; se convierte en el nombre accesible.
-- Usa `tone="danger"` junto con un texto explícito en acciones destructivas; el color nunca es la única señal.
+- Usa `tone="danger"` junto con un texto explícito en acciones destructivas; el color nunca es la única
+  señal.
 - En React Native, los botones pequeños amplían su área táctil a 44 puntos.
 
 ## API
 
 <ApiTable name="button" />
+
+## Eventos por plataforma
+
+<EventsTable name="button" />

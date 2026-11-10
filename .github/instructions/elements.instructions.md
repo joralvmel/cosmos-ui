@@ -4,6 +4,7 @@ applyTo: 'packages/elements/**,packages/charts/**'
 
 # Web Components (Lit 3)
 
+- Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - One folder per component: `src/components/<name>/cosm-<name>.ts`, exported from `src/index.ts` and
   from a subpath in `package.json` (`./<name>`). The generator does this.
 - Extend `CosmElement` (`src/internal/cosm-element.ts`) and dispatch events with `this.emit()`:

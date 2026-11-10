@@ -1,0 +1,509 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`component target > keeps the component templates stable (snapshot) 1`] = `
+{
+  "append packages/angular/src/index.ts": "export { CosmChipComponent } from './components/chip.component.js';
+",
+  "append packages/core/src/index.ts": "export { chipContract } from './specs/chip.js';
+export {
+  type ChipScenario,
+  chipScenarios,
+  chipScenariosFor,
+} from './specs/chip.scenarios.js';
+",
+  "append packages/elements/llms.md": "
+## \`<cosm-chip>\`
+
+TODO(generator): one-line purpose. Import: \`import '@joralvmel/cosmos-elements/chip';\`
+Props: \`disabled\`. Events: none. React \`<Chip>\`, Angular \`CosmChipComponent\`.
+",
+  "append packages/elements/src/index.ts": "export { CosmChip } from './components/chip/cosm-chip.js';
+",
+  "append packages/native/llms.md": "
+## \`Chip\`
+
+TODO(generator): one-line purpose. \`import { Chip } from '@joralvmel/cosmos-native';\` Props: \`disabled\`.
+",
+  "append packages/native/src/index.ts": "export { Chip, type ChipProps, chipPropNames } from './components/chip.js';
+",
+  "append packages/react/src/index.ts": "export { Chip, type ChipProps, chipEvents } from './components/chip.js';
+",
+  "create .changeset/add-chip.md": "---
+'@joralvmel/cosmos-core': minor
+'@joralvmel/cosmos-elements': minor
+'@joralvmel/cosmos-react': minor
+'@joralvmel/cosmos-angular': minor
+'@joralvmel/cosmos-native': minor
+---
+
+Add the Chip component (\`<cosm-chip>\`) with its contract, React, Angular and React Native implementations.
+",
+  "create apps/docs/src/content/docs/components/chip.mdx": "---
+title: Chip
+description: TODO(generator) short description.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="chip" />
+
+TODO(generator): what it is and when to use \`<cosm-chip>\`.
+
+## Playground
+
+<Playground name="chip" content="Chip" />
+
+## Variants
+
+<Preview>
+  <cosm-chip>Chip</cosm-chip>
+</Preview>
+
+## States
+
+<Preview>
+  <cosm-chip disabled>Chip</cosm-chip>
+</Preview>
+
+## Accessibility
+
+- TODO(generator)
+
+## API
+
+<ApiTable name="chip" />
+
+## Events by platform
+
+<EventsTable name="chip" />
+",
+  "create apps/docs/src/content/docs/es/components/chip.mdx": "---
+title: Chip
+description: TODO(generator) descripción breve.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="chip" />
+
+TODO(generator): qué es y cuándo usar \`<cosm-chip>\`.
+
+## Playground
+
+<Playground name="chip" content="Chip" />
+
+## Variantes
+
+<Preview>
+  <cosm-chip>Chip</cosm-chip>
+</Preview>
+
+## Estados
+
+<Preview>
+  <cosm-chip disabled>Chip</cosm-chip>
+</Preview>
+
+## Accesibilidad
+
+- TODO(generator)
+
+## API
+
+<ApiTable name="chip" />
+
+## Eventos por plataforma
+
+<EventsTable name="chip" />
+",
+  "create apps/native-demo/app/chip.tsx": "import { Chip, useTheme } from '@joralvmel/cosmos-native';
+import { Stack } from 'expo-router';
+import { ScrollView, Text } from 'react-native';
+
+export default function ChipScreen() {
+  const theme = useTheme();
+  const label = { color: theme.colors.fg, fontSize: theme.text.md };
+  return (
+    <ScrollView contentContainerStyle={{ padding: theme.space.lg, gap: theme.space.lg }}>
+      <Stack.Screen options={{ title: 'Chip' }} />
+      <Chip>
+        <Text style={label}>Chip</Text>
+      </Chip>
+      <Chip disabled>
+        <Text style={label}>Disabled</Text>
+      </Chip>
+    </ScrollView>
+  );
+}
+",
+  "create packages/angular/src/components/chip.component.ts": "import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  inject,
+} from '@angular/core';
+import type { CosmChip } from '@joralvmel/cosmos-elements/chip';
+import '@joralvmel/cosmos-elements/chip';
+
+/**
+ * Angular proxy of \`<cosm-chip>\`. TODO(generator) add contract inputs and outputs.
+ *
+ * \`\`\`html
+ * <cosm-chip [disabled]="busy">Chip</cosm-chip>
+ * \`\`\`
+ */
+@Component({
+  selector: 'cosm-chip',
+  template: '<ng-content />',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CosmChipComponent {
+  readonly element: CosmChip = inject<ElementRef<CosmChip>>(ElementRef).nativeElement;
+
+  @Input({ transform: booleanAttribute }) set disabled(value: boolean) {
+    this.element.disabled = value;
+  }
+}
+",
+  "create packages/angular/test/chip.test.ts": "import { Component } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { chipContract, eventNames, propNames } from '@joralvmel/cosmos-core';
+import type { CosmChip } from '@joralvmel/cosmos-elements/chip';
+import { afterEach, describe, expect, it } from 'vitest';
+import { COSMOS_COMPONENTS, CosmChipComponent } from '../src/index.js';
+
+@Component({
+  imports: [CosmChipComponent],
+  template: '<cosm-chip disabled>Chip</cosm-chip>',
+})
+class HostComponent {}
+
+afterEach(() => TestBed.resetTestingModule());
+
+describe('CosmChipComponent', () => {
+  it('forwards inputs as element properties', async () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    await fixture.whenStable();
+    const el = fixture.nativeElement.querySelector('cosm-chip') as CosmChip;
+    await el.updateComplete;
+    expect(el.disabled).toBe(true);
+  });
+
+  it('is part of COSMOS_COMPONENTS', () => {
+    expect(COSMOS_COMPONENTS).toContain(CosmChipComponent);
+  });
+});
+
+describe('CosmChipComponent: contract drift', () => {
+  it('declares exactly the contract inputs and outputs', () => {
+    const def = (CosmChipComponent as unknown as { ɵcmp: { inputs: object; outputs: object } })
+      .ɵcmp;
+    expect(Object.keys(def.inputs).sort()).toEqual(propNames(chipContract, 'angular').sort());
+    expect(Object.keys(def.outputs)).toEqual(eventNames(chipContract, 'angular'));
+  });
+});
+",
+  "create packages/core/src/specs/chip.scenarios.ts": "import type { Platform } from '../contract.js';
+
+export interface ChipScenario {
+  name: string;
+  props: { disabled?: boolean };
+  expected: { disabled: boolean };
+  platforms?: readonly Platform[];
+}
+
+/** Shared behavior scenarios, run by the web, React and native tests. TODO(generator) add behavior. */
+export const chipScenarios: readonly ChipScenario[] = [
+  { name: 'is enabled by default', props: {}, expected: { disabled: false } },
+  { name: 'can be disabled', props: { disabled: true }, expected: { disabled: true } },
+];
+
+export const chipScenariosFor = (platform: Platform) =>
+  chipScenarios.filter(scenario => !scenario.platforms || scenario.platforms.includes(platform));
+",
+  "create packages/core/src/specs/chip.ts": "import { defineContract } from '../contract.js';
+
+/**
+ * Chip: TODO(generator) describe the component and link its WAI-ARIA pattern.
+ */
+export const chipContract = defineContract({
+  name: 'chip',
+  tag: 'cosm-chip',
+  description: 'TODO(generator): one-line description.',
+  role: 'TODO(generator)',
+  pattern: 'https://www.w3.org/WAI/ARIA/apg/patterns/',
+  props: {
+    disabled: {
+      type: 'boolean',
+      default: false,
+      reflect: true,
+      description: 'Prevents interaction.',
+    },
+  },
+  events: {},
+  states: [],
+  slots: { '': 'Content.' },
+  parts: { base: 'Root element.' },
+  cssProperties: {},
+  keyboard: [],
+});
+",
+  "create packages/elements/src/components/chip/cosm-chip.ts": "import { type ContractProps, chipContract } from '@joralvmel/cosmos-core';
+import { css, html } from 'lit';
+import { CosmElement } from '../../internal/cosm-element.js';
+import { define } from '../../internal/define.js';
+import { boxSizing } from '../../internal/styles.js';
+
+type Props = Required<ContractProps<typeof chipContract, 'web'>>;
+
+const styles = css\`
+  :host {
+    display: inline-block;
+    color: var(--cosm-fg, oklch(0.24 0.01 268));
+    font-family: var(--cosm-font-sans, system-ui, sans-serif);
+  }
+  :host([disabled]) {
+    opacity: 0.5;
+  }
+\`;
+
+/**
+ * TODO(generator): describe the component.
+ *
+ * @tag cosm-chip
+ * @slot - Content.
+ * @csspart base - Root element.
+ */
+export class CosmChip extends CosmElement {
+  static override properties = {
+    disabled: { type: Boolean, reflect: true },
+  };
+
+  static override styles = [boxSizing, styles];
+
+  declare disabled: Props['disabled'];
+
+  constructor() {
+    super();
+    this.disabled = chipContract.props.disabled.default;
+  }
+
+  protected override render() {
+    return html\`<div part="base" class="base" aria-disabled=\${this.disabled ? 'true' : 'false'}>
+      <slot></slot>
+    </div>\`;
+  }
+}
+
+define('cosm-chip', CosmChip);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'cosm-chip': CosmChip;
+  }
+}
+",
+  "create packages/elements/test/chip.test.ts": "import { chipContract, chipScenariosFor, eventNames, propNames } from '@joralvmel/cosmos-core';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CosmChip } from '../src/components/chip/cosm-chip.js';
+import { cleanup, fixture } from './fixture.js';
+
+afterEach(cleanup);
+
+describe('cosm-chip: shared scenarios', () => {
+  for (const scenario of chipScenariosFor('web')) {
+    it(scenario.name, async () => {
+      const el = await fixture<CosmChip>('<cosm-chip>Content</cosm-chip>');
+      Object.assign(el, scenario.props);
+      await el.updateComplete;
+      const base = el.shadowRoot?.querySelector('[part="base"]');
+      expect(base?.getAttribute('aria-disabled')).toBe(String(scenario.expected.disabled));
+    });
+  }
+});
+
+describe('cosm-chip: contract drift', () => {
+  it('exposes exactly the web props of the contract', () => {
+    expect(Object.keys(CosmChip.properties).sort()).toEqual(
+      propNames(chipContract, 'web').sort()
+    );
+  });
+
+  it('dispatches only the DOM events of the contract', async () => {
+    const el = await fixture<CosmChip>('<cosm-chip>Content</cosm-chip>');
+    const listener = vi.fn();
+    for (const name of eventNames(chipContract, 'dom')) el.addEventListener(name, listener);
+    expect(eventNames(chipContract, 'dom').every(name => name.startsWith('cosm-'))).toBe(true);
+  });
+});
+
+describe('cosm-chip', () => {
+  it('reflects styling props', async () => {
+    const el = await fixture<CosmChip>('<cosm-chip disabled>Content</cosm-chip>');
+    expect(el.hasAttribute('disabled')).toBe(true);
+  });
+});
+",
+  "create packages/native/src/components/chip.tsx": "import { type ContractProps, chipContract } from '@joralvmel/cosmos-core';
+import type { ReactNode } from 'react';
+import { type StyleProp, Text, View, type ViewStyle } from 'react-native';
+import { useTheme } from '../theme/theme-provider.js';
+
+type ContractChipProps = ContractProps<typeof chipContract, 'native'>;
+
+export interface ChipProps extends ContractChipProps {
+  children?: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+}
+
+/** Props handled by the native component; checked against the contract by the drift test. */
+export const chipPropNames = ['disabled'] as const satisfies readonly (keyof ContractChipProps)[];
+
+/** Native Chip. TODO(generator) implement the contract behavior. */
+export function Chip({
+  disabled = chipContract.props.disabled.default,
+  children,
+  style,
+  testID,
+}: ChipProps) {
+  const theme = useTheme();
+  return (
+    <View
+      testID={testID}
+      accessibilityState={{ disabled }}
+      style={[{ opacity: disabled ? 0.5 : 1 }, style]}
+    >
+      {typeof children === 'string' ? (
+        <Text style={{ color: theme.colors.fg, fontSize: theme.text.md }}>{children}</Text>
+      ) : (
+        children
+      )}
+    </View>
+  );
+}
+",
+  "create packages/native/test/chip.test.tsx": "import { chipContract, chipScenariosFor, propNames } from '@joralvmel/cosmos-core';
+import { act, type ReactNode } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, describe, expect, it } from 'vitest';
+import { Chip, chipPropNames } from '../src/index.js';
+
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+let root: Root | undefined;
+let container: HTMLElement | undefined;
+
+async function render(node: ReactNode) {
+  container = document.createElement('div');
+  document.body.append(container);
+  root = createRoot(container);
+  await act(async () => root?.render(node));
+  return container.querySelector('[data-testid="subject"]');
+}
+
+afterEach(async () => {
+  await act(async () => root?.unmount());
+  container?.remove();
+});
+
+describe('Chip (native): shared scenarios', () => {
+  for (const scenario of chipScenariosFor('native')) {
+    it(scenario.name, async () => {
+      const subject = await render(
+        <Chip {...scenario.props} testID="subject">
+          Chip
+        </Chip>
+      );
+      expect(subject?.getAttribute('aria-disabled') === 'true').toBe(scenario.expected.disabled);
+    });
+  }
+});
+
+describe('Chip (native): contract drift', () => {
+  it('handles exactly the native props of the contract', () => {
+    expect([...chipPropNames].sort()).toEqual(propNames(chipContract, 'native').sort());
+  });
+});
+",
+  "create packages/react/src/components/chip.ts": "import { CosmChip } from '@joralvmel/cosmos-elements/chip';
+import { createComponent } from '@lit/react';
+import * as React from 'react';
+
+/** React event props of \`Chip\`, mapped to DOM events. TODO(generator) add contract events. */
+export const chipEvents = {};
+
+/** React wrapper of \`<cosm-chip>\`. */
+export const Chip = createComponent({
+  tagName: 'cosm-chip',
+  elementClass: CosmChip,
+  react: React,
+  events: chipEvents,
+  displayName: 'Chip',
+});
+
+export type ChipProps = React.ComponentProps<typeof Chip>;
+",
+  "create packages/react/test/chip.test.tsx": "import { chipContract, chipScenariosFor, eventNames, propNames } from '@joralvmel/cosmos-core';
+import type { CosmChip } from '@joralvmel/cosmos-elements/chip';
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, describe, expect, it } from 'vitest';
+import { Chip, type ChipProps, chipEvents } from '../src/index.js';
+
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+let root: Root | undefined;
+let container: HTMLElement | undefined;
+
+async function render(props: ChipProps) {
+  container = document.createElement('div');
+  document.body.append(container);
+  root = createRoot(container);
+  await act(async () => root?.render(<Chip {...props}>Chip</Chip>));
+  const el = container.querySelector('cosm-chip') as CosmChip;
+  await el.updateComplete;
+  return el;
+}
+
+afterEach(async () => {
+  await act(async () => root?.unmount());
+  container?.remove();
+});
+
+describe('Chip: shared scenarios', () => {
+  for (const scenario of chipScenariosFor('react')) {
+    it(scenario.name, async () => {
+      const el = await render(scenario.props);
+      expect(el.disabled).toBe(scenario.expected.disabled);
+    });
+  }
+});
+
+describe('Chip: contract drift', () => {
+  it('maps every contract event to its React name', () => {
+    expect(Object.keys(chipEvents)).toEqual(eventNames(chipContract, 'react'));
+  });
+
+  it('forwards every contract prop to the element', async () => {
+    const el = await render({});
+    for (const name of propNames(chipContract, 'react')) expect(name in el, name).toBe(true);
+  });
+});
+",
+  "prepend packages/angular/src/index.ts": "import { CosmChipComponent } from './components/chip.component.js';
+",
+  "prepend packages/core/src/index.ts": "import { chipContract } from './specs/chip.js';
+",
+}
+`;

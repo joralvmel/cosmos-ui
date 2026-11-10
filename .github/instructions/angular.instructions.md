@@ -4,6 +4,7 @@ applyTo: 'packages/angular/**'
 
 # Angular wrappers (Angular 22)
 
+- Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - One standalone component per element in `src/components/<name>.component.ts`, with the same
   selector as the custom element (`cosm-<name>`), `template: '<ng-content />'` and `OnPush`.
 - Inputs use `@Input()` setters that write to the element (`booleanAttribute` for booleans). Signal
