@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",
-    "@joralvmel/cosmos-native": "^0.0.0",
-    "@joralvmel/cosmos-tokens": "^0.0.0",
+    "@joralvmel/cosmos-native": "^0.1.0",
+    "@joralvmel/cosmos-tokens": "^0.1.0",
     "expo": "~58.0.23",
     "expo-constants": "~58.0.15",
     "expo-linking": "~58.0.16",
