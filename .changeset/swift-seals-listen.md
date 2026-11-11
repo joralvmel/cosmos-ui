@@ -4,4 +4,4 @@
 '@joralvmel/cosmos-charts-native': patch
 ---
 
-Align React 19.3.1 dependency ranges across React and native packages.
+Align development dependencies with React 19.3.1 while preserving React 19 consumer compatibility.
