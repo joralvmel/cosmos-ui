@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-charts-core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI chart layout: pure, DOM-free scales and geometry shared by web and native charts.",
   "keywords": [
     "charts",

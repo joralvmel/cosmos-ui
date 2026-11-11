@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI component contracts, shared behavior scenarios and headless logic (no DOM), shared by web and React Native.",
   "keywords": [
     "headless",

@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI command line: AI setup for projects and theme utilities.",
   "keywords": [
     "cli",
@@ -48,6 +48,6 @@
     "node": ">=22.12"
   },
   "dependencies": {
-    "@joralvmel/cosmos-core": "^0.0.0"
+    "@joralvmel/cosmos-core": "^0.1.0"
   }
 }

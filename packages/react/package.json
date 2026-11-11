@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React wrappers for the Cosmos UI Web Components (React 19, Vite, Next.js).",
   "keywords": [
     "react",
@@ -42,8 +42,8 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@joralvmel/cosmos-core": "^0.0.0",
-    "@joralvmel/cosmos-elements": "^0.0.0",
+    "@joralvmel/cosmos-core": "^0.1.0",
+    "@joralvmel/cosmos-elements": "^0.1.0",
     "@lit/react": "^1.0.8"
   },
   "peerDependencies": {
