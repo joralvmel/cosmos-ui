@@ -16,7 +16,8 @@ Thanks for helping! The full guide lives in the docs site:
    (`feat(elements): add cosm-switch`), checked by the `commit-msg` hook. Never use `--no-verify`.
 5. **Validate**: `npx biome ci . && npx turbo run typecheck test build`.
 6. **Changeset**: `npm run changeset` for every change to `packages/*`.
-7. **Pull request** to `develop` using the template. CI must be green and one approval is required.
+7. **Pull request** to `develop` using the template. CI must be green and review conversations resolved;
+   approvals are optional.
    Pull requests are squash-merged; the PR title becomes the commit message.
 
 | Task | Command |

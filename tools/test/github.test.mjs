@@ -15,13 +15,15 @@ const workflows = readdirSync(join(root, '.github/workflows')).map(file =>
 describe('setup-repo plan', () => {
   const plan = buildPlan({ repo: 'owner/name', existingLabels: ['type:bug'] });
 
-  it('protects main and develop with reviews, required checks and no force push', () => {
+  it('protects main and develop with PRs, required checks and no mandatory approval', () => {
     for (const branch of ['main', 'develop']) {
       const call = plan.find(
         item => item.path === `repos/owner/name/branches/${branch}/protection`
       );
       expect(call?.method).toBe('PUT');
-      expect(call?.body.required_pull_request_reviews.required_approving_review_count).toBe(1);
+      expect(call?.body.required_pull_request_reviews.required_approving_review_count).toBe(0);
+      expect(call?.body.required_pull_request_reviews.require_code_owner_reviews).toBe(false);
+      expect(call?.body.required_conversation_resolution).toBe(true);
       expect(call?.body.required_status_checks.contexts).toEqual(requiredChecks);
       expect(call?.body.allow_force_pushes).toBe(false);
     }
