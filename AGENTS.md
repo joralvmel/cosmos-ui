@@ -91,8 +91,8 @@ with `npx vitest run` (Turborepo filters do it for you).
 | `develop` | Integration; default branch for pull requests | squash merge of work branches |
 | `feat\|fix\|docs\|chore\|refactor\|test/<scope>-<description>` | One task, created from `develop` (`start-work`) | deleted after merge (`sync-after-merge`) |
 
-- Pull requests need one approval (code owners) and green checks; force pushes to `main`/`develop`
-  are blocked (`tools/github/setup-repo.mjs`).
+- Pull requests need green checks and resolved review conversations; approvals are optional for
+  single-maintainer work. Force pushes to `main`/`develop` are blocked (`tools/github/setup-repo.mjs`).
 - Squash merges use the PR title as commit message, so it must be a Conventional Commit.
 - Releases: `release-pr` (develop → main) → "Version Packages" pull request by Changesets → npm
   publish and GitHub Releases (`release` skill).

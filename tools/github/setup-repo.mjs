@@ -35,8 +35,8 @@ function protection(branch) {
     // Admins can still merge in an emergency (e.g. a single maintainer who cannot approve their own PR).
     enforce_admins: false,
     required_pull_request_reviews: {
-      required_approving_review_count: 1,
-      require_code_owner_reviews: true,
+      required_approving_review_count: 0,
+      require_code_owner_reviews: false,
       dismiss_stale_reviews: true,
     },
     restrictions: null,
@@ -97,7 +97,7 @@ export function buildPlan({ repo, existingLabels = [] }) {
       path: `${base}/private-vulnerability-reporting`,
     },
     ...['main', 'develop'].map(branch => ({
-      description: `Protect ${branch}: pull request with 1 approval, required checks, no force push or deletion`,
+      description: `Protect ${branch}: pull request without mandatory approval, required checks, no force push or deletion`,
       method: 'PUT',
       path: `${base}/branches/${branch}/protection`,
       body: protection(branch),
