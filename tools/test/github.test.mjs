@@ -60,6 +60,17 @@ describe('setup-repo plan', () => {
   });
 });
 
+describe('release synchronization', () => {
+  it('exempts only same-repository main-to-develop PRs from adding new changesets', () => {
+    const workflow = read('.github/workflows/ci.yml');
+    const condition = workflow.split('- name: Check changesets')[1]?.split('run:')[0];
+    expect(condition?.replace(/\s+/g, ' ').trim()).toBe(
+      "if: >- !(github.head_ref == 'main' && github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository)"
+    );
+    expect(workflow).toContain('run: npx changeset status --since=origin/');
+  });
+});
+
 describe('labels', () => {
   it('has one label per package directory', () => {
     const dirs = readdirSync(join(root, 'packages'), { withFileTypes: true })
