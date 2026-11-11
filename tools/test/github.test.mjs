@@ -69,6 +69,20 @@ describe('labels', () => {
     expect([...packages].sort()).toEqual(dirs);
   });
 
+  describe('release workflow', () => {
+    it('uses the Changesets v2 input names for versioning and publishing', () => {
+      const workflow = read('.github/workflows/release.yml');
+      const step = workflow.split('uses: changesets/action@v2')[1]?.split('\n        env:')[0];
+      expect(step).toBeDefined();
+      expect(step).toContain('version-script: npm run version-packages');
+      expect(step).toContain('publish-script: npm run release');
+      expect(step).toContain('pr-title: "chore: version packages"');
+      expect(step).toContain('commit-message: "chore: version packages"');
+      expect(step).toContain('create-github-releases: true');
+      expect(step).not.toMatch(/^\s+(version|publish|title|commit|createGithubReleases):/m);
+    });
+  });
+
   it('only uses known labels in the labeler, issue templates and Dependabot', () => {
     const used = [
       ...read('.github/labeler.yml').matchAll(/^'([^']+)':$/gm),
