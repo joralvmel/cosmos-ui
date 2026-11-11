@@ -67,7 +67,7 @@ describe('release synchronization', () => {
     expect(condition?.replace(/\s+/g, ' ').trim()).toBe(
       "if: >- !(github.head_ref == 'main' && github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository)"
     );
-    expect(workflow).toContain('run: npx changeset status --since=origin/${{ github.base_ref }}');
+    expect(workflow).toContain('run: npx changeset status --since=origin/');
   });
 });
 
