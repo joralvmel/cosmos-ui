@@ -29,9 +29,16 @@ pull request desde él.
 
 1. `start-work` → trabajo → `finish-work` (valida, hace push y abre el pull request a `develop`).
 2. Obligatorio: checks en verde (lint, términos, typecheck, tests, build, paquetes, build de la
-   documentación, changeset, higiene de commits) y una aprobación de un code owner.
+   documentación, changeset, higiene de commits) y resolver las conversaciones de revisión. Las
+   aprobaciones son opcionales.
 3. Squash merge: el título del pull request debe ser un Conventional Commit (lo comprueba la CI).
 4. `sync-after-merge` limpia la rama local.
+
+Las aprobaciones son opcionales en `main` y `develop`, para poder integrar los propios pull requests
+sin otro mantenedor. Esta política se aplica a todos los colaboradores: la protección clásica de un
+repositorio personal no admite excepciones individuales de revisión. Los pull requests, los checks
+obligatorios y la resolución de conversaciones siguen siendo obligatorios. Las revisiones de Copilot
+son orientativas, no aprobaciones.
 
 ## Releases
 
