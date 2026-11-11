@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-elements",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI Web Components built with Lit: framework-agnostic, themeable and accessible.",
   "keywords": [
     "web-components",
@@ -52,7 +52,7 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@joralvmel/cosmos-core": "^0.0.0",
+    "@joralvmel/cosmos-core": "^0.1.0",
     "lit": "^3.3.3"
   },
   "devDependencies": {

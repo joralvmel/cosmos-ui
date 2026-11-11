@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-tokens",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI design tokens and theme engine: OKLCH themes with light/dark modes for CSS, Tailwind, React Native and JSON.",
   "keywords": [
     "design-tokens",

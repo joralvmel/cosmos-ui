@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-angular",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Angular standalone components and forms integration for the Cosmos UI Web Components.",
   "keywords": [
     "angular",
@@ -42,8 +42,8 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@joralvmel/cosmos-core": "^0.0.0",
-    "@joralvmel/cosmos-elements": "^0.0.0",
+    "@joralvmel/cosmos-core": "^0.1.0",
+    "@joralvmel/cosmos-elements": "^0.1.0",
     "tslib": "^2.9.1"
   },
   "peerDependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-charts-native",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI charts for React Native, built on the shared chart layout.",
   "keywords": [
     "charts",
@@ -42,8 +42,8 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@joralvmel/cosmos-charts-core": "^0.0.0",
-    "@joralvmel/cosmos-tokens": "^0.0.0"
+    "@joralvmel/cosmos-charts-core": "^0.1.0",
+    "@joralvmel/cosmos-tokens": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

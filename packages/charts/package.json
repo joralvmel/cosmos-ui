@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-charts",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI chart Web Components (SVG, Lit) with React and Angular wrappers.",
   "keywords": [
     "charts",
@@ -43,7 +43,7 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "dependencies": {
-    "@joralvmel/cosmos-charts-core": "^0.0.0",
+    "@joralvmel/cosmos-charts-core": "^0.1.0",
     "lit": "^3.3.3"
   }
 }

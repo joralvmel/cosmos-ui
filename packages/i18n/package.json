@@ -1,6 +1,6 @@
 {
   "name": "@joralvmel/cosmos-i18n",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cosmos UI internationalization: message formatting and Intl helpers.",
   "keywords": [
     "i18n",
