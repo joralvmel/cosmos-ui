@@ -29,9 +29,14 @@ open the pull request from their fork.
 
 1. `start-work` → work → `finish-work` (validates, pushes and opens the pull request to `develop`).
 2. Required: green checks (lint, terms, typecheck, tests, build, packs, docs build, changeset, commit
-   hygiene) and one approval from a code owner.
+   hygiene) and resolution of review conversations. Approvals are optional.
 3. Squash merge: the pull request title must be a Conventional Commit (checked by CI).
 4. `sync-after-merge` cleans up the local branch.
+
+Approvals are optional on `main` and `develop` so a sole maintainer can merge their own pull requests.
+This policy applies to all contributors: classic branch protection on a personal repository does not
+support individual review exemptions. Pull requests, required checks and conversation resolution
+remain mandatory. Copilot reviews are advisory, not approving reviews.
 
 ## Releases
 
