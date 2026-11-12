@@ -73,48 +73,14 @@ Las descripciones están en inglés, como los archivos de los agentes.
 
 ## Prompts para copiar
 
-```text
-/component-status all — y dime qué tres componentes debería crear después y por qué.
-```
+El [recetario de prompts](../prompt-cookbook/) organiza ejemplos listos para copiar por tarea:
 
-```text
-/start-work feat elements switch, enlazada al issue #12
-```
+- [Crear un componente o partir de Figma](../prompt-cookbook/#empezar-un-componente).
+- [Ampliar funciones, pulir el aspecto o planificar cambios de API](../prompt-cookbook/#evolucionar-un-componente-existente).
+- [Reproducir un bug o recuperar la paridad](../prompt-cookbook/#diagnosticar-y-corregir).
+- [Mejorar docs, demos, pruebas o revisar sin editar](../prompt-cookbook/#mejorar-evidencias-y-ejemplos).
+- [Añadir temas, tokens o gráficas](../prompt-cookbook/#otras-tareas-de-la-librería).
+- [Aceptar alcance, pedir ajustes, autorizar una PR o retomar un chat](../prompt-cookbook/#continuar-la-conversación).
 
-```text
-Crea "switch" para web, React, Angular y React Native siguiendo create-component. Investiga primero;
-después recomienda funciones y pregúntame por alcance, diseño, personalización y diferencias entre
-plataformas. Espera mi aprobación antes de generar archivos o editar el contrato. Implementa y
-prueba lo acordado, crea un commit local y déjame validarlo antes de hacer push o PR. Si pido cambios,
-crea otro commit y vuelve a esperar.
-```
-
-```text
-/component-from-design https://www.figma.com/design/<archivo>?node-id=<nodo> como "chip"
-```
-
-```text
-Usa el agente design-system: añade un tema llamado "aurora" con primario verde azulado y armonía
-triádica; debe pasar la validación de accesibilidad en claro y oscuro.
-```
-
-```text
-Usa el agente reviewer: revisa la rama actual frente a develop y lista solo problemas de alta confianza.
-```
-
-```text
-/finish-work "feat(elements): add cosm-switch" cierra #12
-```
-
-Esto crea el commit de revisión local y se detiene. Después de probarlo, responde:
-
-```text
-Apruebo el commit revisado <SHA>. Haz push y abre la PR a develop.
-```
-
-O pide otra iteración:
-
-```text
-Ajusta la apariencia deshabilitada y sus tests. Crea otro commit y espera a que lo valide;
-no hagas push todavía.
-```
+El [ejemplo completo](../example-switch/) recorre la entrega de un componente;
+las [recetas técnicas](../recipes/) explican los pasos de implementación de tareas concretas.

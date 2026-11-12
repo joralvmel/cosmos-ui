@@ -68,49 +68,14 @@ does not bypass editor permissions or add a new GitHub approval requirement.
 
 ## Copyable prompts
 
-```text
-/component-status all — and tell me which three components I should build next and why.
-```
+The [prompt cookbook](../prompt-cookbook/) organizes ready-to-copy examples by task:
 
-```text
-/start-work feat elements switch, linked to issue #12
-```
+- [Create a component or start from Figma](../prompt-cookbook/#start-a-component).
+- [Extend behavior, polish visuals or plan an API change](../prompt-cookbook/#evolve-an-existing-component).
+- [Reproduce a bug or restore platform parity](../prompt-cookbook/#diagnose-and-fix).
+- [Improve docs, demos, tests or a read-only review](../prompt-cookbook/#improve-evidence-and-examples).
+- [Add themes, tokens or charts](../prompt-cookbook/#other-library-work).
+- [Accept scope, request revisions, approve a PR or resume a chat](../prompt-cookbook/#continue-the-conversation).
 
-```text
-Create "switch" for web, React, Angular and React Native using create-component. Research first,
-then recommend its features and ask me about scope, design, customization and platform differences.
-Wait for my scope approval before generation or contract edits. Implement and test the agreement,
-commit locally and let me validate it before any push or PR. If I request changes, make a new commit
-and wait again.
-```
-
-```text
-/component-from-design https://www.figma.com/design/<file>?node-id=<node> as "chip"
-```
-
-```text
-Use the design-system agent: add a theme called "aurora" with a teal primary and a triadic harmony;
-it must pass the accessibility validation in light and dark.
-```
-
-```text
-Use the reviewer agent: review the current branch against develop and list only high-confidence
-problems.
-```
-
-```text
-/finish-work "feat(elements): add cosm-switch" closes #12
-```
-
-This creates the local review commit and pauses. After trying that commit, reply:
-
-```text
-I approve the reviewed commit <SHA>. Push it and open the PR to develop.
-```
-
-Or request another iteration:
-
-```text
-Adjust the disabled appearance and its tests. Make a new commit and wait for me to validate it;
-do not push yet.
-```
+Use the [end-to-end example](../example-switch/) to follow a whole component through delivery;
+the [technical recipes](../recipes/) explain the implementation steps behind individual tasks.

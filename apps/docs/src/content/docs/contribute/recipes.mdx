@@ -2,10 +2,16 @@
 title: Recipes
 description: Short guides to create a theme, add a token, build a component from Figma, change a component and create a chart.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Each recipe names the skill that automates it (run it as a `/prompt` or ask its agent).
+
+For ready-to-copy task requests, use the [prompt cookbook](../prompt-cookbook/).
+These are technical recipes, not permission to skip research or scope approval: agree new
+component/API/design decisions before generation or contract edits, following the
+[agent workflow](../working-with-agents/#research-decisions-and-local-review).
+Implementation ends at the local commit/review pause, not an automatic push or PR.
 
 ## Create a theme — `add-theme`
 
@@ -33,12 +39,14 @@ npx turbo run test build --filter=@joralvmel/cosmos-tokens...
 1. Share the Figma link of the frame (`?node-id=`) or a screenshot with the `design-system` agent.
 2. It extracts anatomy, variants and states and maps every value to existing tokens; a new token goes
    through `add-token`.
-3. `architect` writes the contract and `component-builder` runs `create-component`.
+3. After research and scope/design approval, `component-builder` runs the generator through
+   `create-component`; `architect` finalizes the contract before platform behavior.
 
 ## Change a component — `modify-component`
 
 1. `component-status` for the component and for any component it will use.
-2. Change the contract and scenarios first; decide the semver bump with `architect`.
+2. Research new behavior and approve its scope first (exact fixes can reuse accepted decisions).
+   Then update the contract and scenarios; decide the semver bump with `architect`.
 3. Update every platform, tests and docs; keep the anatomy (the structure test checks it).
 4. `npm run llms` and a changeset (`major` with a migration note when breaking).
 

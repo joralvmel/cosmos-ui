@@ -2,10 +2,16 @@
 title: Recetas
 description: Guías cortas para crear un tema, añadir un token, crear un componente desde Figma, modificar un componente y crear una gráfica.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Cada receta indica la skill que la automatiza (ejecútala como `/prompt` o pídesela a su agente).
+
+Para peticiones listas para copiar, usa el [recetario de prompts](../prompt-cookbook/).
+Estas son recetas técnicas, no permiso para saltarse la investigación o la aprobación del alcance:
+acuerda las decisiones nuevas de componente, API o diseño antes de generar archivos o editar el
+contrato, siguiendo el [flujo de agentes](../working-with-agents/#investigación-decisiones-y-revisión-local).
+La implementación termina con el commit local y la pausa de revisión, no con push o PR automáticos.
 
 ## Crear un tema — `add-theme`
 
@@ -34,12 +40,15 @@ npx turbo run test build --filter=@joralvmel/cosmos-tokens...
 1. Comparte con el agente `design-system` el enlace de Figma del frame (`?node-id=`) o una captura.
 2. Extrae la anatomía, variantes y estados y asigna cada valor a tokens existentes; un token nuevo pasa
    por `add-token`.
-3. `architect` escribe el contrato y `component-builder` ejecuta `create-component`.
+3. Tras investigar y aprobar alcance/diseño, `component-builder` usa el generador mediante
+   `create-component`; `architect` completa el contrato antes del comportamiento de las plataformas.
 
 ## Modificar un componente — `modify-component`
 
 1. `component-status` del componente y de los componentes que vaya a usar.
-2. Cambia primero el contrato y los escenarios; decide el salto de versión con `architect`.
+2. Investiga el nuevo comportamiento y aprueba primero el alcance (los arreglos concretos pueden
+   reutilizar decisiones aceptadas). Después actualiza contrato y escenarios; decide el salto de
+   versión con `architect`.
 3. Actualiza todas las plataformas, los tests y la documentación; respeta la anatomía (lo comprueba el
    test de estructura).
 4. `npm run llms` y un changeset (`major` con nota de migración si rompe compatibilidad).
