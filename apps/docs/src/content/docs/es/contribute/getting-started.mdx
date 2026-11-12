@@ -64,6 +64,13 @@ npm run dev --workspace=@joralvmel/cosmos-native-demo
 - **Emulador de Android**: instala Android Studio, crea un dispositivo virtual, arráncalo y pulsa `a` en
   la terminal de Expo.
 - **Simulador de iOS** (macOS): instala Xcode y sus herramientas de línea de comandos y pulsa `i`.
+- **Vista previa web**: pulsa `w` en la terminal de Expo, o ejecuta
+  `npm run dev --workspace=@joralvmel/cosmos-native-demo -- --web`. Renderiza los componentes nativos
+  con React Native Web; no sustituye las pruebas en Android o iOS.
+
+`npm run build --workspace=@joralvmel/cosmos-native-demo` exporta la vista previa web a
+`apps/native-demo/dist` una vez compiladas las dependencias de la librería. El build del monorepo
+también ejecuta esta exportación, para que la CI compruebe el empaquetado web de la demo.
 
 ## Estructura del repositorio
 
