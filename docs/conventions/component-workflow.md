@@ -11,6 +11,10 @@ on behalf of the main conversation. Use the available question tool and wait for
 
 ## 1. Research before decisions
 
+For an existing project used as inspiration, start with `adapt-reference-project` and the
+[reference-project convention](reference-projects.md). Read-only source analysis and a token,
+component and migration map inform this workflow; they do not replace either approval gate.
+
 - Check the inventory, existing contracts, architecture decisions and dependencies. Start a local
   work branch from up-to-date `develop`; preserve unrelated work.
 - For a new component, get the `researcher` report before deciding its feature set. For an extension,

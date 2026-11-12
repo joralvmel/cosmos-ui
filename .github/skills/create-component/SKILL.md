@@ -12,6 +12,9 @@ Main agent: `component-builder`. Read `AGENTS.md` first.
 - Component name (kebab-case, without `cosm-`)
 - Purpose, props, events, slots, accessibility needs
 
+If an existing application/library is the reference, use `adapt-reference-project` first. Its
+read-only maps inform research and scope approval; do not copy source APIs or product identity.
+
 ## Steps
 
 1. Run `component-status` for the component: it must be in the catalog and its `dependsOn` must be stable (otherwise build the dependencies first or use native primitives and record a catalog note).

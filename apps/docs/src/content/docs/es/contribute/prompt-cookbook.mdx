@@ -19,6 +19,7 @@ Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un pro
 | Decidir qué crear después | [Explorar el catálogo](#explorar-el-catálogo) | `component-status`, `researcher` |
 | Crear un componente | [Crear desde una necesidad](#crear-desde-una-necesidad) | `create-component` |
 | Partir de un diseño de Figma | [Crear desde un diseño](#crear-desde-un-diseño) | `component-from-design` |
+| Inspirarme en un proyecto existente | [Usar un proyecto de referencia](#usar-un-proyecto-de-referencia) | `adapt-reference-project` |
 | Añadir una función o cambiar la API | [Ampliar el comportamiento](#ampliar-el-comportamiento) | `modify-component` |
 | Pulir un componente existente | [Mejorar la apariencia](#mejorar-la-apariencia) | `modify-component`, `design-system` |
 | Corregir un error | [Reproducir y corregir un bug](#reproducir-y-corregir-un-bug) | `modify-component`, `test-engineer` |
@@ -28,6 +29,7 @@ Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un pro
 | Cubrir un comportamiento con tests | [Añadir pruebas concretas](#añadir-pruebas-concretas) | `add-contract-tests` |
 | Añadir un tema, token o gráfica | [Otras tareas de la librería](#otras-tareas-de-la-librería) | `add-theme`, `add-token`, `create-chart` |
 | Revisar y entregar el resultado | [Continuar la conversación](#continuar-la-conversación) | `finish-work`, `open-pr` |
+| Preparar o verificar una release | [Releases y mantenimiento](#releases-y-mantenimiento) | `release-pr`, `release`, `sync-after-merge` |
 
 ### Qué incluye toda implementación
 
@@ -86,6 +88,66 @@ define la referencia, qué falta y qué diferencias entre plataformas requieren 
 Pregúntame antes de elegir comportamientos no visibles o añadir tokens/dependencias. Espera la
 aprobación del alcance y diseño, y completa lo acordado en todas las plataformas aplicables.
 Valida, crea un commit local y espera mi revisión.
+```
+
+## Usar un proyecto de referencia
+
+Usa un proyecto React, React Native u otro stack como **evidencia**, no como una biblioteca que copiar.
+La [convención de proyectos de referencia](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/reference-projects.md)
+mantiene las fuentes en solo lectura, comprueba el stack real y separa UI genérica de lógica de negocio.
+No hace falta otro paquete ni agente: la skill coordina los roles actuales de investigación, diseño
+y plataformas.
+
+### Analizar temas y componentes
+
+```text
+Usa adapt-reference-project con [carpetas de referencia o enlaces públicos]. Puedes inspeccionar
+en solo lectura los archivos relevantes de UI/tema. Céntrate en [tema, componentes o necesidad];
+el destino es [plataformas]. No ejecutes scripts de origen, instales dependencias, leas archivos
+de entorno ni modifiques esos proyectos.
+
+Comprueba el stack real, propiedad/licencias, definiciones de tema, primitivas representativas y
+sus usos. Compara con tokens, contratos e inventario de Cosmos. Entrega un mapa de tema, otro de
+componentes (reutilizar/ampliar/crear/componer/mantener en la app) y un plan de migración priorizado.
+Separa correspondencias soportadas de carencias, UI genérica de negocio y web de nativo.
+No incluyas identidad de origen, rutas privadas, código ni assets de marca en archivos versionados.
+
+Recomienda una primera entrega pequeña y después de investigar hazme preguntas de diseño/API.
+Es solo análisis: no generes archivos, implementes, hagas commit ni push.
+```
+
+### Implementar una parte aprobada
+
+Envía esto después de revisar los mapas y resolver las decisiones, no como permiso para importar
+todo un proyecto. La identidad del tema es independiente del modo claro/oscuro. Tener semillas y
+presets de radio no implica admitir escalas arbitrarias de tipografía, espaciado o movimiento.
+
+```text
+Apruebo [tema/componente concreto] del análisis, con [decisiones aceptadas], excluyendo [fuera
+de alcance] y aplazando [limitaciones]. Usa adapt-reference-project para continuar con
+add-theme/add-token o create-component/modify-component según corresponda.
+
+Implementa de forma independiente en Cosmos con ejemplos neutros. Respeta la semántica de tokens,
+contratos y accesibilidad; explica las diferencias visuales necesarias por contraste o plataforma.
+Usa el generador cuando corresponda y completa plataformas, ejemplos, docs EN/ES, referencias de IA,
+pruebas y changesets. Vuelve a preguntar si faltan roles de tokens o surgen decisiones relevantes
+de API/dependencias. Mantén intactos los proyectos de referencia/consumidores.
+Valida, crea un commit local y espera sin hacer push ni PR.
+```
+
+### Planificar la sustitución gradual en una app
+
+Cosmos React adapta componentes web; React Native tiene su implementación específica. Compartir
+contratos no hace que sustituyan directamente las props o providers de otro proyecto.
+
+```text
+Planifica sustituir [tema/componentes del consumidor] por Cosmos cuando [entrega aprobada] esté
+publicada. Inspecciona en solo lectura los archivos de UI autorizados del consumidor.
+Comprueba versiones instaladas, providers, estilos, imports, formularios/eventos, límites SSR/cliente
+y compatibilidad nativa/Expo según aplique. Identifica sustitutos estables, capacidades sin cubrir
+y necesidades de convivencia temporal. Propón un orden pequeño, pruebas de aceptación y reversión
+por paso. No edites el consumidor ni Cosmos, instales paquetes, ejecutes código del consumidor,
+hagas commit ni push. Pregunta antes de implementar cualquier paso.
 ```
 
 ## Evolucionar un componente existente
@@ -232,6 +294,92 @@ personalización, texto/tabla alternativos e interacciones antes de generar arch
 Tras aprobarlo, implementa el layout puro compartido y los renderizadores aplicables, ejemplos
 y pruebas. Informa del coste del bundle y separa las evidencias de ejecución de los builds.
 Crea un commit local y espera sin hacer push ni PR.
+```
+
+## Releases y mantenimiento
+
+Una PR de trabajo va a `develop`; publicar es otra decisión. El flujo estable es
+`develop → main` (merge commit), después la PR generada **Version Packages** y finalmente publicación.
+Consulta [releases y publicación](../publishing/) para la configuración y los comandos. Estos prompts
+no autorizan merges automáticos, cambios en permisos de publicación ni publicar trabajo sin integrar.
+
+### Planificar la siguiente release
+
+```text
+Evalúa si develop está listo para una release estable. Es solo lectura.
+Revisa el estado remoto actual, trabajo integrado, CI y changesets pendientes frente a origin/main.
+Lista paquetes afectados, incrementos previstos, cambios incompatibles/notas de migración y
+evidencias pendientes. Distingue cambios de paquetes de docs/herramientas privadas sin changeset.
+Recomienda publicar ahora o qué falta. No cambies versiones/changelogs, ejecutes workflows,
+abras o fusiones PRs, subas tags ni publiques.
+```
+
+### Abrir la PR de release
+
+```text
+Autorizo abrir la PR de release para los cambios ya integrados en develop.
+Usa release-pr: verifica identidad, remoto, checks verdes y changesets pendientes. Reutiliza una
+PR de release develop-a-main si ya está abierta; detente si hay conflictos o faltan evidencias.
+Resume paquetes, incrementos, novedades y migración, e informa de URL/checks.
+No hagas merge, edites versiones/changelogs a mano ni publiques. Espera mi revisión; cuando se
+apruebe, la promoción de release debe usar merge commit, no squash.
+```
+
+### Revisar Version Packages
+
+```text
+Revisa la PR generada Version Packages [URL] sin editar ni fusionar.
+Compara versiones, actualizaciones de dependencias y changelogs con los changesets aceptados y el
+historial de releases. Revisa CI y detecta paquetes, incrementos o notas de migración inesperados
+o ausentes. Explica qué publicará su merge y qué aprobaciones faltan. No publiques, ejecutes
+workflows ni alteres archivos generados; informa de bloqueos y espera mi decisión.
+```
+
+### Verificar la publicación y probar como consumidor
+
+```text
+Verifica la release [versión o URL del workflow] sin cambiar el repositorio.
+Comprueba resultados reales de workflows, versiones/dist-tags y procedencia en npm, tags de Git,
+GitHub Releases y despliegue de docs. Separa paquetes publicados, pendientes y fallidos; CI verde
+no demuestra por sí solo que npm haya publicado.
+Dame los comandos exactos de instalación/versión y pruebas básicas para [React/Angular/web/
+React Native] usando paquetes publicados en un consumidor aislado, no enlaces al workspace.
+No instales ni modifiques ese consumidor todavía. Informa de comprobaciones pendientes de
+compatibilidad/ejecución en vez de darlas por superadas.
+```
+
+### Diagnosticar una publicación fallida
+
+```text
+Diagnostica la release fallida [URL del workflow y error relevante]. Primero inspecciona el run
+y el estado de los paquetes en solo lectura. Identifica la causa raíz y si ya se publicaron
+algunos paquetes/tags. No reintentes a ciegas, borres/reutilices versiones publicadas, debilites
+permisos, cambies registros ni expongas credenciales. Propón la recuperación mínima y pide
+aprobación antes de cambios o reintentos. Un arreglo de código necesita validación, nuevo commit
+local de revisión y pausa antes del push.
+```
+
+### Probar un snapshot antes de la release estable
+
+```text
+Evalúa un snapshot con tag next para [alcance integrado] usando release. Primero revisa inputs
+del workflow, rama actual, CI y estado de paquetes. Explica la ejecución exacta, versiones/dist-tag
+previstos y comandos de instalación; distingue el snapshot de una release estable.
+No ejecutes ni publiques hasta que apruebe explícitamente esa operación. No muevas latest ni crees
+tags de release estable. Indica comprobaciones no disponibles y cómo migrar o limpiar consumidores
+de prueba después.
+```
+
+### Sincronizar tras merge o release
+
+```text
+Sincroniza tras [URL de la PR de trabajo/release fusionada] usando sync-after-merge.
+Comprueba identidad, estado remoto y cambios locales primero; conserva trabajo ajeno y nunca
+hagas force-push. Confirma que la PR se fusionó antes de borrar su rama de trabajo.
+Si Version Packages dejó main adelantado respecto de develop, explica el diff de sincronización
+y solo abre/reutiliza la PR main-a-develop; no la fusiones automáticamente. Detente ante conflictos
+o decisiones que cambien código. Informa de rama/HEAD final y pendientes.
+No empieces otro componente ni otra release.
 ```
 
 ## Continuar la conversación

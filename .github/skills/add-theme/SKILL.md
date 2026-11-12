@@ -14,11 +14,18 @@ Main agent: `design-system`. Read `AGENTS.md` first.
 
 ## Steps
 
+For an existing project's theme, start with `adapt-reference-project`: map semantic roles and
+unsupported typography/spacing/motion needs before selecting seeds or proposing tokens. Follow the
+[component workflow](../../../docs/conventions/component-workflow.md) for design approval and
+local review. Do not edit the source project or promise exact reproduction at the cost of contrast.
+
 1. Run `npm run generate -- theme <name> --seed "oklch(L C H)"`.
 2. Tune seeds, harmony, neutral tint and radius; add mode overrides only when unavoidable.
 3. Run the tokens tests: WCAG AA and CVD checks must pass for light and dark.
 4. Build tokens and tailwind; check the gallery in the docs and the native demo theme switcher.
 5. Document the theme intent in the definition comment.
+6. Update relevant EN/ES docs and AI references, add the changeset and run `finish-work` for a local
+   review commit. Stop without push or PR until that HEAD is accepted.
 
 ## Files
 

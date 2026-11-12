@@ -133,6 +133,11 @@ Standard flow for a component: `researcher` (+ optional Figma design) → `archi
 
 Skills live in `.github/skills/<name>/SKILL.md` and have matching prompts in `.github/prompts/`.
 
+For inspiration from an existing application or design system, use `adapt-reference-project` and
+the [reference-project convention](docs/conventions/reference-projects.md). Sources stay read-only;
+map themes/components and plan migration before scope approval. Reuse the current generators and
+platform implementations; do not copy product identity or add a runtime package by default.
+
 ## 6. Definition of done
 
 - [ ] Contract, scenarios and every platform in parity; drift tests green.

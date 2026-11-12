@@ -19,6 +19,7 @@ Remove anything that does not apply; never paste credentials or private data int
 | Choose what to build next | [Explore the backlog](#explore-the-backlog) | `component-status`, `researcher` |
 | Create a component | [Create from a need](#create-from-a-need) | `create-component` |
 | Use a Figma design | [Create from a design](#create-from-a-design) | `component-from-design` |
+| Learn from an existing project | [Use a reference project](#use-a-reference-project) | `adapt-reference-project` |
 | Add a feature or change an API | [Extend behavior](#extend-behavior) | `modify-component` |
 | Polish an existing component | [Improve appearance](#improve-appearance) | `modify-component`, `design-system` |
 | Fix an error | [Reproduce and fix a bug](#reproduce-and-fix-a-bug) | `modify-component`, `test-engineer` |
@@ -28,6 +29,7 @@ Remove anything that does not apply; never paste credentials or private data int
 | Cover a missing behavior with tests | [Add focused tests](#add-focused-tests) | `add-contract-tests` |
 | Add a theme, token or chart | [Other library work](#other-library-work) | `add-theme`, `add-token`, `create-chart` |
 | Review and deliver the result | [Continue the conversation](#continue-the-conversation) | `finish-work`, `open-pr` |
+| Prepare or verify a release | [Release and maintenance](#release-and-maintenance) | `release-pr`, `release`, `sync-after-merge` |
 
 ### What every implementation includes
 
@@ -83,6 +85,62 @@ Research the interaction pattern and map the design to current tokens. Show what
 defines, what is missing and which platform differences need a decision. Ask me before choosing
 unseen behavior or adding tokens/dependencies. Wait for scope/design approval, then complete the
 accepted component on every applicable platform. Validate, commit locally and pause for my review.
+```
+
+## Use a reference project
+
+Use an existing React, React Native or other UI project as **evidence**, not as a library to copy.
+The [reference-project convention](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/reference-projects.md)
+keeps sources read-only, checks the real stack and separates generic UI from application logic.
+No new package or agent is needed: the skill coordinates existing research/design/platform roles.
+
+### Analyze themes and components
+
+```text
+Use adapt-reference-project with [reference folders or public links]. You may inspect relevant
+UI/theme files read-only. Focus on [theme, components or user need]; target [platforms].
+Do not run source scripts, install dependencies, read environment files or change those projects.
+
+Check the actual stack, ownership/license constraints, theme definitions, representative primitives
+and their usages. Compare with current Cosmos tokens, contracts and inventory. Return a theme map,
+a component map (reuse/extend/create/compose/keep in app) and a prioritized migration plan.
+Distinguish supported mappings from gaps, generic UI from business logic and web from native.
+Keep source identity, private paths, code and branded assets out of tracked output.
+
+Recommend one first slice and ask informed design/API questions after research. This is analysis
+only: do not generate files, implement, commit or push.
+```
+
+### Implement an approved slice
+
+Send this after reviewing the maps and resolving the proposed decisions, not as blanket permission
+to import an entire project. Themes distinguish identity from light/dark mode. Existing seeds and
+radius presets do not imply arbitrary typography, spacing or motion scales are supported.
+
+```text
+I approve [specific theme/component slice] from the analysis, with [accepted choices],
+excluding [out of scope] and deferring [limitations]. Use adapt-reference-project to hand off to
+add-theme/add-token or create-component/modify-component as appropriate.
+
+Implement independently in Cosmos with neutral examples. Preserve existing token semantics,
+contracts and accessibility; explain any visual deviations needed for contrast or platforms.
+Use the generator when required, complete applicable platforms, examples, EN/ES docs, AI references,
+tests and changesets. Reopen approval for unsupported token roles or meaningful API/dependency gaps.
+Keep reference/consumer projects unchanged. Validate, commit locally and pause without push or PR.
+```
+
+### Plan gradual consumer replacement
+
+Cosmos React wraps web components; React Native uses its dedicated implementation. Shared contracts
+do not make either one a drop-in replacement for another project's props or providers.
+
+```text
+Plan replacing [consumer theme/components] with Cosmos after [approved slice] is released.
+Inspect the authorized consumer UI files read-only. Check installed versions, providers,
+styling, imports, forms/events, SSR/client boundaries and native/Expo compatibility as applicable.
+Identify stable replacements, unsupported capabilities and temporary coexistence needs.
+Give a small migration order, acceptance checks and rollback per step. Do not edit the consumer
+or Cosmos, install packages, execute consumer code, commit or push. Ask before implementing any step.
 ```
 
 ## Evolve an existing component
@@ -223,6 +281,88 @@ alternative text/table and any interaction before generation.
 After approval, implement the pure shared layout and applicable renderers, examples and tests.
 Report bundle costs and actual runtime evidence separately from builds. Commit locally and wait
 without push or PR.
+```
+
+## Release and maintenance
+
+A work PR goes to `develop`; releasing is a separate decision. The stable flow is
+`develop → main` (merge commit), then the generated **Version Packages** PR, then publication.
+See [release and publishing](../publishing/) for setup and commands. These prompts do not authorize
+automatic merges, changes to publishing permissions, or a release while work is still unmerged.
+
+### Plan the next release
+
+```text
+Assess whether develop is ready for a stable release. This is read-only.
+Check the current remote state, merged work, CI and pending changesets against origin/main.
+List affected packages, expected bumps, breaking changes/migration notes and missing evidence.
+Distinguish package changes from private docs/tooling changes that need no changeset.
+Recommend release now or remaining work. Do not change versions/changelogs, dispatch workflows,
+open or merge PRs, push tags or publish.
+```
+
+### Open the release PR
+
+```text
+I authorize opening the release PR for the already merged changes on develop.
+Use release-pr: verify identity, remote, green checks and pending changesets. Reuse an existing
+open develop-to-main release PR; stop on conflicts or missing evidence. Summarize packages,
+bumps, highlights and migration notes, and report its URL/checks.
+Do not merge it, edit versions/changelogs manually or publish. Wait for my review; when approved,
+the release promotion must use a merge commit, not squash.
+```
+
+### Review Version Packages
+
+```text
+Review the generated Version Packages PR [URL] without editing or merging.
+Compare its versions, dependency updates and changelogs with the accepted changesets and current
+release history. Check CI and identify missing/unexpected packages, bumps or migration notes.
+Explain what merging it will publish and which approvals remain. Do not publish, dispatch workflows
+or alter generated files; report blockers and wait for my decision.
+```
+
+### Verify publication and try it as a consumer
+
+```text
+Verify the release [version or workflow URL] without changing the repository.
+Check actual workflow results, npm versions/dist-tags and provenance, Git tags/GitHub Releases,
+and the docs deployment. Separate published, pending and failed packages; green CI alone is not
+proof that npm publication succeeded.
+Give exact install/version and smoke-test steps for [React/Angular/web/React Native] using published
+packages in an isolated consumer, not workspace links. Do not install or modify that consumer yet.
+Report remaining compatibility/runtime checks rather than claiming they passed.
+```
+
+### Diagnose a failed publication
+
+```text
+Diagnose the failed release [workflow URL and relevant error]. Inspect the run and package state
+read-only first. Identify the root cause and whether some packages/tags were already published.
+Do not blindly rerun, delete/reuse published versions, weaken permissions, change registry settings
+or expose credentials. Propose the smallest recovery and ask for approval before changes or retry.
+Any code fix needs validation, a new local review commit and a pause before push.
+```
+
+### Try a snapshot before stable release
+
+```text
+Assess a next-tag snapshot for [merged scope] using release. Check workflow inputs, current branch,
+CI and package state first. Explain the exact dispatch, expected versions/dist-tag and install
+commands; distinguish snapshot publication from a stable release.
+Do not dispatch or publish until I explicitly approve that operation. Do not move latest or create
+stable release tags. Report unavailable checks and the cleanup/migration plan for test consumers.
+```
+
+### Synchronize after merge or release
+
+```text
+Synchronize after [merged work/release PR URL] using sync-after-merge.
+Check identity, remote state and local changes first; preserve unrelated work and never force-push.
+Confirm the PR really merged before removing its work branch. If Version Packages left main ahead
+of develop, explain the sync diff and open/reuse the main-to-develop synchronization PR only;
+do not merge it automatically. Stop on conflicts or decisions that change code.
+Report final branch/HEAD and anything still pending. Do not start another component or release.
 ```
 
 ## Continue the conversation
