@@ -30,3 +30,25 @@ const css = toCss([resolved]);
 ```
 
 Theme names cannot be `light`, `dark` or `system`; those are mode names.
+
+## Keep an existing palette
+
+To reuse the colors of an existing product, use them as seeds and set the exact values per
+semantic role and mode. `validateTheme` still checks every pair; when one fails, adjust that value
+instead of lowering the requirement.
+
+```ts
+const brand = defineTheme({
+  name: 'brand',
+  seeds: { primary: '#2f6fed', accent: '#f59e0b' },
+  modes: {
+    light: { primary: '#2f6fed', bg: '#ffffff', surface: '#f6f7f9', fg: '#111827' },
+    dark: { primary: '#7aa2ff', bg: '#0b1020', surface: '#151b2e', fg: '#e5e7eb' },
+  },
+});
+
+console.log(validateTheme(resolveTheme(brand)).pass);
+```
+
+Typography, spacing and motion are not theme inputs. To have an assistant map a palette for you,
+see [use a reference](../../contribute/prompt-cookbook/#use-a-reference).

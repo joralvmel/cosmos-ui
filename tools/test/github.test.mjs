@@ -65,9 +65,41 @@ describe('release synchronization', () => {
     const workflow = read('.github/workflows/ci.yml');
     const condition = workflow.split('- name: Check changesets')[1]?.split('run:')[0];
     expect(condition?.replace(/\s+/g, ' ').trim()).toBe(
-      "if: >- !(github.head_ref == 'main' && github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository)"
+      "if: >- !(github.head_ref == 'main' && github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository) && github.event.pull_request.user.login != 'dependabot[bot]'"
     );
     expect(workflow).toContain('run: npx changeset status --since=origin/');
+  });
+});
+
+describe('dependency automation', () => {
+  const ci = read('.github/workflows/ci.yml');
+
+  it('classifies Dependabot pull requests and checks runtime updates before a release', () => {
+    expect(ci).toContain('node tools/deps/dependency-changes.mjs pr --base "origin/$BASE_REF"');
+    expect(ci).toContain("if: github.base_ref == 'main' && github.head_ref == 'develop'");
+    expect(ci).toContain('uses: actions/dependency-review-action@v5');
+  });
+
+  it('auto-merges only Dependabot pull requests, opt-in and without installing', () => {
+    const workflow = read('.github/workflows/dependabot-automerge.yml');
+    expect(workflow).toContain("vars.COSMOS_DEPENDABOT_AUTOMERGE == 'true'");
+    expect(workflow).toContain("github.event.pull_request.user.login == 'dependabot[bot]'");
+    expect(workflow).toContain("github.actor == 'dependabot[bot]'");
+    expect(workflow).not.toMatch(/npm (ci|install)/);
+    expect(MANUAL_STEPS.join('\n')).toContain('COSMOS_DEPENDABOT_AUTOMERGE');
+  });
+
+  it('reports vulnerabilities and outdated dependencies into labelled issues', () => {
+    for (const [file, label] of [
+      ['security-audit.yml', 'security'],
+      ['dependency-report.yml', 'dependencies'],
+    ]) {
+      const workflow = read(`.github/workflows/${file}`);
+      expect(workflow, file).toContain('schedule:');
+      expect(workflow, file).toContain('node tools/github/upsert-issue.mjs');
+      expect(workflow, file).toContain(`--label ${label}`);
+      expect(labelNames).toContain(label);
+    }
   });
 });
 

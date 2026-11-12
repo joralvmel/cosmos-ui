@@ -11,6 +11,8 @@ Main agent: `component-builder`. Read `AGENTS.md` first.
 
 - Component name
 - Change requested
+- Optional: a reference (another project's component, screenshot or link) for the behavior or
+  style to imitate; follow `use-reference` (component mode). The Cosmos contract still decides.
 
 ## Steps
 

@@ -20,8 +20,9 @@ changelogs, y publica en el registro público de npm con
 <Steps>
 
 1. Cada pull request que cambia `packages/*` añade un changeset (`npm run changeset`).
-2. Cuando `develop` está listo, un mantenedor abre el pull request de release `develop → main`
-   (skill `release-pr`) y lo integra con un **merge commit**.
+2. Cuando `develop` está listo, un mantenedor ejecuta `npm run deps:changeset` (changesets patch
+   para las actualizaciones de dependencias de runtime fusionadas desde Dependabot), abre el pull
+   request de release `develop → main` (skill `release-pr`) y lo integra con un **merge commit**.
 3. En `main`, el workflow `Release` abre o actualiza el pull request **Version Packages**: sube las
    versiones y escribe los changelogs.
 4. Al integrar **Version Packages** se ejecuta `changeset publish`: las nuevas versiones se publican en
@@ -89,10 +90,28 @@ La skill `publish-setup` guía a un agente por la misma lista.
 
 </Steps>
 
+## Mantenimiento de dependencias
+
+| Qué | Automatización | Tu parte |
+| --- | --- | --- |
+| Actualizaciones minor/patch | Dependabot abre PRs agrupadas hacia `develop` cada lunes (stack fijado: solo patches) | Revisarlas e integrarlas |
+| Clasificación | La CI (`Changeset present`) marca cada actualización como de desarrollo, de runtime o pendiente de decisión | Majors, rangos de peer y el stack fijado necesitan un changeset en la PR, normalmente con `upgrade-stack` |
+| Actualizaciones de runtime | Se aplazan a la release; la PR de release falla hasta que estén cubiertas | `npm run deps:changeset` en `develop` antes de `release-pr` |
+| Dependencias nuevas | `Dependency review` bloquea vulnerabilidades altas/críticas y licencias fuera de la lista permitida | Elegir otro paquete o discutir una excepción |
+| Vulnerabilidades | Alertas y PRs de seguridad de Dependabot; `Security audit` semanal mantiene una issue `security` | Corregir con un patch o planificar un `upgrade-stack` |
+| Majors y stack fijado | `Dependency report` mensual mantiene una issue `dependencies` | Planificar la actualización con `upgrade-stack` |
+| Auto-merge de herramientas | Opcional: con la variable `COSMOS_DEPENDABOT_AUTOMERGE` = `true`, las minor/patch de herramientas de desarrollo se integran solas cuando pasan los checks | Nada, o dejarlo desactivado para revisarlo todo |
+
+Ejecuta los informes en local con `npm run deps:audit` y `npm run deps:outdated`. Los merges del
+auto-merge usan el token del workflow, así que no lanzan workflows en `develop`; la siguiente pull
+request o release ejecuta todos los checks. Prompts: [mantener las dependencias al día](../prompt-cookbook/#mantener-las-dependencias-al-día).
+
 ## Solución de problemas
 
 | Síntoma | Solución |
 | --- | --- |
+| La PR de release falla en "Released runtime dependency updates have changesets" | Ejecuta `npm run deps:changeset` en una rama de trabajo de `develop` e intégrala antes de la release. |
+| Una PR de Dependabot falla en "Classify dependency updates" | Necesita una decisión: revísala con `upgrade-stack` y añade un changeset a la PR. |
 | `E404` / `ENEEDAUTH` al publicar | El trusted publisher no coincide: revisa owner, repositorio, nombre del workflow y entorno. |
 | No aparece el pull request "Version Packages" | Permite que GitHub Actions cree pull requests (`npm run setup-repo -- --apply` lo hace). |
 | Workflow omitido | `COSMOS_PUBLISH_ENABLED` no es `true`. |

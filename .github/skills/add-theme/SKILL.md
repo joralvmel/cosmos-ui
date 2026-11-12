@@ -11,11 +11,13 @@ Main agent: `design-system`. Read `AGENTS.md` first.
 
 - Theme name (not light/dark/system)
 - Primary seed (OKLCH), optional accent, harmony, radius preset
+- Optional: a palette to copy from another project (light and dark colors)
 
 ## Steps
 
-For an existing project's theme, start with `adapt-reference-project`: map semantic roles and
-unsupported typography/spacing/motion needs before selecting seeds or proposing tokens. Follow the
+To copy another project's palette, follow `use-reference` (palette mode): use its brand colors as
+seeds and set the copied values per role with `modes.light` / `modes.dark` overrides; when one
+fails validation, explain it and propose the nearest passing value. Follow the
 [component workflow](../../../docs/conventions/component-workflow.md) for design approval and
 local review. Do not edit the source project or promise exact reproduction at the cost of contrast.
 

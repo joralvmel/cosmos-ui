@@ -30,6 +30,9 @@
     "setup-repo": "node tools/github/setup-repo.mjs",
     "publish-order": "node tools/release/packages.mjs --order",
     "check-packs": "turbo run build --filter=./packages/* && node tools/release/packages.mjs --check",
+    "deps:changeset": "node tools/deps/dependency-changes.mjs write --base origin/main",
+    "deps:audit": "node tools/deps/reports.mjs audit",
+    "deps:outdated": "node tools/deps/reports.mjs outdated",
     "docs": "turbo run dev --filter=@joralvmel/cosmos-docs...",
     "prepare": "node tools/git/install-hooks.mjs"
   },

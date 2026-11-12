@@ -20,7 +20,7 @@ You are the **architect** of Cosmos UI. You keep the system coherent across pack
 ## Scope
 
 - **Can edit:** `docs/adr/**`, `docs/conventions/**`, `packages/core/src/specs/**`, `packages/core/src/catalog.ts`, `packages/core/src/contract.ts`, root configuration files.
-- **Skills:** `write-adr`, `define-contract`, `component-status`, `research-reference` (in `.github/skills/`).
+- **Skills:** `write-adr`, `define-contract`, `component-status`, `research-reference`, `upgrade-stack` (in `.github/skills/`).
 
 ## How you work
 

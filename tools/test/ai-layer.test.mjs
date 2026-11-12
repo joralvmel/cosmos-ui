@@ -138,12 +138,12 @@ describe('AI layer files', () => {
     });
   });
 
-  it('connects reference discovery to approval and existing implementation workflows', () => {
-    const skill = read('skills', 'adapt-reference-project', 'SKILL.md');
+  it('uses references one decision at a time through the existing workflows', () => {
+    const skill = read('skills', 'use-reference', 'SKILL.md');
     const conventionPath = resolve(github, '..', 'docs', 'conventions', 'reference-projects.md');
     const convention = readFileSync(conventionPath, 'utf8');
     const files = [
-      join(github, 'skills', 'adapt-reference-project', 'SKILL.md'),
+      join(github, 'skills', 'use-reference', 'SKILL.md'),
       join(github, 'agents', 'researcher.agent.md'),
       join(github, 'agents', 'design-system.agent.md'),
       workflowPath,
@@ -156,14 +156,16 @@ describe('AI layer files', () => {
     }
     const discovery = skill.indexOf('Establish read-only source boundaries');
     const approval = skill.indexOf('STOP for explicit user approval before generation or edits');
-    const implementation = skill.indexOf('After approval, save sanitized decisions');
+    const implementation = skill.indexOf('After approval, the selected skill implements');
     expect(discovery).toBeGreaterThan(-1);
     expect(approval).toBeGreaterThan(discovery);
     expect(implementation).toBeGreaterThan(approval);
-    for (const name of ['add-theme', 'add-token', 'create-component', 'modify-component']) {
+    for (const name of ['add-theme', 'create-component', 'modify-component']) {
       expect(skills).toContain(name);
       expect(skill).toContain(`\`${name}\``);
     }
+    expect(skill).toContain('do not map or create components in batch');
+    expect(convention).toContain('`modes.light` / `modes.dark` overrides');
     expect(convention).toContain('React/Angular wrap web components; they are not React Native');
     expect(convention).toContain('Finish implementation with a verified local commit');
   });

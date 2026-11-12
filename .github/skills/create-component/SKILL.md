@@ -12,8 +12,9 @@ Main agent: `component-builder`. Read `AGENTS.md` first.
 - Component name (kebab-case, without `cosm-`)
 - Purpose, props, events, slots, accessibility needs
 
-If an existing application/library is the reference, use `adapt-reference-project` first. Its
-read-only maps inform research and scope approval; do not copy source APIs or product identity.
+- Optional: a reference (another project's component, screenshot or link) for one behavior or
+  style to imitate; follow `use-reference` (component mode). It informs research and scope
+  approval; do not copy source APIs or product identity.
 
 ## Steps
 

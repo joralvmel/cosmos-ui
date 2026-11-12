@@ -30,3 +30,25 @@ const css = toCss([resolved]);
 ```
 
 Un tema no puede llamarse `light`, `dark` ni `system`; son nombres de modo.
+
+## Conservar una paleta existente
+
+Para reutilizar los colores de un producto existente, úsalos como semillas y fija los valores
+exactos por rol semántico y modo. `validateTheme` sigue comprobando cada par; si uno falla, ajusta
+ese valor en lugar de rebajar el requisito.
+
+```ts
+const brand = defineTheme({
+  name: 'brand',
+  seeds: { primary: '#2f6fed', accent: '#f59e0b' },
+  modes: {
+    light: { primary: '#2f6fed', bg: '#ffffff', surface: '#f6f7f9', fg: '#111827' },
+    dark: { primary: '#7aa2ff', bg: '#0b1020', surface: '#151b2e', fg: '#e5e7eb' },
+  },
+});
+
+console.log(validateTheme(resolveTheme(brand)).pass);
+```
+
+La tipografía, el espaciado y el movimiento no son entradas del tema. Para que un asistente mapee
+una paleta por ti, consulta [usar una referencia](../../contribute/prompt-cookbook/#usar-una-referencia).

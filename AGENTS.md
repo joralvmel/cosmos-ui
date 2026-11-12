@@ -60,7 +60,7 @@ with `npx vitest run` (Turborepo filters do it for you).
 6. **Changesets are mandatory** for every change to `packages/*`.
 7. **Pinned toolchain**: Node 24, npm 11, TypeScript 6.0.x (Angular 22 requires `<6.1`), Lit 3,
    React 19.3, Angular 22, React Native 0.88 + Expo SDK 58, Tailwind 4, Vitest 5, Biome 2, Astro 7.
-   No upgrades or new dependencies unless the task asks for them.
+   No upgrades or new dependencies unless the task asks for them; upgrade with `upgrade-stack`.
 8. **Never edit generated files**: `dist/`, `custom-elements.json`, `.astro/`, `CHANGELOG.md`;
    `package-lock.json` only through npm.
 9. **Write everything for Cosmos.** Use public specifications and open-source libraries as inspiration
@@ -106,6 +106,12 @@ with `npx vitest run` (Turborepo filters do it for you).
 - Squash merges use the PR title as commit message, so it must be a Conventional Commit.
 - Releases: `release-pr` (develop → main) → "Version Packages" pull request by Changesets → npm
   publish and GitHub Releases (`release` skill).
+- Dependencies: Dependabot opens weekly minor/patch PRs into `develop`. CI classifies them
+  (`tools/deps/dependency-changes.mjs`): development and runtime patch/minor updates pass and get a
+  `patch` changeset before the release (`npm run deps:changeset`); majors, peer ranges and the pinned
+  stack need `upgrade-stack` and a changeset. `Dependency review` blocks high/critical vulnerabilities
+  and disallowed licenses; scheduled workflows keep one `security` and one `dependencies` report
+  issue. Auto-merge of tooling updates is opt-in (`COSMOS_DEPENDABOT_AUTOMERGE`).
 
 ## 5. Agents and skills
 
@@ -133,10 +139,10 @@ Standard flow for a component: `researcher` (+ optional Figma design) → `archi
 
 Skills live in `.github/skills/<name>/SKILL.md` and have matching prompts in `.github/prompts/`.
 
-For inspiration from an existing application or design system, use `adapt-reference-project` and
-the [reference-project convention](docs/conventions/reference-projects.md). Sources stay read-only;
-map themes/components and plan migration before scope approval. Reuse the current generators and
-platform implementations; do not copy product identity or add a runtime package by default.
+Cosmos owns its components. To copy another project's palette into a named theme, imitate one
+behavior or style in a component, or plan replacing an app's components, use `use-reference` and
+the [reference convention](docs/conventions/reference-projects.md). Sources stay read-only; one
+decision at a time, never batch component creation, and no source identity in tracked files.
 
 ## 6. Definition of done
 

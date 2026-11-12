@@ -19,7 +19,7 @@ Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un pro
 | Decidir qué crear después | [Explorar el catálogo](#explorar-el-catálogo) | `component-status`, `researcher` |
 | Crear un componente | [Crear desde una necesidad](#crear-desde-una-necesidad) | `create-component` |
 | Partir de un diseño de Figma | [Crear desde un diseño](#crear-desde-un-diseño) | `component-from-design` |
-| Inspirarme en un proyecto existente | [Usar un proyecto de referencia](#usar-un-proyecto-de-referencia) | `adapt-reference-project` |
+| Copiar una paleta o imitar otro proyecto | [Usar una referencia](#usar-una-referencia) | `use-reference` |
 | Añadir una función o cambiar la API | [Ampliar el comportamiento](#ampliar-el-comportamiento) | `modify-component` |
 | Pulir un componente existente | [Mejorar la apariencia](#mejorar-la-apariencia) | `modify-component`, `design-system` |
 | Corregir un error | [Reproducir y corregir un bug](#reproducir-y-corregir-un-bug) | `modify-component`, `test-engineer` |
@@ -30,6 +30,7 @@ Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un pro
 | Añadir un tema, token o gráfica | [Otras tareas de la librería](#otras-tareas-de-la-librería) | `add-theme`, `add-token`, `create-chart` |
 | Revisar y entregar el resultado | [Continuar la conversación](#continuar-la-conversación) | `finish-work`, `open-pr` |
 | Preparar o verificar una release | [Releases y mantenimiento](#releases-y-mantenimiento) | `release-pr`, `release`, `sync-after-merge` |
+| Actualizar dependencias o corregir una vulnerabilidad | [Mantener las dependencias al día](#mantener-las-dependencias-al-día) | `upgrade-stack`, `devops` |
 
 ### Qué incluye toda implementación
 
@@ -90,64 +91,53 @@ aprobación del alcance y diseño, y completa lo acordado en todas las plataform
 Valida, crea un commit local y espera mi revisión.
 ```
 
-## Usar un proyecto de referencia
+## Usar una referencia
 
-Usa un proyecto React, React Native u otro stack como **evidencia**, no como una biblioteca que copiar.
-La [convención de proyectos de referencia](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/reference-projects.md)
-mantiene las fuentes en solo lectura, comprueba el stack real y separa UI genérica de lógica de negocio.
-No hace falta otro paquete ni agente: la skill coordina los roles actuales de investigación, diseño
-y plataformas.
+Cosmos tiene sus propios componentes: otro proyecto es **evidencia para una decisión cada vez**,
+nunca una biblioteca que portar. La [convención de referencias](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/reference-projects.md)
+mantiene las fuentes en solo lectura y su identidad fuera del repositorio. `use-reference` tiene
+tres modos.
 
-### Analizar temas y componentes
+### Copiar una paleta a un tema
+
+Tus propios colores pueden copiarse tal cual a un **tema nuevo con nombre**; los temas incluidos no cambian.
 
 ```text
-Usa adapt-reference-project con [carpetas de referencia o enlaces públicos]. Puedes inspeccionar
-en solo lectura los archivos relevantes de UI/tema. Céntrate en [tema, componentes o necesidad];
-el destino es [plataformas]. No ejecutes scripts de origen, instales dependencias, leas archivos
-de entorno ni modifiques esos proyectos.
-
-Comprueba el stack real, propiedad/licencias, definiciones de tema, primitivas representativas y
-sus usos. Compara con tokens, contratos e inventario de Cosmos. Entrega un mapa de tema, otro de
-componentes (reutilizar/ampliar/crear/componer/mantener en la app) y un plan de migración priorizado.
-Separa correspondencias soportadas de carencias, UI genérica de negocio y web de nativo.
-No incluyas identidad de origen, rutas privadas, código ni assets de marca en archivos versionados.
-
-Recomienda una primera entrega pequeña y después de investigar hazme preguntas de diseño/API.
-Es solo análisis: no generes archivos, implementes, hagas commit ni push.
+Usa use-reference en modo paleta con [archivo de tema del otro proyecto]. Inspecciónalo en solo
+lectura. Crea un tema de Cosmos llamado [nombre] con add-theme que conserve esos colores en modo
+claro y oscuro: los colores de marca como semillas y los valores exactos por rol semántico con
+overrides por modo.
+Muéstrame primero el mapeo de roles y la validación. Si un par copiado no cumple WCAG AA o las
+comprobaciones de visión del color, explícalo y propón el valor más cercano que sí cumpla; no bajes
+los umbrales. Indica lo que el tema no puede expresar (fuentes, espaciado, movimiento). Espera mi
+aprobación; después implementa, valida en web y nativo, haz commit local y para sin push ni PR.
 ```
 
-### Implementar una parte aprobada
+### Imitar un comportamiento o estilo en un componente
 
-Envía esto después de revisar los mapas y resolver las decisiones, no como permiso para importar
-todo un proyecto. La identidad del tema es independiente del modo claro/oscuro. Tener semillas y
-presets de radio no implica admitir escalas arbitrarias de tipografía, espaciado o movimiento.
+Añade la referencia a una petición normal de crear o modificar; el contrato de Cosmos sigue mandando.
 
 ```text
-Apruebo [tema/componente concreto] del análisis, con [decisiones aceptadas], excluyendo [fuera
-de alcance] y aplazando [limitaciones]. Usa adapt-reference-project para continuar con
-add-theme/add-token o create-component/modify-component según corresponda.
-
-Implementa de forma independiente en Cosmos con ejemplos neutros. Respeta la semántica de tokens,
-contratos y accesibilidad; explica las diferencias visuales necesarias por contraste o plataforma.
-Usa el generador cuando corresponda y completa plataformas, ejemplos, docs EN/ES, referencias de IA,
-pruebas y changesets. Vuelve a preguntar si faltan roles de tokens o surgen decisiones relevantes
-de API/dependencias. Mantén intactos los proyectos de referencia/consumidores.
-Valida, crea un commit local y espera sin hacer push ni PR.
+Usa modify-component para [componente]. Como referencia, mira en solo lectura [archivo, captura o
+enlace]: quiero [el gesto de deslizar para cerrar / la densidad compacta / la animación] que tiene.
+Describe qué hace la referencia (estados, interacción, accesibilidad, plataformas) y qué cubre ya
+Cosmos. Recomienda cómo llevar ese aspecto al contrato actual, pregúntame lo que falte decidir y
+espera mi aprobación. No copies sus props, código ni textos. Tras aprobarlo, implementa en todas
+las plataformas, valida, haz commit local y para.
 ```
 
-### Planificar la sustitución gradual en una app
+### Planificar la sustitución de los componentes de una app
 
-Cosmos React adapta componentes web; React Native tiene su implementación específica. Compartir
-contratos no hace que sustituyan directamente las props o providers de otro proyecto.
+Ejecútalo **en el repositorio de la app**. Sustituye un componente cada vez, en pasos separados y autorizados.
 
 ```text
-Planifica sustituir [tema/componentes del consumidor] por Cosmos cuando [entrega aprobada] esté
-publicada. Inspecciona en solo lectura los archivos de UI autorizados del consumidor.
-Comprueba versiones instaladas, providers, estilos, imports, formularios/eventos, límites SSR/cliente
-y compatibilidad nativa/Expo según aplique. Identifica sustitutos estables, capacidades sin cubrir
-y necesidades de convivencia temporal. Propón un orden pequeño, pruebas de aceptación y reversión
-por paso. No edites el consumidor ni Cosmos, instales paquetes, ejecutes código del consumidor,
-hagas commit ni push. Pregunta antes de implementar cualquier paso.
+Con use-reference de Cosmos (modo plan de sustitución), planifica cómo adopta Cosmos esta app.
+Inspecciona la app en solo lectura: versiones instaladas, providers, tema, imports y los componentes
+de UI que define. Lista cada uno con su equivalente en Cosmos (estable, en progreso, planificado o
+ausente), las carencias y un orden de sustitución con comprobaciones de aceptación y rollback.
+Las capacidades que falten se convierten en peticiones a Cosmos, no en código de la app dentro de
+Cosmos. No edites la app, no instales paquetes, no hagas commit ni push. Pregúntame qué primera
+sustitución implementar.
 ```
 
 ## Evolucionar un componente existente
@@ -380,6 +370,45 @@ Si Version Packages dejó main adelantado respecto de develop, explica el diff d
 y solo abre/reutiliza la PR main-a-develop; no la fusiones automáticamente. Detente ante conflictos
 o decisiones que cambien código. Informa de rama/HEAD final y pendientes.
 No empieces otro componente ni otra release.
+```
+
+## Mantener las dependencias al día
+
+Dependabot abre cada semana PRs de versiones minor/patch hacia `develop`, la CI las clasifica y
+los workflows programados mantienen al día una issue de **seguridad** y otra de **informe de
+dependencias**. Consulta [release y publicación](../publishing/#mantenimiento-de-dependencias)
+para ver qué es automático.
+
+### Revisar una PR de Dependabot
+
+```text
+Revisa la PR de Dependabot [URL] en solo lectura. Lee la clasificación de la CI, la revisión de
+dependencias y las notas de versión de cada actualización. Dime si es solo de desarrollo, una
+actualización de runtime que se aplaza a la release o un cambio que necesita una decisión y un
+changeset (major, rango de peer, stack fijado). Revisa los checks fallidos si los hay. Recomienda
+merge, cambios o upgrade-stack; no hagas merge ni push.
+```
+
+### Actualizar el stack o una dependencia major
+
+```text
+Usa upgrade-stack para [TypeScript 6.1 / Expo SDK 59 / React 20 / la issue del informe de dependencias].
+Investiga primero las notas de versión, las guías de migración y la matriz de compatibilidad, y
+dime el impacto para los consumidores y el semver de cada paquete de Cosmos. Espera mi aprobación
+antes de cambiar manifiestos. Después actualiza con npm, migra el código, actualiza las versiones
+fijadas y las reglas de Dependabot, valida todas las plataformas y añade changesets con notas de
+migración. Haz commit local y para.
+```
+
+### Corregir una vulnerabilidad
+
+```text
+Investiga la issue de seguridad [URL o advisory]. Indica si llega a los consumidores (runtime de un
+paquete publicado), a las apps o solo a herramientas de desarrollo, y si existe una corrección
+compatible. Si es un patch, aplícalo con npm, añade un changeset patch para los paquetes afectados,
+valida, haz commit local y para. Si necesita una major o el stack fijado, propón un plan con
+upgrade-stack y espera. Nunca desactives la auditoría ni la revisión de dependencias para tener
+los checks en verde.
 ```
 
 ## Continuar la conversación
