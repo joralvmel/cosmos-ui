@@ -45,7 +45,10 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
 <script>
   import '@joralvmel/cosmos-elements';
   import { contracts } from '@joralvmel/cosmos-core';
+  import { iconCatalog, isIconDefinition } from '@joralvmel/cosmos-icons';
   import { initPlayground } from '../lib/playground';
+
+  const iconModules = import.meta.glob<Record<string, unknown>>('../../../../packages/icons/dist/lucide/*.js');
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
     const contract = contracts[root.dataset.name as keyof typeof contracts];
@@ -56,6 +59,19 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
       labels: JSON.parse(root.dataset.labels ?? '{}'),
       themes: JSON.parse(root.dataset.themes ?? '[]'),
       nativeDemoUrl: root.dataset.nativeDemo || undefined,
+      referenceCatalogs: {
+        IconDefinition: {
+          items: iconCatalog,
+          load: async name => {
+            const loader = iconModules[`../../../../packages/icons/dist/lucide/${name}.js`];
+            if (!loader) throw new Error('Unknown icon');
+            const module = await loader();
+            const icon = Object.values(module).find(isIconDefinition);
+            if (!icon) throw new Error('Invalid icon');
+            return icon;
+          },
+        },
+      },
     });
   }
 </script>

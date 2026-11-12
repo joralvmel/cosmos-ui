@@ -43,7 +43,9 @@
   },
   "dependencies": {
     "@joralvmel/cosmos-core": "^0.1.0",
-    "@joralvmel/cosmos-tokens": "^0.1.0"
+    "@joralvmel/cosmos-icons": "^0.1.0",
+    "@joralvmel/cosmos-tokens": "^0.1.0",
+    "react-native-svg": "15.16.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

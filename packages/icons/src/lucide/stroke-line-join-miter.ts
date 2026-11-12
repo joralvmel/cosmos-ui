@@ -1,0 +1,32 @@
+import type { IconDefinition } from '../index.js';
+
+export const strokeLineJoinMiter = {
+  name: 'stroke-line-join-miter',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M11 21v-2.002',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M3 3h16a2 2 0 012 2v16',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M5 13H3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M9 13h1a1 1 0 011 1v1',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

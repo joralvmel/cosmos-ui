@@ -1,0 +1,36 @@
+import type { IconDefinition } from '../index.js';
+
+export const squareChartGantt = {
+  name: 'square-chart-gantt',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'rect',
+      {
+        width: '18',
+        height: '18',
+        x: '3',
+        y: '3',
+        rx: '2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M9 8h7',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M8 12h6',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M11 16h5',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

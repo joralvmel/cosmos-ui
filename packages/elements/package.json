@@ -40,6 +40,10 @@
       "types": "./dist/components/button/cosm-button.d.ts",
       "default": "./dist/components/button/cosm-button.js"
     },
+    "./icon": {
+      "types": "./dist/components/icon/cosm-icon.d.ts",
+      "default": "./dist/components/icon/cosm-icon.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"
@@ -53,6 +57,7 @@
   },
   "dependencies": {
     "@joralvmel/cosmos-core": "^0.1.0",
+    "@joralvmel/cosmos-icons": "^0.1.0",
     "lit": "^3.3.3"
   },
   "devDependencies": {

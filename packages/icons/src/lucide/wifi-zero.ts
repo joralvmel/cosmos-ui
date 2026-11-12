@@ -1,0 +1,14 @@
+import type { IconDefinition } from '../index.js';
+
+export const wifiZero = {
+  name: 'wifi-zero',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M12 20h.01',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

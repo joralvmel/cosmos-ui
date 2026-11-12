@@ -1,0 +1,44 @@
+import type { IconDefinition } from '../index.js';
+
+export const packageQuestionMark = {
+  name: 'package-question-mark',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M12 22V12l8.71-5',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M21 10.342V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2.33-1.332',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M3.29 7 12 12',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm7.5 4.27 9 5.15',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M19 18.5c.5-1 2-1 2-2.5a2 2 0 00-2-2 2.5 2.5 0 00-2 1',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M19 22h.01',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

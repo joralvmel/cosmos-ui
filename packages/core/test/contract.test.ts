@@ -7,7 +7,10 @@ import {
   contracts,
   defaults,
   eventNames,
+  generateSnippets,
   getPressableState,
+  iconContract,
+  iconScenarios,
   propNames,
   supports,
 } from '../src/index.js';
@@ -50,6 +53,59 @@ describe('contract helpers', () => {
     >();
     expectTypeOf<NativeProps>().not.toHaveProperty('type');
   });
+
+  it('resolves named reference props through an explicit external type map', () => {
+    type IconShape = { name: string };
+    type IconProps = ContractProps<typeof iconContract, 'web', { IconDefinition: IconShape }>;
+    expectTypeOf<IconProps['icon']>().toEqualTypeOf<IconShape>();
+    expectTypeOf<IconProps['size']>().toEqualTypeOf<'sm' | 'md' | 'lg' | number | undefined>();
+    expectTypeOf<Record<never, never>>().not.toMatchTypeOf<IconProps>();
+  });
+
+  it('preserves explicit false values and emits reference-aware examples', () => {
+    const snippets = generateSnippets(
+      iconContract,
+      { icon: 'house', decorative: false, label: 'Home' },
+      'unused content'
+    );
+    expect(snippets.html).toContain("import { house } from '@joralvmel/cosmos-icons/house'");
+    expect(snippets.html).toContain('element.decorative = false');
+    expect(snippets.html).not.toContain('decorative="false"');
+    expect(snippets.react).toContain('decorative={false}');
+    expect(snippets.angular).toContain('[decorative]="false"');
+    expect(snippets.native).toContain('icon={house}');
+    expect(snippets.react).not.toContain('unused content');
+  });
+
+  it('turns CSS color tokens into useTheme colors only in the native example', () => {
+    const snippets = generateSnippets(
+      iconContract,
+      {
+        icon: 'heart',
+        stroke: 'var(--cosm-primary)',
+        fill: 'var(--cosm-danger-subtle)',
+        strokeWidth: 3,
+      },
+      ''
+    );
+    expect(snippets.react).toContain('stroke="var(--cosm-primary)"');
+    expect(snippets.native).toContain("import { Icon, useTheme } from '@joralvmel/cosmos-native';");
+    expect(snippets.native).toContain('const theme = useTheme();');
+    expect(snippets.native).toContain('stroke={theme.colors.primary}');
+    expect(snippets.native).toContain("fill={theme.colors['danger-subtle']}");
+    expect(snippets.native).toContain('strokeWidth={3}');
+    expect(snippets.native).not.toContain('var(');
+    const plain = generateSnippets(iconContract, { icon: 'heart', fill: '#ff0000' }, '');
+    expect(plain.native).toContain('fill="#ff0000"');
+    expect(plain.native).not.toContain('useTheme');
+    const label = generateSnippets(
+      iconContract,
+      { icon: 'heart', decorative: false, label: 'var(--cosm-primary)' },
+      ''
+    );
+    expect(label.native).toContain('label="var(--cosm-primary)"');
+    expect(label.native).not.toContain('useTheme');
+  });
 });
 
 describe('contracts registry', () => {
@@ -64,8 +120,22 @@ describe('contracts registry', () => {
       }
       for (const [name, spec] of Object.entries(contract.props)) {
         if (spec.type === 'enum') expect(spec.values, name).toContain(spec.default);
+        if (spec.type === 'reference') expect(spec.reference).toBeTruthy();
       }
     }
+  });
+
+  describe('icon scenarios', () => {
+    it('cover decorative defaults and informative usage without events or state', () => {
+      expect(iconScenarios.map(scenario => scenario.expected.decorative)).toEqual([
+        true,
+        false,
+        true,
+        true,
+      ]);
+      expect(iconContract.events).toEqual({});
+      expect(iconContract.states).toEqual([]);
+    });
   });
 });
 

@@ -1,0 +1,26 @@
+import type { IconDefinition } from '../index.js';
+
+export const doorClosed = {
+  name: 'door-closed',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M2 21h20',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M9 12h.01',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

@@ -1,0 +1,34 @@
+import type { IconDefinition } from '../index.js';
+
+export const circlePoundSterling = {
+  name: 'circle-pound-sterling',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'circle',
+      {
+        cx: '12',
+        cy: '12',
+        r: '10',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M10 16V9.5a1 1 0 0 1 5 0',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M8 12h4',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M8 16h7',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

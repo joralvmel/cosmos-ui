@@ -4,6 +4,8 @@ export type Platform = (typeof platforms)[number];
 
 interface BasePropSpec {
   description: string;
+  /** Prop must be provided by the consumer; no contract default exists. */
+  required?: boolean;
   /** Reflected to an attribute on the Web Component (used for styling). */
   reflect?: boolean;
   /** Limits the prop to some platforms (e.g. `type` exists only on the web). */
@@ -14,7 +16,19 @@ export type PropSpec =
   | (BasePropSpec & { type: 'string'; default?: string })
   | (BasePropSpec & { type: 'number'; default?: number })
   | (BasePropSpec & { type: 'boolean'; default: boolean })
-  | (BasePropSpec & { type: 'enum'; values: readonly string[]; default: string });
+  | (BasePropSpec & { type: 'enum'; values: readonly string[]; default: string })
+  | (BasePropSpec & {
+      type: 'union';
+      variants: readonly ({ type: 'enum'; values: readonly string[] } | { type: 'number' })[];
+      default?: string | number;
+    })
+  | (BasePropSpec & {
+      type: 'reference';
+      reference: string;
+      /** Named examples used by generated documentation controls and source snippets. */
+      options?: readonly string[];
+      example?: string;
+    });
 
 /** Public event with its name on every platform (see docs/adr/0003-state-ownership-and-events.md). */
 export interface EventSpec {
@@ -68,15 +82,22 @@ export function supports(contract: ComponentContract, platform: Platform): boole
   return !contract.platforms || contract.platforms.includes(platform);
 }
 
-type ValueOf<S> = S extends { type: 'enum'; values: readonly (infer V)[] }
+type ValueOf<S, References extends Record<string, unknown>> = S extends {
+  type: 'enum';
+  values: readonly (infer V)[];
+}
   ? V
-  : S extends { type: 'boolean' }
-    ? boolean
-    : S extends { type: 'number' }
-      ? number
-      : S extends { type: 'string' }
-        ? string
-        : never;
+  : S extends { type: 'union'; variants: readonly (infer Variant)[] }
+    ? ValueOf<Variant, References>
+    : S extends { type: 'boolean' }
+      ? boolean
+      : S extends { type: 'number' }
+        ? number
+        : S extends { type: 'string' }
+          ? string
+          : S extends { type: 'reference'; reference: infer K extends keyof References }
+            ? References[K]
+            : never;
 
 type AvailableOn<S, P extends Platform> = S extends { platforms: readonly (infer X)[] }
   ? P extends X
@@ -85,10 +106,22 @@ type AvailableOn<S, P extends Platform> = S extends { platforms: readonly (infer
   : true;
 
 /** Props of a contract available on a platform, all optional (defaults live in the contract). */
-export type ContractProps<C extends ComponentContract, P extends Platform> = {
+export type ContractProps<
+  C extends ComponentContract,
+  P extends Platform,
+  References extends Record<string, unknown> = Record<never, never>,
+> = {
   -readonly [K in keyof C['props'] as AvailableOn<C['props'][K], P> extends true
-    ? K
-    : never]?: ValueOf<C['props'][K]>;
+    ? C['props'][K] extends { required: true }
+      ? K
+      : never
+    : never]-?: ValueOf<C['props'][K], References>;
+} & {
+  -readonly [K in keyof C['props'] as AvailableOn<C['props'][K], P> extends true
+    ? C['props'][K] extends { required: true }
+      ? never
+      : K
+    : never]?: ValueOf<C['props'][K], References>;
 };
 
 /** Names of the props a platform must expose. */
@@ -110,8 +143,8 @@ export function eventNames(
 export function defaults(contract: ComponentContract, platform: Platform): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(contract.props)
-      .filter(([, spec]) => spec.default !== undefined)
+      .filter(([, spec]) => 'default' in spec && spec.default !== undefined)
       .filter(([, spec]) => !spec.platforms || spec.platforms.includes(platform))
-      .map(([name, spec]) => [name, spec.default])
+      .map(([name, spec]) => [name, 'default' in spec ? spec.default : undefined])
   );
 }

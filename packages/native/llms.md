@@ -69,6 +69,32 @@ export function Example() {
   );
 }
 ```
+### `Icon`
+
+Renders a structured SVG icon. Decorative icons are hidden from assistive technology; informative icons require a text label.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | IconDefinition | Required | Structured icon definition, commonly imported from @joralvmel/cosmos-icons. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size (16, 20 or 24) or a positive finite number in pixels / native units. |
+| `stroke` | string | `currentColor` | Stroke paint; currentColor inherits on web and resolves to the theme foreground on native. |
+| `fill` | string | `none` | Root fill paint. Explicit node fills take precedence. |
+| `strokeWidth` | number | `2` | Finite nonnegative stroke width in SVG viewBox units. |
+| `label` | string | — | Accessible name required when decorative is false. |
+| `decorative` | boolean | `true` | Hides the icon from assistive technology when true. |
+
+Events: none.
+
+```tsx
+import { Icon } from '@joralvmel/cosmos-native';
+import { house } from '@joralvmel/cosmos-icons/house';
+
+export function Example() {
+  return (
+    <Icon icon={house}></Icon>
+  );
+}
+```
 
 ## Themes
 

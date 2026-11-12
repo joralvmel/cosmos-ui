@@ -1,0 +1,44 @@
+import type { IconDefinition } from '../index.js';
+
+export const audioLines = {
+  name: 'audio-lines',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M2 10v3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M6 6v11',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M10 3v18',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M14 8v7',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M18 5v13',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M22 10v3',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

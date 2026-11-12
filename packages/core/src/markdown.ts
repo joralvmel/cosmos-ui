@@ -10,7 +10,19 @@ import type { ComponentContract, Platform, PropSpec } from './contract.js';
 const cell = (value: string) => value.replaceAll('|', '\\|').replaceAll('\n', ' ');
 
 export const propType = (spec: PropSpec) =>
-  spec.type === 'enum' ? spec.values.map(value => `'${value}'`).join(' \\| ') : spec.type;
+  spec.type === 'enum'
+    ? spec.values.map(value => `'${value}'`).join(' \\| ')
+    : spec.type === 'union'
+      ? spec.variants
+          .map(variant =>
+            variant.type === 'enum'
+              ? variant.values.map(value => `'${value}'`).join(' \\| ')
+              : 'number'
+          )
+          .join(' \\| ')
+      : spec.type === 'reference'
+        ? spec.reference
+        : spec.type;
 
 const snippetLanguage: Record<SnippetTarget, string> = {
   html: 'html',
@@ -33,7 +45,13 @@ export function propsMarkdown(contract: ComponentContract, platform?: Platform):
     .map(([name, spec]) => {
       const attribute =
         platform === 'web' && toAttribute(name) !== name ? ` (\`${toAttribute(name)}\`)` : '';
-      const value = spec.default === undefined ? '—' : `\`${String(spec.default)}\``;
+      const defaultValue = 'default' in spec ? spec.default : undefined;
+      const value =
+        defaultValue === undefined
+          ? 'required' in spec && spec.required
+            ? 'Required'
+            : '—'
+          : `\`${String(defaultValue)}\``;
       return `| \`${name}\`${attribute} | ${propType(spec)} | ${value} | ${cell(spec.description)} |`;
     });
   return ['| Prop | Type | Default | Description |', '| --- | --- | --- | --- |', ...rows].join(

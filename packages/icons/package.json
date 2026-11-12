@@ -21,7 +21,8 @@
   "sideEffects": false,
   "files": [
     "dist",
-    "llms.md"
+    "llms.md",
+    "LICENSE-lucide"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,14 +31,22 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./*": {
+      "types": "./dist/lucide/*.d.ts",
+      "default": "./dist/lucide/*.js"
+    },
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "sync-icons": "node scripts/sync-lucide.mjs",
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "devDependencies": {
+    "@lucide/icons": "1.72.0"
   }
 }

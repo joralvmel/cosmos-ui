@@ -1,0 +1,28 @@
+import type { IconDefinition } from '../index.js';
+
+export const circleQuestionMark = {
+  name: 'circle-question-mark',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'circle',
+      {
+        cx: '12',
+        cy: '12',
+        r: '10',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M9 9.5a3 2.5 0 016 0c0 2-2 2-3 3.5',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12 17h.01',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;
