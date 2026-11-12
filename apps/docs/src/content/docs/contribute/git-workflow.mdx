@@ -27,16 +27,25 @@ open the pull request from their fork.
 
 ## Pull requests
 
-1. `start-work` → work → `finish-work` (validates, pushes and opens the pull request to `develop`).
-2. Required: green checks (lint, terms, typecheck, tests, build, packs, docs build, changeset, commit
+1. `start-work` creates a local branch from synchronized `develop`. Component work follows the
+   [research and scope approval workflow](../working-with-agents/#research-decisions-and-local-review).
+2. `finish-work` validates, automatically commits locally, reports the SHA and local test steps,
+   then **waits without push or PR**. Requested changes get a new commit and another review pause;
+   previous commits are not amended by default.
+3. Explicit acceptance of that unchanged HEAD authorizes `open-pr` to verify identity, push and
+   open/reuse the PR to `develop`. Initial task or scope approval does not accept unseen changes.
+   New commits on an already open PR require the same local review before push.
+4. Required: green checks (lint, terms, typecheck, tests, build, packs, docs build, changeset, commit
    hygiene) and resolution of review conversations. Approvals are optional.
-3. Squash merge: the pull request title must be a Conventional Commit (checked by CI).
-4. `sync-after-merge` cleans up the local branch.
+5. Squash merge: the pull request title must be a Conventional Commit (checked by CI).
+6. `sync-after-merge` cleans up the local branch.
 
 Approvals are optional on `main` and `develop` so a sole maintainer can merge their own pull requests.
 This policy applies to all contributors: classic branch protection on a personal repository does not
 support individual review exemptions. Pull requests, required checks and conversation resolution
 remain mandatory. Copilot reviews are advisory, not approving reviews.
+The agent's local review pause is separate from GitHub review requirements; it changes no branch
+protection settings. Agents never merge or publish just because local changes were accepted.
 
 ## Releases
 

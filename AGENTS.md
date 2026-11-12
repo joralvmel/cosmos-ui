@@ -77,11 +77,21 @@ with `npx vitest run` (Turborepo filters do it for you).
 
 1. Read this file, the package `AGENTS.md` and the matching `.github/instructions/*.instructions.md`.
 2. Start a work branch from `develop` (`start-work`); for components run `component-status` first.
-3. If behavior is new, ask `researcher` for references (APG, Open UI, public libraries).
-4. Update the contract and scenarios (`define-contract`), then the visual spec (`design-component`).
-5. Implement per platform, keeping parity; add tests.
-6. Update docs (EN + ES), `llms.md` and add a changeset.
-7. Run the validation commands, then `finish-work` (push + pull request to `develop`).
+3. Follow [the component workflow](docs/conventions/component-workflow.md): research first, then
+   present recommendations and ask the user what to include, exclude or defer. The main conversation
+   owns approval; a specialist's recommendation is not acceptance.
+4. Stop for explicit scope/design approval before generation or contract edits. Record accepted
+   decisions in `docs/design/<name>.md`; scaffold, then finalize the contract and shared scenarios
+   (`define-contract`) before platform behavior.
+5. Implement the approved scope per platform; complete docs (EN + ES), demos, `llms.md` and changeset.
+6. Run validation and report the workflow's evidence matrix. Browser, wrapper, React Native Web and
+   native runtime checks are distinct; mocks/builds do not prove device interaction.
+7. `finish-work` automatically creates a verified **local commit**, reports its SHA and pauses for
+   user validation. **No push or PR before explicit approval of that reviewed HEAD.** Revisions get
+   new commits and another pause; never amend by default. Approval of scope is not approval to push.
+8. After approval, `open-pr` pushes the unchanged reviewed HEAD and opens/reuses its PR to `develop`.
+   Do not merge or publish automatically. This local review gate applies to all implementation
+   tasks; read-only requests do not authorize a commit.
 
 ### Git and GitHub flow
 
@@ -132,6 +142,10 @@ Skills live in `.github/skills/<name>/SKILL.md` and have matching prompts in `.g
 - [ ] Styled only with tokens; checked in light and dark and in at least two themes.
 - [ ] Docs page in English and Spanish with Playground and API table; `llms.md` updated.
 - [ ] No `TODO(generator)` markers, no `console.log`, no unused exports.
+- [ ] Research-led scope/design accepted before implementation; changes stay within that agreement.
+- [ ] Validation evidence separates unit/browser/wrapper/native-web/device results and states any
+      unavailable checks. File presence alone does not establish runtime readiness.
+- [ ] Local review commit and SHA presented; push/PR only after acceptance of that same HEAD.
 - [ ] Changeset for each touched publishable package.
 - [ ] `npx biome ci . && npx turbo run typecheck test build` and `npm run check-terms` pass.
 

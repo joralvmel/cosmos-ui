@@ -18,6 +18,10 @@ Main agent: `test-engineer`. Read `AGENTS.md` first.
 3. Check contrast through the theme validation and in forced-colors mode.
 4. Check `prefers-reduced-motion`.
 5. Native: TalkBack/VoiceOver in the Expo demo, 44pt targets, focus order.
+6. Follow the [component workflow](../../../docs/conventions/component-workflow.md): record the
+   browser/device and actual tool used for each check. If axe, a screen reader or a native runtime
+   is unavailable, state that explicitly instead of checking its box. Scripted DOM activation is
+   not evidence of real keyboard/touch use; accessibility tree inspection is not a screen-reader run.
 
 ## Files
 

@@ -28,15 +28,18 @@ Next suggested: icon, badge, avatar, divider, listbox
 ## 2. Issue y rama — `start-work`
 
 ```bash
-gh issue create --template component_request.yml --title "Component: switch"
-# → https://github.com/joralvmel/cosmos-ui/issues/12
-gh issue develop 12 --base develop --name feat/elements-switch --checkout
+git fetch origin
+git switch develop
+git pull --ff-only
+git switch -c feat/elements-switch
 ```
 
 ```text
-github.com/joralvmel/cosmos-ui/tree/feat/elements-switch
 Switched to a new branch 'feat/elements-switch'
 ```
+
+Si existe un issue relacionado (por ejemplo #12), se enlaza en la PR posterior. La rama de trabajo
+se mantiene local hasta que aceptes la implementación.
 
 ## 3. Investigación — `research-reference`
 
@@ -46,12 +49,19 @@ El agente `researcher` resume el
 `<input type="checkbox" role="switch">` nativo dentro del Web Component (participación en formularios
 sin coste).
 
-## 4. Contrato — `define-contract`
+También compara implementaciones públicas y separa los requisitos de los tamaños, estados y opciones
+de personalización sugeridos. El chat principal pregunta qué incluir o aplazar, explica las
+alternativas y resume el alcance y las pruebas de aceptación web/nativas. **Espera tu aprobación del
+alcance y diseño antes de generar archivos o editar el contrato.**
 
-El agente `architect` escribe `packages/core/src/specs/switch.ts` (props `checked`, `disabled`,
+## 4. Plan de API aceptado — `define-contract`
+
+Tras la aceptación, `architect` plantea el contrato (por ejemplo props `checked`, `disabled`,
 `required`, `name`, `value`, `label`; evento `change` → DOM `cosm-change`, React `onChange`, Angular
 `(checkedChange)`, React Native `onCheckedChange`; estado `checked` con `defaultChecked`) y los
 escenarios compartidos (alternar con puntero y teclado, deshabilitado, propuesta controlada sin aplicar).
+Son decisiones ilustrativas, no una lista de funciones que se deba asumir. Los archivos del contrato
+se completan tras generar el scaffold en el paso 6 y antes del comportamiento de cada plataforma.
 
 ## 5. Especificación visual — `design-component`
 
@@ -118,7 +128,9 @@ npm run status
 stable       1  switch
 ```
 
-Cuando existen todas las piezas, `component-builder` pone `status: 'stable'` en la entrada del catálogo.
+El inventario comprueba la estructura. Solo se marca `stable` al completar el alcance aceptado y las
+pruebas requeridas, o si aplazas explícitamente pruebas no disponibles que siguen indicándose como
+pendientes. La existencia de archivos no demuestra el funcionamiento en ejecución.
 
 ## 10. Changeset — `add-changeset`
 
@@ -134,16 +146,26 @@ Cuando existen todas las piezas, `component-builder` pone `status: 'stable'` en 
 Add the Switch component (`cosm-switch`) on every platform.
 ```
 
-## 11. Pull request — `finish-work`
-
-```bash
-npx biome ci . && npx turbo run typecheck test build && npm run check-terms
-git push -u origin HEAD
-gh pr create --base develop --title "feat(elements): add cosm-switch" --body-file pr.md --label type:component
-```
+## 11. Revisión local y después pull request — `finish-work`, `open-pr`
 
 ```text
-https://github.com/joralvmel/cosmos-ui/pull/13
+/finish-work "feat(elements): add cosm-switch" cierra #12
+```
+
+El agente ejecuta las comprobaciones del repositorio y las pruebas aplicables de navegador, wrappers
+y nativo; verifica la identidad y crea automáticamente un commit local solo con los archivos de la
+tarea. Comunica rama, SHA, matriz de resultados y cómo probarlo. **Se detiene sin push ni PR.**
+Los mocks y las exportaciones no demuestran ejecución nativa; las pruebas o dispositivos no disponibles
+siguen indicándose.
+
+Prueba ese commit. Si pides ajustes, el agente valida y crea otro commit y vuelve a esperar.
+No modifica el anterior con amend por defecto.
+
+Solo después de aceptar el SHA revisado actual, `open-pr` verifica que HEAD no haya cambiado, hace
+push y abre la PR a `develop` o reutiliza la PR abierta de esa rama. Por ejemplo:
+
+```text
+Apruebo el commit revisado <SHA>. Haz push y abre la PR a develop.
 ```
 
 La CI ejecuta lint, términos, typecheck, tests y build, el build de la documentación (artefacto de
@@ -152,9 +174,11 @@ preview), la comprobación de changesets y la higiene de commits; el labeler añ
 
 ## 12. Revisión e integración
 
-Pide una revisión al agente `reviewer`, resuelve los comentarios y espera la aprobación del code owner.
-Integra con **Squash and merge** (el título del PR se convierte en el mensaje del commit); la rama se
-borra sola.
+Pide una revisión a `reviewer` y resuelve los hallazgos; las correcciones pasan por otro commit local
+y tu aceptación antes del push. Las aprobaciones de GitHub son opcionales, pero los checks y la
+resolución de conversaciones son obligatorios. El mantenedor integra con **Squash and merge** (el
+título del PR se convierte en el mensaje del commit); la rama se borra sola. Aceptar los cambios locales
+no autoriza una integración ni una release automática.
 
 ## 13. Volver a develop — `sync-after-merge`
 

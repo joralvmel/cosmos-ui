@@ -1,6 +1,6 @@
 ---
 name: open-pr
-description: 'Opens a pull request for an existing pushed branch (develop for work branches, main only for release PRs). Prefer finish-work, which validates first.'
+description: 'Pushes and opens or updates a work PR only after explicit approval of the current local review commit.'
 argument-hint: 'Branch'
 agent: agent
 ---
@@ -10,3 +10,7 @@ Act as the `github-ops` agent ([definition](../agents/github-ops.agent.md)) and 
 
 - Branch: ${input:arg1}
 - Summary: ${input:arg2}
+
+Follow the [component workflow](../../docs/conventions/component-workflow.md). Check that the user
+has accepted the presented HEAD and that it is unchanged. Otherwise stop at the local review gate;
+do not push, create a duplicate PR or infer approval from this prompt alone.
