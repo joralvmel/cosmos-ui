@@ -1,0 +1,34 @@
+import type { IconDefinition } from '../index.js';
+
+export const clefBass = {
+  name: 'clef-bass',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M19 11h.01',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M19 6h.01',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M5 8c0-4 4-4 4-4 6 0 6 6 6 6 0 7-10 11-10 11',
+      },
+    ],
+    [
+      'circle',
+      {
+        cx: '7',
+        cy: '8',
+        r: '2',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

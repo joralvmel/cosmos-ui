@@ -78,6 +78,7 @@ export const catalog: readonly CatalogEntry[] = [
     priority: 1,
     dependsOn: [],
     pattern: 'https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA24',
+    status: 'stable',
   }),
   entry({
     name: 'icon-button',

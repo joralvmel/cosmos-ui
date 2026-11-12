@@ -1,6 +1,7 @@
 # @joralvmel/cosmos-icons
 
 Structured, framework-neutral icon definitions; validate untrusted data with `isIconDefinition()`.
+Search metadata with `searchIconCatalog(iconCatalog, query)`; import artwork by individual icon path.
 
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 

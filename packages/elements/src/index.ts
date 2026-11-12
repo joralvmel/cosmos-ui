@@ -6,5 +6,6 @@ export {
   type ButtonVariant,
   CosmButton,
 } from './components/button/cosm-button.js';
+export { CosmIcon, type CosmIconSize } from './components/icon/cosm-icon.js';
 export { CosmElement, type EmitOptions } from './internal/cosm-element.js';
 export { define } from './internal/define.js';

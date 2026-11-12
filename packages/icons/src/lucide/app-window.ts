@@ -1,0 +1,36 @@
+import type { IconDefinition } from '../index.js';
+
+export const appWindow = {
+  name: 'app-window',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'rect',
+      {
+        x: '2',
+        y: '4',
+        width: '20',
+        height: '16',
+        rx: '2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M10 4v4',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M2 8h20',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M6 4v4',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

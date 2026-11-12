@@ -1,0 +1,24 @@
+import type { IconDefinition } from '../index.js';
+
+export const squareChevronUp = {
+  name: 'square-chevron-up',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'rect',
+      {
+        width: '18',
+        height: '18',
+        x: '3',
+        y: '3',
+        rx: '2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm8 14 4-4 4 4',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

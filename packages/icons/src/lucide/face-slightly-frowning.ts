@@ -1,0 +1,34 @@
+import type { IconDefinition } from '../index.js';
+
+export const faceSlightlyFrowning = {
+  name: 'face-slightly-frowning',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M15 10V9',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M9 10V9',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M9 16a5 5 0 016 0',
+      },
+    ],
+    [
+      'circle',
+      {
+        cx: '12',
+        cy: '12',
+        r: '10',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

@@ -1,0 +1,30 @@
+import type { IconDefinition } from '../index.js';
+
+export const touchpad = {
+  name: 'touchpad',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'rect',
+      {
+        width: '20',
+        height: '16',
+        x: '2',
+        y: '4',
+        rx: '2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M2 14h20',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12 20v-6',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

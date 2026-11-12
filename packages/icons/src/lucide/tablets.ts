@@ -1,0 +1,36 @@
+import type { IconDefinition } from '../index.js';
+
+export const tablets = {
+  name: 'tablets',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'circle',
+      {
+        cx: '7',
+        cy: '7',
+        r: '5',
+      },
+    ],
+    [
+      'circle',
+      {
+        cx: '17',
+        cy: '17',
+        r: '5',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12 17h10',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm3.46 10.54 7.08-7.08',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

@@ -1,0 +1,44 @@
+import type { IconDefinition } from '../index.js';
+
+export const gapHorizontal = {
+  name: 'gap-horizontal',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M12 2v2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12 8v2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12 14v2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12 20v2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M21 3h-3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M3 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H3',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

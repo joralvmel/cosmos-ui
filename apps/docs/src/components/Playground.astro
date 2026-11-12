@@ -50,12 +50,30 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
   for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
     const contract = contracts[root.dataset.name as keyof typeof contracts];
     if (!contract) continue;
-    initPlayground(root, {
+    const options = {
       contract,
       content: root.dataset.content ?? '',
       labels: JSON.parse(root.dataset.labels ?? '{}'),
       themes: JSON.parse(root.dataset.themes ?? '[]'),
       nativeDemoUrl: root.dataset.nativeDemo || undefined,
-    });
+    };
+    if (contract.name === 'icon') {
+      import('../lib/icon-catalog')
+        .then(({ iconReferenceCatalog }) => {
+          initPlayground(root, {
+            ...options,
+            referenceCatalogs: { IconDefinition: iconReferenceCatalog },
+          });
+        })
+        .catch(error => {
+          console.error('Could not initialize the icon playground.', error);
+          const message = document.createElement('p');
+          message.setAttribute('role', 'alert');
+          message.textContent = options.labels.iconCatalogError;
+          root.append(message);
+        });
+    } else {
+      initPlayground(root, options);
+    }
   }
 </script>

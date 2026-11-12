@@ -7,6 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       'react-native': fileURLToPath(new URL('./test/react-native.mock.tsx', import.meta.url)),
+      'react-native-svg': fileURLToPath(
+        new URL('./test/react-native-svg.mock.ts', import.meta.url)
+      ),
     },
   },
   test: {

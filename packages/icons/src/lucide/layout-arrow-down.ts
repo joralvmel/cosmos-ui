@@ -1,0 +1,40 @@
+import type { IconDefinition } from '../index.js';
+
+export const layoutArrowDown = {
+  name: 'layout-arrow-down',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'rect',
+      {
+        width: '7',
+        height: '7',
+        x: '3',
+        y: '3',
+        rx: '1',
+      },
+    ],
+    [
+      'rect',
+      {
+        width: '7',
+        height: '7',
+        x: '3',
+        y: '14',
+        rx: '1',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M18 3v18',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm21 18-3 3-3-3',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

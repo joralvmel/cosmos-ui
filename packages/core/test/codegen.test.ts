@@ -12,7 +12,7 @@ import {
 const defaults = Object.fromEntries(
   Object.entries(buttonContract.props as ComponentContract['props']).map(([name, spec]) => [
     name,
-    spec.default,
+    'default' in spec ? spec.default : undefined,
   ])
 );
 
@@ -75,7 +75,7 @@ describe('codegen', () => {
       props: { open: { type: 'boolean', default: false, description: 'Open.' } },
       events: {},
       states: [],
-      slots: {},
+      slots: { '': 'Sheet content.' },
       parts: {},
       cssProperties: {},
       keyboard: [],

@@ -1,0 +1,35 @@
+import type { IconDefinition } from '../index.js';
+
+export const italic = {
+  name: 'italic',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'line',
+      {
+        x1: '19',
+        x2: '10',
+        y1: '4',
+        y2: '4',
+      },
+    ],
+    [
+      'line',
+      {
+        x1: '14',
+        x2: '5',
+        y1: '20',
+        y2: '20',
+      },
+    ],
+    [
+      'line',
+      {
+        x1: '15',
+        x2: '9',
+        y1: '4',
+        y2: '20',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;
