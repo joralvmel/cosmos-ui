@@ -57,6 +57,10 @@ const strings = {
       iconInvalid:
         'Enter a valid size, stroke width or paint: none, currentColor, a Cosmos token such as var(--cosm-primary), or a hex, rgb or hsl color.',
       iconLabelRequired: 'Enter a label before making the icon informative.',
+      iconGallery: 'Icon gallery',
+      iconMore: 'Show more icons',
+      iconPreviewError: 'Preview unavailable',
+      iconCatalogError: 'Could not load the icon catalog. Reload the page to try again.',
       tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
     },
     eventsNote:
@@ -131,6 +135,11 @@ const strings = {
       iconInvalid:
         'Introduce un tamaño, grosor o color válido: none, currentColor, un token de Cosmos como var(--cosm-primary) o un color hex, rgb o hsl.',
       iconLabelRequired: 'Introduce una etiqueta antes de hacer informativo el icono.',
+      iconGallery: 'Galería de iconos',
+      iconMore: 'Mostrar más iconos',
+      iconPreviewError: 'Vista previa no disponible',
+      iconCatalogError:
+        'No se pudo cargar el catálogo de iconos. Recarga la página para reintentar.',
       tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
     },
     eventsNote:

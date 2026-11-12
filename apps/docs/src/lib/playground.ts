@@ -7,7 +7,6 @@ import {
   supportsTarget,
   toAttribute,
 } from '@joralvmel/cosmos-core';
-import { searchIconCatalog } from '@joralvmel/cosmos-icons';
 import { semanticColors } from '@joralvmel/cosmos-tokens';
 
 export interface PlaygroundLabels {
@@ -28,6 +27,9 @@ export interface PlaygroundLabels {
   iconError?: string;
   iconInvalid?: string;
   iconLabelRequired?: string;
+  iconGallery?: string;
+  iconMore?: string;
+  iconPreviewError?: string;
   tabs: Record<SnippetTarget, string>;
 }
 
@@ -45,7 +47,9 @@ export interface PlaygroundOptions {
       string,
       {
         items: readonly { name: string; category: string; tags: readonly string[] }[];
+        search: (query: string) => readonly { name: string }[];
         load: (name: string) => Promise<unknown>;
+        preview?: (name: string) => Promise<HTMLElement>;
       }
     >
   >;
@@ -208,23 +212,73 @@ export function initPlayground(
         const searchInput = element('input', { type: 'search' });
         const results = element(
           'span',
-          { role: 'status', 'aria-live': 'polite' },
+          { id: `${id}-${name}-results`, role: 'status', 'aria-live': 'polite' },
           `${choices.length} ${labels.iconResults ?? 'icons found'}`
         );
+        searchInput.setAttribute('aria-describedby', results.id);
         const iconSelect = control;
+        const gallery = element('div', {
+          class: 'cosm-icon-gallery',
+          role: 'group',
+          'aria-label': labels.iconGallery ?? 'Icon gallery',
+        });
+        const more = element(
+          'button',
+          { type: 'button', class: 'cosm-icon-more' },
+          labels.iconMore ?? 'Show more icons'
+        );
+        let matches: readonly { name: string }[] = catalog.items;
+        let shown = 0;
+        const appendPreviews = () => {
+          const next = matches.slice(shown, shown + 24);
+          shown += next.length;
+          more.hidden = shown >= matches.length;
+          for (const item of next) {
+            const button = element('button', {
+              type: 'button',
+              class: 'cosm-icon-choice',
+              'data-icon-name': item.name,
+              'aria-pressed': String(values[name] === item.name),
+            });
+            const thumbnail = element('span', { 'aria-hidden': 'true' });
+            button.append(thumbnail, element('span', {}, item.name));
+            button.addEventListener('click', () => {
+              iconSelect.value = item.name;
+              controller.set(name, item.name);
+            });
+            gallery.append(button);
+            catalog
+              .preview?.(item.name)
+              .then(node => thumbnail.replaceChildren(node))
+              .catch(() => {
+                thumbnail.textContent = labels.iconPreviewError ?? 'Preview unavailable';
+                button.title = thumbnail.textContent;
+              });
+          }
+        };
+        more.addEventListener('click', appendPreviews);
         searchInput.addEventListener('input', () => {
-          const matches = searchIconCatalog(catalog.items, searchInput.value);
+          matches = catalog.search(searchInput.value);
           iconSelect.replaceChildren();
           for (const item of matches)
             iconSelect.append(element('option', { value: item.name }, item.name));
           results.textContent = `${matches.length} ${labels.iconResults ?? 'icons found'}`;
+          if (catalog.preview) {
+            gallery.replaceChildren();
+            shown = 0;
+            appendPreviews();
+          }
           if (matches[0]) {
             iconSelect.value = matches[0].name;
             controller.set(name, matches[0].name);
           }
         });
-        searchLabel.append(searchInput, results);
-        fieldset.append(searchLabel);
+        searchLabel.append(searchInput);
+        fieldset.append(searchLabel, results);
+        if (catalog.preview) {
+          appendPreviews();
+          fieldset.append(gallery, more);
+        }
       }
     } else if (spec.type === 'boolean') {
       control = element('input', { type: 'checkbox' });
@@ -337,6 +391,9 @@ export function initPlayground(
 
   const render = () => {
     snippets = generateSnippets(contract, values, options.content);
+    for (const button of fieldset.querySelectorAll<HTMLElement>('[data-icon-name]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.iconName === values.icon));
+    }
     for (const [item, { tab, code, panel }] of panels) {
       const active = item === selected;
       tab.setAttribute('aria-selected', String(active));

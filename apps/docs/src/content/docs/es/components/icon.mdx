@@ -5,6 +5,7 @@ description: Muestra un SVG basado en Lucide como imagen decorativa o informativ
 
 import ApiTable from '../../../../components/ApiTable.astro';
 import EventsTable from '../../../../components/EventsTable.astro';
+import IconFillExamples from '../../../../components/IconFillExamples.astro';
 import Playground from '../../../../components/Playground.astro';
 import StatusBadge from '../../../../components/StatusBadge.astro';
 
@@ -18,8 +19,10 @@ de código no utilizado.
 
 <Playground name="icon" content="" />
 
-Busca entre los 2.052 iconos por nombre, categoría o etiqueta; al elegir uno solo se carga ese
-dibujo. Prueba `heart` o `star` y ajusta `stroke`, `fill`, `strokeWidth` y `size` por separado.
+Busca entre los 2.052 iconos por nombre, categoría o etiqueta. La galería carga miniaturas por
+lotes; selecciona una para actualizar la vista previa y el código. Ajusta `stroke`, `fill`,
+`strokeWidth` y `size` por separado. En el sitio de producción, el catálogo y su mapa de módulos
+se cargan solo en el Playground de Icono.
 
 ## Variantes
 
@@ -40,19 +43,47 @@ ser finito y no negativo. Los colores deben ser compatibles con la plataforma; s
 Las variables CSS funcionan en web; en nativo usa cadenas de color de React Native.
 
 ```tsx
-import { heart } from '@joralvmel/cosmos-icons/heart';
+import { circle } from '@joralvmel/cosmos-icons/circle';
 
-<Icon icon={heart} size={32} stroke="var(--cosm-fg)" fill="var(--cosm-surface)" strokeWidth={1.5} />;
+<Icon icon={circle} size={32} stroke="var(--cosm-fg)" fill="var(--cosm-primary)" strokeWidth={1.5} />;
 ```
 
+### Rellenar no equivale a una variante sólida
+
+`fill` funciona con cualquier definición; no es exclusivo de ciertos nombres de icono. El
+resultado depende de la geometría del SVG:
+
+- Los contornos cerrados, como `circle` y `star`, pueden dar formas rellenas útiles.
+- SVG rellena los trazos abiertos como si sus extremos estuvieran unidos. Por ejemplo, aplicar
+  relleno a `arrow-right` crea un triángulo en su punta abierta, no una flecha sólida diseñada
+  expresamente.
+- Los contornos con varias partes pueden perder detalles al rellenarlos. Un relleno explícito
+  de un nodo, incluido `none`, prevalece sobre el relleno raíz.
+
+Cada pareja muestra `fill="none"` a la izquierda y `fill="var(--cosm-primary)"` a la derecha.
+Las tres usan la misma propiedad genérica; no hay renderizado especial según el nombre.
+
+<IconFillExamples label="Trazos cerrados y abiertos con y sin relleno" />
+
+Lucide es un conjunto de contornos. Cambiar su relleno no proporciona una colección completa de
+variantes sólidas diseñadas como tales; conserva `fill="none"` salvo que la geometría elegida
+produzca el resultado deseado.
+
 En React Native usa `const theme = useTheme()` y pasa `stroke={theme.colors.fg}` y
-`fill={theme.colors.surface}`. Un relleno explícito de un nodo prevalece sobre el relleno raíz,
-incluido `none` para nodos transparentes. Heart y star admiten este ejemplo relleno; no todos los
-iconos de Lucide tienen una variante sólida. En nativo, un nodo con relleno `currentColor` (por
+`fill={theme.colors.primary}`. En nativo, un nodo con relleno `currentColor` (por
 ejemplo los puntos de `brain-circuit`) también usa `theme.colors.fg`, con independencia de
 `stroke`. El Playground acepta `none`, `currentColor`, tokens de color de Cosmos como
 `var(--cosm-primary)` y colores hex/rgb/hsl/con nombre para que todas las pestañas sean válidas;
 su pestaña de React Native convierte los tokens en valores de `theme.colors` de `useTheme()`.
+
+### Catálogo frente al bundle de la aplicación
+
+El paquete incluye el catálogo completo, pero una aplicación debe importar los glifos
+individualmente, no el cargador del catálogo de la demo. Los bundlers web pueden eliminar módulos
+no utilizados. La demo nativa referencia todos los iconos para que su explorador muestre cualquier
+resultado: Metro incluye esos módulos en el bundle de producción de Android/iOS aunque el
+cargador use `import()`. Esa demo no representa una aplicación mínima. Importa únicamente los
+iconos que utilice tu aplicación nativa.
 
 ## Estados
 

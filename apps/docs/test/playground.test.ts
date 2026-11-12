@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { buttonContract, iconContract } from '@joralvmel/cosmos-core';
-import { iconCatalog } from '@joralvmel/cosmos-icons';
+import { iconCatalog, searchIconCatalog } from '@joralvmel/cosmos-icons';
 import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -266,6 +266,11 @@ describe('Playground', () => {
     const load = vi.fn(
       (name: string) => new Promise<unknown>(resolve => pending.set(name, resolve))
     );
+    const items = [
+      { name: 'house', category: 'navigation', tags: ['home'] },
+      { name: 'heart', category: 'shapes', tags: ['love'] },
+      { name: 'star', category: 'shapes', tags: ['favorite'] },
+    ];
     const controller = initPlayground(root, {
       contract: iconContract,
       content: '',
@@ -273,11 +278,8 @@ describe('Playground', () => {
       themes: [],
       referenceCatalogs: {
         IconDefinition: {
-          items: [
-            { name: 'house', category: 'navigation', tags: ['home'] },
-            { name: 'heart', category: 'shapes', tags: ['love'] },
-            { name: 'star', category: 'shapes', tags: ['favorite'] },
-          ],
+          items,
+          search: query => searchIconCatalog(items, query),
           load,
         },
       },
@@ -316,7 +318,13 @@ describe('Playground', () => {
         content: '',
         labels,
         themes: [],
-        referenceCatalogs: { IconDefinition: { items: iconCatalog, load } },
+        referenceCatalogs: {
+          IconDefinition: {
+            items: iconCatalog,
+            search: query => searchIconCatalog(iconCatalog, query),
+            load,
+          },
+        },
         storage: { getItem: () => null, setItem: () => {} },
       });
       const search = root.querySelector<HTMLInputElement>('input[type="search"]');
@@ -353,6 +361,7 @@ describe('Playground', () => {
             { name: 'house', category: 'navigation', tags: [] },
             { name: 'heart', category: 'shapes', tags: [] },
           ],
+          search: query => searchIconCatalog(iconCatalog, query),
           load: name =>
             name === 'house' ? Promise.resolve(house) : Promise.reject(new Error('offline')),
         },
@@ -364,5 +373,84 @@ describe('Playground', () => {
     await vi.waitFor(() => expect(root.textContent).toContain('Could not load the selected icon.'));
     expect(root.querySelector('cosm-icon')?.icon).toBe(house);
     expect(controller.code('react')).toContain('cosmos-icons/house');
+  });
+
+  it('loads gallery thumbnails in batches and selects them through the existing controls', async () => {
+    const root = document.createElement('div');
+    root.innerHTML = '<div data-cosm-preview><cosm-icon data-playground-target></cosm-icon></div>';
+    document.body.append(root);
+    const items = iconCatalog.slice(0, 50);
+    const preview = vi.fn(async () => document.createElement('cosm-icon'));
+    const load = vi.fn(async () => house);
+    const controller = initPlayground(root, {
+      contract: iconContract,
+      content: '',
+      labels,
+      themes: [],
+      referenceCatalogs: {
+        IconDefinition: {
+          items,
+          search: query => searchIconCatalog(items, query),
+          load,
+          preview,
+        },
+      },
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    expect(preview).toHaveBeenCalledTimes(24);
+    expect(root.querySelectorAll('.cosm-icon-choice')).toHaveLength(24);
+    const more = root.querySelector<HTMLButtonElement>('.cosm-icon-more');
+    more?.click();
+    expect(preview).toHaveBeenCalledTimes(48);
+    const button = root.querySelector<HTMLButtonElement>('.cosm-icon-choice');
+    if (!button) throw new Error('missing gallery choice');
+    button.click();
+    await vi.waitFor(() => expect(button.getAttribute('aria-pressed')).toBe('true'));
+    expect(load).toHaveBeenLastCalledWith(button.dataset.iconName);
+    expect(controller.code('react')).toContain(`cosmos-icons/${button.dataset.iconName}`);
+    expect(root.querySelector<HTMLSelectElement>('[data-prop="icon"]')?.value).toBe(
+      button.dataset.iconName
+    );
+    expect(button.querySelector('[aria-hidden="true"] cosm-icon')).not.toBeNull();
+
+    const search = root.querySelector<HTMLInputElement>('input[type="search"]');
+    if (!search) throw new Error('missing gallery search');
+    expect(search.labels?.[0]?.textContent).toBe('Search icons');
+    expect(
+      document.getElementById(search.getAttribute('aria-describedby') ?? '')?.textContent
+    ).toBe('50 icons found');
+    search.value = 'no-matching-icons';
+    search.dispatchEvent(new Event('input'));
+    expect(root.querySelectorAll('.cosm-icon-choice')).toHaveLength(0);
+    expect(more?.hidden).toBe(true);
+    expect(root.textContent).toContain('0 icons found');
+  });
+
+  it('shows thumbnail failures without losing the usable icon selection', async () => {
+    const root = document.createElement('div');
+    root.innerHTML = '<div data-cosm-preview><cosm-icon data-playground-target></cosm-icon></div>';
+    document.body.append(root);
+    initPlayground(root, {
+      contract: iconContract,
+      content: '',
+      labels,
+      themes: [],
+      referenceCatalogs: {
+        IconDefinition: {
+          items: [{ name: 'house', category: 'navigation', tags: [] }],
+          search: () => [],
+          load: async () => house,
+          preview: async () => {
+            throw new Error('offline');
+          },
+        },
+      },
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    await vi.waitFor(() =>
+      expect(root.querySelector('.cosm-icon-choice')?.textContent).toContain('Preview unavailable')
+    );
+    expect(root.querySelector('cosm-icon')?.icon).toBe(house);
+    expect(root.querySelector('.cosm-icon-choice')?.getAttribute('aria-pressed')).toBe('true');
   });
 });

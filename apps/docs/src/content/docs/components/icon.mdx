@@ -5,6 +5,7 @@ description: Render a Lucide-based SVG as a decorative or informative image.
 
 import ApiTable from '../../../components/ApiTable.astro';
 import EventsTable from '../../../components/EventsTable.astro';
+import IconFillExamples from '../../../components/IconFillExamples.astro';
 import Playground from '../../../components/Playground.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
 
@@ -17,8 +18,10 @@ import StatusBadge from '../../../components/StatusBadge.astro';
 
 <Playground name="icon" content="" />
 
-Search all 2,052 icons by name, category or tag; choose a result to load only that artwork.
-Try `heart` or `star`, then edit `stroke`, `fill`, `strokeWidth`, and `size` independently.
+Search all 2,052 icons by name, category or tag. The gallery loads thumbnails in batches;
+select one to update the preview and code. Edit `stroke`, `fill`, `strokeWidth`, and `size`
+independently. On the production site, the catalog and its module map load only on the Icon
+playground.
 
 ## Variants
 
@@ -39,19 +42,44 @@ nonnegative finite widths. Paints must be supported by the platform; URL paints 
 CSS custom-property paints work on the web, while native requires React Native color strings.
 
 ```tsx
-import { heart } from '@joralvmel/cosmos-icons/heart';
+import { circle } from '@joralvmel/cosmos-icons/circle';
 
-<Icon icon={heart} size={32} stroke="var(--cosm-fg)" fill="var(--cosm-surface)" strokeWidth={1.5} />;
+<Icon icon={circle} size={32} stroke="var(--cosm-fg)" fill="var(--cosm-primary)" strokeWidth={1.5} />;
 ```
 
+### Fill is not a solid variant
+
+`fill` works with every definition; it is not exclusive to particular icon names. The result
+depends on the SVG geometry:
+
+- Closed contours, such as `circle` and `star`, can produce useful filled shapes.
+- SVG fills open paths as if their endpoints were joined. For example, filling `arrow-right`
+  creates a triangle in its open arrowhead, not a purpose-designed solid arrow.
+- Multi-part outlines can lose details when filled. An explicit node fill, including `none`,
+  takes precedence over the root fill.
+
+Each pair below shows `fill="none"` on the left and `fill="var(--cosm-primary)"` on the right.
+The same generic property is used in all three pairs; there is no special-case rendering.
+
+<IconFillExamples label="Closed and open paths with and without fill" />
+
+Lucide is an outline set. Changing its fill does not provide a complete set of designed solid
+variants; keep `fill="none"` unless the selected geometry gives the intended result.
+
 In React Native use `const theme = useTheme()` and pass `stroke={theme.colors.fg}` and
-`fill={theme.colors.surface}` instead. An explicit fill on a definition node takes precedence
-over the root fill, including `none` on transparent nodes. Heart and star have compatible geometry
-for a filled example; not every Lucide icon has a solid variant. On native, a definition node
+`fill={theme.colors.primary}` instead. On native, a definition node
 whose fill is `currentColor` (for example the dots of `brain-circuit`) also uses
 `theme.colors.fg`, independently of `stroke`. The Playground accepts `none`, `currentColor`, Cosmos
 color tokens such as `var(--cosm-primary)` and hex/rgb/hsl/named colors so every tab is valid; its
 React Native tab turns token paints into `theme.colors` values from `useTheme()`.
+
+### Catalog versus application bundle
+
+The package includes the full catalog, but application code should import individual glyphs, not
+the demo's catalog loader. Web bundlers can discard unused modules. The native demo deliberately
+references every icon so its explorer can display any result: Metro includes those modules in the
+Android/iOS production bundle even though the loader uses `import()`. That demo is not a minimal
+application bundle. Import only the icons your native application uses.
 
 ## States
 

@@ -1,0 +1,41 @@
+---
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+const names = ['circle', 'star', 'arrow-right'];
+---
+
+<div class="cosm-preview" role="group" aria-label={label}>
+  {
+    names.map(name => (
+      <figure>
+        <cosm-icon data-fill-example={name} size="32" fill="none" />
+        <cosm-icon data-fill-example={name} size="32" fill="var(--cosm-primary)" />
+        <figcaption>{name}: none / fill</figcaption>
+      </figure>
+    ))
+  }
+</div>
+
+<script>
+  import '@joralvmel/cosmos-elements';
+  import type { IconDefinition } from '@joralvmel/cosmos-icons';
+  import { arrowRight } from '@joralvmel/cosmos-icons/arrow-right';
+  import { circle } from '@joralvmel/cosmos-icons/circle';
+  import { star } from '@joralvmel/cosmos-icons/star';
+
+  const definitions = new Map<string, IconDefinition>([
+    ['circle', circle],
+    ['star', star],
+    ['arrow-right', arrowRight],
+  ]);
+  for (const element of document.querySelectorAll('cosm-icon')) {
+    const name = element.dataset.fillExample;
+    if (!name) continue;
+    const icon = definitions.get(name);
+    if (!icon) throw new Error(`Unknown fill example: ${name}`);
+    element.icon = icon;
+  }
+</script>
