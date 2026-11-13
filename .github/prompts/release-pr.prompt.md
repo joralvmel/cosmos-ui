@@ -1,6 +1,6 @@
 ---
 name: release-pr
-description: 'Opens the release pull request develop → main with the summary of pending changesets.'
+description: 'Recommends the release type (none, snapshot, patch/minor, major) and opens the release pull request develop → main with the summary of pending changesets.'
 argument-hint: 'Release name or notes (optional)'
 agent: agent
 ---

@@ -59,11 +59,14 @@ Present the decisions I should make next. This is read-only: do not generate fil
 
 ### Create from a need
 
-`badge` is an example, not a request to add every feature mentioned in the research.
+Copy this template and fill in the brackets. Leave out the optional lines you do not need. The
+agent researches and asks before deciding, so you do not have to know every feature up front.
 
 ```text
-Create the badge component using create-component. The goal is to communicate a short status or
-count in web, React, Angular and React Native.
+Create the [component] component using create-component and ADR 0005. The goal is [user need]
+in web, React, Angular and React Native.
+[Optional: Use use-reference only for this component: imitate [behavior or style] from [path or
+link]; the reference is read-only.]
 
 Check the inventory and research first. Recommend a useful initial scope, then ask me about
 variants, sizes, customization, content, accessibility and platform differences in small batches.
@@ -73,6 +76,8 @@ or contract edits.
 After approval, implement and validate the agreement end-to-end, including representative demo
 controls. Create a local commit, show its SHA and how to try it, then wait without push or PR.
 ```
+
+Not sure which component? Start with [Explore the backlog](#explore-the-backlog).
 
 ### Create from a design
 
@@ -276,27 +281,30 @@ without push or PR.
 
 ## Release and maintenance
 
-A work PR goes to `develop`; releasing is a separate decision. The stable flow is
+A work PR goes to `develop`; releasing is a separate decision. The usual flow is
 `develop → main` (merge commit), then the generated **Version Packages** PR, then publication.
+`release-pr` decides which kind of release fits the current state (none, snapshot, patch/minor or
+major) and explains why; you approve before anything is opened or published.
 See [release and publishing](../publishing/) for setup and commands. These prompts do not authorize
 automatic merges, changes to publishing permissions, or a release while work is still unmerged.
 
 ### Plan the next release
 
 ```text
-Assess whether develop is ready for a stable release. This is read-only.
-Check the current remote state, merged work, CI and pending changesets against origin/main.
-List affected packages, expected bumps, breaking changes/migration notes and missing evidence.
-Distinguish package changes from private docs/tooling changes that need no changeset.
-Recommend release now or remaining work. Do not change versions/changelogs, dispatch workflows,
-open or merge PRs, push tags or publish.
+Use release-pr to recommend the next release. This is read-only.
+Check the remote state, merged work, CI, pending changesets and uncovered dependency updates
+against origin/main. Decide which kind of release fits (none, snapshot, patch/minor or major) and
+explain why, with affected packages, resulting versions, migration notes and missing evidence.
+Do not change versions/changelogs, dispatch workflows, open or merge PRs, push tags or publish.
 ```
 
 ### Open the release PR
 
 ```text
 I authorize opening the release PR for the already merged changes on develop.
-Use release-pr: verify identity, remote, green checks and pending changesets. Reuse an existing
+Use release-pr: verify identity, remote, green checks and pending changesets. If
+npm run deps:changeset finds uncovered runtime dependency updates, first commit that changeset
+locally and pause for my review before its PR into develop. Reuse an existing
 open develop-to-main release PR; stop on conflicts or missing evidence. Summarize packages,
 bumps, highlights and migration notes, and report its URL/checks.
 Do not merge it, edit versions/changelogs manually or publish. Wait for my review; when approved,
@@ -335,14 +343,14 @@ or expose credentials. Propose the smallest recovery and ask for approval before
 Any code fix needs validation, a new local review commit and a pause before push.
 ```
 
-### Try a snapshot before stable release
+### Try a snapshot before releasing
 
 ```text
 Assess a next-tag snapshot for [merged scope] using release. Check workflow inputs, current branch,
 CI and package state first. Explain the exact dispatch, expected versions/dist-tag and install
-commands; distinguish snapshot publication from a stable release.
+commands; distinguish snapshot publication from a latest release.
 Do not dispatch or publish until I explicitly approve that operation. Do not move latest or create
-stable release tags. Report unavailable checks and the cleanup/migration plan for test consumers.
+release tags. Report unavailable checks and the cleanup/migration plan for test consumers.
 ```
 
 ### Synchronize after merge or release

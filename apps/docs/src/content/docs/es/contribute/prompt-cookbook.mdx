@@ -61,11 +61,15 @@ Es una tarea de solo lectura: no generes archivos, no hagas commit ni push.
 
 ### Crear desde una necesidad
 
-`badge` es un ejemplo, no una petición de añadir todas las funciones que aparezcan al investigar.
+Copia esta plantilla y rellena los corchetes. Quita las líneas opcionales que no necesites. El
+agente investiga y pregunta antes de decidir, así que no hace falta conocer todas las funciones de
+antemano.
 
 ```text
-Crea el componente badge siguiendo create-component. El objetivo es comunicar un estado breve
-o un recuento en web, React, Angular y React Native.
+Crea el componente [componente] siguiendo create-component y la ADR 0005. El objetivo es
+[necesidad del usuario] en web, React, Angular y React Native.
+[Opcional: usa use-reference solo para este componente: imita [comportamiento o estilo] de
+[ruta o enlace]; la referencia es de solo lectura.]
 
 Revisa el inventario e investiga primero. Recomienda un alcance inicial útil y después pregúntame
 en bloques pequeños sobre variantes, tamaños, personalización, contenido, accesibilidad y
@@ -75,6 +79,8 @@ de generar archivos o editar el contrato.
 Tras aprobarlo, implementa y valida lo acordado end-to-end, con controles representativos en las
 demos. Crea un commit local, muestra el SHA y cómo probarlo, y espera sin hacer push ni PR.
 ```
+
+¿No sabes cuál crear? Empieza por [Explorar el backlog](#explorar-el-backlog).
 
 ### Crear desde un diseño
 
@@ -288,27 +294,31 @@ Crea un commit local y espera sin hacer push ni PR.
 
 ## Releases y mantenimiento
 
-Una PR de trabajo va a `develop`; publicar es otra decisión. El flujo estable es
-`develop → main` (merge commit), después la PR generada **Version Packages** y finalmente publicación.
+Una PR de trabajo va a `develop`; publicar es otra decisión. El flujo habitual es
+`develop → main` (merge commit), después la PR generada **Version Packages** y finalmente la
+publicación. `release-pr` decide qué tipo de release encaja con el estado actual (ninguna, snapshot,
+patch/minor o major) y explica por qué; tú apruebas antes de abrir o publicar nada.
 Consulta [releases y publicación](../publishing/) para la configuración y los comandos. Estos prompts
 no autorizan merges automáticos, cambios en permisos de publicación ni publicar trabajo sin integrar.
 
 ### Planificar la siguiente release
 
 ```text
-Evalúa si develop está listo para una release estable. Es solo lectura.
-Revisa el estado remoto actual, trabajo integrado, CI y changesets pendientes frente a origin/main.
-Lista paquetes afectados, incrementos previstos, cambios incompatibles/notas de migración y
-evidencias pendientes. Distingue cambios de paquetes de docs/herramientas privadas sin changeset.
-Recomienda publicar ahora o qué falta. No cambies versiones/changelogs, ejecutes workflows,
-abras o fusiones PRs, subas tags ni publiques.
+Usa release-pr para recomendar la siguiente release. Es solo lectura.
+Revisa estado remoto, trabajo integrado, CI, changesets pendientes y actualizaciones de dependencias
+sin cubrir frente a origin/main. Decide qué tipo de release encaja (ninguna, snapshot, patch/minor
+o major) y explica por qué, con paquetes afectados, versiones resultantes, notas de migración y
+evidencias pendientes. No cambies versiones/changelogs, ejecutes workflows, abras o fusiones PRs,
+subas tags ni publiques.
 ```
 
 ### Abrir la PR de release
 
 ```text
 Autorizo abrir la PR de release para los cambios ya integrados en develop.
-Usa release-pr: verifica identidad, remoto, checks verdes y changesets pendientes. Reutiliza una
+Usa release-pr: verifica identidad, remoto, checks verdes y changesets pendientes. Si
+npm run deps:changeset encuentra actualizaciones de dependencias sin cubrir, primero haz commit
+local de ese changeset y espera mi revisión antes de su PR a develop. Reutiliza una
 PR de release develop-a-main si ya está abierta; detente si hay conflictos o faltan evidencias.
 Resume paquetes, incrementos, novedades y migración, e informa de URL/checks.
 No hagas merge, edites versiones/changelogs a mano ni publiques. Espera mi revisión; cuando se
@@ -349,14 +359,14 @@ aprobación antes de cambios o reintentos. Un arreglo de código necesita valida
 local de revisión y pausa antes del push.
 ```
 
-### Probar un snapshot antes de la release estable
+### Probar un snapshot antes de publicar
 
 ```text
 Evalúa un snapshot con tag next para [alcance integrado] usando release. Primero revisa inputs
 del workflow, rama actual, CI y estado de paquetes. Explica la ejecución exacta, versiones/dist-tag
-previstos y comandos de instalación; distingue el snapshot de una release estable.
+previstos y comandos de instalación; distingue el snapshot de una release en latest.
 No ejecutes ni publiques hasta que apruebe explícitamente esa operación. No muevas latest ni crees
-tags de release estable. Indica comprobaciones no disponibles y cómo migrar o limpiar consumidores
+tags de release. Indica comprobaciones no disponibles y cómo migrar o limpiar consumidores
 de prueba después.
 ```
 
