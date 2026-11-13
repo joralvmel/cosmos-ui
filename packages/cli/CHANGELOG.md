@@ -1,5 +1,12 @@
 # @joralvmel/cosmos-cli
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`206945f`](https://github.com/joralvmel/cosmos-ui/commit/206945fcd14e121c3d41479719df88f2040c9aae)]:
+  - @joralvmel/cosmos-core@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes

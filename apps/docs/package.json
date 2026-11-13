@@ -12,9 +12,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@joralvmel/cosmos-core": "^0.1.0",
-    "@joralvmel/cosmos-elements": "^0.1.0",
-    "@joralvmel/cosmos-icons": "^0.1.0",
+    "@joralvmel/cosmos-core": "^0.2.0",
+    "@joralvmel/cosmos-elements": "^0.2.0",
+    "@joralvmel/cosmos-icons": "^0.2.0",
     "@joralvmel/cosmos-tokens": "^0.1.0"
   },
   "devDependencies": {
