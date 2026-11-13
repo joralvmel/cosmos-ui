@@ -28,8 +28,16 @@ synchronization, see [release and maintenance](../prompt-cookbook/#release-and-m
 4. Merging **Version Packages** runs `changeset publish`: new versions go to npm with provenance, Git
    tags are pushed and a GitHub Release is created per package.
 5. The `Docs` workflow deploys the documentation site from `main`.
+6. Synchronize published `main` back into `develop` through a PR using a **merge commit**, never
+   squash/rebase. Verify `git merge-base --is-ancestor origin/main origin/develop` succeeds after
+   fetching. Matching files alone are not enough: preserving ancestry prevents repeated conflicts.
 
 </Steps>
+
+`release-pr` distinguishes a read-only assessment from preparation. Preparation includes safe
+local repairs for synchronization, dependency changesets and conflicts, with validation and a
+local review commit before push. It resumes after prerequisite PRs merge; merge and publication
+still need explicit approval. Use [the preparation prompt](../prompt-cookbook/#prepare-and-open-the-release-pr).
 
 Prereleases: run the `Release` workflow manually on `develop` (Actions → Release → Run workflow). It
 publishes a snapshot such as `0.2.0-next-20261110120000` with the dist-tag `next`:
@@ -109,6 +117,8 @@ request or release runs the full checks. Prompts: [keep dependencies up to date]
 
 | Symptom | Fix |
 | --- | --- |
+| Release promotion conflicts after an earlier synchronization | Check ancestry, not only file equality. Prepare a reviewed synchronization repair with `release-pr`; preserve published metadata and newer develop work, regenerate the lockfile with npm, and merge the synchronization with a merge commit. |
+| Synchronization merge commit is blocked by linear-history protection | Apply the reviewed `setup-repo` policy with maintainer approval. It allows merge commits while retaining PRs, required checks and force-push/deletion protections. Do not squash synchronization as a workaround. |
 | Release PR fails "Released runtime dependency updates have changesets" | Run `npm run deps:changeset` on a `develop` work branch and merge it before the release. |
 | Dependabot PR fails "Classify dependency updates" | It needs a decision: review it with `upgrade-stack` and add a changeset to the PR. |
 | `E404` / `ENEEDAUTH` on publish | The trusted publisher does not match: check owner, repository, workflow file name and environment. |
