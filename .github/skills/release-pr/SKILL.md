@@ -1,6 +1,6 @@
 ---
 name: release-pr
-description: 'Opens the release pull request develop → main with the summary of pending changesets.'
+description: 'Recommends the release type (none, snapshot, patch/minor, major) and opens the release pull request develop → main with the summary of pending changesets.'
 ---
 
 # release-pr
@@ -10,6 +10,20 @@ Main agent: `release-manager`. Read `AGENTS.md` first.
 ## Inputs
 
 - Release name or notes (optional)
+
+## Choose the release type
+
+Decide from the current state, explain the reasons and wait for approval before step 1:
+
+| Situation | Recommend |
+| --- | --- |
+| No pending changesets, red CI or incomplete merged work | No release yet; list what is missing |
+| Merged work needs real-consumer testing before a promise | Snapshot on `next` (`release` skill) |
+| Validated fixes or additions | Regular release; changesets decide patch/minor |
+| Breaking changes | Major bump with migration notes. On `0.x` a `major` changeset produces `1.0.0`: confirm the user wants that API commitment, otherwise use `minor` |
+
+Release readiness depends on the pending work being complete and validated, not on catalog
+completeness or a version milestone.
 
 ## Steps
 
@@ -29,6 +43,7 @@ Main agent: `release-manager`. Read `AGENTS.md` first.
 
 ## Checklist
 
+- [ ] Release type chosen and justified
 - [ ] Runtime dependency updates covered (`npm run deps:changeset`)
 - [ ] Pending changesets listed
 - [ ] Breaking changes highlighted
