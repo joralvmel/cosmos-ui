@@ -50,6 +50,17 @@ const strings = {
       dark: 'Dark',
       nativeDemo: 'Open the screen of the native demo app',
       noScript: 'The interactive playground needs JavaScript.',
+      iconSearch: 'Search icons',
+      iconResults: 'icons found',
+      iconLoading: 'Loading icon…',
+      iconError: 'Could not load the selected icon.',
+      iconInvalid:
+        'Enter a valid size, stroke width or paint: none, currentColor, a Cosmos token such as var(--cosm-primary), or a hex, rgb or hsl color.',
+      iconLabelRequired: 'Enter a label before making the icon informative.',
+      iconGallery: 'Icon gallery',
+      iconMore: 'Show more icons',
+      iconPreviewError: 'Preview unavailable',
+      iconCatalogError: 'Could not load the icon catalog. Reload the page to try again.',
       tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
     },
     eventsNote:
@@ -117,6 +128,18 @@ const strings = {
       dark: 'Oscuro',
       nativeDemo: 'Abrir la pantalla de la app de demo nativa',
       noScript: 'El playground interactivo necesita JavaScript.',
+      iconSearch: 'Buscar iconos',
+      iconResults: 'iconos encontrados',
+      iconLoading: 'Cargando icono…',
+      iconError: 'No se pudo cargar el icono seleccionado.',
+      iconInvalid:
+        'Introduce un tamaño, grosor o color válido: none, currentColor, un token de Cosmos como var(--cosm-primary) o un color hex, rgb o hsl.',
+      iconLabelRequired: 'Introduce una etiqueta antes de hacer informativo el icono.',
+      iconGallery: 'Galería de iconos',
+      iconMore: 'Mostrar más iconos',
+      iconPreviewError: 'Vista previa no disponible',
+      iconCatalogError:
+        'No se pudo cargar el catálogo de iconos. Recarga la página para reintentar.',
       tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
     },
     eventsNote:

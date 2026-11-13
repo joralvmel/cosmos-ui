@@ -1,0 +1,41 @@
+name: Dependency report
+
+# Monthly list of available updates. Minor/patch updates arrive as Dependabot pull requests; the
+# issue (label "dependencies") tracks majors and the pinned stack for a planned upgrade-stack.
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  outdated:
+    name: npm outdated
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      - name: Outdated dependencies
+        id: report
+        run: node tools/deps/reports.mjs outdated --out "$RUNNER_TEMP/outdated.md"
+
+      - name: Open, update or close the issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FINDINGS: ${{ steps.report.outputs.findings }}
+        run: >-
+          node tools/github/upsert-issue.mjs --title "Dependency report: majors and pinned stack"
+          --label dependencies --body-file "$RUNNER_TEMP/outdated.md" --findings "$FINDINGS"

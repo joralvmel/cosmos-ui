@@ -1,0 +1,38 @@
+import type { IconDefinition } from '../index.js';
+
+export const listX = {
+  name: 'list-x',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M16 5H3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M11 12H3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M16 19H3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm15.5 9.5 5 5',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm20.5 9.5-5 5',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

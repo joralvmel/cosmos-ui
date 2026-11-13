@@ -29,6 +29,7 @@ export const labels = [
   { name: 'breaking', color: 'b60205', description: 'Breaking change (major changeset)' },
   { name: 'release', color: 'c5def5', description: 'Release pull request' },
   { name: 'dependencies', color: '0366d6', description: 'Dependency updates' },
+  { name: 'security', color: 'b60205', description: 'Vulnerabilities and security fixes' },
   { name: 'ci', color: '5319e7', description: 'Workflows and automation' },
   { name: 'good first issue', color: '7057ff', description: 'Good for newcomers' },
   { name: 'help wanted', color: '008672', description: 'Extra attention is needed' },

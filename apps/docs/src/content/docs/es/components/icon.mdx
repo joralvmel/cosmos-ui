@@ -1,0 +1,113 @@
+---
+title: Icono
+description: Muestra un SVG basado en Lucide como imagen decorativa o informativa.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import IconFillExamples from '../../../../components/IconFillExamples.astro';
+import Playground from '../../../../components/Playground.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="icon" />
+
+`<cosm-icon>` muestra una definición SVG estructurada. Importa solo los glifos que utilices desde
+`@joralvmel/cosmos-icons`; cada icono tiene un módulo independiente para facilitar la eliminación
+de código no utilizado.
+
+## Playground
+
+<Playground name="icon" content="" />
+
+Busca entre los 2.052 iconos por nombre, categoría o etiqueta. La galería carga miniaturas por
+lotes; selecciona una para actualizar la vista previa y el código. Ajusta `stroke`, `fill`,
+`strokeWidth` y `size` por separado. En el sitio de producción, el catálogo y su mapa de módulos
+se cargan solo en el Playground de Icono.
+
+## Variantes
+
+Elige `sm` (16), `md` (20, predeterminado), `lg` (24) o un número positivo finito. Los números
+son píxeles CSS en web y unidades lógicas en nativo. En web, `--cosm-icon-size` tiene prioridad y
+admite también `em` y `rem`; no se aplica en nativo.
+
+```tsx
+import { Icon } from '@joralvmel/cosmos-react';
+import { house } from '@joralvmel/cosmos-icons/house';
+
+<Icon icon={house} size="lg" />;
+```
+
+`stroke` usa `currentColor` por defecto (heredado en web; `theme.colors.fg` en nativo), `fill`
+usa `none` y `strokeWidth` usa `2` unidades del viewBox SVG. El grosor escala con el icono y debe
+ser finito y no negativo. Los colores deben ser compatibles con la plataforma; se rechazan URL.
+Las variables CSS funcionan en web; en nativo usa cadenas de color de React Native.
+
+```tsx
+import { circle } from '@joralvmel/cosmos-icons/circle';
+
+<Icon icon={circle} size={32} stroke="var(--cosm-fg)" fill="var(--cosm-primary)" strokeWidth={1.5} />;
+```
+
+### Rellenar no equivale a una variante sólida
+
+`fill` funciona con cualquier definición; no es exclusivo de ciertos nombres de icono. El
+resultado depende de la geometría del SVG:
+
+- Los contornos cerrados, como `circle` y `star`, pueden dar formas rellenas útiles.
+- SVG rellena los trazos abiertos como si sus extremos estuvieran unidos. Por ejemplo, aplicar
+  relleno a `arrow-right` crea un triángulo en su punta abierta, no una flecha sólida diseñada
+  expresamente.
+- Los contornos con varias partes pueden perder detalles al rellenarlos. Un relleno explícito
+  de un nodo, incluido `none`, prevalece sobre el relleno raíz.
+
+Cada pareja muestra `fill="none"` a la izquierda y `fill="var(--cosm-primary)"` a la derecha.
+Las tres usan la misma propiedad genérica; no hay renderizado especial según el nombre.
+
+<IconFillExamples label="Trazos cerrados y abiertos con y sin relleno" />
+
+Lucide es un conjunto de contornos. Cambiar su relleno no proporciona una colección completa de
+variantes sólidas diseñadas como tales; conserva `fill="none"` salvo que la geometría elegida
+produzca el resultado deseado.
+
+En React Native usa `const theme = useTheme()` y pasa `stroke={theme.colors.fg}` y
+`fill={theme.colors.primary}`. En nativo, un nodo con relleno `currentColor` (por
+ejemplo los puntos de `brain-circuit`) también usa `theme.colors.fg`, con independencia de
+`stroke`. El Playground acepta `none`, `currentColor`, tokens de color de Cosmos como
+`var(--cosm-primary)` y colores hex/rgb/hsl/con nombre para que todas las pestañas sean válidas;
+su pestaña de React Native convierte los tokens en valores de `theme.colors` de `useTheme()`.
+
+### Catálogo frente al bundle de la aplicación
+
+El paquete incluye el catálogo completo, pero una aplicación debe importar los glifos
+individualmente, no el cargador del catálogo de la demo. Los bundlers web pueden eliminar módulos
+no utilizados. La demo nativa referencia todos los iconos para que su explorador muestre cualquier
+resultado: Metro incluye esos módulos en el bundle de producción de Android/iOS aunque el
+cargador use `import()`. Esa demo no representa una aplicación mínima. Importa únicamente los
+iconos que utilice tu aplicación nativa.
+
+## Estados
+
+Los iconos no son interactivos y no tienen estados ni eventos. De forma predeterminada son
+decorativos. Para transmitir significado, establece `decorative={false}` y proporciona una etiqueta
+concisa con `label`.
+
+```tsx
+<Icon icon={house} decorative={false} label="Inicio" />;
+```
+
+## Accesibilidad
+
+- Los iconos decorativos se ocultan a las tecnologías de asistencia y no reciben el foco.
+- Los iconos informativos exponen un único rol de imagen y el nombre accesible proporcionado.
+- Usar `decorative={false}` sin un `label` no vacío es un error; proporciona una etiqueta o conserva
+  el icono como decorativo.
+- No uses un icono como único contenido de un control interactivo. Colócalo dentro de un botón con
+  una etiqueta independiente.
+
+## API
+
+<ApiTable name="icon" />
+
+## Eventos por plataforma
+
+<EventsTable name="icon" />

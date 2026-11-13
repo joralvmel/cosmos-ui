@@ -2,7 +2,7 @@
 title: Release and publishing
 description: How Cosmos UI is versioned and published to npm, and the one-time setup for maintainers.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -14,18 +14,30 @@ publishes to the public npm registry with
 
 ## How releases work
 
+For copyable prompts covering release planning, PR review, verification, recovery and branch
+synchronization, see [release and maintenance](../prompt-cookbook/#release-and-maintenance).
+
 <Steps>
 
 1. Every pull request that changes `packages/*` adds a changeset (`npm run changeset`).
-2. When `develop` is ready, a maintainer opens the release pull request `develop → main`
-   (skill `release-pr`) and merges it with a **merge commit**.
+2. When `develop` is ready, a maintainer runs `npm run deps:changeset` (patch changesets for
+   runtime dependency updates merged from Dependabot), then opens the release pull request
+   `develop → main` (skill `release-pr`) and merges it with a **merge commit**.
 3. On `main`, the `Release` workflow opens or updates the **Version Packages** pull request: it bumps
    versions and writes the changelogs.
 4. Merging **Version Packages** runs `changeset publish`: new versions go to npm with provenance, Git
    tags are pushed and a GitHub Release is created per package.
 5. The `Docs` workflow deploys the documentation site from `main`.
+6. Synchronize published `main` back into `develop` through a PR using a **merge commit**, never
+   squash/rebase. Verify `git merge-base --is-ancestor origin/main origin/develop` succeeds after
+   fetching. Matching files alone are not enough: preserving ancestry prevents repeated conflicts.
 
 </Steps>
+
+`release-pr` distinguishes a read-only assessment from preparation. Preparation includes safe
+local repairs for synchronization, dependency changesets and conflicts, with validation and a
+local review commit before push. It resumes after prerequisite PRs merge; merge and publication
+still need explicit approval. Use [the preparation prompt](../prompt-cookbook/#prepare-and-open-the-release-pr).
 
 Prereleases: run the `Release` workflow manually on `develop` (Actions → Release → Run workflow). It
 publishes a snapshot such as `0.2.0-next-20261110120000` with the dist-tag `next`:
@@ -85,10 +97,30 @@ The skill `publish-setup` walks an agent through the same checklist.
 
 </Steps>
 
+## Dependency maintenance
+
+| What | Automation | Your part |
+| --- | --- | --- |
+| Minor/patch updates | Dependabot opens grouped PRs into `develop` every Monday (pinned stack: patches only) | Review and merge them |
+| Classification | CI (`Changeset present`) labels each update as development, runtime or needing a decision | Majors, peer ranges and the pinned stack need a changeset in the PR, usually through `upgrade-stack` |
+| Runtime updates | Deferred to the release; the release PR fails until they are covered | `npm run deps:changeset` on `develop` before `release-pr` |
+| New dependencies | `Dependency review` blocks high/critical vulnerabilities and licenses outside the allow list | Choose another package or discuss an exception |
+| Vulnerabilities | Dependabot alerts and security PRs; weekly `Security audit` keeps one `security` issue | Fix with a patch or plan an `upgrade-stack` |
+| Majors and pinned stack | Monthly `Dependency report` keeps one `dependencies` issue | Plan the upgrade with `upgrade-stack` |
+| Tooling auto-merge | Optional: with the variable `COSMOS_DEPENDABOT_AUTOMERGE` = `true`, minor/patch updates of development tooling merge themselves once checks pass | Nothing, or leave it off to review everything |
+
+Run the reports locally with `npm run deps:audit` and `npm run deps:outdated`. Merges made by the
+auto-merge use the workflow token, so they do not trigger workflows on `develop`; the next pull
+request or release runs the full checks. Prompts: [keep dependencies up to date](../prompt-cookbook/#keep-dependencies-up-to-date).
+
 ## Troubleshooting
 
 | Symptom | Fix |
 | --- | --- |
+| Release promotion conflicts after an earlier synchronization | Check ancestry, not only file equality. Prepare a reviewed synchronization repair with `release-pr`; preserve published metadata and newer develop work, regenerate the lockfile with npm, and merge the synchronization with a merge commit. |
+| Synchronization merge commit is blocked by linear-history protection | Apply the reviewed `setup-repo` policy with maintainer approval. It allows merge commits while retaining PRs, required checks and force-push/deletion protections. Do not squash synchronization as a workaround. |
+| Release PR fails "Released runtime dependency updates have changesets" | Run `npm run deps:changeset` on a `develop` work branch and merge it before the release. |
+| Dependabot PR fails "Classify dependency updates" | It needs a decision: review it with `upgrade-stack` and add a changeset to the PR. |
 | `E404` / `ENEEDAUTH` on publish | The trusted publisher does not match: check owner, repository, workflow file name and environment. |
 | No "Version Packages" pull request | Allow GitHub Actions to create pull requests (`npm run setup-repo -- --apply` does it). |
 | Workflow skipped | `COSMOS_PUBLISH_ENABLED` is not `true`. |

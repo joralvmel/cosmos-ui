@@ -1,11 +1,12 @@
 ---
 name: commit
-description: 'Creates a Conventional Commit on a work branch after verifying identity, running validation and the blocked-terms check.'
+description: 'Creates a local Conventional Commit after identity and validation checks, then pauses for user review without pushing. Revisions use new commits, not amendments.'
 ---
 
 # commit
 
 Main agent: `github-ops`. Read `AGENTS.md` first.
+Follow the [component workflow](../../../docs/conventions/component-workflow.md) local review gate.
 
 ## Inputs
 
@@ -19,6 +20,11 @@ Main agent: `github-ops`. Read `AGENTS.md` first.
 4. Stage only the files of the change and write `type(scope): summary` (types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert; scopes are package or area names, comma separated if several).
 5. Sign off when the contributor wants DCO: `git commit -s`.
 6. Let the hooks run; never use `--no-verify`.
+7. Report the new SHA and validation instructions, then stop. Do not push or create/update a PR
+   before the user accepts this HEAD. A requested revision creates a new commit and another review
+   pause; never amend, squash or rewrite earlier commits without explicit permission.
+8. If no task diff exists, report the existing reviewed HEAD; do not manufacture an empty commit
+   or treat it as approved. Read-only requests do not authorize a commit.
 
 ## Files
 

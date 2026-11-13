@@ -4,14 +4,9 @@ Cosmos UI is MIT licensed. This file lists third-party code and assets that are 
 published packages, with their license and attribution. Regular npm dependencies keep their own license files and are
 covered by the SBOM generated on each release.
 
-| Component  | Used in | License | Source |
-| ---------- | ------- | ------- | ------ |
-| _None yet_ | —       | —       | —      |
-
-## Planned
-
-- **Lucide** icons (ISC) for `@joralvmel/cosmos-icons`. When the icon pipeline lands, its license text is copied to
-  `packages/icons/LICENSE-lucide` and recorded here (see `.github/skills/sync-icons/SKILL.md`).
+| Component                | Used in                   | License | Source |
+| ------------------------ | ------------------------- | ------- | ------ |
+| Lucide Icons 1.72.0      | `@joralvmel/cosmos-icons` | ISC     | [lucide.dev](https://lucide.dev/) |
 
 ## How to add an entry
 

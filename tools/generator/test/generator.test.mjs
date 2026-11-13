@@ -74,7 +74,9 @@ describe('component target', () => {
     expect(core).toContain("'date-picker': datePickerContract,");
     expect(core).toContain("import { datePickerContract } from './specs/date-picker.js';");
     const angular = readFileSync(join(root, 'packages/angular/src/index.ts'), 'utf8');
-    expect(angular).toMatch(/\[CosmButtonComponent, CosmDatePickerComponent\] as const/);
+    expect(angular).toMatch(
+      /\[CosmButtonComponent, CosmIconComponent, CosmDatePickerComponent\] as const/
+    );
     const pkg = JSON.parse(readFileSync(join(root, 'packages/elements/package.json'), 'utf8'));
     expect(Object.keys(pkg.exports)).toContain('./date-picker');
     const screens = readFileSync(join(root, 'apps/native-demo/src/screens.ts'), 'utf8');

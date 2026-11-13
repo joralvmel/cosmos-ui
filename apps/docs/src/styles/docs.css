@@ -37,6 +37,48 @@
   align-items: center;
 }
 
+.cosm-icon-gallery {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: var(--cosm-space-sm);
+  padding: var(--cosm-space-sm);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
+}
+
+.cosm-icon-choice,
+.cosm-icon-more {
+  min-height: 44px;
+  padding: var(--cosm-space-sm);
+  border: 1px solid var(--cosm-border);
+  border-radius: var(--cosm-radius-sm);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  cursor: pointer;
+}
+
+.cosm-icon-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cosm-space-sm);
+  overflow-wrap: anywhere;
+}
+
+.cosm-icon-choice[aria-pressed="true"] {
+  border-color: var(--cosm-primary);
+  outline: 1px solid var(--cosm-primary);
+}
+
+.cosm-icon-choice:focus-visible,
+.cosm-icon-more:focus-visible {
+  outline: 2px solid var(--cosm-focus-ring);
+  outline-offset: 2px;
+}
+
 .cosm-playground {
   display: grid;
   gap: 0.75rem;

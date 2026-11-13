@@ -1,0 +1,36 @@
+import type { IconDefinition } from '../index.js';
+
+export const decimalsArrowLeft = {
+  name: 'decimals-arrow-left',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'm13 21-3-3 3-3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M20 18H10',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M3 11h.01',
+      },
+    ],
+    [
+      'rect',
+      {
+        x: '6',
+        y: '3',
+        width: '5',
+        height: '8',
+        rx: '2.5',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

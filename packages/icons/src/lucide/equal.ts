@@ -1,0 +1,26 @@
+import type { IconDefinition } from '../index.js';
+
+export const equal = {
+  name: 'equal',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'line',
+      {
+        x1: '5',
+        x2: '19',
+        y1: '9',
+        y2: '9',
+      },
+    ],
+    [
+      'line',
+      {
+        x1: '5',
+        x2: '19',
+        y1: '15',
+        y2: '15',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

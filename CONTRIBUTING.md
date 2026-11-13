@@ -16,9 +16,14 @@ Thanks for helping! The full guide lives in the docs site:
    (`feat(elements): add cosm-switch`), checked by the `commit-msg` hook. Never use `--no-verify`.
 5. **Validate**: `npx biome ci . && npx turbo run typecheck test build`.
 6. **Changeset**: `npm run changeset` for every change to `packages/*`.
-7. **Pull request** to `develop` using the template. CI must be green and review conversations resolved;
+7. **Agent-assisted review**: follow the [component workflow](docs/conventions/component-workflow.md).
+   After research, approve the proposed feature/design scope. The agent then implements, validates
+   and commits locally, and pauses for you to try the exact commit. Request changes for another
+   commit and review cycle, or approve it to authorize push and PR creation.
+8. **Pull request** to `develop` using the template. CI must be green and review conversations resolved;
    approvals are optional.
-   Pull requests are squash-merged; the PR title becomes the commit message.
+   Work pull requests are squash-merged; the PR title becomes the commit message. Release promotion
+   and main-to-develop synchronization PRs use merge commits to preserve ancestry.
 
 | Task | Command |
 | --- | --- |

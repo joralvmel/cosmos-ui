@@ -1,0 +1,44 @@
+import type { IconDefinition } from '../index.js';
+
+export const contactRound = {
+  name: 'contact-round',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M16 2v2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M17.915 21a6 6 0 10-12 0',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M8 2v2',
+      },
+    ],
+    [
+      'circle',
+      {
+        cx: '12',
+        cy: '11',
+        r: '4',
+      },
+    ],
+    [
+      'rect',
+      {
+        x: '3',
+        y: '3',
+        width: '18',
+        height: '18',
+        rx: '2',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

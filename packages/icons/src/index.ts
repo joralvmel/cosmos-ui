@@ -15,7 +15,47 @@ export interface IconDefinition {
 }
 
 const tags = new Set<string>(['path', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'rect']);
-const attribute = /^[a-z][a-z-]*$/;
+const attributes = new Set<string>([
+  'cx',
+  'cy',
+  'd',
+  'fill',
+  'height',
+  'points',
+  'r',
+  'rx',
+  'ry',
+  'width',
+  'x',
+  'x1',
+  'x2',
+  'y',
+  'y1',
+  'y2',
+]);
+
+export interface IconCatalogItem {
+  name: string;
+  category: string;
+  tags: readonly string[];
+}
+
+export { iconCatalog, lucideVersion } from './catalog.js';
+
+/** Search metadata without loading artwork; exact names precede prefixes and other matches. */
+export function searchIconCatalog(
+  items: readonly IconCatalogItem[],
+  query: string
+): IconCatalogItem[] {
+  const term = query.trim().toLowerCase();
+  const rank = (name: string) =>
+    term && name.toLowerCase() === term ? 0 : term && name.toLowerCase().startsWith(term) ? 1 : 2;
+  return items
+    .filter(item =>
+      `${item.name} ${item.category} ${item.tags.join(' ')}`.toLowerCase().includes(term)
+    )
+    .sort((a, b) => rank(a.name) - rank(b.name));
+}
 
 /** Validates untrusted icon data (e.g. loaded from JSON) before rendering it. */
 export function isIconDefinition(value: unknown): value is IconDefinition {
@@ -23,6 +63,19 @@ export function isIconDefinition(value: unknown): value is IconDefinition {
   const icon = value as Partial<IconDefinition>;
   if (typeof icon.name !== 'string' || !/^[a-z0-9-]+$/.test(icon.name)) return false;
   if (typeof icon.viewBox !== 'string' || !/^[\d.\s-]+$/.test(icon.viewBox)) return false;
+  const viewBox = icon.viewBox.trim().split(/\s+/).map(Number);
+  const width = viewBox.at(2);
+  const height = viewBox.at(3);
+  if (
+    viewBox.length !== 4 ||
+    !viewBox.every(Number.isFinite) ||
+    width === undefined ||
+    height === undefined ||
+    width <= 0 ||
+    height <= 0
+  ) {
+    return false;
+  }
   if (!Array.isArray(icon.nodes)) return false;
   return icon.nodes.every(
     node =>
@@ -33,10 +86,13 @@ export function isIconDefinition(value: unknown): value is IconDefinition {
       node[1] !== null &&
       Object.entries(node[1]).every(
         ([key, val]) =>
-          attribute.test(key) &&
-          !key.startsWith('on') &&
-          (typeof val === 'number' ||
-            (typeof val === 'string' && !/url\s*\(|javascript:/i.test(val)))
+          attributes.has(key) &&
+          ((typeof val === 'number' && Number.isFinite(val)) ||
+            (typeof val === 'string' &&
+              !/url\s*\(|javascript:/i.test(val) &&
+              (key !== 'fill' ||
+                (!val.includes('\\') &&
+                  ![...val].some(character => character.charCodeAt(0) < 32)))))
       )
   );
 }

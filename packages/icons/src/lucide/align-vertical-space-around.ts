@@ -1,0 +1,30 @@
+import type { IconDefinition } from '../index.js';
+
+export const alignVerticalSpaceAround = {
+  name: 'align-vertical-space-around',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'rect',
+      {
+        width: '10',
+        height: '6',
+        x: '7',
+        y: '9',
+        rx: '2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M22 20H2',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M22 4H2',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

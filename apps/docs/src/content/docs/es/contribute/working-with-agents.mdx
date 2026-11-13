@@ -24,6 +24,33 @@ El repositorio incluye un equipo de agentes especializados (`.github/agents/`) y
 Otros asistentes (Codex, Claude Code, Cursor…) leen `AGENTS.md`; indícales una skill, por ejemplo
 "sigue `.github/skills/create-component/SKILL.md` para `switch`".
 
+## Investigación, decisiones y revisión local
+
+Sigue el [flujo de componentes](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-workflow.md).
+El chat principal coordina a los especialistas y mantiene contigo las decisiones:
+
+1. El investigador compara estándares e implementaciones públicas, con licencias, diferencias entre
+   plataformas y costes. Su recomendación no autoriza a implementar todas las opciones.
+2. Copilot presenta requisitos, funciones recomendadas y mejoras opcionales; después pregunta en
+   bloques pequeños sobre diseño y API. Apruebas qué se incluye, excluye o aplaza **antes de generar
+   archivos o editar el contrato**. Los ejemplos no se convierten sin consultarte en casos especiales
+   ni listas exclusivas de valores admitidos.
+3. Los agentes implementan lo acordado y ejecutan las comprobaciones. El informe distingue navegador
+   e integración real de wrappers, React Native Web, mocks, builds y ejecución en Android/iOS.
+   Las herramientas, dispositivos o pruebas de lector de pantalla no disponibles se indican; no se
+   marcan como aprobadas.
+4. `finish-work` valida y crea automáticamente un **commit local**, comunica su SHA y cómo probarlo,
+   y **espera sin hacer push ni PR**. Puedes pedir ajustes para otro commit y otra pausa, o aceptar
+   ese commit concreto para que `open-pr` haga push y abra o reutilice la PR.
+
+Pedir al principio que implemente y termine abriendo una PR no aprueba cambios que aún no has visto.
+Aprobar las funciones no equivale a aceptar la implementación. Si cambia HEAD, debes volver a
+validarlo; el agente no modifica commits anteriores con amend por defecto.
+
+Los agentes de pruebas y nativo incluyen herramientas de navegador, y los roles coordinadores pueden
+delegar y hacer preguntas interactivas. Su disponibilidad depende del harness y las herramientas
+habilitadas. El flujo no omite permisos del editor ni añade una aprobación obligatoria en GitHub.
+
 ## Agentes
 
 Las descripciones están en inglés, como los archivos de los agentes.
@@ -39,39 +66,21 @@ Las descripciones están en inglés, como los archivos de los agentes.
 - **Una tarea cada vez**, con el resultado que esperas: "Crea el componente `switch` para todas las
   plataformas" mejor que "trabaja en formularios".
 - **Da referencias**: un número de issue, un enlace de Figma, un patrón de la WAI-ARIA APG.
-- **Déjales validar**: cada skill termina con tests y `npx biome ci . && npx turbo run typecheck test
-  build`; pide la salida si tienes dudas.
+- **Déjales validar**: la implementación incluye tests y
+  `npx biome ci . && npx turbo run typecheck test build`. Una investigación entrega fuentes, no
+  resultados de tests inventados. Pide las evidencias y las comprobaciones no disponibles.
 - **Revisa antes de integrar**: pide a `reviewer` una revisión de la rama.
 
 ## Prompts para copiar
 
-```text
-/component-status all — y dime qué tres componentes debería crear después y por qué.
-```
+El [recetario de prompts](../prompt-cookbook/) organiza ejemplos listos para copiar por tarea:
 
-```text
-/start-work feat elements switch, enlazada al issue #12
-```
+- [Crear un componente o partir de Figma](../prompt-cookbook/#empezar-un-componente).
+- [Ampliar funciones, pulir el aspecto o planificar cambios de API](../prompt-cookbook/#evolucionar-un-componente-existente).
+- [Reproducir un bug o recuperar la paridad](../prompt-cookbook/#diagnosticar-y-corregir).
+- [Mejorar docs, demos, pruebas o revisar sin editar](../prompt-cookbook/#mejorar-evidencias-y-ejemplos).
+- [Añadir temas, tokens o gráficas](../prompt-cookbook/#otras-tareas-de-la-librería).
+- [Aceptar alcance, pedir ajustes, autorizar una PR o retomar un chat](../prompt-cookbook/#continuar-la-conversación).
 
-```text
-Usa el agente component-builder: crea el componente "switch" (patrón switch de WAI-ARIA) para web,
-React, Angular y React Native, con estado `checked` controlado y no controlado y un evento
-`cosm-change`. Sigue la skill create-component y termina con el test de estructura.
-```
-
-```text
-/component-from-design https://www.figma.com/design/<archivo>?node-id=<nodo> como "chip"
-```
-
-```text
-Usa el agente design-system: añade un tema llamado "aurora" con primario verde azulado y armonía
-triádica; debe pasar la validación de accesibilidad en claro y oscuro.
-```
-
-```text
-Usa el agente reviewer: revisa la rama actual frente a develop y lista solo problemas de alta confianza.
-```
-
-```text
-/finish-work "feat(elements): add cosm-switch" cierra #12
-```
+El [ejemplo completo](../example-switch/) recorre la entrega de un componente;
+las [recetas técnicas](../recipes/) explican los pasos de implementación de tareas concretas.

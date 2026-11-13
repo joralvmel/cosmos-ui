@@ -20,6 +20,10 @@ Main agent: `docs-writer`. Read `AGENTS.md` first.
 5. Keep the UI accessible (APG tabs, labels, `role="status"` for copy feedback) and build text only with `textContent`.
 6. The native demo link appears automatically when `apps/native-demo/app/<name>.tsx` exists.
 7. Run `npx turbo run typecheck test build --filter=@joralvmel/cosmos-docs` and check the page in `npm run docs`.
+8. Use the [component workflow](../../../docs/conventions/component-workflow.md) acceptance
+   scenarios: try the approved customization and relevant states, copy/execute framework snippets,
+   test keyboard and narrow layouts, and inspect the console. Record limitations rather than
+   declaring all platforms verified from a successful docs build.
 
 ## Files
 

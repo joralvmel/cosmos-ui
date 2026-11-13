@@ -9,7 +9,17 @@ interface Props {
 const contract: ComponentContract = contracts[Astro.props.name];
 const s = t(Astro.currentLocale);
 const typeOf = (spec: ComponentContract['props'][string]) =>
-  spec.type === 'enum' ? spec.values.map(v => `'${v}'`).join(' | ') : spec.type;
+  spec.type === 'enum'
+    ? spec.values.map(v => `'${v}'`).join(' | ')
+    : spec.type === 'union'
+      ? spec.variants
+          .map(v =>
+            v.type === 'enum' ? v.values.map(value => `'${value}'`).join(' | ') : 'number'
+          )
+          .join(' | ')
+      : spec.type === 'reference'
+        ? spec.reference
+        : spec.type;
 ---
 
 <h3>{s.props}</h3>
@@ -26,7 +36,17 @@ const typeOf = (spec: ComponentContract['props'][string]) =>
             {toAttribute(name) !== name && <><br /><code>{toAttribute(name)}</code></>}
           </td>
           <td><code>{typeOf(spec)}</code></td>
-          <td>{spec.default !== undefined ? <code>{String(spec.default)}</code> : '—'}</td>
+          <td>
+            {
+              'default' in spec && spec.default !== undefined ? (
+                <code>{String(spec.default)}</code>
+              ) : 'required' in spec && spec.required ? (
+                Astro.currentLocale === 'es' ? 'Obligatorio' : 'Required'
+              ) : (
+                '—'
+              )
+            }
+          </td>
           <td>{spec.platforms ? spec.platforms.join(', ') : s.all}</td>
           <td>{spec.description}</td>
         </tr>

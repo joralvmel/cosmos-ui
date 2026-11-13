@@ -1,6 +1,6 @@
 ---
 name: commit
-description: 'Creates a Conventional Commit on a work branch after verifying identity, running validation and the blocked-terms check.'
+description: 'Creates a validated local Conventional Commit and pauses for review without pushing; revisions create new commits.'
 argument-hint: 'Change summary'
 agent: agent
 ---

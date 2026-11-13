@@ -1,3 +1,5 @@
+import { iconContract } from './specs/icon.js';
+
 export {
   buildOrder,
   type CatalogEntry,
@@ -71,4 +73,11 @@ import { buttonContract } from './specs/button.js';
 /** Every component contract, keyed by name. Used by docs, AI references and drift tests. */
 export const contracts = {
   button: buttonContract,
+  icon: iconContract,
 } as const;
+export { iconContract } from './specs/icon.js';
+export {
+  type IconScenario,
+  iconScenarios,
+  iconScenariosFor,
+} from './specs/icon.scenarios.js';

@@ -1,0 +1,24 @@
+import type { IconDefinition } from '../index.js';
+
+export const squareLetterJ = {
+  name: 'square-letter-j',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M14 8v5.5a1 1 0 01-5 0V13',
+      },
+    ],
+    [
+      'rect',
+      {
+        width: '18',
+        height: '18',
+        x: '3',
+        y: '3',
+        rx: '2',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;

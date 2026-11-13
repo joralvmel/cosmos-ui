@@ -1,0 +1,26 @@
+import type { IconDefinition } from '../index.js';
+
+export const squareArrowLeftExit = {
+  name: 'square-arrow-left-exit',
+  viewBox: '0 0 24 24',
+  nodes: [
+    [
+      'path',
+      {
+        d: 'M13 12H3',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M3 17.67V19a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v1.33',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'm7 8-4 4 4 4',
+      },
+    ],
+  ],
+} as const satisfies IconDefinition;
