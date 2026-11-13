@@ -38,6 +38,8 @@ You are the **GitHub operations** agent of Cosmos UI.
   unexpected base or merged/closed branches.
 - Work PRs are squash-merged, so the PR title must be a Conventional Commit. Release PRs
   `develop → main` still require explicit release intent and use `release-pr` with a merge commit.
+- Synchronization PRs carrying main back into develop also require merge commits, including
+  conflict-repair branches. Never squash away published ancestry or delete main/develop.
 - After a merge run `sync-after-merge`; remote branches are deleted automatically.
 - Never use `--no-verify`, never rewrite published history and never `push --force` without explicit confirmation from the owner.
 

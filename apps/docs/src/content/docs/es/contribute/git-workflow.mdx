@@ -10,7 +10,7 @@ sidebar:
 | Rama | Propósito | Cómo llegan los cambios |
 | --- | --- | --- |
 | `main` | Código publicado; cada push ejecuta la release y el despliegue de la documentación | Merge commit desde `develop` (pull request de release) |
-| `develop` | Integración, rama por defecto | Squash merge de las ramas de trabajo |
+| `develop` | Integración, rama por defecto | Squash en PRs de trabajo; merge commit al sincronizar main |
 | `<tipo>/<ámbito>-<descripción>` | Una tarea | Se crea desde `develop` y se borra tras integrarla |
 
 Tipos: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`. Ámbito: paquete o área (`elements`, `tokens`,
@@ -39,7 +39,8 @@ pull request desde él.
 4. Obligatorio: checks en verde (lint, términos, typecheck, tests, build, paquetes, build de la
    documentación, changeset, higiene de commits) y resolver las conversaciones de revisión. Las
    aprobaciones son opcionales.
-5. Squash merge: el título del pull request debe ser un Conventional Commit (lo comprueba la CI).
+5. Squash en PRs de trabajo; el título debe ser un Conventional Commit (lo comprueba la CI).
+   La sincronización desde main, incluidas sus ramas de reparación, usa merge commit.
 6. `sync-after-merge` limpia la rama local.
 
 Las aprobaciones son opcionales en `main` y `develop`, para poder integrar los propios pull requests
@@ -54,6 +55,8 @@ protección de ramas. Aceptar los cambios locales no autoriza al agente a integr
 
 `release-pr` abre `develop → main` con los changesets pendientes; intégralo con un merge commit. La
 página [Versiones y publicación](../publishing/) explica el resto.
+Tras publicar, sincroniza main con develop usando merge commit, nunca squash/rebase.
+Verifica que main sea ancestro de develop; nunca borres ninguna de esas dos ramas.
 
 ## Configuración del repositorio
 

@@ -61,6 +61,18 @@ describe('setup-repo plan', () => {
 });
 
 describe('release synchronization', () => {
+  it('allows ancestry-preserving synchronization without relaxing PRs or checks', () => {
+    const plan = buildPlan({ repo: 'owner/name' });
+    const protection = plan.find(
+      item => item.path === 'repos/owner/name/branches/develop/protection'
+    )?.body;
+    expect(protection?.required_linear_history).toBe(false);
+    expect(protection?.required_status_checks).toEqual({ strict: true, contexts: requiredChecks });
+    expect(protection?.required_pull_request_reviews).toBeDefined();
+    expect(protection?.allow_force_pushes).toBe(false);
+    expect(protection?.allow_deletions).toBe(false);
+  });
+
   it('exempts only same-repository main-to-develop PRs from adding new changesets', () => {
     const workflow = read('.github/workflows/ci.yml');
     const condition = workflow.split('- name: Check changesets')[1]?.split('run:')[0];

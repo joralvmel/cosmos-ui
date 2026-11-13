@@ -18,7 +18,9 @@ Main agent: `release-manager`. Read `AGENTS.md` first.
 3. Stable: run `release-pr` and merge the release PR with a merge commit. The `Release` workflow opens "Version Packages" on main; review versions and changelogs, approve and merge it. The workflow then publishes to npm with provenance, pushes tags and creates GitHub Releases.
 4. Snapshot: `gh workflow run release.yml --ref develop -f snapshot=true`; it publishes `x.y.z-next-<datetime>` with the dist-tag `next` and no Git tags.
 5. Verify: `npm view @joralvmel/cosmos-<pkg> versions dist-tags`, the GitHub Releases page and the docs deployment on main.
-6. After the release, merge main back into develop if Version Packages changed files there (`gh pr create --base develop --head main`).
+6. After publication, use `sync-after-merge` to synchronize main back into develop through a PR.
+   Use a **merge commit**, never squash/rebase, and verify main is an ancestor of develop.
+   Prepare evidence-backed conflict repairs locally; preserve review and merge approvals.
 
 ## Files
 

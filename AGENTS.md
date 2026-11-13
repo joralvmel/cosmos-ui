@@ -98,14 +98,16 @@ with `npx vitest run` (Turborepo filters do it for you).
 | Branch | Purpose | Merged with |
 | --- | --- | --- |
 | `main` | Released code. Every push runs `release.yml` and deploys the docs | merge commit from `develop` (`release-pr`) |
-| `develop` | Integration; default branch for pull requests | squash merge of work branches |
+| `develop` | Integration; default branch for pull requests | squash work PRs; merge commit for main synchronization |
 | `feat\|fix\|docs\|chore\|refactor\|test/<scope>-<description>` | One task, created from `develop` (`start-work`) | deleted after merge (`sync-after-merge`) |
 
 - Pull requests need green checks and resolved review conversations; approvals are optional for
   single-maintainer work. Force pushes to `main`/`develop` are blocked (`tools/github/setup-repo.mjs`).
 - Squash merges use the PR title as commit message, so it must be a Conventional Commit.
 - Releases: `release-pr` (develop → main) → "Version Packages" pull request by Changesets → npm
-  publish and GitHub Releases (`release` skill).
+  publish and GitHub Releases (`release` skill). Synchronize main back into develop using a
+  **merge commit**, including synchronization repair branches; verify main's ancestry afterward.
+  Never squash/rebase synchronization or delete either long-lived branch.
 - Dependencies: Dependabot opens weekly minor/patch PRs into `develop`. CI classifies them
   (`tools/deps/dependency-changes.mjs`): development and runtime patch/minor updates pass and get a
   `patch` changeset before the release (`npm run deps:changeset`); majors, peer ranges and the pinned
