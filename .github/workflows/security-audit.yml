@@ -1,0 +1,38 @@
+name: Security audit
+
+# Weekly npm audit of the whole workspace. Keeps one open issue labelled "security" up to date and
+# closes it when the audit is clean. Dependabot security updates open the fix pull requests.
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Audit (lockfile, no install)
+        id: report
+        run: node tools/deps/reports.mjs audit --out "$RUNNER_TEMP/audit.md"
+
+      - name: Open, update or close the issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FINDINGS: ${{ steps.report.outputs.findings }}
+        run: >-
+          node tools/github/upsert-issue.mjs --title "Security audit: vulnerable dependencies"
+          --label security --body-file "$RUNNER_TEMP/audit.md" --findings "$FINDINGS"

@@ -39,3 +39,10 @@ Biome 2 · Astro 7 + Starlight · Changesets · culori.
 - Never render untrusted HTML or build class names from input ([SECURITY.md](../SECURITY.md)).
 - Commits with your own identity (personal checks are local, see `.local/git-identity.json`);
   Conventional Commits; no `--no-verify`.
+- Follow [the component workflow](../docs/conventions/component-workflow.md): research precedes
+  informed feature/design questions and explicit scope approval, before generation or contract edits.
+- Automatically validate and commit implementation tasks locally, then stop for user review.
+  No push or PR until the user accepts that exact HEAD. Requested revisions create new commits and
+  require another pause; do not amend by default. Scope approval is not permission to publish.
+- Report real validation evidence and unavailable checks honestly: mocks, builds and React Native
+  Web do not establish native-device behavior.

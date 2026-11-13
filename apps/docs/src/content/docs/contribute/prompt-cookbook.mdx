@@ -1,0 +1,435 @@
+---
+title: Prompt cookbook
+description: Copyable prompts organized by task, from researching and creating components to fixes, tests and local review.
+sidebar:
+  order: 3
+---
+
+Use these prompts in the **main chat opened in this repository**. It coordinates the specialists;
+you do not need to switch agents for each step. Natural-language prompts work without a slash
+command. Names such as `create-component` refer to existing skills, not new commands.
+
+Replace the values in `[brackets]` and attach relevant files, screenshots, issue links or logs.
+Remove anything that does not apply; never paste credentials or private data into a prompt.
+
+## Choose your task
+
+| I want to… | Start here | Skill or role |
+| --- | --- | --- |
+| Choose what to build next | [Explore the backlog](#explore-the-backlog) | `component-status`, `researcher` |
+| Create a component | [Create from a need](#create-from-a-need) | `create-component` |
+| Use a Figma design | [Create from a design](#create-from-a-design) | `component-from-design` |
+| Copy a palette or imitate another project | [Use a reference](#use-a-reference) | `use-reference` |
+| Add a feature or change an API | [Extend behavior](#extend-behavior) | `modify-component` |
+| Polish an existing component | [Improve appearance](#improve-appearance) | `modify-component`, `design-system` |
+| Fix an error | [Reproduce and fix a bug](#reproduce-and-fix-a-bug) | `modify-component`, `test-engineer` |
+| Fix a platform-specific difference | [Restore platform parity](#restore-platform-parity) | Framework/native specialist |
+| Improve examples or controls | [Update documentation and demos](#update-documentation-and-demos) | `add-playground`, `docs-writer` |
+| Check quality without edits | [Review without changing files](#review-without-changing-files) | `reviewer`, `test-engineer` |
+| Cover a missing behavior with tests | [Add focused tests](#add-focused-tests) | `add-contract-tests` |
+| Add a theme, token or chart | [Other library work](#other-library-work) | `add-theme`, `add-token`, `create-chart` |
+| Review and deliver the result | [Continue the conversation](#continue-the-conversation) | `finish-work`, `open-pr` |
+| Prepare or verify a release | [Release and maintenance](#release-and-maintenance) | `release-pr`, `release`, `sync-after-merge` |
+| Update dependencies or fix a vulnerability | [Keep dependencies up to date](#keep-dependencies-up-to-date) | `upgrade-stack`, `devops` |
+
+### What every implementation includes
+
+The [component workflow](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-workflow.md)
+already requires research-led scope approval for new behavior, contract/platform parity,
+appropriate tests, EN/ES docs, AI references and changesets for changed publishable packages.
+An exact bug fix within the accepted contract does not need another feature interview.
+
+Implementation ends with a validated **local commit and a pause**. Neither the initial prompt nor
+scope approval authorizes push, PR, merge or release. Read-only research/review does not authorize
+edits or commits. If a browser, device or tool is unavailable, the agent must report it rather than
+call the check passed.
+
+## Start a component
+
+### Explore the backlog
+
+Use this when you want advice, not implementation yet.
+
+```text
+Check the current component inventory and its dependencies. Recommend three candidates to build
+next, ordered by usefulness, effort and what they unblock. Research the most promising candidate
+and distinguish required, recommended and optional features, with sources and platform differences.
+Present the decisions I should make next. This is read-only: do not generate files, commit or push.
+```
+
+### Create from a need
+
+`badge` is an example, not a request to add every feature mentioned in the research.
+
+```text
+Create the badge component using create-component. The goal is to communicate a short status or
+count in web, React, Angular and React Native.
+
+Check the inventory and research first. Recommend a useful initial scope, then ask me about
+variants, sizes, customization, content, accessibility and platform differences in small batches.
+Explain what should be included, excluded or deferred; wait for my approval before generation
+or contract edits.
+
+After approval, implement and validate the agreement end-to-end, including representative demo
+controls. Create a local commit, show its SHA and how to try it, then wait without push or PR.
+```
+
+### Create from a design
+
+A screenshot does not specify keyboard behavior, state ownership or all native interactions.
+
+```text
+Use component-from-design for [component] with this reference: [Figma frame link or screenshot].
+The intended use is [user need]. Check whether an existing component already solves it.
+
+Research the interaction pattern and map the design to current tokens. Show what the reference
+defines, what is missing and which platform differences need a decision. Ask me before choosing
+unseen behavior or adding tokens/dependencies. Wait for scope/design approval, then complete the
+accepted component on every applicable platform. Validate, commit locally and pause for my review.
+```
+
+## Use a reference
+
+Cosmos owns its components: another project is **evidence for one decision at a time**, never a
+library to port. The [reference convention](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/reference-projects.md)
+keeps sources read-only and their identity out of the repository. `use-reference` has three modes.
+
+### Copy a palette into a theme
+
+Your own colors can be copied directly into a **new named theme**; the built-in themes stay as they are.
+
+```text
+Use use-reference in palette mode with [theme file of the other project]. Inspect it read-only.
+Create a Cosmos theme named [name] with add-theme that keeps those colors in light and dark mode:
+brand colors as seeds and the exact values per semantic role with mode overrides.
+Show the role mapping and the validation first. If a copied pair fails WCAG AA or the color-vision
+checks, explain it and propose the nearest passing value; do not lower thresholds. Report what the
+theme cannot express (fonts, spacing, motion). Wait for my approval, then implement, validate on
+web and native, commit locally and pause without push or PR.
+```
+
+### Imitate a behavior or style in one component
+
+Add the reference to a normal create or modify request; the Cosmos contract still decides the API.
+
+```text
+Use modify-component for [component]. As a reference, look read-only at [file, screenshot or link]:
+I want [the swipe-to-dismiss behavior / the compact density / the animation] it has.
+Describe what the reference does (states, interaction, accessibility, platforms) and what Cosmos
+already covers. Recommend how to bring that aspect into the current contract, ask the open
+decisions and wait for my approval. Do not copy its props, code or text. After approval implement
+on every platform, validate, commit locally and pause.
+```
+
+### Plan replacing an app's components with Cosmos
+
+Run this **in the app's repository**. Replace one component at a time in separate, authorized steps.
+
+```text
+Using Cosmos's use-reference (replacement plan mode), plan how this app adopts Cosmos.
+Inspect the app read-only: installed versions, providers, theme, imports and the UI components it
+defines. List each one with its Cosmos equivalent (stable, in progress, planned or absent), the
+gaps and a replacement order with acceptance checks and rollback.
+Missing capabilities become Cosmos requests, not app code inside Cosmos. Do not edit the app,
+install packages, commit or push. Ask me which first replacement to implement.
+```
+
+## Evolve an existing component
+
+### Extend behavior
+
+Describe the user outcome before prescribing a prop name. If the capability already exists,
+the agent should explain how to use it instead of creating another API.
+
+```text
+Use modify-component for [component]. I need users to be able to [desired outcome].
+Example scenario: [input, interaction and expected result].
+
+Check the current API, scenarios and docs first. If this is already supported, show me how and
+do not make unnecessary changes. Otherwise research alternatives, recommend an API and explain
+compatibility, accessibility and web/native trade-offs. Ask me to approve the scope before edits.
+After approval, update the contract, affected platforms, controls, tests and docs. State the
+versioning impact and add the required changeset. Commit locally and wait without push or PR.
+```
+
+### Improve appearance
+
+Separate a visual adjustment from a new public customization API.
+
+```text
+Polish the appearance of [component]. Current issue: [what looks wrong].
+Desired result: [description or attached reference]. Keep its existing behavior and public API.
+
+Inspect the current tokens and styling hooks; propose the smallest coherent adjustment. If it
+requires a new prop, token, dependency or behavior, explain it and ask before expanding the scope.
+Check light/dark, at least two themes, narrow/wide layouts and relevant focus/disabled states
+in the affected web and native demos. Update visual examples as needed, validate and create
+a new local review commit. Do not push.
+```
+
+### Plan a breaking change
+
+```text
+I am considering changing [current API] to [desired API] in [component].
+Research the alternatives and report affected consumers/platforms, migration steps, versioning
+impact and a compatible option if one exists. Do not edit files yet. Ask me to choose the approach
+before implementing a breaking change.
+```
+
+## Diagnose and fix
+
+### Reproduce and fix a bug
+
+Give observable facts; a suspected cause is a hypothesis, not a constraint on the fix.
+
+```text
+Fix this bug in [component] without redesigning its API.
+Environment: [framework/platform, relevant versions, browser or device].
+Reproduction: [minimal numbered steps or attached example].
+Expected: [observable behavior].
+Actual: [observable behavior and relevant error/log].
+Frequency: [always, intermittent or known conditions].
+
+Reproduce it first and find the root cause. If you cannot reproduce it, explain the missing
+information rather than guessing. Add a focused regression that fails before the fix and passes
+after it, preserve existing behavior and check the affected platform integration/console.
+If the fix requires an API or scope change, ask first. Validate, commit locally and show me
+the evidence and retry steps. Wait without push or PR.
+```
+
+### Restore platform parity
+
+```text
+[Component] behaves differently between [platform A] and [platform B].
+The shared contract says [expected rule]. Reproduce using [steps or example].
+
+Compare both implementations and their wrapper/event integration. Fix the platform-specific
+cause without duplicating behavior in adapters. If the difference is intentional or the contract
+does not resolve it, explain the options and ask me before changing it. Test the affected
+integration, controls and console. Separate React Native Web, mocked tests, native builds and
+actual device results; disclose unavailable environments. Commit locally and pause for review.
+```
+
+## Improve evidence and examples
+
+### Update documentation and demos
+
+```text
+Improve the docs and demos for [component] without adding new component behavior.
+Use case to explain: [user task]. Missing or confusing examples/controls: [observations].
+
+Check the real contract first. Keep generated API tables/snippets tied to it; show normal use,
+relevant states, customization and limitations rather than only the default appearance.
+Update EN/ES pages and applicable Playground/native demo controls. Try the examples and controls
+in the available environments, checking keyboard, state changes and console diagnostics.
+Report any contract/control gap instead of silently inventing an API. Validate the affected
+files, create a local commit and wait for my review.
+```
+
+### Review without changing files
+
+```text
+Use reviewer to inspect [component or current branch] against develop and the accepted scope.
+Focus on correctness, accessibility, API/platform parity, representative controls, bundle impact
+and missing runtime evidence. Report only actionable, high-confidence findings with file locations,
+severity and reproduction steps where possible. Separate actual failures from unavailable checks.
+Do not edit files, commit, push or open a PR.
+```
+
+For an accessibility-focused review, add the relevant keyboard, labeling, focus, motion or
+screen-reader scenario. Automated checks alone do not prove accessibility.
+
+### Add focused tests
+
+```text
+Add focused coverage for [component] using add-contract-tests where applicable.
+Missing behavior: [scenario and expected result from the accepted contract].
+Cover relevant platform integration and edge cases, not implementation details or trivial getters.
+Do not change the API or chase a coverage percentage. If the tests expose a behavior bug, report it
+and agree the fix scope before expanding this task. Run the tests and required checks, distinguish
+mocks from runtime evidence, commit locally and pause without push or PR.
+```
+
+## Other library work
+
+### Add a theme or token
+
+```text
+Use design-system with add-theme/add-token as appropriate. I need [visual goal and affected uses].
+First check whether current themes/tokens already solve it. Recommend options for light/dark,
+semantic roles, web/native parity and accessibility; ask me before adding public tokens or choosing
+the design. After approval, use the generator for a new theme, validate contrast without lowering
+thresholds, update galleries/docs and add the required changeset. Commit locally and pause for review.
+```
+
+### Create a chart
+
+```text
+Create [chart type] using create-chart for [data shape and user question].
+Research accessible representations, interactions, data limits and web/native trade-offs first.
+Recommend an initial scope and ask me about axes, labels, empty/error states, customization,
+alternative text/table and any interaction before generation.
+After approval, implement the pure shared layout and applicable renderers, examples and tests.
+Report bundle costs and actual runtime evidence separately from builds. Commit locally and wait
+without push or PR.
+```
+
+## Release and maintenance
+
+A work PR goes to `develop`; releasing is a separate decision. The stable flow is
+`develop → main` (merge commit), then the generated **Version Packages** PR, then publication.
+See [release and publishing](../publishing/) for setup and commands. These prompts do not authorize
+automatic merges, changes to publishing permissions, or a release while work is still unmerged.
+
+### Plan the next release
+
+```text
+Assess whether develop is ready for a stable release. This is read-only.
+Check the current remote state, merged work, CI and pending changesets against origin/main.
+List affected packages, expected bumps, breaking changes/migration notes and missing evidence.
+Distinguish package changes from private docs/tooling changes that need no changeset.
+Recommend release now or remaining work. Do not change versions/changelogs, dispatch workflows,
+open or merge PRs, push tags or publish.
+```
+
+### Open the release PR
+
+```text
+I authorize opening the release PR for the already merged changes on develop.
+Use release-pr: verify identity, remote, green checks and pending changesets. Reuse an existing
+open develop-to-main release PR; stop on conflicts or missing evidence. Summarize packages,
+bumps, highlights and migration notes, and report its URL/checks.
+Do not merge it, edit versions/changelogs manually or publish. Wait for my review; when approved,
+the release promotion must use a merge commit, not squash.
+```
+
+### Review Version Packages
+
+```text
+Review the generated Version Packages PR [URL] without editing or merging.
+Compare its versions, dependency updates and changelogs with the accepted changesets and current
+release history. Check CI and identify missing/unexpected packages, bumps or migration notes.
+Explain what merging it will publish and which approvals remain. Do not publish, dispatch workflows
+or alter generated files; report blockers and wait for my decision.
+```
+
+### Verify publication and try it as a consumer
+
+```text
+Verify the release [version or workflow URL] without changing the repository.
+Check actual workflow results, npm versions/dist-tags and provenance, Git tags/GitHub Releases,
+and the docs deployment. Separate published, pending and failed packages; green CI alone is not
+proof that npm publication succeeded.
+Give exact install/version and smoke-test steps for [React/Angular/web/React Native] using published
+packages in an isolated consumer, not workspace links. Do not install or modify that consumer yet.
+Report remaining compatibility/runtime checks rather than claiming they passed.
+```
+
+### Diagnose a failed publication
+
+```text
+Diagnose the failed release [workflow URL and relevant error]. Inspect the run and package state
+read-only first. Identify the root cause and whether some packages/tags were already published.
+Do not blindly rerun, delete/reuse published versions, weaken permissions, change registry settings
+or expose credentials. Propose the smallest recovery and ask for approval before changes or retry.
+Any code fix needs validation, a new local review commit and a pause before push.
+```
+
+### Try a snapshot before stable release
+
+```text
+Assess a next-tag snapshot for [merged scope] using release. Check workflow inputs, current branch,
+CI and package state first. Explain the exact dispatch, expected versions/dist-tag and install
+commands; distinguish snapshot publication from a stable release.
+Do not dispatch or publish until I explicitly approve that operation. Do not move latest or create
+stable release tags. Report unavailable checks and the cleanup/migration plan for test consumers.
+```
+
+### Synchronize after merge or release
+
+```text
+Synchronize after [merged work/release PR URL] using sync-after-merge.
+Check identity, remote state and local changes first; preserve unrelated work and never force-push.
+Confirm the PR really merged before removing its work branch. If Version Packages left main ahead
+of develop, explain the sync diff and open/reuse the main-to-develop synchronization PR only;
+do not merge it automatically. Stop on conflicts or decisions that change code.
+Report final branch/HEAD and anything still pending. Do not start another component or release.
+```
+
+## Keep dependencies up to date
+
+Dependabot opens weekly minor/patch pull requests into `develop`, CI classifies them and the
+scheduled workflows keep a **security** issue and a **dependency report** issue up to date. See
+[release and publishing](../publishing/#dependency-maintenance) for what is automatic.
+
+### Review a Dependabot pull request
+
+```text
+Review Dependabot PR [URL] read-only. Read the CI classification, the dependency review and the
+release notes of each update. Tell me whether it is development-only, a runtime update deferred
+to the release, or a change that needs a decision and a changeset (major, peer range, pinned stack).
+Check the failed checks if any. Recommend merge, changes or upgrade-stack; do not merge or push.
+```
+
+### Upgrade the stack or a major dependency
+
+```text
+Use upgrade-stack for [TypeScript 6.1 / Expo SDK 59 / React 20 / the open dependency report].
+Research the release notes, migration guides and compatibility matrix first, and tell me the
+consumer impact and the Cosmos semver of each package. Wait for my approval before changing
+manifests. Then upgrade with npm, migrate the code, update the pinned versions and Dependabot
+rules, validate every platform and add changesets with migration notes. Commit locally and pause.
+```
+
+### Fix a vulnerability
+
+```text
+Investigate the security issue [URL or advisory]. Say whether it reaches consumers (runtime of a
+published package), the apps or only development tooling, and whether a compatible fix exists.
+If the fix is a patch, apply it with npm, add a patch changeset for affected packages, validate,
+commit locally and pause. If it needs a major or the pinned stack, propose an upgrade-stack plan
+and wait. Never disable the audit or the dependency review to get green checks.
+```
+
+## Continue the conversation
+
+These are **separate messages at the appropriate stage**, not lines to append to the initial prompt.
+Replace `[SHA]` with the exact commit presented for local review.
+
+### Accept the proposed scope
+
+```text
+I approve the scope you just summarized, including its exclusions and deferred checks.
+Implement that agreement and run the checks. If a meaningful API, design or dependency decision
+changes, ask me again. Finish with a local commit and pause; this does not authorize push or PR.
+```
+
+### Request another iteration
+
+```text
+I tried commit [SHA]. Change [specific observation] to [expected result].
+Keep the rest of the accepted scope. Validate the adjustment, create a new commit on this work
+branch without amending earlier commits, and wait for me to review the new SHA. Do not push yet.
+```
+
+### Push the accepted commit and open the PR
+
+Use this only after checking the implementation and its reported limitations.
+
+```text
+I approve the reviewed commit [SHA] and its disclosed limitations. Use open-pr to verify identity,
+unchanged HEAD and validation evidence, push it and open or update its PR to develop.
+Report the URL and actual check status. Do not merge or publish.
+```
+
+### Resume in another chat
+
+```text
+Resume [task] on branch [branch] at commit [SHA]. Read the accepted design, current diff and
+validation evidence: [file locations or previous handoff].
+Summarize what is done, pending and unverified before continuing. Do not infer scope or push
+approval from this message; ask again if the previous agreement/evidence cannot be recovered.
+```
+
+For the complete delivery process, see [Git workflow](../git-workflow/) and
+[release and publishing](../publishing/). Opening a work PR is not a request to create a release.

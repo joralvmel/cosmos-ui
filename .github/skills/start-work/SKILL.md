@@ -18,7 +18,10 @@ Main agent: `github-ops`. Read `AGENTS.md` first.
 2. `git fetch origin --prune`, `git switch develop`, `git pull --ff-only`.
 3. Build the branch name `<type>/<scope>-<description>`: lowercase, words separated by `-`, only `[a-z0-9-]`, at most 50 characters; scope is the package or area (`elements`, `docs`, `tokens`…). Example: `feat/elements-switch`.
 4. `git switch -c <branch>`.
-5. With an issue: `gh issue develop <number> --base develop --name <branch> --checkout` instead (links the branch to the issue), and assign it with `gh issue edit <number> --add-assignee @me`.
+5. With an issue, retain its number for the eventual PR (`Closes #<number>`). Follow the
+   [component workflow](../../../docs/conventions/component-workflow.md): keep the branch local
+   until the user accepts the implementation commit. Do not use `gh issue develop` to create a
+   remote branch or otherwise perform the deferred push/PR step during local preparation.
 6. For component work, run `component-status` first to confirm the component and its dependencies.
 
 ## Files
@@ -29,7 +32,7 @@ Main agent: `github-ops`. Read `AGENTS.md` first.
 
 - [ ] develop up to date
 - [ ] Branch name normalized
-- [ ] Issue linked (if any)
+- [ ] Issue noted for the approved PR (if any)
 
 ## Done
 

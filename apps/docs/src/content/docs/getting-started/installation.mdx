@@ -94,3 +94,29 @@ system; without `data-mode` the light mode is used.
 
 Utilities such as `bg-primary`, `text-fg-muted`, `rounded-md`, `dark:bg-surface` or
 `theme-nebula:text-accent` use the Cosmos tokens.
+
+## Stay up to date
+
+Cosmos packages are released together through Changesets; while versions are `0.x`, a **minor**
+release may contain breaking changes. Read the package changelogs (GitHub Releases) before
+updating and follow their migration notes. To get update pull requests in your app, group the
+Cosmos packages in its Dependabot configuration so they move together:
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      cosmos:
+        patterns: ['@joralvmel/cosmos-*']
+```
+
+## Adopt Cosmos in an existing app
+
+Replace one component at a time and keep the old one until the new one passes your checks. An
+assistant can plan the order for you from the app's repository: see
+[plan replacing an app's components](../../contribute/prompt-cookbook/#plan-replacing-an-apps-components-with-cosmos).
+To keep your current colors, create a [theme from your palette](../../theming/themes/#keep-an-existing-palette).

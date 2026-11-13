@@ -1,0 +1,455 @@
+---
+title: Recetario de prompts
+description: Prompts para copiar organizados por tarea, desde investigar y crear componentes hasta corregir errores, probar y revisar cambios locales.
+sidebar:
+  order: 3
+---
+
+Usa estos prompts en el **chat principal abierto en este repositorio**. Ese chat coordina a los
+especialistas; no necesitas cambiar de agente en cada paso. Puedes escribir en lenguaje natural,
+sin un comando con `/`. Nombres como `create-component` son skills existentes, no comandos nuevos.
+
+Sustituye los valores entre `[corchetes]` y adjunta los archivos, capturas, issues o logs relevantes.
+Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un prompt.
+
+## Elige tu tarea
+
+| Quiero… | Empieza aquí | Skill o rol |
+| --- | --- | --- |
+| Decidir qué crear después | [Explorar el catálogo](#explorar-el-catálogo) | `component-status`, `researcher` |
+| Crear un componente | [Crear desde una necesidad](#crear-desde-una-necesidad) | `create-component` |
+| Partir de un diseño de Figma | [Crear desde un diseño](#crear-desde-un-diseño) | `component-from-design` |
+| Copiar una paleta o imitar otro proyecto | [Usar una referencia](#usar-una-referencia) | `use-reference` |
+| Añadir una función o cambiar la API | [Ampliar el comportamiento](#ampliar-el-comportamiento) | `modify-component` |
+| Pulir un componente existente | [Mejorar la apariencia](#mejorar-la-apariencia) | `modify-component`, `design-system` |
+| Corregir un error | [Reproducir y corregir un bug](#reproducir-y-corregir-un-bug) | `modify-component`, `test-engineer` |
+| Corregir diferencias entre plataformas | [Recuperar la paridad](#recuperar-la-paridad) | Especialista del framework o nativo |
+| Mejorar ejemplos o controles | [Actualizar documentación y demos](#actualizar-documentación-y-demos) | `add-playground`, `docs-writer` |
+| Revisar la calidad sin editar | [Revisar sin cambiar archivos](#revisar-sin-cambiar-archivos) | `reviewer`, `test-engineer` |
+| Cubrir un comportamiento con tests | [Añadir pruebas concretas](#añadir-pruebas-concretas) | `add-contract-tests` |
+| Añadir un tema, token o gráfica | [Otras tareas de la librería](#otras-tareas-de-la-librería) | `add-theme`, `add-token`, `create-chart` |
+| Revisar y entregar el resultado | [Continuar la conversación](#continuar-la-conversación) | `finish-work`, `open-pr` |
+| Preparar o verificar una release | [Releases y mantenimiento](#releases-y-mantenimiento) | `release-pr`, `release`, `sync-after-merge` |
+| Actualizar dependencias o corregir una vulnerabilidad | [Mantener las dependencias al día](#mantener-las-dependencias-al-día) | `upgrade-stack`, `devops` |
+
+### Qué incluye toda implementación
+
+El [flujo de componentes](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-workflow.md)
+ya exige aprobar el alcance de nuevos comportamientos tras investigar, mantener la paridad del
+contrato y las plataformas, pruebas adecuadas, docs EN/ES, referencias de IA y changesets para los
+paquetes publicables modificados. Corregir un bug concreto dentro del contrato aceptado no requiere
+otra entrevista de funcionalidades.
+
+La implementación termina con un **commit local validado y una pausa**. Ni el prompt inicial ni
+la aprobación del alcance autorizan push, PR, merge o release. Investigar o revisar en modo solo
+lectura no autoriza ediciones ni commits. Si falta un navegador, dispositivo o herramienta, el
+agente debe indicarlo en vez de dar la comprobación por superada.
+
+## Empezar un componente
+
+### Explorar el catálogo
+
+Úsalo si quieres recomendaciones, todavía no una implementación.
+
+```text
+Revisa el inventario actual de componentes y sus dependencias. Recomiéndame tres candidatos
+para crear después, ordenados por utilidad, esfuerzo y lo que desbloquean. Investiga el candidato
+más prometedor y distingue funciones obligatorias, recomendadas y opcionales, con fuentes y
+diferencias entre plataformas. Presenta las decisiones que debería tomar a continuación.
+Es una tarea de solo lectura: no generes archivos, no hagas commit ni push.
+```
+
+### Crear desde una necesidad
+
+`badge` es un ejemplo, no una petición de añadir todas las funciones que aparezcan al investigar.
+
+```text
+Crea el componente badge siguiendo create-component. El objetivo es comunicar un estado breve
+o un recuento en web, React, Angular y React Native.
+
+Revisa el inventario e investiga primero. Recomienda un alcance inicial útil y después pregúntame
+en bloques pequeños sobre variantes, tamaños, personalización, contenido, accesibilidad y
+diferencias entre plataformas. Explica qué incluir, excluir o aplazar; espera mi aprobación antes
+de generar archivos o editar el contrato.
+
+Tras aprobarlo, implementa y valida lo acordado end-to-end, con controles representativos en las
+demos. Crea un commit local, muestra el SHA y cómo probarlo, y espera sin hacer push ni PR.
+```
+
+### Crear desde un diseño
+
+Una captura no especifica el teclado, la propiedad del estado ni todas las interacciones nativas.
+
+```text
+Usa component-from-design para [componente] con esta referencia: [enlace al frame de Figma o captura].
+El uso previsto es [necesidad del usuario]. Comprueba si ya existe un componente que lo resuelva.
+
+Investiga el patrón de interacción y relaciona el diseño con los tokens actuales. Indica qué
+define la referencia, qué falta y qué diferencias entre plataformas requieren una decisión.
+Pregúntame antes de elegir comportamientos no visibles o añadir tokens/dependencias. Espera la
+aprobación del alcance y diseño, y completa lo acordado en todas las plataformas aplicables.
+Valida, crea un commit local y espera mi revisión.
+```
+
+## Usar una referencia
+
+Cosmos tiene sus propios componentes: otro proyecto es **evidencia para una decisión cada vez**,
+nunca una biblioteca que portar. La [convención de referencias](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/reference-projects.md)
+mantiene las fuentes en solo lectura y su identidad fuera del repositorio. `use-reference` tiene
+tres modos.
+
+### Copiar una paleta a un tema
+
+Tus propios colores pueden copiarse tal cual a un **tema nuevo con nombre**; los temas incluidos no cambian.
+
+```text
+Usa use-reference en modo paleta con [archivo de tema del otro proyecto]. Inspecciónalo en solo
+lectura. Crea un tema de Cosmos llamado [nombre] con add-theme que conserve esos colores en modo
+claro y oscuro: los colores de marca como semillas y los valores exactos por rol semántico con
+overrides por modo.
+Muéstrame primero el mapeo de roles y la validación. Si un par copiado no cumple WCAG AA o las
+comprobaciones de visión del color, explícalo y propón el valor más cercano que sí cumpla; no bajes
+los umbrales. Indica lo que el tema no puede expresar (fuentes, espaciado, movimiento). Espera mi
+aprobación; después implementa, valida en web y nativo, haz commit local y para sin push ni PR.
+```
+
+### Imitar un comportamiento o estilo en un componente
+
+Añade la referencia a una petición normal de crear o modificar; el contrato de Cosmos sigue mandando.
+
+```text
+Usa modify-component para [componente]. Como referencia, mira en solo lectura [archivo, captura o
+enlace]: quiero [el gesto de deslizar para cerrar / la densidad compacta / la animación] que tiene.
+Describe qué hace la referencia (estados, interacción, accesibilidad, plataformas) y qué cubre ya
+Cosmos. Recomienda cómo llevar ese aspecto al contrato actual, pregúntame lo que falte decidir y
+espera mi aprobación. No copies sus props, código ni textos. Tras aprobarlo, implementa en todas
+las plataformas, valida, haz commit local y para.
+```
+
+### Planificar la sustitución de los componentes de una app
+
+Ejecútalo **en el repositorio de la app**. Sustituye un componente cada vez, en pasos separados y autorizados.
+
+```text
+Con use-reference de Cosmos (modo plan de sustitución), planifica cómo adopta Cosmos esta app.
+Inspecciona la app en solo lectura: versiones instaladas, providers, tema, imports y los componentes
+de UI que define. Lista cada uno con su equivalente en Cosmos (estable, en progreso, planificado o
+ausente), las carencias y un orden de sustitución con comprobaciones de aceptación y rollback.
+Las capacidades que falten se convierten en peticiones a Cosmos, no en código de la app dentro de
+Cosmos. No edites la app, no instales paquetes, no hagas commit ni push. Pregúntame qué primera
+sustitución implementar.
+```
+
+## Evolucionar un componente existente
+
+### Ampliar el comportamiento
+
+Describe el resultado para el usuario antes de imponer un nombre de prop. Si la capacidad ya
+existe, el agente debe explicar cómo usarla en vez de crear otra API.
+
+```text
+Usa modify-component para [componente]. Necesito que el usuario pueda [resultado deseado].
+Ejemplo de uso: [entrada, interacción y resultado esperado].
+
+Revisa primero la API, los escenarios y la documentación actuales. Si ya está soportado, explícame
+cómo usarlo y no hagas cambios innecesarios. Si no, investiga alternativas, recomienda una API y
+explica compatibilidad, accesibilidad y diferencias web/nativo. Pídeme aprobar el alcance antes
+de editar. Tras aprobarlo, actualiza contrato, plataformas afectadas, controles, pruebas y docs.
+Indica el impacto de versión y añade el changeset necesario. Crea un commit local y espera sin
+hacer push ni PR.
+```
+
+### Mejorar la apariencia
+
+Separa un ajuste visual de una nueva API pública de personalización.
+
+```text
+Pule la apariencia de [componente]. Problema actual: [qué se ve mal].
+Resultado deseado: [descripción o referencia adjunta]. Mantén el comportamiento y la API existentes.
+
+Revisa los tokens y puntos de personalización actuales; propón el ajuste coherente más pequeño.
+Si requiere una prop, token, dependencia o comportamiento nuevo, explícalo y pregunta antes de
+ampliar el alcance. Comprueba claro/oscuro, al menos dos temas, pantallas estrechas/anchas y los
+estados de foco/deshabilitado relevantes en las demos web y nativa afectadas. Actualiza los
+ejemplos visuales necesarios, valida y crea un nuevo commit local de revisión. No hagas push.
+```
+
+### Planificar un cambio incompatible
+
+```text
+Estoy valorando cambiar [API actual] por [API deseada] en [componente].
+Investiga las alternativas e indica consumidores/plataformas afectados, pasos de migración,
+impacto de versión y una opción compatible si existe. No edites archivos todavía. Pídeme elegir
+el enfoque antes de implementar un cambio incompatible.
+```
+
+## Diagnosticar y corregir
+
+### Reproducir y corregir un bug
+
+Da hechos observables; una causa sospechada es una hipótesis, no una condición para la solución.
+
+```text
+Corrige este bug en [componente] sin rediseñar su API.
+Entorno: [framework/plataforma, versiones relevantes, navegador o dispositivo].
+Reproducción: [pasos mínimos numerados o ejemplo adjunto].
+Esperado: [comportamiento observable].
+Actual: [comportamiento observable y error/log relevante].
+Frecuencia: [siempre, intermitente o condiciones conocidas].
+
+Reprodúcelo primero y encuentra la causa raíz. Si no puedes reproducirlo, explica qué información
+falta en vez de adivinar. Añade una regresión concreta que falle antes del arreglo y pase después,
+preserva el comportamiento existente y revisa la integración/consola de la plataforma afectada.
+Si la solución requiere cambiar la API o el alcance, pregunta antes. Valida, crea un commit local
+y muéstrame las evidencias y los pasos para volver a probarlo. Espera sin hacer push ni PR.
+```
+
+### Recuperar la paridad
+
+```text
+[Componente] se comporta distinto entre [plataforma A] y [plataforma B].
+El contrato compartido indica [regla esperada]. Reprodúcelo con [pasos o ejemplo].
+
+Compara ambas implementaciones y su integración de wrappers/eventos. Corrige la causa específica
+sin duplicar comportamiento en los adaptadores. Si la diferencia es intencional o el contrato
+no la resuelve, explica las opciones y pregúntame antes de cambiarlo. Prueba la integración,
+controles y consola afectados. Separa React Native Web, tests con mocks, builds nativos y resultados
+en dispositivos reales; declara los entornos no disponibles. Crea un commit local y espera mi revisión.
+```
+
+## Mejorar evidencias y ejemplos
+
+### Actualizar documentación y demos
+
+```text
+Mejora las docs y demos de [componente] sin añadir comportamiento nuevo al componente.
+Caso de uso que quiero explicar: [tarea del usuario].
+Ejemplos/controles ausentes o confusos: [observaciones].
+
+Revisa primero el contrato real. Mantén las tablas y snippets generados vinculados a él; muestra
+uso normal, estados relevantes, personalización y limitaciones, no solo el aspecto por defecto.
+Actualiza las páginas EN/ES y los controles aplicables del Playground/demo nativa. Prueba los
+ejemplos y controles en los entornos disponibles, revisando teclado, cambios de estado y consola.
+Informa de carencias del contrato o controles en vez de inventar una API. Valida los archivos
+afectados, crea un commit local y espera mi revisión.
+```
+
+### Revisar sin cambiar archivos
+
+```text
+Usa reviewer para revisar [componente o rama actual] frente a develop y al alcance aceptado.
+Busca problemas de funcionamiento, accesibilidad, paridad de API/plataformas, controles
+representativos, coste del bundle y evidencias de ejecución ausentes. Informa solo de hallazgos
+accionables de alta confianza con ubicación, gravedad y pasos de reproducción cuando sea posible.
+Distingue los fallos reales de las comprobaciones no disponibles.
+No edites archivos, no hagas commit ni push y no abras una PR.
+```
+
+Para una revisión centrada en accesibilidad, añade el escenario de teclado, etiquetado, foco,
+movimiento o lector de pantalla relevante. Las comprobaciones automáticas no prueban por sí solas
+la accesibilidad.
+
+### Añadir pruebas concretas
+
+```text
+Añade cobertura concreta para [componente], usando add-contract-tests cuando corresponda.
+Comportamiento sin cubrir: [escenario y resultado esperado según el contrato aceptado].
+Cubre la integración de plataformas y casos límite relevantes, no detalles internos ni getters
+triviales. No cambies la API ni persigas un porcentaje de cobertura. Si las pruebas descubren
+un bug de comportamiento, infórmalo y acuerda el alcance del arreglo antes de ampliar esta tarea.
+Ejecuta los tests y comprobaciones requeridas, distingue mocks de evidencias de ejecución,
+crea un commit local y espera sin hacer push ni PR.
+```
+
+## Otras tareas de la librería
+
+### Añadir un tema o token
+
+```text
+Usa design-system con add-theme/add-token según corresponda.
+Necesito [objetivo visual y usos afectados]. Comprueba primero si los temas/tokens actuales ya lo
+resuelven. Recomienda opciones para claro/oscuro, roles semánticos, paridad web/nativo y
+accesibilidad; pregúntame antes de añadir tokens públicos o decidir el diseño. Tras aprobarlo,
+usa el generador para un tema nuevo, valida contraste sin bajar umbrales, actualiza galerías/docs
+y añade el changeset necesario. Crea un commit local y espera mi revisión.
+```
+
+### Crear una gráfica
+
+```text
+Crea [tipo de gráfica] siguiendo create-chart para [estructura de datos y pregunta del usuario].
+Investiga primero representaciones accesibles, interacciones, límites de datos y diferencias
+web/nativo. Recomienda un alcance inicial y pregúntame por ejes, etiquetas, estados vacíos/de error,
+personalización, texto/tabla alternativos e interacciones antes de generar archivos.
+Tras aprobarlo, implementa el layout puro compartido y los renderizadores aplicables, ejemplos
+y pruebas. Informa del coste del bundle y separa las evidencias de ejecución de los builds.
+Crea un commit local y espera sin hacer push ni PR.
+```
+
+## Releases y mantenimiento
+
+Una PR de trabajo va a `develop`; publicar es otra decisión. El flujo estable es
+`develop → main` (merge commit), después la PR generada **Version Packages** y finalmente publicación.
+Consulta [releases y publicación](../publishing/) para la configuración y los comandos. Estos prompts
+no autorizan merges automáticos, cambios en permisos de publicación ni publicar trabajo sin integrar.
+
+### Planificar la siguiente release
+
+```text
+Evalúa si develop está listo para una release estable. Es solo lectura.
+Revisa el estado remoto actual, trabajo integrado, CI y changesets pendientes frente a origin/main.
+Lista paquetes afectados, incrementos previstos, cambios incompatibles/notas de migración y
+evidencias pendientes. Distingue cambios de paquetes de docs/herramientas privadas sin changeset.
+Recomienda publicar ahora o qué falta. No cambies versiones/changelogs, ejecutes workflows,
+abras o fusiones PRs, subas tags ni publiques.
+```
+
+### Abrir la PR de release
+
+```text
+Autorizo abrir la PR de release para los cambios ya integrados en develop.
+Usa release-pr: verifica identidad, remoto, checks verdes y changesets pendientes. Reutiliza una
+PR de release develop-a-main si ya está abierta; detente si hay conflictos o faltan evidencias.
+Resume paquetes, incrementos, novedades y migración, e informa de URL/checks.
+No hagas merge, edites versiones/changelogs a mano ni publiques. Espera mi revisión; cuando se
+apruebe, la promoción de release debe usar merge commit, no squash.
+```
+
+### Revisar Version Packages
+
+```text
+Revisa la PR generada Version Packages [URL] sin editar ni fusionar.
+Compara versiones, actualizaciones de dependencias y changelogs con los changesets aceptados y el
+historial de releases. Revisa CI y detecta paquetes, incrementos o notas de migración inesperados
+o ausentes. Explica qué publicará su merge y qué aprobaciones faltan. No publiques, ejecutes
+workflows ni alteres archivos generados; informa de bloqueos y espera mi decisión.
+```
+
+### Verificar la publicación y probar como consumidor
+
+```text
+Verifica la release [versión o URL del workflow] sin cambiar el repositorio.
+Comprueba resultados reales de workflows, versiones/dist-tags y procedencia en npm, tags de Git,
+GitHub Releases y despliegue de docs. Separa paquetes publicados, pendientes y fallidos; CI verde
+no demuestra por sí solo que npm haya publicado.
+Dame los comandos exactos de instalación/versión y pruebas básicas para [React/Angular/web/
+React Native] usando paquetes publicados en un consumidor aislado, no enlaces al workspace.
+No instales ni modifiques ese consumidor todavía. Informa de comprobaciones pendientes de
+compatibilidad/ejecución en vez de darlas por superadas.
+```
+
+### Diagnosticar una publicación fallida
+
+```text
+Diagnostica la release fallida [URL del workflow y error relevante]. Primero inspecciona el run
+y el estado de los paquetes en solo lectura. Identifica la causa raíz y si ya se publicaron
+algunos paquetes/tags. No reintentes a ciegas, borres/reutilices versiones publicadas, debilites
+permisos, cambies registros ni expongas credenciales. Propón la recuperación mínima y pide
+aprobación antes de cambios o reintentos. Un arreglo de código necesita validación, nuevo commit
+local de revisión y pausa antes del push.
+```
+
+### Probar un snapshot antes de la release estable
+
+```text
+Evalúa un snapshot con tag next para [alcance integrado] usando release. Primero revisa inputs
+del workflow, rama actual, CI y estado de paquetes. Explica la ejecución exacta, versiones/dist-tag
+previstos y comandos de instalación; distingue el snapshot de una release estable.
+No ejecutes ni publiques hasta que apruebe explícitamente esa operación. No muevas latest ni crees
+tags de release estable. Indica comprobaciones no disponibles y cómo migrar o limpiar consumidores
+de prueba después.
+```
+
+### Sincronizar tras merge o release
+
+```text
+Sincroniza tras [URL de la PR de trabajo/release fusionada] usando sync-after-merge.
+Comprueba identidad, estado remoto y cambios locales primero; conserva trabajo ajeno y nunca
+hagas force-push. Confirma que la PR se fusionó antes de borrar su rama de trabajo.
+Si Version Packages dejó main adelantado respecto de develop, explica el diff de sincronización
+y solo abre/reutiliza la PR main-a-develop; no la fusiones automáticamente. Detente ante conflictos
+o decisiones que cambien código. Informa de rama/HEAD final y pendientes.
+No empieces otro componente ni otra release.
+```
+
+## Mantener las dependencias al día
+
+Dependabot abre cada semana PRs de versiones minor/patch hacia `develop`, la CI las clasifica y
+los workflows programados mantienen al día una issue de **seguridad** y otra de **informe de
+dependencias**. Consulta [release y publicación](../publishing/#mantenimiento-de-dependencias)
+para ver qué es automático.
+
+### Revisar una PR de Dependabot
+
+```text
+Revisa la PR de Dependabot [URL] en solo lectura. Lee la clasificación de la CI, la revisión de
+dependencias y las notas de versión de cada actualización. Dime si es solo de desarrollo, una
+actualización de runtime que se aplaza a la release o un cambio que necesita una decisión y un
+changeset (major, rango de peer, stack fijado). Revisa los checks fallidos si los hay. Recomienda
+merge, cambios o upgrade-stack; no hagas merge ni push.
+```
+
+### Actualizar el stack o una dependencia major
+
+```text
+Usa upgrade-stack para [TypeScript 6.1 / Expo SDK 59 / React 20 / la issue del informe de dependencias].
+Investiga primero las notas de versión, las guías de migración y la matriz de compatibilidad, y
+dime el impacto para los consumidores y el semver de cada paquete de Cosmos. Espera mi aprobación
+antes de cambiar manifiestos. Después actualiza con npm, migra el código, actualiza las versiones
+fijadas y las reglas de Dependabot, valida todas las plataformas y añade changesets con notas de
+migración. Haz commit local y para.
+```
+
+### Corregir una vulnerabilidad
+
+```text
+Investiga la issue de seguridad [URL o advisory]. Indica si llega a los consumidores (runtime de un
+paquete publicado), a las apps o solo a herramientas de desarrollo, y si existe una corrección
+compatible. Si es un patch, aplícalo con npm, añade un changeset patch para los paquetes afectados,
+valida, haz commit local y para. Si necesita una major o el stack fijado, propón un plan con
+upgrade-stack y espera. Nunca desactives la auditoría ni la revisión de dependencias para tener
+los checks en verde.
+```
+
+## Continuar la conversación
+
+Son **mensajes separados para cada momento**, no líneas para añadir al prompt inicial.
+Sustituye `[SHA]` por el commit exacto presentado para revisión local.
+
+### Aceptar el alcance propuesto
+
+```text
+Apruebo el alcance que acabas de resumir, con sus exclusiones y comprobaciones aplazadas.
+Implementa ese acuerdo y ejecuta las pruebas. Si cambia una decisión relevante de API, diseño
+o dependencias, vuelve a preguntarme. Termina con un commit local y espera; esto no autoriza push ni PR.
+```
+
+### Pedir otra iteración
+
+```text
+Probé el commit [SHA]. Cambia [observación concreta] para que [resultado esperado].
+Mantén el resto del alcance aceptado. Valida el ajuste, crea un nuevo commit en esta rama de
+trabajo sin modificar los anteriores con amend y espera a que revise el nuevo SHA. No hagas push.
+```
+
+### Subir el commit aceptado y abrir la PR
+
+Úsalo solo después de comprobar la implementación y sus limitaciones declaradas.
+
+```text
+Apruebo el commit revisado [SHA] y sus limitaciones declaradas. Usa open-pr para verificar la
+identidad, que HEAD no haya cambiado y las evidencias de validación; haz push y abre o actualiza
+su PR a develop. Informa de la URL y del estado real de los checks. No hagas merge ni publiques.
+```
+
+### Retomar en otro chat
+
+```text
+Retoma [tarea] en la rama [rama], commit [SHA]. Lee el diseño aceptado, el diff actual y las
+evidencias de validación: [ubicaciones o resumen de entrega anterior].
+Resume lo terminado, pendiente y no verificado antes de continuar. Este mensaje no autoriza
+alcance ni push; vuelve a preguntar si no puedes recuperar el acuerdo o las evidencias anteriores.
+```
+
+Para el proceso completo de entrega, consulta el [flujo de Git](../git-workflow/) y
+[versiones y publicación](../publishing/). Abrir una PR de trabajo no equivale a pedir una release.

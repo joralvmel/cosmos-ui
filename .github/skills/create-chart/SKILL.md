@@ -14,11 +14,17 @@ Main agent: `chart-builder`. Read `AGENTS.md` first.
 
 ## Steps
 
+Follow the [component workflow](../../../docs/conventions/component-workflow.md): research the
+pattern, ask about data, interactions, accessibility, visual customization and web/native limits,
+then stop for scope/design approval before generation. Record the accepted decisions first.
+
 1. Run `npm run generate -- chart <name>`.
 2. Implement the layout as a pure function; test geometry, ticks, empty and edge data.
 3. Render SVG in `packages/charts` with theme colors and an accessible description/data table.
 4. Render in `packages/charts-native` with `react-native-svg` using the same layout.
 5. Write docs pages (EN + ES) with examples.
+6. Collect the workflow's relevant browser/native evidence and limitations. Use `finish-work` for
+   the local commit and review pause; no push or PR before approval of that HEAD.
 
 ## Files
 

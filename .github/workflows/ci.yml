@@ -72,8 +72,37 @@ jobs:
 
       # Fails when a publishable package changed without a changeset (`npm run changeset`).
       # Same-repository main -> develop syncs contain already-published, consumed changesets.
+      # Dependabot pull requests are classified by the next step instead.
       - name: Check changesets
         if: >-
           !(github.head_ref == 'main' && github.base_ref == 'develop' &&
-            github.event.pull_request.head.repo.full_name == github.repository)
+            github.event.pull_request.head.repo.full_name == github.repository) &&
+          github.event.pull_request.user.login != 'dependabot[bot]'
         run: npx changeset status --since=origin/${{ github.base_ref }}
+
+      # Development and runtime patch/minor updates pass (runtime ones get a changeset before the
+      # release with `npm run deps:changeset`); majors, peers and the pinned stack need one here.
+      - name: Classify dependency updates (Dependabot)
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: node tools/deps/dependency-changes.mjs pr --base "origin/$BASE_REF"
+
+      - name: Released runtime dependency updates have changesets
+        if: github.base_ref == 'main' && github.head_ref == 'develop'
+        run: node tools/deps/dependency-changes.mjs release --base origin/main
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Blocks new dependencies with known high/critical vulnerabilities or a license outside the list.
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high
+          allow-licenses: >-
+            MIT, MIT-0, ISC, 0BSD, BSD-2-Clause, BSD-3-Clause, Apache-2.0, BlueOak-1.0.0,
+            CC0-1.0, CC-BY-3.0, CC-BY-4.0, OFL-1.1, Python-2.0, Unlicense, MPL-2.0

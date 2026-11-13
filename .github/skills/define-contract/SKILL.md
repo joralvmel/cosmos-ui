@@ -14,6 +14,11 @@ Main agent: `architect`. Read `AGENTS.md` first.
 
 ## Steps
 
+Before editing, confirm accepted scope/design under the
+[component workflow](../../../docs/conventions/component-workflow.md). The main conversation must
+ask research-led questions and obtain approval first; do not invent defaults or public features to
+fill gaps. New components use the generated scaffold, not hand-written replacement files.
+
 1. Open or create `packages/core/src/specs/<name>.ts` with `defineContract` (the generator creates it for new components).
 2. Declare props with type, default, `reflect` (styling props) and `platforms` when not universal.
 3. Declare events with `names: { dom, react, angular, native }` following ADR 0003 and a `<Name><Event>Detail` type.

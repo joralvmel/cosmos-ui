@@ -1,6 +1,6 @@
 ---
 name: finish-work
-description: 'Finishes a task: validates, pushes the branch and opens a pull request to develop with the template filled, labels and reviewers; optionally requests a Copilot review.'
+description: 'Validates implementation work, creates a local commit and pauses for user testing; pushes and opens a PR only after approval of that HEAD.'
 argument-hint: 'Pull request title (Conventional Commits)'
 agent: agent
 ---
@@ -10,3 +10,8 @@ Act as the `github-ops` agent ([definition](../agents/github-ops.agent.md)) and 
 
 - Pull request title (Conventional Commits): ${input:arg1}
 - Issue number (optional): ${input:arg2}
+
+Follow the [component workflow](../../docs/conventions/component-workflow.md): automatically commit
+validated task changes locally, report the SHA and local test steps, then stop without push/PR.
+Requested revisions get new commits and another pause. Resume remote delivery only after explicit
+acceptance of the unchanged reviewed HEAD, not merely because this prompt was invoked.

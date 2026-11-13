@@ -23,6 +23,31 @@ The repository ships a team of specialized agents (`.github/agents/`) and step-b
 Other assistants (Codex, Claude Code, Cursor…) read `AGENTS.md`; point them to a skill file, e.g.
 "follow `.github/skills/create-component/SKILL.md` for `switch`".
 
+## Research, decisions and local review
+
+Follow the [component workflow](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-workflow.md).
+The main chat coordinates specialists and keeps the conversation with you:
+
+1. The researcher compares standards and public implementations, with licenses, platform
+   differences and costs. Its recommendation is not permission to implement everything.
+2. Copilot presents required, recommended and optional features, then asks small batches of
+   design/API questions. You approve what is included, excluded or deferred **before generation
+   or contract edits**. Examples do not silently become special cases or exclusive feature lists.
+3. Agents implement the accepted scope and run checks themselves. The evidence report distinguishes
+   actual browser/wrapper checks, React Native Web, mocked tests, builds and Android/iOS runtime.
+   Unavailable tools, devices and screen-reader checks must be reported, not marked passed.
+4. `finish-work` validates and automatically creates a **local commit**, reports its SHA and how
+   to try it, then **waits without push or PR**. Request changes for another commit and review
+   pause, or accept that exact commit to authorize `open-pr` to push and create/reuse the PR.
+
+An initial request to implement and eventually open a PR is not approval of unseen changes.
+Approving the feature scope is different from accepting the implementation. A changed HEAD needs
+another review; agents do not amend earlier commits by default.
+
+The test and native agents include browser tools, and coordinating roles can delegate and ask
+interactive questions. Availability still depends on your harness and enabled tools. The workflow
+does not bypass editor permissions or add a new GitHub approval requirement.
+
 ## Agents
 
 <AgentsTable kind="agents" />
@@ -36,40 +61,21 @@ Other assistants (Codex, Claude Code, Cursor…) read `AGENTS.md`; point them to
 - **One task at a time**, with the outcome you expect: "Create the `switch` component for all
   platforms" rather than "work on forms".
 - **Give references**: an issue number, a Figma link, a pattern of the WAI-ARIA APG.
-- **Let them validate**: every skill ends with tests and `npx biome ci . && npx turbo run typecheck test
-  build`; ask for the output when in doubt.
+- **Let them validate**: implementation work includes tests and
+  `npx biome ci . && npx turbo run typecheck test build`. Research-only work returns sources, not
+  invented test results. Ask for the evidence and unavailable checks.
 - **Review before merging**: ask `reviewer` for a review of the branch.
 
 ## Copyable prompts
 
-```text
-/component-status all — and tell me which three components I should build next and why.
-```
+The [prompt cookbook](../prompt-cookbook/) organizes ready-to-copy examples by task:
 
-```text
-/start-work feat elements switch, linked to issue #12
-```
+- [Create a component or start from Figma](../prompt-cookbook/#start-a-component).
+- [Extend behavior, polish visuals or plan an API change](../prompt-cookbook/#evolve-an-existing-component).
+- [Reproduce a bug or restore platform parity](../prompt-cookbook/#diagnose-and-fix).
+- [Improve docs, demos, tests or a read-only review](../prompt-cookbook/#improve-evidence-and-examples).
+- [Add themes, tokens or charts](../prompt-cookbook/#other-library-work).
+- [Accept scope, request revisions, approve a PR or resume a chat](../prompt-cookbook/#continue-the-conversation).
 
-```text
-Use the component-builder agent: create the "switch" component (WAI-ARIA switch pattern) for web,
-React, Angular and React Native, with controlled and uncontrolled `checked` state and a `cosm-change`
-event. Follow the create-component skill and finish with the structure test.
-```
-
-```text
-/component-from-design https://www.figma.com/design/<file>?node-id=<node> as "chip"
-```
-
-```text
-Use the design-system agent: add a theme called "aurora" with a teal primary and a triadic harmony;
-it must pass the accessibility validation in light and dark.
-```
-
-```text
-Use the reviewer agent: review the current branch against develop and list only high-confidence
-problems.
-```
-
-```text
-/finish-work "feat(elements): add cosm-switch" closes #12
-```
+Use the [end-to-end example](../example-switch/) to follow a whole component through delivery;
+the [technical recipes](../recipes/) explain the implementation steps behind individual tasks.

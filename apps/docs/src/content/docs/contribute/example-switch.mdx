@@ -2,7 +2,7 @@
 title: 'Example: from issue to release'
 description: A complete walkthrough that creates the cosm-switch component with the agents and skills, from the issue to the npm release.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 This walkthrough adds `cosm-switch` (WAI-ARIA switch) on every platform. Each step names the skill to
@@ -28,15 +28,18 @@ Next suggested: icon, badge, avatar, divider, listbox
 ## 2. Issue and branch — `start-work`
 
 ```bash
-gh issue create --template component_request.yml --title "Component: switch"
-# → https://github.com/joralvmel/cosmos-ui/issues/12
-gh issue develop 12 --base develop --name feat/elements-switch --checkout
+git fetch origin
+git switch develop
+git pull --ff-only
+git switch -c feat/elements-switch
 ```
 
 ```text
-github.com/joralvmel/cosmos-ui/tree/feat/elements-switch
 Switched to a new branch 'feat/elements-switch'
 ```
+
+An optional existing issue (for example #12) is linked in the eventual PR. The work branch stays
+local until the implementation review is accepted.
 
 ## 3. Research — `research-reference`
 
@@ -45,12 +48,19 @@ The `researcher` agent summarizes the
 `aria-checked`, <kbd>Space</kbd> toggles, visible label, and recommends a native
 `<input type="checkbox" role="switch">` inside the Web Component (form participation for free).
 
-## 4. Contract — `define-contract`
+It also compares public implementations and returns required behavior separately from suggested
+sizes, states and customization. The main chat asks what to include or defer, presents tradeoffs
+and summarizes the proposed scope and web/native acceptance scenarios. **It waits for your scope
+and design approval before generating files or editing the contract.**
 
-The `architect` agent writes `packages/core/src/specs/switch.ts` (props `checked`, `disabled`,
+## 4. Accepted API plan — `define-contract`
+
+After acceptance, `architect` outlines the contract (for example props `checked`, `disabled`,
 `required`, `name`, `value`, `label`; event `change` → DOM `cosm-change`, React `onChange`, Angular
 `(checkedChange)`, React Native `onCheckedChange`; state `checked` with `defaultChecked`) and the shared
-scenarios (toggle by pointer and keyboard, disabled, controlled proposal without commit).
+scenarios (toggle by pointer and keyboard, disabled, controlled proposal without commit). These are
+illustrative decisions, not a feature list to assume. The contract files are finalized after the
+scaffold in step 6 and before platform behavior.
 
 ## 5. Visual spec — `design-component`
 
@@ -116,7 +126,9 @@ npm run status
 stable       1  switch
 ```
 
-When every piece exists, `component-builder` sets `status: 'stable'` in the catalog entry.
+The inventory checks structural completeness. Only mark the component `stable` when the accepted
+scope and required checks are complete, or the user explicitly deferred unavailable checks that
+remain disclosed. File presence does not prove runtime readiness.
 
 ## 10. Changeset — `add-changeset`
 
@@ -132,16 +144,25 @@ When every piece exists, `component-builder` sets `status: 'stable'` in the cata
 Add the Switch component (`cosm-switch`) on every platform.
 ```
 
-## 11. Pull request — `finish-work`
-
-```bash
-npx biome ci . && npx turbo run typecheck test build && npm run check-terms
-git push -u origin HEAD
-gh pr create --base develop --title "feat(elements): add cosm-switch" --body-file pr.md --label type:component
-```
+## 11. Local review, then pull request — `finish-work`, `open-pr`
 
 ```text
-https://github.com/joralvmel/cosmos-ui/pull/13
+/finish-work "feat(elements): add cosm-switch" closes #12
+```
+
+The agent runs repository checks and the relevant browser/wrapper/native scenarios, then verifies
+identity and automatically commits only the task files locally. It reports the branch, SHA,
+validation matrix and how to try the component. **It stops without pushing or opening a PR.**
+Mocks and exports are not native runtime evidence; unavailable devices/checks stay visible.
+
+Try that commit. If you request changes, the agent validates and creates a new commit, then waits
+again. It does not amend the previous commit by default.
+
+Only after you accept the current reviewed SHA does `open-pr` verify the unchanged HEAD, push the
+branch and open the PR to `develop` (or reuse its existing open PR). For example:
+
+```text
+I approve the reviewed commit <SHA>. Push it and open the PR to develop.
 ```
 
 CI runs lint, terms, typecheck, tests and build, the docs build (preview artifact), the changeset check
@@ -150,9 +171,10 @@ and commit hygiene; the labeler adds `pkg:core`, `pkg:elements`, `pkg:react`, `p
 
 ## 12. Review and merge
 
-Ask the `reviewer` agent for a review, address the comments and wait for the code owner approval. Merge
-with **Squash and merge** (the PR title becomes the commit message); the branch is deleted
-automatically.
+Ask `reviewer` for a review and address findings; fixes get another local commit and acceptance
+before pushing. GitHub approvals are optional, but checks and conversation resolution are required.
+The maintainer merges with **Squash and merge** (the PR title becomes the commit message); the
+branch is deleted automatically. Local acceptance does not authorize an automatic merge/release.
 
 ## 13. Back to develop — `sync-after-merge`
 

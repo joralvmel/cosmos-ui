@@ -2,7 +2,7 @@
 title: Flujo de Git
 description: Ramas, commits, pull requests, revisiones y releases en Cosmos UI.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 ## Ramas
@@ -27,18 +27,28 @@ pull request desde él.
 
 ## Pull requests
 
-1. `start-work` → trabajo → `finish-work` (valida, hace push y abre el pull request a `develop`).
-2. Obligatorio: checks en verde (lint, términos, typecheck, tests, build, paquetes, build de la
+1. `start-work` crea una rama local desde `develop` sincronizada. Para componentes se sigue el
+   [flujo de investigación y aprobación de alcance](../working-with-agents/#investigación-decisiones-y-revisión-local).
+2. `finish-work` valida, crea automáticamente un commit local, muestra el SHA y los pasos para
+   probarlo, y **espera sin push ni PR**. Los ajustes generan otro commit y otra pausa de revisión;
+   no se modifican los commits anteriores con amend por defecto.
+3. La aceptación explícita de ese HEAD sin cambios permite a `open-pr` verificar la identidad,
+   hacer push y abrir o reutilizar la PR a `develop`. La petición inicial o la aprobación del
+   alcance no aceptan cambios aún no vistos. Los nuevos commits de una PR abierta pasan por la
+   misma revisión local antes del push.
+4. Obligatorio: checks en verde (lint, términos, typecheck, tests, build, paquetes, build de la
    documentación, changeset, higiene de commits) y resolver las conversaciones de revisión. Las
    aprobaciones son opcionales.
-3. Squash merge: el título del pull request debe ser un Conventional Commit (lo comprueba la CI).
-4. `sync-after-merge` limpia la rama local.
+5. Squash merge: el título del pull request debe ser un Conventional Commit (lo comprueba la CI).
+6. `sync-after-merge` limpia la rama local.
 
 Las aprobaciones son opcionales en `main` y `develop`, para poder integrar los propios pull requests
 sin otro mantenedor. Esta política se aplica a todos los colaboradores: la protección clásica de un
 repositorio personal no admite excepciones individuales de revisión. Los pull requests, los checks
 obligatorios y la resolución de conversaciones siguen siendo obligatorios. Las revisiones de Copilot
 son orientativas, no aprobaciones.
+La pausa de revisión local del agente es independiente de las aprobaciones de GitHub y no cambia la
+protección de ramas. Aceptar los cambios locales no autoriza al agente a integrar ni publicar.
 
 ## Releases
 

@@ -1,0 +1,48 @@
+name: Dependabot auto-merge
+
+# Opt-in (repository variable COSMOS_DEPENDABOT_AUTOMERGE = "true"). Enables auto-merge only for
+# minor/patch updates of development tooling; the required checks still decide the merge. Nothing
+# from the pull request is installed or executed with the write token.
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  automerge:
+    name: Auto-merge development tooling updates
+    if: >-
+      vars.COSMOS_DEPENDABOT_AUTOMERGE == 'true' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Classify the update
+        id: classify
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: node tools/deps/dependency-changes.mjs automerge --base "origin/$BASE_REF" >> "$GITHUB_OUTPUT"
+
+      - name: Enable auto-merge (squash)
+        if: steps.classify.outputs.automerge == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR_URL"

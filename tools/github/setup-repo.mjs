@@ -16,11 +16,13 @@ export const requiredChecks = [
   'Changeset present',
   'Commit emails and PR title',
   'Build docs',
+  'Dependency review',
 ];
 
 export const MANUAL_STEPS = [
   'Settings → Secrets and variables → Actions → Secrets: add COSMOS_BLOCKED_TERMS (one term per line).',
   'Settings → Secrets and variables → Actions → Variables: set COSMOS_DOCS_ENABLED and COSMOS_PUBLISH_ENABLED to "true" when ready (see the Publishing guide).',
+  'Settings → Secrets and variables → Actions → Variables (optional): set COSMOS_DEPENDABOT_AUTOMERGE to "true" to auto-merge minor/patch development tooling updates once their checks pass.',
   'Settings → Pages → Build and deployment → Source: "GitHub Actions".',
   'Settings → Environments: create "npm" (optional: required reviewers before publishing) and "github-pages".',
   'Settings → Code security: enable secret scanning push protection (free for public repositories).',

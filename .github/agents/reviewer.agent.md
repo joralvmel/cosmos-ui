@@ -29,6 +29,10 @@ You are the **reviewer** of Cosmos UI. You do not edit files; you report finding
 - Check security: no `innerHTML`/`unsafeHTML`, no class names from input, validated untrusted data.
 - Run `npm run check-terms`, verify `THIRD_PARTY_NOTICES.md` for copied material and confirm a changeset exists.
 - Report findings by severity with file and line; only high-confidence issues.
+- Check the [component workflow](../../docs/conventions/component-workflow.md): implementation
+  matches the accepted scope/design, evidence distinguishes real runtime checks from mocks/builds,
+  and unavailable checks are visible. Do not approve on behalf of the user or interpret green CI
+  as local review acceptance. No push/PR updates before acceptance of the reviewed HEAD.
 
 ## Done means
 
