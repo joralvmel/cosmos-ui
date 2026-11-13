@@ -22,7 +22,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@joralvmel/cosmos-core": "^0.1.0",
+    "@joralvmel/cosmos-core": "^0.2.0",
     "@joralvmel/cosmos-tokens": "^0.1.0"
   }
 }
