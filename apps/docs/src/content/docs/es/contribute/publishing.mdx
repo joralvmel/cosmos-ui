@@ -28,8 +28,17 @@ changelogs, y publica en el registro público de npm con
 4. Al integrar **Version Packages** se ejecuta `changeset publish`: las nuevas versiones se publican en
    npm con provenance, se suben los tags de Git y se crea una GitHub Release por paquete.
 5. El workflow `Docs` despliega el sitio de documentación desde `main`.
+6. Sincroniza el `main` publicado con `develop` mediante una PR con **merge commit**, nunca
+   squash/rebase. Tras actualizar los remotos, verifica que
+   `git merge-base --is-ancestor origin/main origin/develop` termine correctamente. Igualar los
+   archivos no basta: conservar el historial evita conflictos repetidos.
 
 </Steps>
+
+`release-pr` distingue una evaluación de solo lectura de la preparación. Preparar incluye arreglos
+locales seguros de sincronización, changesets de dependencias y conflictos, con validación y commit
+local para revisar antes del push. Continúa tras integrar las PRs previas; el merge y la publicación
+siguen necesitando aprobación explícita. Usa [el prompt de preparación](../prompt-cookbook/#preparar-y-abrir-la-pr-de-release).
 
 Prereleases: ejecuta a mano el workflow `Release` sobre `develop` (Actions → Release → Run workflow).
 Publica un snapshot como `0.2.0-next-20261110120000` con el dist-tag `next`:
@@ -110,6 +119,8 @@ request o release ejecuta todos los checks. Prompts: [mantener las dependencias 
 
 | Síntoma | Solución |
 | --- | --- |
+| La promoción de release tiene conflictos tras una sincronización anterior | Comprueba el historial, no solo la igualdad de archivos. Prepara un arreglo de sincronización con `release-pr`; conserva los metadatos publicados y el trabajo nuevo de develop, regenera el lockfile con npm y fusiona la sincronización con merge commit. |
+| La protección de historial lineal bloquea el merge commit de sincronización | Con aprobación del mantenedor, aplica la política revisada de `setup-repo`. Permite merge commits conservando PRs, checks obligatorios y protecciones contra force-push y borrado. No uses squash como atajo. |
 | La PR de release falla en "Released runtime dependency updates have changesets" | Ejecuta `npm run deps:changeset` en una rama de trabajo de `develop` e intégrala antes de la release. |
 | Una PR de Dependabot falla en "Classify dependency updates" | Necesita una decisión: revísala con `upgrade-stack` y añade un changeset a la PR. |
 | `E404` / `ENEEDAUTH` al publicar | El trusted publisher no coincide: revisa owner, repositorio, nombre del workflow y entorno. |

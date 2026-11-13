@@ -22,7 +22,8 @@ Thanks for helping! The full guide lives in the docs site:
    commit and review cycle, or approve it to authorize push and PR creation.
 8. **Pull request** to `develop` using the template. CI must be green and review conversations resolved;
    approvals are optional.
-   Pull requests are squash-merged; the PR title becomes the commit message.
+   Work pull requests are squash-merged; the PR title becomes the commit message. Release promotion
+   and main-to-develop synchronization PRs use merge commits to preserve ancestry.
 
 | Task | Command |
 | --- | --- |

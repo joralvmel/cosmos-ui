@@ -290,6 +290,8 @@ automatic merges, changes to publishing permissions, or a release while work is 
 
 ### Plan the next release
 
+Use this for advice only. To have the agent do the preparation, use the next prompt instead.
+
 ```text
 Use release-pr to recommend the next release. This is read-only.
 Check the remote state, merged work, CI, pending changesets and uncovered dependency updates
@@ -298,17 +300,25 @@ explain why, with affected packages, resulting versions, migration notes and mis
 Do not change versions/changelogs, dispatch workflows, open or merge PRs, push tags or publish.
 ```
 
-### Open the release PR
+### Prepare and open the release PR
+
+This includes local prerequisite repairs, not automatic publication. If no repair is needed,
+the agent opens the release PR directly. Otherwise it prepares the repair and pauses at the
+local review gate; after acceptance and the prerequisite PR's approved merge, it resumes.
 
 ```text
-I authorize opening the release PR for the already merged changes on develop.
-Use release-pr: verify identity, remote, green checks and pending changesets. If
-npm run deps:changeset finds uncovered runtime dependency updates, first commit that changeset
-locally and pause for my review before its PR into develop. Reuse an existing
-open develop-to-main release PR; stop on conflicts or missing evidence. Summarize packages,
-bumps, highlights and migration notes, and report its URL/checks.
-Do not merge it, edit versions/changelogs manually or publish. Wait for my review; when approved,
-the release promotion must use a merge commit, not squash.
+Prepare the next release using release-pr, recommending the appropriate type from the current
+repository state. I authorize opening/reusing the release PR once its prerequisites are met.
+Verify identity, fresh remote state, exact-SHA checks, changesets, dependency coverage and ancestry.
+If synchronization, a dependency changeset or conflict repair is needed, prepare it on a dedicated
+work branch, resolve only evidence-backed conflicts, regenerate the lockfile through npm and
+validate. Create a local commit and pause for my review before pushing prerequisite changes.
+Ask only about unresolved semantic decisions; do not stop at merely listing conflicts.
+After I accept the commit, open/reuse the prerequisite PR. Explain the required merge method and
+wait for merge approval; once merged, recheck and resume the release preparation.
+Use merge commits for main/develop synchronization and release promotion, never squash.
+Report packages, resulting versions, migration notes, limitations and the exact next approval.
+Do not merge PRs, change versions/changelogs manually, dispatch publication or publish.
 ```
 
 ### Review Version Packages
@@ -359,8 +369,9 @@ release tags. Report unavailable checks and the cleanup/migration plan for test 
 Synchronize after [merged work/release PR URL] using sync-after-merge.
 Check identity, remote state and local changes first; preserve unrelated work and never force-push.
 Confirm the PR really merged before removing its work branch. If Version Packages left main ahead
-of develop, explain the sync diff and open/reuse the main-to-develop synchronization PR only;
-do not merge it automatically. Stop on conflicts or decisions that change code.
+of develop, use a synchronization PR with a merge commit, never squash. Prepare evidence-backed
+conflict repairs on a dedicated branch, validate and commit locally, then pause before push.
+Ask about unresolved semantic decisions. Do not merge automatically or delete main/develop.
 Report final branch/HEAD and anything still pending. Do not start another component or release.
 ```
 

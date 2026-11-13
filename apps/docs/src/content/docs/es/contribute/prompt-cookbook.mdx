@@ -303,6 +303,8 @@ no autorizan merges automáticos, cambios en permisos de publicación ni publica
 
 ### Planificar la siguiente release
 
+Úsalo solo para recibir una recomendación. Para que el agente haga la preparación, usa el siguiente.
+
 ```text
 Usa release-pr para recomendar la siguiente release. Es solo lectura.
 Revisa estado remoto, trabajo integrado, CI, changesets pendientes y actualizaciones de dependencias
@@ -312,17 +314,25 @@ evidencias pendientes. No cambies versiones/changelogs, ejecutes workflows, abra
 subas tags ni publiques.
 ```
 
-### Abrir la PR de release
+### Preparar y abrir la PR de release
+
+Incluye preparar arreglos locales necesarios, no publicar automáticamente. Si no hace falta
+ningún arreglo, el agente abre directamente la PR de release. Si hace falta, prepara el arreglo
+y espera la revisión local; tras aceptar el commit y aprobar el merge de su PR, continúa.
 
 ```text
-Autorizo abrir la PR de release para los cambios ya integrados en develop.
-Usa release-pr: verifica identidad, remoto, checks verdes y changesets pendientes. Si
-npm run deps:changeset encuentra actualizaciones de dependencias sin cubrir, primero haz commit
-local de ese changeset y espera mi revisión antes de su PR a develop. Reutiliza una
-PR de release develop-a-main si ya está abierta; detente si hay conflictos o faltan evidencias.
-Resume paquetes, incrementos, novedades y migración, e informa de URL/checks.
-No hagas merge, edites versiones/changelogs a mano ni publiques. Espera mi revisión; cuando se
-apruebe, la promoción de release debe usar merge commit, no squash.
+Prepara la siguiente release usando release-pr y recomienda el tipo adecuado según el estado
+actual del repositorio. Autorizo abrir/reutilizar la PR de release cuando cumpla sus requisitos.
+Verifica identidad, remoto actualizado, checks del SHA exacto, changesets, dependencias e historial.
+Si hace falta sincronizar ramas, añadir un changeset de dependencias o resolver conflictos,
+prepáralo en una rama de trabajo, resuelve solo lo respaldado por evidencias, regenera el lockfile
+con npm y valida. Haz un commit local y espera mi revisión antes de subir esos cambios previos.
+Consulta solo decisiones semánticas sin resolver; no te limites a enumerar conflictos y detenerte.
+Tras aceptar el commit, abre/reutiliza la PR previa. Explica cómo debe fusionarse y espera
+aprobación del merge; una vez integrada, vuelve a comprobar y continúa preparando la release.
+Usa merge commit para sincronizar main/develop y promocionar la release, nunca squash.
+Informa de paquetes, versiones resultantes, migración, limitaciones y la siguiente aprobación exacta.
+No fusiones PRs, cambies versiones/changelogs a mano, ejecutes la publicación ni publiques.
 ```
 
 ### Revisar Version Packages
@@ -376,9 +386,10 @@ de prueba después.
 Sincroniza tras [URL de la PR de trabajo/release fusionada] usando sync-after-merge.
 Comprueba identidad, estado remoto y cambios locales primero; conserva trabajo ajeno y nunca
 hagas force-push. Confirma que la PR se fusionó antes de borrar su rama de trabajo.
-Si Version Packages dejó main adelantado respecto de develop, explica el diff de sincronización
-y solo abre/reutiliza la PR main-a-develop; no la fusiones automáticamente. Detente ante conflictos
-o decisiones que cambien código. Informa de rama/HEAD final y pendientes.
+Si Version Packages dejó main adelantado respecto de develop, usa una PR de sincronización con
+merge commit, nunca squash. Prepara arreglos de conflictos respaldados por evidencias en una rama
+de trabajo, valida y haz commit local; espera antes del push. Consulta decisiones semánticas sin
+resolver. No fusiones automáticamente ni borres main/develop. Informa de rama/HEAD final y pendientes.
 No empieces otro componente ni otra release.
 ```
 

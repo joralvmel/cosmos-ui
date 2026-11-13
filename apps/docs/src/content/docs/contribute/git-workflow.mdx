@@ -10,7 +10,7 @@ sidebar:
 | Branch | Purpose | How changes arrive |
 | --- | --- | --- |
 | `main` | Released code; every push runs the release and docs deployment | Merge commit from `develop` (release pull request) |
-| `develop` | Integration, default branch | Squash merge of work branches |
+| `develop` | Integration, default branch | Squash work PRs; merge commit for main synchronization |
 | `<type>/<scope>-<description>` | One task | Created from `develop`, deleted after merge |
 
 Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`. Scope: package or area (`elements`, `tokens`,
@@ -37,7 +37,8 @@ open the pull request from their fork.
    New commits on an already open PR require the same local review before push.
 4. Required: green checks (lint, terms, typecheck, tests, build, packs, docs build, changeset, commit
    hygiene) and resolution of review conversations. Approvals are optional.
-5. Squash merge: the pull request title must be a Conventional Commit (checked by CI).
+5. Squash work PRs; the pull request title must be a Conventional Commit (checked by CI).
+   Synchronization from main, including repair branches, uses a merge commit instead.
 6. `sync-after-merge` cleans up the local branch.
 
 Approvals are optional on `main` and `develop` so a sole maintainer can merge their own pull requests.
@@ -51,6 +52,8 @@ protection settings. Agents never merge or publish just because local changes we
 
 `release-pr` opens `develop → main` with the pending changesets; merge it with a merge commit. The
 [Release and publishing](../publishing/) page explains the rest.
+After publication, synchronize main back into develop with a merge commit, never squash/rebase.
+Verify main is an ancestor of develop; never delete either long-lived branch.
 
 ## Repository settings
 

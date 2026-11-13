@@ -28,10 +28,10 @@ export const MANUAL_STEPS = [
   'Settings → Code security: enable secret scanning push protection (free for public repositories).',
   'Settings → Rules (optional): a ruleset that requests a Copilot code review on every pull request.',
   'Your account → Settings → Emails: enable "Keep my email addresses private" and "Block command line pushes that expose my email".',
-  'The merge button remembers the last method per user: choose "Squash and merge" for pull requests into develop and "Create a merge commit" for release pull requests into main.',
+  'The merge button remembers the last method per user: squash work PRs into develop; use "Create a merge commit" for releases into main and synchronization back into develop. Never delete main or develop.',
 ];
 
-function protection(branch) {
+function protection() {
   return {
     required_status_checks: { strict: true, contexts: requiredChecks },
     // Admins can still merge in an emergency (e.g. a single maintainer who cannot approve their own PR).
@@ -42,7 +42,7 @@ function protection(branch) {
       dismiss_stale_reviews: true,
     },
     restrictions: null,
-    required_linear_history: branch === 'develop',
+    required_linear_history: false,
     required_conversation_resolution: true,
     allow_force_pushes: false,
     allow_deletions: false,
@@ -102,7 +102,7 @@ export function buildPlan({ repo, existingLabels = [] }) {
       description: `Protect ${branch}: pull request without mandatory approval, required checks, no force push or deletion`,
       method: 'PUT',
       path: `${base}/branches/${branch}/protection`,
-      body: protection(branch),
+      body: protection(),
     })),
     ...labels.map(label =>
       existing.has(label.name.toLowerCase())
