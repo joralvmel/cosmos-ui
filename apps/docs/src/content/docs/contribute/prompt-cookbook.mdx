@@ -288,6 +288,23 @@ major) and explains why; you approve before anything is opened or published.
 See [release and publishing](../publishing/) for setup and commands. These prompts do not authorize
 automatic merges, changes to publishing permissions, or a release while work is still unmerged.
 
+### Coordinate a release end-to-end
+
+Use one prompt for the whole workflow. The agent recommends the release, opens or reuses PRs,
+checks publication and isolated consumers, and prepares synchronization. It asks for approval at
+each merge or publication gate and resumes after your answer. If interactive questions are not
+available, reply in chat; if the session ends, resume from the reported stage and PR.
+
+```text
+Coordinate the next release end-to-end using release and release-manager. Assess and recommend the
+release type, prepare prerequisites and PRs, verify publication and isolated consumers, and
+synchronize main back into develop. Ask for my explicit approval at each merge or publication gate,
+then verify the current state and continue in this conversation. Report failures and unavailable
+checks; do not bypass protections or publish without approval.
+```
+
+The focused prompts below remain useful for assessment, review or recovery on their own.
+
 ### Plan the next release
 
 Use this for advice only. To have the agent do the preparation, use the next prompt instead.
