@@ -301,6 +301,23 @@ patch/minor o major) y explica por qué; tú apruebas antes de abrir o publicar 
 Consulta [releases y publicación](../publishing/) para la configuración y los comandos. Estos prompts
 no autorizan merges automáticos, cambios en permisos de publicación ni publicar trabajo sin integrar.
 
+### Coordinar una release completa
+
+Usa un solo prompt para todo el proceso. El agente recomienda la release, abre o reutiliza PRs,
+comprueba la publicación y consumidores aislados, y prepara la sincronización. Pide aprobación en
+cada merge o publicación y continúa tras tu respuesta. Si no hay cuestionario interactivo, responde
+en el chat; si termina la sesión, retómala desde la fase y PR indicadas.
+
+```text
+Coordina la siguiente release de principio a fin usando release y release-manager. Evalúa y
+recomienda el tipo de release, prepara los requisitos y las PRs, verifica la publicación y
+consumidores aislados, y sincroniza main con develop. Pide mi aprobación explícita para cada merge
+o publicación; después comprueba el estado actual y continúa en esta conversación. Informa de los
+fallos y comprobaciones no disponibles; no eludas protecciones ni publiques sin aprobación.
+```
+
+Los prompts siguientes siguen disponibles para evaluar, revisar o recuperar una fase concreta.
+
 ### Planificar la siguiente release
 
 Úsalo solo para recibir una recomendación. Para que el agente haga la preparación, usa el siguiente.

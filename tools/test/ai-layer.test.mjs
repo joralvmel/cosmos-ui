@@ -170,6 +170,33 @@ describe('AI layer files', () => {
     expect(convention).toContain('Finish implementation with a verified local commit');
   });
 
+  it('coordinates release approval, publication evidence and synchronization in order', () => {
+    const skill = read('skills', 'release', 'SKILL.md');
+    const steps = [
+      '**Assess and prepare.**',
+      '**Promote.**',
+      '**Review Version Packages.**',
+      '**Verify publication.**',
+      '**Test as a consumer.**',
+      '**Synchronize.**',
+    ];
+    let previous = -1;
+    for (const step of steps) {
+      const position = skill.indexOf(step);
+      expect(position, step).toBeGreaterThan(previous);
+      previous = position;
+    }
+    expect(skill).toContain('separate explicit approval to merge **and publish**');
+    expect(skill).toContain('head or base invalidates the approval');
+    expect(skill).toContain('`vscode/askQuestions`');
+    expect(skill).toContain('workflow success alone does not');
+    expect(skill).toContain('`origin/main` is an ancestor of `origin/develop`');
+    expect(frontmatter(read('agents', 'release-manager.agent.md'))?.tools).toContain(
+      "'vscode/askQuestions'"
+    );
+    expect(read('prompts', 'release.prompt.md')).toContain('[release](../skills/release/SKILL.md)');
+  });
+
   it.each(skills)('skill %s has name and description and a prompt', skill => {
     const data = frontmatter(read('skills', skill, 'SKILL.md'));
     expect(data?.name).toBe(skill);
