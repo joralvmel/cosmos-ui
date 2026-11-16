@@ -1,3 +1,4 @@
+import { brainCircuit } from '@joralvmel/cosmos-icons/brain-circuit';
 import { heart } from '@joralvmel/cosmos-icons/heart';
 import { search } from '@joralvmel/cosmos-icons/search';
 import { act } from 'react';
@@ -20,6 +21,77 @@ import { TextField } from '../src/components/text-field.js';
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
 describe('TextField with React Native Web', () => {
+  it.each(['control', 'input'] as const)(
+    'applies independent icon colors within %s focus without recoloring affixes or actions',
+    async iconFocusScope => {
+      const container = document.createElement('div');
+      document.body.append(container);
+      const root = createRoot(container);
+      const props = {
+        label: 'Colors',
+        type: 'password',
+        defaultValue: 'Secret',
+        startIcon: brainCircuit,
+        endIcon: heart,
+        prefix: '$',
+        clearable: true,
+        clearLabel: 'Clear',
+        passwordReveal: true,
+        revealPasswordLabel: 'Show',
+        hidePasswordLabel: 'Hide',
+        iconFocusScope,
+        appearance: {
+          startIconColor: 'red',
+          startIconFocusColor: 'blue',
+          endIconColor: 'green',
+        },
+      } as const;
+      try {
+        await act(async () => root.render(<TextField {...props} />));
+        const input = container.querySelector('input');
+        const icons = container.querySelectorAll('svg');
+        const actions = container.querySelectorAll<HTMLElement>('[role="button"]');
+        if (!input || !actions[0] || !actions[1]) throw new Error('Controls are missing');
+        const expectColors = (start: string) => {
+          expect(icons[0]?.getAttribute('stroke')).toBe(start);
+          expect(icons[0]?.getAttribute('color')).toBe(start);
+          expect(icons[0]?.querySelector('[fill="currentColor"]')).not.toBeNull();
+          expect(icons[1]?.getAttribute('stroke')).toBe('green');
+        };
+        const actionColor = icons[2]?.getAttribute('stroke');
+        expectColors('red');
+        await act(async () => input.focus());
+        expectColors('blue');
+        expect(icons[2]?.getAttribute('stroke')).toBe(actionColor);
+        await act(async () => actions[0]?.focus());
+        expectColors(iconFocusScope === 'control' ? 'blue' : 'red');
+        await act(async () => actions[1]?.focus());
+        expectColors(iconFocusScope === 'control' ? 'blue' : 'red');
+        await act(async () => actions[1]?.blur());
+        expectColors('red');
+        await act(async () => input.focus());
+        await act(async () =>
+          root.render(
+            <TextField {...props} appearance={{ startIconColor: 'red', endIconColor: 'green' }} />
+          )
+        );
+        expectColors('red');
+        await act(async () => root.render(<TextField {...props} />));
+        await act(async () => actions[1]?.focus());
+        await act(async () => root.render(<TextField {...props} readOnly />));
+        expectColors('red');
+        await act(async () => root.render(<TextField {...props} />));
+        expectColors('red');
+        await act(async () => input.focus());
+        await act(async () => root.render(<TextField {...props} disabled />));
+        expectColors('red');
+      } finally {
+        await act(async () => root.unmount());
+        container.remove();
+      }
+    }
+  );
+
   it('keeps artwork passive and reserves editing space with all adornments and actions', async () => {
     const container = document.createElement('div');
     document.body.append(container);

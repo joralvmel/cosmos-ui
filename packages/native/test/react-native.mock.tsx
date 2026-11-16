@@ -25,6 +25,8 @@ export function Pressable({ children, onPress, disabled, style, ...props }: AnyP
       type: 'button',
       disabled: Boolean(disabled),
       onClick: onPress as () => void,
+      onFocus: props.onFocus,
+      onBlur: props.onBlur,
       'data-testid': props.testID,
       'data-role': props.accessibilityRole,
       'aria-label': props.accessibilityLabel,

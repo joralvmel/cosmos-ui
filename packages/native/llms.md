@@ -6,6 +6,10 @@ On React Native Web, TextField draws its focus indicator on the outer control, w
 browser outline around the editable input.
 Icons do not take focus independently of their owning controls. TextField reserves at least
 44 units of editable width when long affixes and actions compete for space.
+Its `appearance` accepts `startIconColor`, `startIconFocusColor`, `endIconColor` and
+`endIconFocusColor` (native colors). Focus overrides are optional and fall back per icon.
+`iconFocusScope` is `control` (input and action buttons, default) or `input`; action icons,
+affixes and editable text retain their own colors.
 
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 
@@ -126,6 +130,7 @@ Accepts a single line of text with an accessible label, optional help and error 
 | `inputMode` | 'none' \| 'text' \| 'decimal' \| 'numeric' \| 'tel' \| 'search' \| 'email' \| 'url' | — | Input or keyboard hint (none, text, decimal, numeric, tel, search, email or url); it does not add numeric or multiline field behavior. |
 | `startIcon` | IconDefinition | — | Optional structured decorative icon before the editable text. |
 | `endIcon` | IconDefinition | — | Optional structured decorative icon after the editable text. |
+| `iconFocusScope` | 'control' \| 'input' | `control` | When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override. |
 | `prefix` | string | — | Optional non-interactive text decoration before the editable text. |
 | `suffix` | string | — | Optional non-interactive text decoration after the editable text. |
 | `clearable` | boolean | `false` | Shows a clear action for non-empty editable fields. Supply clearLabel when enabled. |

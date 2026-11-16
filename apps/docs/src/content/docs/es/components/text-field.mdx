@@ -9,6 +9,7 @@ import Playground from '../../../../components/Playground.astro';
 import Preview from '../../../../components/Preview.astro';
 import StatusBadge from '../../../../components/StatusBadge.astro';
 import TextFieldOwnershipDemo from '../../../../components/TextFieldOwnershipDemo.astro';
+import TextFieldIconColorsDemo from '../../../../components/TextFieldIconColorsDemo.astro';
 
 <StatusBadge name="text-field" />
 
@@ -102,6 +103,61 @@ la decisión de su propietario. La integración Angular usa `ControlValueAccesso
 touched, el restablecimiento, la deshabilitación y `updateOn: 'blur'`. Native no simula formularios
 HTML, validación de correo ni expresiones regulares; el consumidor controla la validación de negocio
 y el envío.
+
+## Colores de los iconos
+
+El campo ya utiliza el componente Icon compartido. Puedes configurar cada icono decorativo sin
+cambiar el texto, los afijos ni los iconos de borrar o mostrar contraseña. Sin personalización se
+mantiene el tema actual. El color de foco es opcional; si no lo defines, se conserva el color normal
+del mismo icono.
+
+<TextFieldIconColorsDemo />
+
+HTML, React y Angular comparten estas variables CSS:
+
+```css
+.colored-icons {
+  --cosm-text-field-start-icon-color: var(--cosm-success-text);
+  --cosm-text-field-start-icon-focus-color: var(--cosm-primary-text);
+  --cosm-text-field-end-icon-color: var(--cosm-danger-text);
+  --cosm-text-field-end-icon-focus-color: var(--cosm-warning-text);
+}
+```
+
+Sigue pasando las definiciones `startIcon` y `endIcon` como hasta ahora. Con el CSS anterior:
+
+```html
+<cosm-text-field class="colored-icons" label="Buscar" icon-focus-scope="input"></cosm-text-field>
+```
+
+```tsx
+<TextField className="colored-icons" label="Buscar"
+  startIcon={search} endIcon={heart} iconFocusScope="input" />
+```
+
+```html
+<cosm-text-field class="colored-icons" label="Buscar"
+  [startIcon]="search" [endIcon]="heart" iconFocusScope="input"></cosm-text-field>
+```
+
+En React Native, configura los cuatro colores en `appearance`, usando colores del tema nativo:
+
+```tsx
+<TextField label="Buscar" startIcon={search} endIcon={heart} iconFocusScope="input"
+  appearance={{
+    startIconColor: theme.colors['success-text'],
+    startIconFocusColor: theme.colors['primary-text'],
+    endIconColor: theme.colors['danger-text'],
+    endIconFocusColor: theme.colors['warning-text'],
+  }} />
+```
+
+`iconFocusScope="control"` (predeterminado) incluye el campo editable y sus botones de borrar o
+mostrar contraseña; `"input"` aplica los colores de foco solo mientras el área editable tiene foco.
+Sin un color de foco configurado, ninguna opción cambia el color del icono. No necesitas añadir
+manejadores de eventos. El consumidor debe asegurar el contraste de sus colores; el modo de colores
+forzados puede sustituirlos por colores del sistema. El foco de accesibilidad nativo no equivale al
+foco de teclado o edición.
 
 ## Accesibilidad
 

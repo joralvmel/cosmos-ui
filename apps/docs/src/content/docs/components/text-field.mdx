@@ -9,6 +9,7 @@ import Playground from '../../../components/Playground.astro';
 import Preview from '../../../components/Preview.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
 import TextFieldOwnershipDemo from '../../../components/TextFieldOwnershipDemo.astro';
+import TextFieldIconColorsDemo from '../../../components/TextFieldIconColorsDemo.astro';
 
 <StatusBadge name="text-field" />
 
@@ -100,6 +101,59 @@ reset returns to `defaultValue`; a controlled reset emits a proposal and waits f
 Angular integrates with `ControlValueAccessor`, including touched state, reset, disabled state and
 `updateOn: 'blur'`. Native does not emulate HTML form submission, email validation or regex
 validation; its consumer owns business validation and submit handling.
+
+## Icon colors
+
+The field already renders the shared Icon component. Configure each decorative icon independently
+without changing input text, affixes, clear or reveal icons. Unset hooks preserve the current theme.
+A focus color is opt-in and falls back to the same icon's normal color when omitted.
+
+<TextFieldIconColorsDemo />
+
+HTML, React and Angular share these CSS hooks:
+
+```css
+.colored-icons {
+  --cosm-text-field-start-icon-color: var(--cosm-success-text);
+  --cosm-text-field-start-icon-focus-color: var(--cosm-primary-text);
+  --cosm-text-field-end-icon-color: var(--cosm-danger-text);
+  --cosm-text-field-end-icon-focus-color: var(--cosm-warning-text);
+}
+```
+
+Keep passing `startIcon` and `endIcon` definitions as usual. For example, with the shared CSS above:
+
+```html
+<cosm-text-field class="colored-icons" label="Search" icon-focus-scope="input"></cosm-text-field>
+```
+
+```tsx
+<TextField className="colored-icons" label="Search"
+  startIcon={search} endIcon={heart} iconFocusScope="input" />
+```
+
+```html
+<cosm-text-field class="colored-icons" label="Search"
+  [startIcon]="search" [endIcon]="heart" iconFocusScope="input"></cosm-text-field>
+```
+
+React Native uses the same four hooks in `appearance`, with native theme colors rather than CSS:
+
+```tsx
+<TextField label="Search" startIcon={search} endIcon={heart} iconFocusScope="input"
+  appearance={{
+    startIconColor: theme.colors['success-text'],
+    startIconFocusColor: theme.colors['primary-text'],
+    endIconColor: theme.colors['danger-text'],
+    endIconFocusColor: theme.colors['warning-text'],
+  }} />
+```
+
+`iconFocusScope="control"` (default) includes the editable input and its clear/reveal buttons;
+`"input"` applies the configured focus colors only while the editable input is focused. Without a
+focus-color hook, neither scope changes the icon color. No additional event handlers are needed.
+Custom colors remain the consumer's contrast responsibility; forced-colors mode may replace them
+with system colors. Native accessibility focus is not keyboard/input focus.
 
 ## Accessibility
 

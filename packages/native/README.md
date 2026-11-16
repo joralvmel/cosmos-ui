@@ -49,6 +49,12 @@ Icons are passive artwork, not independent pointer or keyboard focus targets; cl
 buttons retain their own focus and keyboard behavior. With long affixes, icons and both actions,
 the editable input reserves at least 44 units of width while affixes shrink and truncate.
 
+Set `appearance.startIconColor` / `endIconColor` for independent decorative icon colors, and
+`startIconFocusColor` / `endIconFocusColor` for opt-in focus colors. Missing focus colors retain the
+normal color. `iconFocusScope="control"` (default) includes the input and clear/reveal buttons;
+use `"input"` to react only to editable-input focus. These hooks do not recolor text, affixes or
+action icons, and require no consumer focus handlers. Use native color values, not CSS variables.
+
 The implementation is stable with explicitly deferred platform and accessibility checks;
 see the [design evidence](../../docs/design/text-field.md) for what is verified and what is not.
 

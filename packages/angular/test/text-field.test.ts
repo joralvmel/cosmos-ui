@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -18,6 +18,16 @@ import { COSMOS_COMPONENTS, CosmTextFieldComponent } from '../src/index.js';
   template: '<cosm-text-field label="Text field"></cosm-text-field>',
 })
 class HostComponent {}
+
+@Component({
+  imports: [CosmTextFieldComponent],
+  template:
+    '<cosm-text-field label="Icons" [iconFocusScope]="scope()" [style.--cosm-text-field-start-icon-color]="color()"></cosm-text-field>',
+})
+class IconHostComponent {
+  scope = signal<'input' | 'control'>('input');
+  color = signal('red');
+}
 
 @Component({
   imports: [ReactiveFormsModule, CosmTextFieldComponent],
@@ -48,6 +58,24 @@ function componentOf<T>(fixture: ComponentFixture<T>): CosmTextFieldComponent {
 }
 
 describe('CosmTextFieldComponent', () => {
+  it('updates icon focus scope and CSS color bindings without taking ownership of behavior', async () => {
+    await TestBed.configureTestingModule({ imports: [IconHostComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(IconHostComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const el = componentOf(fixture).element;
+    await el.updateComplete;
+    expect(el.getAttribute('icon-focus-scope')).toBe('input');
+    expect(el.style.getPropertyValue('--cosm-text-field-start-icon-color')).toBe('red');
+    fixture.componentInstance.scope.set('control');
+    fixture.componentInstance.color.set('blue');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await el.updateComplete;
+    expect(el.iconFocusScope).toBe('control');
+    expect(el.style.getPropertyValue('--cosm-text-field-start-icon-color')).toBe('blue');
+  });
+
   for (const scenario of textFieldScenariosFor('angular')) {
     it(scenario.name, async () => {
       await TestBed.configureTestingModule({ imports: [HostComponent] }).compileComponents();

@@ -117,6 +117,7 @@ Accepts a single line of text with an accessible label, optional help and error 
 | `inputMode` (`input-mode`) | 'none' \| 'text' \| 'decimal' \| 'numeric' \| 'tel' \| 'search' \| 'email' \| 'url' | — | Input or keyboard hint (none, text, decimal, numeric, tel, search, email or url); it does not add numeric or multiline field behavior. |
 | `startIcon` (`start-icon`) | IconDefinition | — | Optional structured decorative icon before the editable text. |
 | `endIcon` (`end-icon`) | IconDefinition | — | Optional structured decorative icon after the editable text. |
+| `iconFocusScope` (`icon-focus-scope`) | 'control' \| 'input' | `control` | When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override. |
 | `prefix` | string | — | Optional non-interactive text decoration before the editable text. |
 | `suffix` | string | — | Optional non-interactive text decoration after the editable text. |
 | `clearable` | boolean | `false` | Shows a clear action for non-empty editable fields. Supply clearLabel when enabled. |

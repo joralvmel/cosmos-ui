@@ -109,6 +109,26 @@ const styles = css`
     width: 1.25em;
     height: 1.25em;
   }
+  .start-icon {
+    color: var(--cosm-text-field-start-icon-color, inherit);
+  }
+  .end-icon {
+    color: var(--cosm-text-field-end-icon-color, inherit);
+  }
+  :host(:not([icon-focus-scope='input'])) .control:focus-within .start-icon,
+  :host([icon-focus-scope='input']) .control:has(input:focus) .start-icon {
+    color: var(
+      --cosm-text-field-start-icon-focus-color,
+      var(--cosm-text-field-start-icon-color, inherit)
+    );
+  }
+  :host(:not([icon-focus-scope='input'])) .control:focus-within .end-icon,
+  :host([icon-focus-scope='input']) .control:has(input:focus) .end-icon {
+    color: var(
+      --cosm-text-field-end-icon-focus-color,
+      var(--cosm-text-field-end-icon-color, inherit)
+    );
+  }
   .affix {
     min-inline-size: 0;
     overflow: hidden;
@@ -206,6 +226,10 @@ const styles = css`
  * @cssprop --cosm-text-field-border - Control boundary color.
  * @cssprop --cosm-text-field-focus - Focus indicator color.
  * @cssprop --cosm-text-field-radius - Control corner radius.
+ * @cssprop --cosm-text-field-start-icon-color - Start icon color.
+ * @cssprop --cosm-text-field-start-icon-focus-color - Start icon focused color.
+ * @cssprop --cosm-text-field-end-icon-color - End icon color.
+ * @cssprop --cosm-text-field-end-icon-focus-color - End icon focused color.
  */
 export class CosmTextField extends CosmElement {
   static formAssociated = true;
@@ -238,6 +262,11 @@ export class CosmTextField extends CosmElement {
     inputMode: { attribute: 'input-mode' },
     startIcon: { attribute: false },
     endIcon: { attribute: false },
+    iconFocusScope: {
+      reflect: true,
+      attribute: 'icon-focus-scope',
+      converter: (value: string | null) => value ?? textFieldContract.props.iconFocusScope.default,
+    },
     prefix: {},
     suffix: {},
     clearable: { type: Boolean, reflect: true },
@@ -271,6 +300,7 @@ export class CosmTextField extends CosmElement {
   declare inputMode: string;
   declare startIcon: Props['startIcon'];
   declare endIcon: Props['endIcon'];
+  declare iconFocusScope: Props['iconFocusScope'];
   declare prefix: string | null;
   declare suffix: Props['suffix'];
   declare clearable: Props['clearable'];
@@ -326,6 +356,7 @@ export class CosmTextField extends CosmElement {
     this.inputMode = '';
     this.startIcon = undefined;
     this.endIcon = undefined;
+    this.iconFocusScope = props.iconFocusScope.default;
     this.prefix = '';
     this.suffix = '';
     this.clearable = props.clearable.default;
@@ -428,6 +459,12 @@ export class CosmTextField extends CosmElement {
       throw new TypeError('Text field size must be a positive finite number.');
     }
     if (!this.label.trim()) throw new TypeError('Text field requires a non-empty label.');
+    if (
+      this.iconFocusScope !== undefined &&
+      this.iconFocusScope !== 'control' &&
+      this.iconFocusScope !== 'input'
+    )
+      throw new TypeError('Text field iconFocusScope must be control or input.');
     if (this.clearable && !this.clearLabel?.trim()) {
       throw new TypeError('Text field requires clearLabel when clearable is enabled.');
     }
@@ -669,7 +706,7 @@ export class CosmTextField extends CosmElement {
             ? html`<span part="start" class="decoration">
               ${
                 this.startIcon
-                  ? html`<cosm-icon .icon=${this.startIcon} decorative size="md"></cosm-icon>`
+                  ? html`<cosm-icon class="start-icon" .icon=${this.startIcon} decorative size="md"></cosm-icon>`
                   : nothing
               }
               ${this.prefix ? html`<span class="affix">${this.prefix}</span>` : nothing}
@@ -706,7 +743,7 @@ export class CosmTextField extends CosmElement {
               ${this.suffix ? html`<span class="affix">${this.suffix}</span>` : nothing}
               ${
                 this.endIcon
-                  ? html`<cosm-icon .icon=${this.endIcon} decorative size="md"></cosm-icon>`
+                  ? html`<cosm-icon class="end-icon" .icon=${this.endIcon} decorative size="md"></cosm-icon>`
                   : nothing
               }
             </span>`

@@ -60,6 +60,7 @@ described by ADR 0005; no global icon registry or catalog is introduced.
 | `autoComplete` | `string` | Consumer-provided completion/autofill hint, mapped to platform-supported attributes. |
 | `inputMode` | `none \| text \| decimal \| numeric \| tel \| search \| email \| url` | Input/keyboard hint, not a change to the supported text-field types. |
 | `startIcon`, `endIcon` | `IconDefinition` | Optional structured decorative icons on either side of the editable text. |
+| `iconFocusScope` | `control \| input`, `control` | Scope for optional icon focus colors: input plus clear/reveal buttons, or input alone. No effect without configured focus colors. |
 | `prefix`, `suffix` | `string` | Optional non-interactive text decorations at the start/end of the editable text. |
 | `clearable` | `boolean`, `false` | Opts into a clear action when there is text and the field is editable. |
 | `clearLabel` | `string` | Required by consumers when `clearable` is enabled; localized accessible name for the clear action. |
@@ -123,6 +124,32 @@ component styles/theme values for the same visual roles.
 | `--cosm-text-field-border` | Control boundary |
 | `--cosm-text-field-focus` | Visible focus indicator |
 | `--cosm-text-field-radius` | Control corner radius |
+| `--cosm-text-field-start-icon-color` | Start icon only, excluding prefix |
+| `--cosm-text-field-start-icon-focus-color` | Optional start icon focus override |
+| `--cosm-text-field-end-icon-color` | End icon only, excluding suffix and actions |
+| `--cosm-text-field-end-icon-focus-color` | Optional end icon focus override |
+
+### Approved icon color extension
+
+The maintainer approved four independent optional visual hooks, keeping structured IconDefinition
+rendering rather than adding slots or custom child composition. Web/React/Angular use the CSS
+properties above; Native maps them to `appearance.startIconColor`, `startIconFocusColor`,
+`endIconColor` and `endIconFocusColor`. Each unset focus color falls back to the same icon's normal
+color, then its pre-existing theme/inheritance. Text, affixes, clear and reveal icons are unaffected.
+
+The shared `iconFocusScope` enum is consumer-owned configuration, not controlled state, and emits
+no event. `control` (default) includes keyboard/input focus on the input or action buttons; `input`
+includes only the editable input. Neither scope changes colors unless a focus override is supplied.
+Lit owns CSS focus matching; React/Angular forward the property and styles. Native observes input
+and action focus internally and discards focus from removed/disabled actions. Accessibility-reader
+focus is not substituted for keyboard/input focus. Native's private inherited-icon-color context
+also colors `currentColor` fills without adding a public Icon prop or changing explicit node paints.
+
+The existing value ownership and DOM → React → Angular → Native event/detail mapping above remain
+unchanged. This is additive (minor for affected packages), with no new dependencies. Colors are a
+consumer contrast responsibility and may be replaced by system colors in forced-colors mode.
+Public references: [CSS :focus-within](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-within)
+and [React Native TextInput focus events](https://reactnative.dev/docs/textinput#onfocus).
 
 Use semantic tokens only, with visible focus and sufficient boundary/text contrast in light and dark
 themes. RTL reverses logical start/end placement. Font scaling may increase control height; the
@@ -202,6 +229,7 @@ changeset accompany the implementation.
 | Native web browser | Accepted/rejected edits and clear, focus retention, password reveal, read-only action suppression and an 80-unit control verified through real browser interactions. |
 | Native Web focus regression | Passed in Chromium on the Expo demo: Cosmos/Nebula, light/dark, outlined/filled and custom 80-pixel height (12 combinations). The editable input has a solid zero-width outline; only the outer control paints a 2-pixel inward themed stroke. Screenshots confirmed that resetting width alone still painted the browser's auto outline, so its style is also reset explicitly. Keyboard Tab reaches the custom-height field; forced-colors mode retains the outer stroke with no inner ring. Real React Native Web renderer regressions cover focus/blur at md and 80-unit sizes. |
 | Native Web artwork and narrow controls | Passed in Chromium: clicking search/heart artwork no longer focuses the SVG or paints a rectangle in Cosmos/Nebula light/dark. RN Web had converted `focusable={false}` to `tabindex="-1"`, permitting pointer focus; passive SVGs now omit that prop. Clear/reveal glyph clicks still activate their owning buttons. Tab skips artwork, reaches actions and skips disabled inputs; Enter/Space activate reveal, and forced-colors preserves input/action focus. Search submit, rapid controlled typing, accepted/rejected edits and clear, six input types, hidden labels, required/invalid semantics and read-only password concealment passed. A second regression appeared with both icons, both actions and long affixes: editable width was 10.5 pixels at a 390-pixel viewport and zero at 320. Reserving 44 units restores a 44-pixel input at both widths, with no control overflow and both actions still 44 x 44. Real RN Web renderer tests cover passive artwork, focusable action owners and the editing minimum. |
+| Configurable icon colors | Passed in Chromium on the docs and Expo web demos: Cosmos/Nebula light/dark, independent normal/focus colors, optional per-side fallback, and both input/control scopes using actual input clicks and Tab navigation to clear/reveal. Action icons retain their original colors; clear restores input focus and configured focus colors. Web forced-colors retains the outer focus stroke. Real RN Web renderer tests cover action removal, disabled/read-only transitions and inherited `currentColor` fills. Mocked Android/iOS branches cover configured colors, not device interaction. React contract forwarding and Angular reactive CSS/scope bindings pass. No new Android/iOS runtime or screen-reader run was performed for this extension; the existing disclosed device/accessibility limitations remain. |
 | Android runtime | Expo Go on the Pixel 9 API 35 emulator: keyboard editing, controlled acceptance/rejection, accepted/rejected clear, password conceal/reveal and disabled/read-only states exercised. Exact outer numeric height was not measured on Android. |
 | Android long content and scaling | Passed on Pixel 9 API 35, 1080 x 2424 pixels at 420 dpi, using the native demo's Adornments, Actions and Long content controls. At 100% and 200% system font scale, long labels/help wrap and both affixes visibly ellipsize inside the control. At 200%, the field stays within x=42..1038, editable bounds are x=376..578 (202 pixels wide), and clear-action bounds are 115 x 116 physical pixels, consistent with a 44-unit target after pixel rounding. The editable height grows from 117 to 142 physical pixels with font scaling. |
 | Android keyboard candidates | Passed using actual Gboard touch keys and suggestion selection, not injected text or synthetic composition events: typing Account and selecting Accounting yields exactly `Accounting ` in both accepted value and proposal. A subsequent soft-key x while rejecting edits proposes `Accounting x` but retains `Accounting `. This covers Latin candidate input, not Japanese/Chinese/Korean composition or web IME. |
@@ -239,7 +267,7 @@ no docs typecheck errors or warnings were reported.
 
 ### Handoff to design-system
 
-Use the anatomy and six independent hooks above. Verify contrast, visible focus, outlined/filled
+Use the anatomy and independent hooks above. Verify contrast, visible focus, outlined/filled
 states, light/dark, RTL, responsive width and font scaling; do not introduce public tone/color props.
 
 ### Handoff to component-builder

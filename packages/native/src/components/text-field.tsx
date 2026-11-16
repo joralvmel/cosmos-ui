@@ -21,6 +21,7 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import { IconColorContext } from '../internal/icon-color.js';
 import { useTheme } from '../theme/theme-provider.js';
 import { Icon } from './icon.js';
 
@@ -47,6 +48,10 @@ export interface TextFieldProps extends ContractTextFieldProps {
     border?: string;
     focus?: string;
     radius?: number;
+    startIconColor?: string;
+    startIconFocusColor?: string;
+    endIconColor?: string;
+    endIconFocusColor?: string;
   };
   testID?: string;
 }
@@ -73,6 +78,7 @@ export const textFieldPropNames = [
   'inputMode',
   'startIcon',
   'endIcon',
+  'iconFocusScope',
   'prefix',
   'suffix',
   'clearable',
@@ -210,6 +216,7 @@ export function TextField({
   inputMode,
   startIcon,
   endIcon,
+  iconFocusScope = 'control',
   prefix,
   suffix,
   clearable = false,
@@ -232,6 +239,7 @@ export function TextField({
   const [ownedValue, setOwnedValue] = useState(defaultValue);
   const [, forceRender] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [focusedAction, setFocusedAction] = useState<'clear' | 'reveal' | null>(null);
   const [revealed, setRevealed] = useState(false);
   const descriptionId = useId();
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
@@ -254,6 +262,8 @@ export function TextField({
   }
   if (typeof label !== 'string' || !label.trim())
     throw new TypeError('Text field requires a non-empty label.');
+  if (iconFocusScope !== 'control' && iconFocusScope !== 'input')
+    throw new TypeError('Text field iconFocusScope must be control or input.');
   if (clearable && !clearLabel?.trim())
     throw new TypeError('Text field requires clearLabel when clearable is enabled.');
   if (passwordReveal && (!revealPasswordLabel?.trim() || !hidePasswordLabel?.trim()))
@@ -282,6 +292,23 @@ export function TextField({
   useEffect(() => {
     if (type !== 'password' || disabled || readOnly || !passwordReveal) setRevealed(false);
   }, [type, disabled, readOnly, passwordReveal]);
+  const actionFocused =
+    (focusedAction === 'clear' && state.showClearAction) ||
+    (focusedAction === 'reveal' && state.showPasswordReveal);
+  useEffect(() => {
+    if (!actionFocused) setFocusedAction(null);
+  }, [actionFocused]);
+  useEffect(() => {
+    if (disabled) {
+      setFocused(false);
+      setFocusedAction(null);
+    }
+  }, [disabled]);
+  const iconsFocused = !disabled && (focused || (iconFocusScope === 'control' && actionFocused));
+  const startIconColor =
+    (iconsFocused ? appearance?.startIconFocusColor : undefined) ?? appearance?.startIconColor;
+  const endIconColor =
+    (iconsFocused ? appearance?.endIconFocusColor : undefined) ?? appearance?.endIconColor;
   const webSemantics =
     Platform.OS === 'web'
       ? {
@@ -358,7 +385,11 @@ export function TextField({
           controlStyle,
         ]}
       >
-        {startIcon && <DecorativeIcon icon={startIcon} />}
+        {startIcon && (
+          <IconColorContext value={startIconColor}>
+            <DecorativeIcon icon={startIcon} />
+          </IconColorContext>
+        )}
         {prefix && (
           <Text accessible={false} numberOfLines={1} ellipsizeMode="tail" style={decoration}>
             {prefix}
@@ -403,12 +434,18 @@ export function TextField({
             {suffix}
           </Text>
         )}
-        {endIcon && <DecorativeIcon icon={endIcon} />}
+        {endIcon && (
+          <IconColorContext value={endIconColor}>
+            <DecorativeIcon icon={endIcon} />
+          </IconColorContext>
+        )}
         {state.showClearAction && (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={clearLabel}
             style={actionStyle}
+            onFocus={() => setFocusedAction('clear')}
+            onBlur={() => setFocusedAction(current => (current === 'clear' ? null : current))}
             onPress={() => {
               propose('');
               inputRef.current?.focus();
@@ -422,6 +459,8 @@ export function TextField({
             accessibilityRole="button"
             accessibilityLabel={revealed ? hidePasswordLabel : revealPasswordLabel}
             style={actionStyle}
+            onFocus={() => setFocusedAction('reveal')}
+            onBlur={() => setFocusedAction(current => (current === 'reveal' ? null : current))}
             onPress={() => setRevealed(previous => !previous)}
           >
             <DecorativeIcon icon={revealed ? eyeOff : eye} color={decoration.color} />

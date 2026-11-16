@@ -4,6 +4,7 @@ import {
   textFieldContract,
   textFieldScenariosFor,
 } from '@joralvmel/cosmos-core';
+import { brainCircuit } from '@joralvmel/cosmos-icons/brain-circuit';
 import { search } from '@joralvmel/cosmos-icons/search';
 import { getNativeTheme } from '@joralvmel/cosmos-tokens/native';
 import { act, type ReactNode } from 'react';
@@ -134,6 +135,30 @@ describe('TextField (native): contract drift', () => {
 });
 
 describe('TextField (native)', () => {
+  it.each(['android', 'ios'])('renders configured inherited icon colors on %s', async platform => {
+    Platform.OS = platform;
+    await render(
+      <TextField
+        label="Icons"
+        startIcon={brainCircuit}
+        endIcon={search}
+        clearable
+        clearLabel="Clear"
+        defaultValue="Text"
+        appearance={{ startIconColor: 'red', startIconFocusColor: 'blue', endIconColor: 'green' }}
+      />
+    );
+    const icons = container.querySelectorAll('svg');
+    const action = icons[2]?.getAttribute('stroke');
+    expect(icons[0]?.getAttribute('stroke')).toBe('red');
+    expect(icons[0]?.getAttribute('color')).toBe('red');
+    await act(async () => input().focus());
+    expect(icons[0]?.getAttribute('stroke')).toBe('blue');
+    expect(icons[0]?.getAttribute('color')).toBe('blue');
+    expect(icons[1]?.getAttribute('stroke')).toBe('green');
+    expect(icons[2]?.getAttribute('stroke')).toBe(action);
+  });
+
   for (const theme of ['cosmos', 'nebula']) {
     for (const mode of ['light', 'dark'] as const) {
       for (const variant of ['outlined', 'filled'] as const) {

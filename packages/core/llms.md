@@ -123,6 +123,7 @@ Accepts a single line of text with an accessible label, optional help and error 
 | `inputMode` | 'none' \| 'text' \| 'decimal' \| 'numeric' \| 'tel' \| 'search' \| 'email' \| 'url' | — | Input or keyboard hint (none, text, decimal, numeric, tel, search, email or url); it does not add numeric or multiline field behavior. |
 | `startIcon` | IconDefinition | — | Optional structured decorative icon before the editable text. |
 | `endIcon` | IconDefinition | — | Optional structured decorative icon after the editable text. |
+| `iconFocusScope` | 'control' \| 'input' | `control` | When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override. |
 | `prefix` | string | — | Optional non-interactive text decoration before the editable text. |
 | `suffix` | string | — | Optional non-interactive text decoration after the editable text. |
 | `clearable` | boolean | `false` | Shows a clear action for non-empty editable fields. Supply clearLabel when enabled. |
@@ -162,6 +163,10 @@ Accepts a single line of text with an accessible label, optional help and error 
 | `--cosm-text-field-border` | Editable control boundary color. |
 | `--cosm-text-field-focus` | Visible focus indicator color. |
 | `--cosm-text-field-radius` | Editable control corner radius. |
+| `--cosm-text-field-start-icon-color` | Start icon color, independent of text and affixes. |
+| `--cosm-text-field-start-icon-focus-color` | Start icon color within iconFocusScope; falls back to its normal color. |
+| `--cosm-text-field-end-icon-color` | End icon color, independent of text and affixes. |
+| `--cosm-text-field-end-icon-focus-color` | End icon color within iconFocusScope; falls back to its normal color. |
 
 **Keyboard**
 

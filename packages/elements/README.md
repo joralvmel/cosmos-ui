@@ -27,6 +27,12 @@ import '@joralvmel/cosmos-elements/button';
 
 The Custom Elements Manifest is published as `@joralvmel/cosmos-elements/custom-elements.json`.
 
+Text-field start/end icons support independent `--cosm-text-field-start-icon-color` and
+`--cosm-text-field-end-icon-color` hooks, with optional `-focus-color` equivalents replacing
+`-color`. `icon-focus-scope="control"` (default) includes the input and action buttons;
+`"input"` limits those focus colors to the editable input. Unset hooks preserve existing colors;
+affixes and action icons are unaffected.
+
 ## License
 
 MIT

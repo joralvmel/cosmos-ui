@@ -161,6 +161,14 @@ export const textFieldContract = defineContract({
       example: 'search',
       description: 'Optional structured decorative icon after the editable text.',
     },
+    iconFocusScope: {
+      type: 'enum',
+      values: ['control', 'input'],
+      default: 'control',
+      reflect: true,
+      description:
+        'When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override.',
+    },
     prefix: {
       type: 'string',
       description: 'Optional non-interactive text decoration before the editable text.',
@@ -240,6 +248,12 @@ export const textFieldContract = defineContract({
     '--cosm-text-field-border': 'Editable control boundary color.',
     '--cosm-text-field-focus': 'Visible focus indicator color.',
     '--cosm-text-field-radius': 'Editable control corner radius.',
+    '--cosm-text-field-start-icon-color': 'Start icon color, independent of text and affixes.',
+    '--cosm-text-field-start-icon-focus-color':
+      'Start icon color within iconFocusScope; falls back to its normal color.',
+    '--cosm-text-field-end-icon-color': 'End icon color, independent of text and affixes.',
+    '--cosm-text-field-end-icon-focus-color':
+      'End icon color within iconFocusScope; falls back to its normal color.',
   },
   keyboard: [
     { keys: ['Tab', 'Shift+Tab'], action: 'Moves focus to or from the enabled editable control.' },

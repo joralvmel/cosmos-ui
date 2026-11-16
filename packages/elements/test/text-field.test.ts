@@ -97,6 +97,24 @@ describe('cosm-text-field: contract drift', () => {
 });
 
 describe('cosm-text-field', () => {
+  it('restores whole-control scope when the optional attribute or property is cleared', async () => {
+    const el = await fixture<CosmTextField>(
+      '<cosm-text-field label="Icons" icon-focus-scope="input"></cosm-text-field>'
+    );
+    el.removeAttribute('icon-focus-scope');
+    await el.updateComplete;
+    expect(el.iconFocusScope).toBe('control');
+    el.iconFocusScope = undefined;
+    await el.updateComplete;
+    expect(el.hasAttribute('icon-focus-scope')).toBe(false);
+  });
+
+  it('rejects unsupported icon focus scopes rather than silently ignoring focus colors', async () => {
+    const el = await fixture<CosmTextField>('<cosm-text-field label="Icons"></cosm-text-field>');
+    el.setAttribute('icon-focus-scope', 'unsupported');
+    await expect(el.updateComplete).rejects.toThrow('iconFocusScope must be control or input');
+  });
+
   it('associates the label and supporting/error content with the editable control', async () => {
     const el = await fixture<CosmTextField>(
       '<cosm-text-field label="Email" help-text="Use a work address" error="Not valid" invalid></cosm-text-field>'

@@ -50,6 +50,11 @@ export class EmailComponent {
 Reactive Forms handles programmatic writes, touched/disabled state, reset and the configured
 `updateOn` strategy.
 
+Text fields also forward `iconFocusScope` (`control` by default, or `input`) for optional decorative
+icon focus colors. Use CSS classes or Angular style bindings with
+`--cosm-text-field-start-icon-color`, `--cosm-text-field-start-icon-focus-color`, and the matching
+`end-icon` hooks. Normal/focus colors are independent per side and do not recolor affixes or actions.
+
 ## License
 
 MIT

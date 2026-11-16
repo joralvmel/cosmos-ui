@@ -122,6 +122,9 @@ export class CosmTextFieldComponent implements ControlValueAccessor {
   @Input() set endIcon(value: Props['endIcon']) {
     this.element.endIcon = value;
   }
+  @Input() set iconFocusScope(value: Props['iconFocusScope']) {
+    this.element.iconFocusScope = value ?? 'control';
+  }
   @Input() set prefix(value: Props['prefix']) {
     this.element.prefix = value ?? '';
   }

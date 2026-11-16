@@ -179,6 +179,7 @@ describe('TextField: contract drift', () => {
       inputMode: 'email',
       startIcon: { name: 'search', viewBox: '0 0 24 24', nodes: [] },
       endIcon: { name: 'house', viewBox: '0 0 24 24', nodes: [] },
+      iconFocusScope: 'input',
       prefix: '$',
       suffix: 'USD',
       clearable: true,

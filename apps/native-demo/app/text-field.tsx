@@ -53,6 +53,10 @@ export default function TextFieldScreen() {
   const [adornments, setAdornments] = useState(false);
   const [longContent, setLongContent] = useState(false);
   const [actions, setActions] = useState(false);
+  const [iconColors, setIconColors] = useState(false);
+  const [iconFocusColors, setIconFocusColors] = useState(false);
+  const [iconFocusScope, setIconFocusScope] =
+    useState<NonNullable<TextFieldProps['iconFocusScope']>>('control');
   const [accept, setAccept] = useState(true);
   const [controlled, setControlled] = useState('Example');
   const [lastProposal, setLastProposal] = useState('');
@@ -97,6 +101,21 @@ export default function TextFieldScreen() {
         }
         startIcon={adornments ? search : undefined}
         endIcon={adornments ? heart : undefined}
+        iconFocusScope={iconFocusScope}
+        appearance={{
+          ...(iconColors
+            ? {
+                startIconColor: theme.colors['success-text'],
+                endIconColor: theme.colors['danger-text'],
+              }
+            : {}),
+          ...(iconFocusColors
+            ? {
+                startIconFocusColor: theme.colors['primary-text'],
+                endIconFocusColor: theme.colors['warning-text'],
+              }
+            : {}),
+        }}
         prefix={adornments ? (longContent ? 'ReferencePrefix'.repeat(8) : '#') : undefined}
         suffix={adornments ? (longContent ? 'ReferenceSuffix'.repeat(8) : '.com') : undefined}
         clearable={actions}
@@ -172,6 +191,36 @@ export default function TextFieldScreen() {
           selected={accept}
           onPress={() => setAccept(!accept)}
         />
+      </View>
+      <Text style={textStyle}>Icon colors (start / end)</Text>
+      <View style={groupStyle}>
+        <Choice
+          label="Normal: success / danger"
+          selected={iconColors}
+          onPress={() => {
+            setIconColors(!iconColors);
+            setAdornments(true);
+          }}
+        />
+        <Choice
+          label="Focus: primary / warning"
+          selected={iconFocusColors}
+          onPress={() => {
+            setIconFocusColors(!iconFocusColors);
+            setAdornments(true);
+          }}
+        />
+      </View>
+      <Text style={textStyle}>Icon focus scope</Text>
+      <View style={groupStyle}>
+        {(['control', 'input'] as const).map(item => (
+          <Choice
+            key={item}
+            label={`Focus: ${item}`}
+            selected={iconFocusScope === item}
+            onPress={() => setIconFocusScope(item)}
+          />
+        ))}
       </View>
       <Text style={textStyle}>More examples</Text>
       <TextField
