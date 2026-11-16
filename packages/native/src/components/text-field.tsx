@@ -342,6 +342,14 @@ export function TextField({
                 ? theme.colors.danger
                 : (appearance?.border ?? theme.colors['border-strong']),
             borderRadius: appearance?.radius ?? theme.radius.md,
+            ...(Platform.OS === 'web'
+              ? {
+                  outlineWidth: focused ? 2 : 0,
+                  outlineOffset: -2,
+                  outlineStyle: 'solid',
+                  outlineColor: appearance?.focus ?? theme.colors.primary,
+                }
+              : {}),
             backgroundColor:
               appearance?.background ??
               (variant === 'filled' ? theme.colors['surface-raised'] : theme.colors.bg),
@@ -380,6 +388,9 @@ export function TextField({
               flex: 1,
               minWidth: 0,
               minHeight: MIN_TARGET,
+              // Browsers can still paint an auto outline when its computed width is zero.
+              outlineWidth: Platform.OS === 'web' ? 0 : undefined,
+              outlineStyle: Platform.OS === 'web' ? 'solid' : undefined,
               color: appearance?.text ?? theme.colors.fg,
               fontSize: theme.text.md,
               paddingVertical: theme.space.sm,

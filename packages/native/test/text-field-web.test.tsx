@@ -19,6 +19,43 @@ import { TextField } from '../src/components/text-field.js';
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
 describe('TextField with React Native Web', () => {
+  it.each(['md', 80] as const)(
+    'keeps one themed focus boundary for size %s without an inner browser outline',
+    async size => {
+      const container = document.createElement('div');
+      document.body.append(container);
+      const root = createRoot(container);
+      try {
+        await act(async () =>
+          root.render(
+            <TextField
+              label="Focus"
+              size={size}
+              appearance={{ border: '#334155', focus: '#2563eb' }}
+            />
+          )
+        );
+        const input = container.querySelector('input');
+        if (!input?.parentElement) throw new Error('Text field control is missing');
+        const control = input.parentElement;
+        const restingBorder = getComputedStyle(control).borderColor;
+        await act(async () => input.focus());
+        expect(document.activeElement).toBe(input);
+        expect(getComputedStyle(input).outlineWidth).toBe('0px');
+        expect(getComputedStyle(input).outlineStyle).toBe('solid');
+        expect(getComputedStyle(control).borderColor).toBe('rgba(37, 99, 235, 1.00)');
+        expect(getComputedStyle(control).outlineWidth).toBe('2px');
+        expect(getComputedStyle(control).outlineOffset).toBe('-2px');
+        await act(async () => input.blur());
+        expect(getComputedStyle(control).borderColor).toBe(restingBorder);
+        expect(getComputedStyle(control).outlineWidth).toBe('0px');
+      } finally {
+        await act(async () => root.unmount());
+        container.remove();
+      }
+    }
+  );
+
   it('keeps normal fields editable, applies readonly only when requested and hides decoration', async () => {
     const container = document.createElement('div');
     document.body.append(container);

@@ -2,6 +2,9 @@
 
 React Native components of Cosmos UI with the same contracts and themes as the web. Callbacks receive the event detail directly.
 
+On React Native Web, TextField draws its focus indicator on the outer control, without a second
+browser outline around the editable input.
+
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 
 ## Setup: React Native (Expo)

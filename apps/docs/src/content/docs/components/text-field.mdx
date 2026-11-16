@@ -111,6 +111,8 @@ validation; its consumer owns business validation and submit handling.
   keyboard behavior. They are unavailable in disabled or read-only states.
 - Web focus retains a single inward indicator in forced-colors mode, using the system highlight
   color rather than relying on a box shadow.
+- React Native Web also draws focus on the outer control, without a second browser outline
+  around the editable input.
 - The editable input remains keyboard-operable; Enter reports `cosm-submit` and web form submission
   continues through the containing form.
 - Decorations follow logical inline direction for RTL. Font scaling may grow the control beyond a

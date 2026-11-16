@@ -200,6 +200,7 @@ changeset accompany the implementation.
 | Additional web accessibility | Passed in Chromium: Tab reaches clear/reveal buttons; Space and Enter activate them; button focus has a solid 2-pixel outline; disabled input is skipped. Accepted clearing produces an empty controlled value. With reduced-motion emulation, the control transition duration is zero. Chromium's accessibility tree exposes names, help/error descriptions and required/invalid/read-only/disabled states. Tree inspection is not a desktop screen-reader test. Axe was not run because it is not installed; no audit tools were downloaded. |
 | Native tests | Mocked React Native behavior and shared scenarios, plus a real React Native Web renderer regression for required/read-only DOM semantics. |
 | Native web browser | Accepted/rejected edits and clear, focus retention, password reveal, read-only action suppression and an 80-unit control verified through real browser interactions. |
+| Native Web focus regression | Passed in Chromium on the Expo demo: Cosmos/Nebula, light/dark, outlined/filled and custom 80-pixel height (12 combinations). The editable input has a solid zero-width outline; only the outer control paints a 2-pixel inward themed stroke. Screenshots confirmed that resetting width alone still painted the browser's auto outline, so its style is also reset explicitly. Keyboard Tab reaches the custom-height field; forced-colors mode retains the outer stroke with no inner ring. Real React Native Web renderer regressions cover focus/blur at md and 80-unit sizes. |
 | Android runtime | Expo Go on the Pixel 9 API 35 emulator: keyboard editing, controlled acceptance/rejection, accepted/rejected clear, password conceal/reveal and disabled/read-only states exercised. Exact outer numeric height was not measured on Android. |
 | Android long content and scaling | Passed on Pixel 9 API 35, 1080 x 2424 pixels at 420 dpi, using the native demo's Adornments, Actions and Long content controls. At 100% and 200% system font scale, long labels/help wrap and both affixes visibly ellipsize inside the control. At 200%, the field stays within x=42..1038, editable bounds are x=376..578 (202 pixels wide), and clear-action bounds are 115 x 116 physical pixels, consistent with a 44-unit target after pixel rounding. The editable height grows from 117 to 142 physical pixels with font scaling. |
 | Android keyboard candidates | Passed using actual Gboard touch keys and suggestion selection, not injected text or synthetic composition events: typing Account and selecting Accounting yields exactly `Accounting ` in both accepted value and proposal. A subsequent soft-key x while rejecting edits proposes `Accounting x` but retains `Accounting `. This covers Latin candidate input, not Japanese/Chinese/Korean composition or web IME. |
@@ -219,6 +220,11 @@ They remain unverified, not passed. The stable inventory status records a comple
 and acceptance of the available evidence with these disclosed limitations; it does not certify
 every device, browser, assistive technology or input method. No new platform features or test
 dependencies are added by this readiness decision.
+
+React Native Web focus uses a single 2-pixel inward outline on the outer control and suppresses
+the editable input's browser-default outline. Unlike removing all outlines and relying only on
+border color, the outer focus stroke remains distinguishable in forced-colors mode. These styles
+apply only to the web renderer; Android and iOS styling is unchanged.
 
 Final repository validation: Biome CI and all 49 Turborepo typecheck/test/build tasks passed.
 Terminology and generated AI-reference freshness checks also passed. The docs build reports the

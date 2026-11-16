@@ -41,8 +41,12 @@ actions and localized required/error wording in the label or supporting text. Na
 emulate HTML form submission, email constraints or regular-expression validation.
 
 Customize independently through `appearance` (background, text, placeholder, border, focus and
-radius) and the component style props. The component remains in progress pending required device,
-screen-reader and real IME validation; see the [design evidence](../../docs/design/text-field.md).
+radius) and the component style props. On React Native Web, the outer control owns the themed
+inward focus indicator; the editable input does not add a second browser outline. The focused
+boundary remains visible in forced-colors mode.
+
+The implementation is stable with explicitly deferred platform and accessibility checks;
+see the [design evidence](../../docs/design/text-field.md) for what is verified and what is not.
 
 ## License
 
