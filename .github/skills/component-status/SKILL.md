@@ -19,10 +19,12 @@ Main agent: `architect`. Read `AGENTS.md` first.
 4. If its dependencies are not stable, propose building them first (in `buildOrder()` order) or, when the user agrees, start the work with `create-component` for the first unblocked dependency.
 5. Composition rule: before using a component inside another, look it up here. If it is stable, use it. If not, use the accessible native primitive (`<button>`, `<input>`, `<select>`, `<dialog>`, `popover` attribute…), add the dependency to `dependsOn` and write a traceable note in the catalog entry `notes` (e.g. "uses native <select> until listbox is stable"). Never leave TODOs in component code.
 6. File completeness is only a structural check. Follow the
-   [component workflow](../../../docs/conventions/component-workflow.md): set `status: 'stable'`
-   only when the accepted scope and required checks are complete, or unavailable checks were
-   explicitly deferred by the user and remain disclosed. Keep `in-progress` for failed or
-   unresolved required acceptance checks; the status test does not prove runtime behavior.
+   [component workflow](../../../docs/conventions/component-workflow.md)
+   and its [readiness policy](../../../docs/conventions/component-workflow.md#default-readiness-policy).
+   Mark `stable` when the accepted scope and required checks are complete; optional iOS and manual
+   screen-reader checks need no individual waiver and remain disclosed as not verified.
+   Keep `in-progress` for failed or unresolved required checks and known defects, not the default
+   optional categories. The status test does not prove runtime behavior.
 
 ## Files
 

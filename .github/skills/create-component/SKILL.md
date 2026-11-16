@@ -36,8 +36,10 @@ Main agent: `component-builder`. Read `AGENTS.md` first.
 10. Edit the generated changeset and remove every `TODO(generator)` marker (`npm run status` keeps the component "in progress" while markers remain).
 11. Run the structure test and full checks, then collect the workflow's runtime evidence matrix.
     Test real web/wrapper integration and the native demo, not just mocks or exports. Inventory
-    completeness alone is not readiness: keep `in-progress` if required acceptance checks are
-    failed/unavailable, unless the user explicitly defers those limitations.
+    completeness alone is not readiness. Apply the
+    [readiness policy](../../../docs/conventions/component-workflow.md#default-readiness-policy):
+    iOS validation and manual screen readers are optional/non-blocking, with no recurring waiver.
+    Keep `in-progress` for unresolved required checks or known defects, not optional evidence gaps.
 12. Run `finish-work`: create a local commit and **STOP for user validation**. Revisions get new
     commits and a fresh pause. Only after approval of the current HEAD does `open-pr` push/create PR.
 

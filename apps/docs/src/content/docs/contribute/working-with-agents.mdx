@@ -48,6 +48,19 @@ The test and native agents include browser tools, and coordinating roles can del
 interactive questions. Availability still depends on your harness and enabled tools. The workflow
 does not bypass editor permissions or add a new GitHub approval requirement.
 
+## Readiness and optional validation
+
+`stable` means the implementation and required acceptance checks are complete, not that every
+device or assistive technology is certified. The
+[readiness policy](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-workflow.md#default-readiness-policy)
+makes iOS validation and manual screen-reader testing optional and non-blocking for all components.
+Agents do not attempt them unless explicitly requested and do not ask for a waiver on every task.
+They report **not verified (optional)** instead of claiming a pass or holding a component in progress.
+
+Automated tests, applicable browser integration and accessibility requirements such as names,
+roles, states, keyboard, focus, contrast, motion and touch targets still apply. Known defects remain
+blockers, including those discovered in an optional environment.
+
 ## Agents
 
 <AgentsTable kind="agents" />

@@ -72,6 +72,11 @@ with `npx vitest run` (Turborepo filters do it for you).
     `npm run status` reports what exists. Before using a component inside another, check it: if it is
     stable, use it; if not, use the accessible native primitive, add the dependency to the catalog
     entry (`dependsOn`) and a traceable note (`notes`). Never leave TODOs in component code.
+12. **Default readiness.** iOS validation and manual screen-reader testing are optional and
+    non-blocking for `stable`; do not attempt them unless explicitly requested or ask for a
+    per-component waiver. Disclose them as not verified, never passed. Required automated,
+    applicable browser and accessibility checks still apply; known defects still block readiness.
+    Follow the [readiness policy](docs/conventions/component-workflow.md#default-readiness-policy).
 
 ## 4. Workflow for any change
 

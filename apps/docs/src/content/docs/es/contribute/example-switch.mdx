@@ -129,8 +129,9 @@ stable       1  switch
 ```
 
 El inventario comprueba la estructura. Solo se marca `stable` al completar el alcance aceptado y las
-pruebas requeridas, o si aplazas explícitamente pruebas no disponibles que siguen indicándose como
-pendientes. La existencia de archivos no demuestra el funcionamiento en ejecución.
+pruebas obligatorias. Por defecto, iOS y las pruebas manuales con lectores de pantalla son opcionales
+y no bloqueantes; se indican como no verificadas sin pedir una excepción en cada componente.
+Las demás pruebas obligatorias siguen bloqueando; los archivos no demuestran el funcionamiento real.
 
 ## 10. Changeset — `add-changeset`
 
