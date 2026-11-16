@@ -51,6 +51,7 @@ export default function TextFieldScreen() {
   const [required, setRequired] = useState(false);
   const [labelHidden, setLabelHidden] = useState(false);
   const [adornments, setAdornments] = useState(false);
+  const [longContent, setLongContent] = useState(false);
   const [actions, setActions] = useState(false);
   const [accept, setAccept] = useState(true);
   const [controlled, setControlled] = useState('Example');
@@ -67,7 +68,8 @@ export default function TextFieldScreen() {
       <Stack.Screen options={{ title: 'Text Field' }} />
       <Text style={textStyle}>Interactive text field</Text>
       <TextField
-        label="Interactive field"
+        testID="interactive-text-field"
+        label={longContent ? 'LongAccountReference'.repeat(8) : 'Interactive field'}
         labelHidden={labelHidden}
         value={controlled}
         onValueChange={({ value }) => {
@@ -81,12 +83,22 @@ export default function TextFieldScreen() {
         readOnly={readOnly}
         required={required}
         invalid={invalid}
-        error={invalid ? 'Please check this value.' : undefined}
-        helpText="Use the controls below to change this field."
+        error={
+          invalid
+            ? longContent
+              ? 'Please check this account reference. '.repeat(5)
+              : 'Please check this value.'
+            : undefined
+        }
+        helpText={
+          longContent
+            ? 'Use the controls below to change this field. '.repeat(5)
+            : 'Use the controls below to change this field.'
+        }
         startIcon={adornments ? search : undefined}
         endIcon={adornments ? heart : undefined}
-        prefix={adornments ? '#' : undefined}
-        suffix={adornments ? '.com' : undefined}
+        prefix={adornments ? (longContent ? 'ReferencePrefix'.repeat(8) : '#') : undefined}
+        suffix={adornments ? (longContent ? 'ReferenceSuffix'.repeat(8) : '.com') : undefined}
         clearable={actions}
         clearLabel="Clear interactive field"
         passwordReveal={actions}
@@ -148,6 +160,11 @@ export default function TextFieldScreen() {
           label="Adornments"
           selected={adornments}
           onPress={() => setAdornments(!adornments)}
+        />
+        <Choice
+          label="Long content"
+          selected={longContent}
+          onPress={() => setLongContent(!longContent)}
         />
         <Choice label="Actions" selected={actions} onPress={() => setActions(!actions)} />
         <Choice
