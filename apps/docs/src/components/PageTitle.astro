@@ -17,6 +17,9 @@ const markdownUrl = path === base || path === '' ? `${base}/index.md` : `${path}
     tone="neutral"
     size="sm"
     class="cosm-docs-action-button cosm-page-ai-button"
+    data-cosm-preview
+    data-theme="cosmos"
+    data-mode="light"
     data-copy-page={markdownUrl}
     data-copied={s.ai.copied}
     data-failed={s.ai.failed}
@@ -56,13 +59,8 @@ const markdownUrl = path === base || path === '' ? `${base}/index.md` : `${path}
     font-size: var(--sl-text-sm);
   }
   .cosm-page-ai-button {
-    --cosm-fg: var(--sl-color-gray-1);
-    --cosm-bg: var(--sl-color-bg);
-    --cosm-neutral-3: var(--sl-color-gray-6);
-    --cosm-border-strong: var(--sl-color-gray-4);
-    --cosm-focus-ring: var(--sl-color-accent);
-    --cosm-text-sm: var(--sl-text-sm);
-    --cosm-font-sans: var(--sl-font-system, system-ui, sans-serif);
+    background: var(--cosm-bg);
+    border-radius: var(--cosm-radius-md);
   }
   .cosm-page-ai-status {
     color: var(--sl-color-gray-3);

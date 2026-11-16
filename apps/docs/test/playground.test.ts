@@ -330,7 +330,11 @@ describe('Playground', () => {
       ...root.querySelectorAll<HTMLSelectElement>('.cosm-playground-toolbar select'),
     ];
     const preview = root.querySelector<HTMLElement>('[data-cosm-preview]');
-    if (!theme || !mode || !preview) throw new Error('missing toolbar');
+    const controls = root.querySelector<HTMLElement>('.cosm-playground-controls');
+    const copy = root.querySelector<HTMLElement>('.cosm-playground-copy');
+    if (!theme || !mode || !preview || !controls || !copy) throw new Error('missing toolbar');
+    expect(controls.dataset.theme).toBe('cosmos');
+    expect(controls.dataset.mode).toBe('light');
     theme.value = 'nebula';
     theme.dispatchEvent(new Event('change'));
     mode.value = 'dark';
@@ -338,10 +342,24 @@ describe('Playground', () => {
     expect(preview.dataset.theme).toBe('nebula');
     expect(preview.dataset.mode).toBe('dark');
     expect(preview.hasAttribute('data-fixed')).toBe(true);
+    for (const surface of [controls, copy]) {
+      expect(surface.dataset.theme).toBe('nebula');
+      expect(surface.dataset.mode).toBe('dark');
+      expect(surface.hasAttribute('data-fixed')).toBe(true);
+      expect(surface.hasAttribute('data-fixed-mode')).toBe(true);
+    }
+    theme.value = '';
+    theme.dispatchEvent(new Event('change'));
     mode.value = '';
     mode.dispatchEvent(new Event('change'));
     expect(preview.hasAttribute('data-fixed-mode')).toBe(false);
     expect(preview.dataset.mode).toBe('light');
+    for (const surface of [controls, copy]) {
+      expect(surface.dataset.theme).toBe('cosmos');
+      expect(surface.dataset.mode).toBe('light');
+      expect(surface.hasAttribute('data-fixed')).toBe(false);
+      expect(surface.hasAttribute('data-fixed-mode')).toBe(false);
+    }
   });
 
   it('links to the native demo screen when available', () => {

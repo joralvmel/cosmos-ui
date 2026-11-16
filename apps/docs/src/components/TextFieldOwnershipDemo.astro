@@ -24,6 +24,9 @@ const {
 
 <div
   class="text-field-ownership-demo"
+  data-cosm-preview
+  data-theme="cosmos"
+  data-mode="light"
   data-text-field-ownership-demo
   data-pending={pendingMessage}
   data-accepted={acceptedMessage}
@@ -106,6 +109,8 @@ const {
     padding: 1rem;
     border: 1px solid var(--cosm-border, oklch(0.78 0.01 268));
     border-radius: var(--cosm-radius-md, 0.5rem);
+    background: var(--cosm-bg);
+    color: var(--cosm-fg);
   }
   .text-field-ownership-actions {
     display: flex;

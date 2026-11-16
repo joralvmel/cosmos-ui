@@ -230,7 +230,17 @@ export function initPlayground(
   }
 
   // Controls generated from the contract.
-  const fieldset = element('fieldset', { class: 'cosm-playground-controls not-content' });
+  const themeAttributes = () => ({
+    'data-cosm-preview': '',
+    'data-theme': preview?.dataset.theme ?? storage?.getItem(SITE_THEME_KEY) ?? 'cosmos',
+    'data-mode':
+      preview?.dataset.mode ??
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'),
+  });
+  const fieldset = element('fieldset', {
+    class: 'cosm-playground-controls not-content',
+    ...themeAttributes(),
+  });
   fieldset.append(element('legend', {}, labels.controls));
   const advanced = element('details', { class: 'cosm-playground-advanced' });
   advanced.append(element('summary', {}, labels.advanced ?? 'Advanced options'));
@@ -651,6 +661,7 @@ export function initPlayground(
       tone: 'neutral',
       size: 'sm',
       class: 'cosm-docs-action-button cosm-playground-copy',
+      ...themeAttributes(),
     },
     labels.copy
   );

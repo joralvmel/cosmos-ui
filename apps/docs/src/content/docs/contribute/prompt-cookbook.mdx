@@ -249,8 +249,12 @@ or change library APIs; retain native controls where no stable equivalent covers
 
 After approval, update shared controls and EN/ES docs without duplicating behavior or breaking
 generated snippets. Verify actual interactions, keyboard, focus, themes and narrow layouts in the
-browser, and add focused regressions. Report replacements and deferrals, validate, create a local
-commit and wait for my review without push or PR.
+browser, and add focused regressions. Adopted controls must use the active Cosmos theme and mode,
+including Playground overrides and return to the site setting; do not mask their tokens with
+Starlight-only colors. Check their rendered colors, focus and contrast against their actual
+background in at least two themes and both modes, not just the preview's attributes.
+Report replacements and deferrals, validate, create a local commit and wait for my review
+without push or PR.
 ```
 
 ### Review without changing files
