@@ -51,6 +51,20 @@ Los agentes de pruebas y nativo incluyen herramientas de navegador, y los roles 
 delegar y hacer preguntas interactivas. Su disponibilidad depende del harness y las herramientas
 habilitadas. El flujo no omite permisos del editor ni añade una aprobación obligatoria en GitHub.
 
+## Estado estable y validación opcional
+
+`stable` indica que la implementación y las comprobaciones obligatorias están completas, no una
+certificación de todos los dispositivos o tecnologías de asistencia. La
+[política de validación](https://github.com/joralvmel/cosmos-ui/blob/develop/docs/conventions/component-workflow.md#default-readiness-policy)
+establece que las pruebas de iOS y las pruebas manuales con lectores de pantalla son opcionales y
+no bloqueantes para todos los componentes. Los agentes no las intentan salvo petición explícita
+ni piden una excepción en cada tarea. Las declaran **no verificadas (opcionales)**, sin darlas por
+aprobadas ni mantener el componente en progreso por ese único motivo.
+
+Siguen siendo obligatorios los tests automatizados, la integración aplicable en navegador y los
+requisitos de accesibilidad: nombres, roles, estados, teclado, foco, contraste, movimiento y áreas
+táctiles. Los defectos conocidos siguen bloqueando, incluso si se detectan en un entorno opcional.
+
 ## Agentes
 
 Las descripciones están en inglés, como los archivos de los agentes.

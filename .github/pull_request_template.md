@@ -9,8 +9,11 @@ acceptance before push. List any explicitly deferred checks. Not applicable? Exp
 
 ## Validation evidence
 
-<!-- Use passed / failed / unavailable / not applicable, with commands or observed scenarios and
-environment. Delete no area merely because it was not run. See docs/conventions/component-workflow.md. -->
+<!-- Use passed / failed / unavailable / not applicable / not verified (optional), with commands or
+observed scenarios and environment. iOS and manual screen readers are optional/non-blocking by
+default: do not run them unless explicitly requested or ask for individual waivers. Keep unverified
+evidence disclosed, never passed. Required accessibility checks and known defects remain blocking.
+See docs/conventions/component-workflow.md#default-readiness-policy. -->
 
 | Area | Result | Command/scenario, environment and limitations |
 | --- | --- | --- |
@@ -21,8 +24,9 @@ environment. Delete no area merely because it was not run. See docs/conventions/
 | React Native mocked tests | | |
 | React Native Web | | |
 | Android build / runtime (separate results) | | |
-| iOS build / runtime (separate results) | | |
+| iOS build / runtime (optional; separate results if run) | Not verified (optional) | Outside default validation scope unless explicitly requested |
 | Visual / accessibility | | |
+| Manual screen readers (optional) | Not verified (optional) | Outside default validation scope unless explicitly requested |
 
 ## Checklist
 

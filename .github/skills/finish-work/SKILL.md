@@ -26,6 +26,9 @@ implementation changes.
    `npm run status`. For package changes confirm a changeset (`npx changeset status --since=origin/develop`).
    Collect the relevant runtime evidence matrix; identify failed/unavailable checks and any
    explicitly deferred limitations. Never claim mocks or exports are real-device tests.
+   Apply the [readiness policy](../../../docs/conventions/component-workflow.md#default-readiness-policy):
+   default optional iOS/manual reader checks do not block completion or `stable` and need no
+   individual waiver; record them as not verified (optional).
 3. Run `verify-identity` (account and remote included), then `commit` to automatically create a
    **local Conventional Commit** of the validated task files. Honor an explicit no-commit request.
    Do not make an empty commit if this HEAD already contains the validated change.

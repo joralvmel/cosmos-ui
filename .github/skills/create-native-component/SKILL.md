@@ -29,6 +29,9 @@ require a scope/API/design change.
 8. Exercise the demo controls and inspect console/accessibility props on React Native Web. Report
    Android/iOS export/build separately from runtime checks on a named emulator/device. Mocks and web
    do not prove touch, TalkBack or VoiceOver behavior; record unavailable checks, never a false pass.
+   Apply the [readiness policy](../../../docs/conventions/component-workflow.md#default-readiness-policy):
+   do not attempt iOS validation or manual screen-reader runs unless explicitly requested.
+   Record them as not verified (optional); they do not block `stable` or need a user waiver.
 9. Hand evidence to `finish-work` for the local commit and user review pause. Do not push or create
    a PR independently.
 

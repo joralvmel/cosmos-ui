@@ -127,8 +127,9 @@ stable       1  switch
 ```
 
 The inventory checks structural completeness. Only mark the component `stable` when the accepted
-scope and required checks are complete, or the user explicitly deferred unavailable checks that
-remain disclosed. File presence does not prove runtime readiness.
+scope and required checks are complete. Under the default readiness policy, iOS and manual
+screen-reader validation are optional/non-blocking and reported as not verified without a
+per-component waiver. Other required checks still block; file presence does not prove runtime readiness.
 
 ## 10. Changeset — `add-changeset`
 

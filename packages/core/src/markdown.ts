@@ -1,13 +1,18 @@
 import {
   activeProps,
-  generateSnippets,
+  generateComposedSnippets,
   pascalCase,
   type SnippetTarget,
   toAttribute,
 } from './codegen.js';
 import type { ComponentContract, Platform, PropSpec } from './contract.js';
+import { iconContract } from './specs/icon.js';
 
 const cell = (value: string) => value.replaceAll('|', '\\|').replaceAll('\n', ' ');
+const exampleChild = (contract: ComponentContract) =>
+  contract.name === 'icon-button'
+    ? { contract: iconContract, values: { icon: 'heart' } }
+    : undefined;
 
 export const propType = (spec: PropSpec) =>
   spec.type === 'enum'
@@ -120,7 +125,7 @@ export function snippetsMarkdown(
   content = pascalCase(contract.name),
   values: Record<string, string | number | boolean | undefined> = {}
 ): string {
-  const snippets = generateSnippets(contract, values, content);
+  const snippets = generateComposedSnippets(contract, values, content, exampleChild(contract));
   return (Object.entries(snippets) as [SnippetTarget, string][])
     .map(
       ([target, code]) =>
@@ -148,10 +153,11 @@ export function componentReference(contract: ComponentContract, platform: Platfo
     return `\`${names[platform]}\` → \`${event.detail}\``;
   });
   const target: SnippetTarget = platform === 'web' ? 'html' : platform;
-  const example = generateSnippets(
+  const example = generateComposedSnippets(
     contract,
     Object.fromEntries(activeProps(contract, {}, platform).map(prop => [prop.name, prop.value])),
-    pascalCase(contract.name)
+    pascalCase(contract.name),
+    exampleChild(contract)
   )[target];
   return [
     `### ${heading}`,

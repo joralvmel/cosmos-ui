@@ -26,7 +26,10 @@ You are the **native expert** of Cosmos UI.
 
 - Derive props from the contract and keep `<name>PropNames` in sync; callbacks receive the contract detail.
 - Use `useTheme()` for every visual value; support every theme and `system` mode.
-- Accessibility: roles, states, labels, 44pt targets, screen reader order; test with TalkBack/VoiceOver in the demo.
+- Accessibility: roles, states, labels, 44pt targets and focus order remain required.
+  Follow the [readiness policy](../../docs/conventions/component-workflow.md#default-readiness-policy):
+  do not attempt iOS validation or manual TalkBack/VoiceOver runs unless explicitly requested.
+  They are optional/non-blocking for `stable`; disclose them as not verified without asking for waivers.
 - Add gesture or animation libraries only when required and record their licenses.
 - Add a demo screen for every component.
 - Follow the [component workflow](../../docs/conventions/component-workflow.md). Reuse accepted

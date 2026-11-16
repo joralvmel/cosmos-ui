@@ -142,6 +142,40 @@ Events: `cosm-change` → `TextFieldChangeDetail`, `cosm-submit` → `TextFieldS
   element.addEventListener('cosm-submit', event => console.log(event.detail));
 </script>
 ```
+### `<cosm-icon-button>`
+
+Activates an action or toggles a boolean state using a labeled icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required localized accessible name. Missing, empty or whitespace-only labels are rejected. |
+| `mode` | 'action' \| 'toggle' | `action` | Action activates without toggle state; toggle exposes and changes pressed state. |
+| `variant` | 'solid' \| 'soft' \| 'outline' \| 'ghost' | `solid` | Visual emphasis, from highest (solid) to lowest (ghost). |
+| `tone` | 'primary' \| 'neutral' \| 'danger' | `primary` | Color role. Use danger for destructive actions. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Size of the square visual control. |
+| `disabled` | boolean | `false` | Prevents activation and removes the web button from the tab order. |
+| `type` | 'button' \| 'submit' \| 'reset' | `button` | Native web button form behavior. |
+| `pressed` | boolean | `false` | Toggle state. If supplied, including false, activation proposes changes without committing them until the owner updates this prop. |
+| `defaultPressed` (`default-pressed`) | boolean | `false` | Initial toggle state when pressed is not supplied; it does not control later changes. |
+
+Events: `cosm-press` → `IconButtonPressDetail`, `cosm-pressed-change` → `IconButtonPressedChangeDetail`.
+
+```html
+<cosm-icon-button label="IconButton"><cosm-icon></cosm-icon></cosm-icon-button>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/icon';
+  import { heart } from '@joralvmel/cosmos-icons/heart';
+  import '@joralvmel/cosmos-elements/icon-button';
+
+  const element = document.querySelector('cosm-icon-button');
+  element.addEventListener('cosm-press', event => console.log(event.detail));
+  element.addEventListener('cosm-pressed-change', event => console.log(event.detail));
+
+  const childElement = document.querySelector('cosm-icon');
+  childElement.icon = heart;
+</script>
+```
 
 ## Themes
 

@@ -30,7 +30,7 @@ describe('MDX to Markdown', () => {
     expect(markdown).toMatch(/^# \S/);
     expect(markdown).not.toMatch(/^import .*(\.astro|@astrojs\/starlight\/components)';$/m);
     expect(markdown).not.toMatch(
-      /<(?:Playground|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
+      /<(?:Playground|IconButtonExamples|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
     );
   });
 
@@ -41,6 +41,15 @@ describe('MDX to Markdown', () => {
     expect(markdown).toContain('| `variant` |');
     expect(markdown).toContain('| `cosm-press` | `onPress` | `(press)` |');
     expect(markdown).toContain('```html\n<cosm-button>Solid</cosm-button>');
+  });
+
+  it('converts icon-button examples with their decorative icon on every platform', () => {
+    const markdown = convert('components/icon-button.mdx');
+    expect(markdown).not.toContain('<IconButtonExamples');
+    expect(markdown).toContain('<cosm-icon></cosm-icon>');
+    expect(markdown).toContain('<Icon icon={heart}></Icon>');
+    expect(markdown).toContain("from '@joralvmel/cosmos-icons/heart'");
+    expect(markdown).not.toContain('COSMOS_PLAYGROUND_CHILD');
   });
 
   it('keeps tab contents as normal Markdown', () => {

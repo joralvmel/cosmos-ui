@@ -23,7 +23,9 @@ const fieldActionLabels =
         'reveal-password-label': s.playground.textFieldDefaults?.revealPasswordLabel,
         'hide-password-label': s.playground.textFieldDefaults?.hidePasswordLabel,
       }
-    : {};
+    : name === 'icon-button'
+      ? { label: s.playground.iconButtonLabel }
+      : {};
 const web = supports(contract, 'web');
 const hasDemo = getStatusReport().components.find(item => item.name === name)?.pieces.nativeDemo;
 const nativeDemoUrl = hasDemo
@@ -47,7 +49,7 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
         <Element
           data-playground-target
           {...fieldActionLabels}
-        >{content}</Element>
+        >{name === 'icon-button' ? <cosm-icon data-playground-child /> : content}</Element>
       </div>
     )
   }
@@ -92,6 +94,15 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
       initPlayground(root, {
         ...options,
         referenceValues: { IconDefinition: { heart, house, search, star } },
+      });
+    } else if (contract.name === 'icon-button') {
+      const icon = root.querySelector<HTMLElementTagNameMap['cosm-icon']>(
+        'cosm-icon[data-playground-child]'
+      );
+      if (icon) icon.icon = heart;
+      initPlayground(root, {
+        ...options,
+        child: { contract: contracts.icon, values: { icon: 'heart' } },
       });
     } else {
       initPlayground(root, options);

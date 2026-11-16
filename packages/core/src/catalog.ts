@@ -88,6 +88,11 @@ export const catalog: readonly CatalogEntry[] = [
     priority: 2,
     dependsOn: ['button', 'icon'],
     pattern: apg('button'),
+    target: 'stable',
+    status: 'stable',
+    notes: [
+      'Android/iOS device, screen-reader, and full theme/contrast checks are explicitly deferred and remain unverified in docs/design/icon-button.md.',
+    ],
   }),
   entry({
     name: 'badge',
@@ -154,7 +159,7 @@ export const catalog: readonly CatalogEntry[] = [
     dependsOn: ['icon', 'icon-button'],
     pattern: html('input.html'),
     notes: [
-      'icon-button is planned; clear and password-reveal actions use local accessible native button primitives until that dependency is stable.',
+      'Clear and password-reveal actions use local accessible native button primitives; migration to icon-button is deferred.',
       'Implementation complete; outstanding acceptance checks are explicitly deferred and remain unverified in docs/design/text-field.md.',
     ],
     status: 'stable',

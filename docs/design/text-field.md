@@ -4,8 +4,9 @@
 
 Text field is an accessible, single-line text-entry control for web and React Native. This is the
 accepted design record for the first implementation stage. Implementations and demos are present
-on all four platforms. The component remains **in progress** because the required runtime evidence
-is not complete; see the verification matrix below.
+on all four platforms. The component is **stable** under the current
+[readiness policy](../conventions/component-workflow.md#default-readiness-policy), with the
+verification matrix and explicitly deferred checks below preserved as unverified, not passed.
 
 ## Accepted scope
 
@@ -209,10 +210,11 @@ is added:
 
 Required evidence is shared/unit and contract-drift tests; real browser form and editing behavior;
 React and Angular browser integration; React Native mocked tests and React Native Web browser checks;
-and separate Android/iOS device or simulator checks. Mocks, typechecks and native exports do not
-prove native device interaction. If any required device check is unavailable, status remains
-in-progress. Documentation in English/Spanish, representative demos, AI references and the
-changeset accompany the implementation.
+and Android checks within the approved scope. Under the current readiness policy, iOS validation
+and manual screen-reader runs are optional/non-blocking by default. Mocks, typechecks and native
+exports do not prove native device interaction. Unresolved required checks still block readiness;
+optional gaps remain disclosed without individual waivers. Documentation in English/Spanish,
+representative demos, AI references and the changeset accompany the implementation.
 
 ### Verification matrix
 

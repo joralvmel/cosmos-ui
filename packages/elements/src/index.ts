@@ -12,6 +12,7 @@ export {
   CosmButton,
 } from './components/button/cosm-button.js';
 export { CosmIcon, type CosmIconSize } from './components/icon/cosm-icon.js';
+export { CosmIconButton } from './components/icon-button/cosm-icon-button.js';
 export {
   CosmTextField,
   type TextFieldSize,
