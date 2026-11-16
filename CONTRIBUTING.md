@@ -34,6 +34,19 @@ Thanks for helping! The full guide lives in the docs site:
 | Generate a component, chart or theme | `npm run generate -- <target> <kebab-name>` |
 | Docs site | `npm run docs` |
 
+## Temporary dependency overrides
+
+The root manifest overrides `minimatch` to `11.0.8` only for `@expo/fingerprint@0.21.10`
+in the private Expo demo. This removes
+[GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249) without downgrading
+Expo SDK 58. Fingerprint uses the supported `Minimatch` constructor and matching API, not the
+APIs removed in minimatch 11. Expo's default matching options do not activate the vulnerable
+optimization, but the override also removes the affected dependency from the installed tree.
+
+Remove this exception when Expo's fingerprint dependency accepts a patched minimatch version.
+Recheck `npm audit`, fingerprint generation and the native demo web export after changing it.
+It does not change published package requirements or need a release changeset.
+
 ## Guides (docs site, English and Spanish)
 
 | Guide | Source |
