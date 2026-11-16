@@ -212,8 +212,13 @@ development-only NAVIGATE-to-`__root` warning. Normal navigation from the demo h
 the font-scale activity restart. This is recorded as a demo navigation diagnostic, not hidden or
 reported as a text-field editing failure.
 
-No unavailable check has been deferred by the user. Keep the catalog readiness override
-`in-progress`; structural completeness does not authorize promotion to stable.
+The maintainer explicitly approved marking this component `stable` with the outstanding checks
+listed above deferred: iOS runtime/VoiceOver and text scaling, desktop screen readers, axe,
+full TalkBack state/error coverage, and Japanese/Chinese/Korean or web IME composition.
+They remain unverified, not passed. The stable inventory status records a complete implementation
+and acceptance of the available evidence with these disclosed limitations; it does not certify
+every device, browser, assistive technology or input method. No new platform features or test
+dependencies are added by this readiness decision.
 
 Final repository validation: Biome CI and all 49 Turborepo typecheck/test/build tasks passed.
 Terminology and generated AI-reference freshness checks also passed. The docs build reports the

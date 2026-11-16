@@ -155,9 +155,9 @@ export const catalog: readonly CatalogEntry[] = [
     pattern: html('input.html'),
     notes: [
       'icon-button is planned; clear and password-reveal actions use local accessible native button primitives until that dependency is stable.',
-      'Keep readiness in-progress until required browser, React Native Web, Android and iOS acceptance evidence is available.',
+      'Implementation complete; outstanding acceptance checks are explicitly deferred and remain unverified in docs/design/text-field.md.',
     ],
-    status: 'in-progress',
+    status: 'stable',
   }),
   entry({
     name: 'textarea',

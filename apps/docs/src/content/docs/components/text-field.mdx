@@ -121,6 +121,11 @@ validation; its consumer owns business validation and submit handling.
   region, but TalkBack/VoiceOver behavior is not verified here. Do not assume semantic parity across
   devices.
 
+The stable inventory status records implementation readiness with explicitly deferred validation:
+iOS/VoiceOver, desktop screen readers, axe, full TalkBack state/error coverage and non-Latin/web
+IME composition remain unverified. Representative Android TalkBack output, Latin Gboard candidate
+input and 200% Android text scaling have been checked; they do not certify the other environments.
+
 ## API
 
 <ApiTable name="text-field" />

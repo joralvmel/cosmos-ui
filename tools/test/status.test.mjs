@@ -45,8 +45,10 @@ describe('component status', () => {
     }
   });
 
-  it('keeps text-field in progress when its complete file inventory lacks device evidence', () => {
-    const textField = report.components.find(component => component.name === 'text-field');
+  it('honors an explicit readiness downgrade for a complete component', () => {
+    const entry = catalog.find(item => item.name === 'text-field');
+    if (!entry) throw new Error('text-field missing from the catalog');
+    const [textField] = getStatusReport(ROOT, [{ ...entry, status: 'in-progress' }]).components;
     expect(textField?.missing).toEqual([]);
     expect(textField?.todos).toEqual([]);
     expect(textField?.claimed).toBe('in-progress');
