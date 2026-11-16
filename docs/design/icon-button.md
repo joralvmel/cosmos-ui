@@ -52,3 +52,10 @@ Text Field controls are outside the approved scope.
 - Demos exercise variants, tones, sizes, disabled and toggle state, and icon customization.
 - Validate contract and platform drift, real browser and wrapper integration, native web and
   available device runtimes. Report unavailable checks rather than treating mocks as runtime proof.
+
+## Deferred validation
+
+The user explicitly deferred Android and iOS device interaction, screen-reader testing, and visual
+and contrast checks across all built-in themes when approving stable status. These checks remain
+unverified; successful JavaScript exports and React Native Web interaction do not establish native
+device accessibility or behavior.
