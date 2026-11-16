@@ -74,6 +74,78 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('combines catalog category and search, and copies the selected icon style and size', async () => {
+    const root = document.createElement('div');
+    const preview = document.createElement('div');
+    preview.dataset.cosmPreview = '';
+    const target = document.createElement('cosm-icon');
+    target.dataset.playgroundTarget = '';
+    preview.append(target);
+    root.append(preview);
+    document.body.append(root);
+    const items = [
+      { name: 'house', category: 'navigation', tags: ['home'] },
+      { name: 'heart', category: 'shapes', tags: ['love'] },
+    ];
+    const writeText = vi.fn(async () => {});
+    const controller = initPlayground(root, {
+      contract: iconContract,
+      content: '',
+      labels,
+      themes: [],
+      referenceCatalogs: {
+        IconDefinition: {
+          items,
+          search: query => searchIconCatalog(items, query),
+          load: async name => (name === 'heart' ? heart : house),
+          preview: async () => document.createElement('cosm-icon'),
+        },
+      },
+      clipboard: { writeText },
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    const category = root.querySelector<HTMLSelectElement>('[data-icon-category]');
+    const searchInput = root.querySelector<HTMLInputElement>('input[type="search"]');
+    const size = root.querySelector<HTMLSelectElement>('[data-icon-size]');
+    const style = root.querySelector<HTMLSelectElement>('[data-icon-style]');
+    if (!category || !searchInput || !size || !style) throw new Error('Missing catalog controls');
+    category.value = 'shapes';
+    category.dispatchEvent(new Event('change'));
+    await vi.waitFor(() => expect(controller.values.icon).toBe('heart'));
+    expect(root.querySelectorAll('[data-icon-name]')).toHaveLength(1);
+    searchInput.value = 'house';
+    searchInput.dispatchEvent(new Event('input'));
+    expect(root.querySelectorAll('[data-icon-name]')).toHaveLength(0);
+    expect(controller.values.icon).toBe('heart');
+    searchInput.value = 'love';
+    searchInput.dispatchEvent(new Event('input'));
+    size.value = '32';
+    size.dispatchEvent(new Event('change'));
+    style.value = 'filled';
+    style.dispatchEvent(new Event('change'));
+    await vi.waitFor(() => expect(target.icon).toBe(heart));
+    expect(target.size).toBe(32);
+    expect(target.fill).toBe('currentColor');
+    expect(root.querySelector('cosm-icon[data-playground-target]')).toBe(target);
+    for (const technology of ['html', 'react', 'angular', 'native'] as const) {
+      controller.select(technology);
+      root.querySelector<HTMLButtonElement>('.cosm-playground-copy')?.click();
+      await vi.waitFor(() => expect(writeText).toHaveBeenLastCalledWith(controller.code()));
+      expect(controller.code()).toContain('cosmos-icons/heart');
+      expect(controller.code()).toContain('32');
+    }
+    await vi.waitFor(() => {
+      const thumbnail = root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon');
+      expect(thumbnail?.size).toBe(32);
+      expect(thumbnail?.fill).toBe('currentColor');
+    });
+    controller.set('size', 37);
+    controller.set('fill', 'none');
+    expect(size.value).toBe('37');
+    expect(style.value).toBe('outline');
+    expect(root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon')?.size).toBe(37);
+  });
+
   it('builds one control per contract prop and four code tabs', () => {
     const { root } = mount();
     expect(root.querySelectorAll('[data-prop]')).toHaveLength(

@@ -30,6 +30,16 @@ export interface PlaygroundLabels {
   iconGallery?: string;
   iconMore?: string;
   iconPreviewError?: string;
+  iconCategory?: string;
+  iconAllCategories?: string;
+  iconPreviewSize?: string;
+  iconStyle?: string;
+  iconOutline?: string;
+  iconFilled?: string;
+  iconFillNote?: string;
+  iconSelected?: string;
+  iconCategories?: Readonly<Record<string, string>>;
+  highlightError?: string;
   advanced?: string;
   none?: string;
   customSize?: string;
@@ -239,6 +249,7 @@ export function initPlayground(
   customHeightLabel.hidden = true;
   const referenceStatus = element('span', { role: 'status', 'aria-live': 'polite' });
   let referenceRequest = 0;
+  const refreshCatalogs: (() => void)[] = [];
   for (const [name, spec] of Object.entries(contract.props)) {
     const label = element('label');
     label.append(element('span', {}, name));
@@ -254,6 +265,7 @@ export function initPlayground(
       control = element('select');
       const catalog =
         spec.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
+      if (catalog?.preview) label.hidden = true;
       const choices = catalog
         ? catalog.items.map(item => item.name)
         : spec.type === 'enum'
@@ -273,6 +285,7 @@ export function initPlayground(
         control.append(element('option', { value: 'custom' }, labels.customSize ?? 'Custom'));
       }
       if (catalog) {
+        const catalogControls = element('div', { class: 'cosm-icon-toolbar' });
         const searchLabel = element('label');
         searchLabel.append(element('span', {}, labels.iconSearch ?? 'Search icons'));
         const searchInput = element('input', { type: 'search' });
@@ -295,6 +308,71 @@ export function initPlayground(
         );
         let matches: readonly { name: string }[] = catalog.items;
         let shown = 0;
+        const category = select(
+          labels.iconCategory ?? 'Category',
+          [
+            ['', labels.iconAllCategories ?? 'All categories'],
+            ...[...new Set(catalog.items.map(item => item.category))]
+              .sort()
+              .map(value => [value, labels.iconCategories?.[value] ?? value] as [string, string]),
+          ],
+          ''
+        );
+        category.control.dataset.iconCategory = '';
+        const size = select(
+          labels.iconPreviewSize ?? 'Preview size',
+          ['16', '20', '24', '32', '48'].map(value => [value, `${value} px`]),
+          '20'
+        );
+        size.control.dataset.iconSize = '';
+        const style = select(
+          labels.iconStyle ?? 'Style',
+          [
+            ['outline', labels.iconOutline ?? 'Outline'],
+            ['filled', labels.iconFilled ?? 'Filled paths'],
+          ],
+          'outline'
+        );
+        style.control.dataset.iconStyle = '';
+        const previewSize = () =>
+          typeof values.size === 'number'
+            ? values.size
+            : values.size === 'sm'
+              ? 16
+              : values.size === 'lg'
+                ? 24
+                : 20;
+        const paintPreviews = () => {
+          const iconSize = previewSize();
+          for (const icon of gallery.querySelectorAll('cosm-icon')) {
+            icon.size = iconSize;
+            icon.fill = String(values.fill ?? 'none');
+            icon.stroke = String(values.stroke ?? 'currentColor');
+            icon.strokeWidth = Number(values.strokeWidth ?? 2);
+          }
+        };
+        refreshCatalogs.push(() => {
+          const value = String(previewSize());
+          if (![...size.control.options].some(option => option.value === value)) {
+            size.control.querySelector('[data-custom-size]')?.remove();
+            size.control.append(
+              element('option', { value, 'data-custom-size': '' }, `${value} px`)
+            );
+          }
+          size.control.value = value;
+          style.control.value = values.fill === 'none' ? 'outline' : 'filled';
+          const sizeInput = fieldset.querySelector<HTMLInputElement>('[data-prop="size"]');
+          if (sizeInput) sizeInput.value = String(values.size);
+          const fillInput = fieldset.querySelector<HTMLInputElement>('[data-prop="fill"]');
+          if (fillInput) fillInput.value = String(values.fill);
+          paintPreviews();
+        });
+        size.control.addEventListener('change', () => {
+          controller.set('size', Number(size.control.value));
+        });
+        style.control.addEventListener('change', () => {
+          controller.set('fill', style.control.value === 'filled' ? 'currentColor' : 'none');
+        });
         const appendPreviews = () => {
           const next = matches.slice(shown, shown + 24);
           shown += next.length;
@@ -315,7 +393,10 @@ export function initPlayground(
             gallery.append(button);
             catalog
               .preview?.(item.name)
-              .then(node => thumbnail.replaceChildren(node))
+              .then(node => {
+                thumbnail.replaceChildren(node);
+                paintPreviews();
+              })
               .catch(() => {
                 thumbnail.textContent = labels.iconPreviewError ?? 'Preview unavailable';
                 button.title = thumbnail.textContent;
@@ -323,8 +404,13 @@ export function initPlayground(
           }
         };
         more.addEventListener('click', appendPreviews);
-        searchInput.addEventListener('input', () => {
-          matches = catalog.search(searchInput.value);
+        const filter = () => {
+          const names = new Set(
+            catalog.items
+              .filter(item => !category.control.value || item.category === category.control.value)
+              .map(item => item.name)
+          );
+          matches = catalog.search(searchInput.value).filter(item => names.has(item.name));
           iconSelect.replaceChildren();
           for (const item of matches)
             iconSelect.append(element('option', { value: item.name }, item.name));
@@ -338,9 +424,22 @@ export function initPlayground(
             iconSelect.value = matches[0].name;
             controller.set(name, matches[0].name);
           }
-        });
+        };
+        searchInput.addEventListener('input', filter);
+        category.control.addEventListener('change', filter);
         searchLabel.append(searchInput);
-        fieldset.append(searchLabel, results);
+        catalogControls.append(searchLabel, category.wrapper, size.wrapper, style.wrapper);
+        fieldset.append(
+          catalogControls,
+          results,
+          element('p', { class: 'cosm-icon-note', 'data-icon-selection': '' }),
+          element(
+            'p',
+            { class: 'cosm-icon-note' },
+            labels.iconFillNote ??
+              'Filled paths use SVG fill; this is not a designed solid icon set.'
+          )
+        );
         if (catalog.preview) {
           appendPreviews();
           fieldset.append(gallery, more);
@@ -385,7 +484,10 @@ export function initPlayground(
       if (input.type === 'checkbox') input.checked = values[name] === true;
     });
     label.append(control);
-    if (contract.name === 'text-field' && !basicFieldProps.has(name))
+    if (
+      (contract.name === 'text-field' && !basicFieldProps.has(name)) ||
+      (contract.name === 'icon' && name !== 'icon')
+    )
       advancedControls.append(label);
     else fieldset.append(label);
     if (fieldSize) fieldset.append(customHeightLabel);
@@ -393,7 +495,7 @@ export function initPlayground(
   customHeight.addEventListener('input', () => {
     controller.set('size', Number(customHeight.value));
   });
-  if (contract.name === 'text-field') fieldset.append(advanced);
+  if (contract.name === 'text-field' || contract.name === 'icon') fieldset.append(advanced);
   fieldset.append(referenceStatus);
   root.append(fieldset);
 
@@ -473,9 +575,14 @@ export function initPlayground(
 
   let selected: SnippetTarget = targets[0] ?? 'html';
   let snippets = generateSnippets(contract, values, options.content);
+  let highlightRequest = 0;
 
   const render = () => {
     snippets = generateSnippets(contract, values, options.content);
+    for (const refresh of refreshCatalogs) refresh();
+    const selection = root.querySelector('[data-icon-selection]');
+    if (selection)
+      selection.textContent = `${labels.iconSelected ?? 'Selected icon'}: ${values.icon}`;
     for (const button of fieldset.querySelectorAll<HTMLElement>('[data-icon-name]')) {
       button.setAttribute('aria-pressed', String(button.dataset.iconName === values.icon));
     }
@@ -485,6 +592,21 @@ export function initPlayground(
       tab.tabIndex = active ? 0 : -1;
       panel.hidden = !active;
       code.textContent = snippets[item] ?? '';
+    }
+    const activeCode = panels.get(selected)?.code;
+    const source = snippets[selected] ?? '';
+    const request = ++highlightRequest;
+    if (activeCode) {
+      import('./highlight')
+        .then(({ highlightCode }) => {
+          if (request === highlightRequest) return highlightCode(activeCode, source, selected);
+        })
+        .catch(error => {
+          console.error('Could not highlight playground code.', error);
+          if (request === highlightRequest)
+            status.textContent =
+              labels.highlightError ?? 'Highlighting unavailable; code can still be copied.';
+        });
     }
   };
 

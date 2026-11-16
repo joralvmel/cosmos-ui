@@ -107,3 +107,9 @@ Frontmatter (`title`, `description`), imports, then:
 7. `## Events by platform` (`## Eventos por plataforma`) — `<EventsTable name="chip" />`.
 
 The Spanish page has the same structure under `apps/docs/src/content/docs/es/components/`.
+
+The shared Playground provides one framed preview, labeled controls, theme/mode selectors and
+syntax-highlighted, keyboard-accessible HTML/React/Angular/React Native tabs with copy feedback.
+New pages inherit this automatically; do not build a parallel per-component playground or duplicate
+the snippet generator. Extend the shared controls and tests when a contract needs a new input.
+Reference catalogs load only on the pages that need them and render thumbnails in batches.
