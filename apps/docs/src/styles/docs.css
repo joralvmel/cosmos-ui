@@ -1,4 +1,4 @@
-/* Docs chrome only. Component styles come from Cosmos tokens inside .cosm-preview areas. */
+/* Docs chrome; adopted controls inherit tokens from their Cosmos theme scopes. */
 
 .cosm-preview {
   display: flex;
@@ -23,11 +23,13 @@
   border: 0;
   border-block-start: 1px solid var(--sl-color-gray-5);
   min-inline-size: 0;
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
 }
 
 .cosm-playground-controls legend {
   padding-inline: 0.5rem;
-  color: var(--sl-color-text-accent);
+  color: var(--cosm-primary-text);
   font-size: var(--sl-text-sm);
   font-weight: 600;
 }
@@ -44,6 +46,21 @@
   font: inherit;
 }
 
+.cosm-playground .cosm-playground-text-control {
+  inline-size: 100%;
+}
+
+.cosm-docs-action-button {
+  background: var(--cosm-bg);
+  border-radius: var(--cosm-radius-md);
+}
+
+.cosm-playground-controls :is(input:not([type="checkbox"]), select) {
+  border-color: var(--cosm-border-strong);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
+}
+
 .cosm-icon-toolbar {
   display: grid;
   grid-column: 1 / -1;
@@ -54,7 +71,7 @@
 .cosm-icon-note {
   grid-column: 1 / -1;
   margin: 0;
-  color: var(--sl-color-gray-2);
+  color: var(--cosm-fg-muted);
   font-size: var(--sl-text-xs);
 }
 
@@ -90,7 +107,7 @@
   width: 1.125rem;
   height: 1.125rem;
   flex: none;
-  accent-color: var(--sl-color-text-accent);
+  accent-color: var(--cosm-primary);
 }
 
 .cosm-playground-advanced {
@@ -123,8 +140,7 @@
   border-radius: 0.5rem;
 }
 
-.cosm-icon-choice,
-.cosm-icon-more {
+.cosm-icon-choice {
   min-height: 44px;
   padding: var(--cosm-space-sm);
   border: 1px solid var(--cosm-border);
@@ -149,10 +165,13 @@
   outline: 1px solid var(--cosm-primary);
 }
 
-.cosm-icon-choice:focus-visible,
-.cosm-icon-more:focus-visible {
+.cosm-icon-choice:focus-visible {
   outline: 2px solid var(--cosm-focus-ring);
   outline-offset: 2px;
+}
+
+.cosm-icon-more::part(base) {
+  min-height: 44px;
 }
 
 .cosm-playground {
@@ -171,7 +190,7 @@
   min-inline-size: 0;
 }
 
-.cosm-playground > [data-cosm-preview] {
+.cosm-playground > .cosm-preview[data-cosm-preview] {
   min-block-size: 11rem;
   justify-content: center;
   border: 0;
@@ -222,8 +241,7 @@
   min-inline-size: 0;
 }
 
-.cosm-playground-code [role="tab"],
-.cosm-playground-copy {
+.cosm-playground-code [role="tab"] {
   padding: 0.25rem 0.75rem;
   border: 1px solid transparent;
   border-radius: 0.375rem;
@@ -242,14 +260,9 @@
 }
 
 .cosm-playground-code [role="tab"]:focus-visible,
-.cosm-playground-copy:focus-visible,
 .cosm-playground-code [role="tabpanel"]:focus-visible {
   outline: 2px solid var(--sl-color-accent);
   outline-offset: 2px;
-}
-
-.cosm-playground-copy {
-  border-color: var(--sl-color-gray-4);
 }
 
 .cosm-playground-status {
@@ -290,7 +303,7 @@
 }
 
 .cosm-playground :is(input, select, button, summary):focus-visible {
-  outline: 2px solid var(--sl-color-text-accent);
+  outline: 2px solid var(--cosm-focus-ring, var(--sl-color-text-accent));
   outline-offset: 2px;
 }
 

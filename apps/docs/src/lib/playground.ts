@@ -7,6 +7,8 @@ import {
   supportsTarget,
   toAttribute,
 } from '@joralvmel/cosmos-core';
+import '@joralvmel/cosmos-elements/button';
+import '@joralvmel/cosmos-elements/text-field';
 import { semanticColors } from '@joralvmel/cosmos-tokens';
 
 export interface PlaygroundLabels {
@@ -228,7 +230,17 @@ export function initPlayground(
   }
 
   // Controls generated from the contract.
-  const fieldset = element('fieldset', { class: 'cosm-playground-controls not-content' });
+  const themeAttributes = () => ({
+    'data-cosm-preview': '',
+    'data-theme': preview?.dataset.theme ?? storage?.getItem(SITE_THEME_KEY) ?? 'cosmos',
+    'data-mode':
+      preview?.dataset.mode ??
+      (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'),
+  });
+  const fieldset = element('fieldset', {
+    class: 'cosm-playground-controls not-content',
+    ...themeAttributes(),
+  });
   fieldset.append(element('legend', {}, labels.controls));
   const advanced = element('details', { class: 'cosm-playground-advanced' });
   advanced.append(element('summary', {}, labels.advanced ?? 'Advanced options'));
@@ -289,6 +301,23 @@ export function initPlayground(
         color.control.value = value;
       });
       iconToolbar.append(color.wrapper);
+      continue;
+    }
+    if (spec.type === 'string') {
+      const control = element('cosm-text-field');
+      control.classList.add('cosm-playground-text-control');
+      control.label = paintLabel;
+      control.value = typeof values[name] === 'string' ? values[name] : '';
+      control.title = spec.description;
+      control.dataset.prop = name;
+      control.addEventListener('cosm-change', event => controller.set(name, event.detail.value));
+      const container =
+        contract.name === 'text-field' && !basicFieldProps.has(name)
+          ? advancedControls
+          : iconToolbar && name !== 'icon'
+            ? iconToolbar
+            : fieldset;
+      container.append(control);
       continue;
     }
     const label = element('label');
@@ -352,8 +381,14 @@ export function initPlayground(
           'aria-label': labels.iconGallery ?? 'Icon gallery',
         });
         const more = element(
-          'button',
-          { type: 'button', class: 'cosm-icon-more' },
+          'cosm-button',
+          {
+            type: 'button',
+            variant: 'outline',
+            tone: 'neutral',
+            size: 'sm',
+            class: 'cosm-docs-action-button cosm-icon-more',
+          },
           labels.iconMore ?? 'Show more icons'
         );
         let matches: readonly { name: string }[] = catalog.items;
@@ -471,7 +506,7 @@ export function initPlayground(
               });
           }
         };
-        more.addEventListener('click', appendPreviews);
+        more.addEventListener('cosm-press', appendPreviews);
         const filter = () => {
           const names = new Set(
             catalog.items
@@ -618,9 +653,20 @@ export function initPlayground(
     controller.select(next);
     panels.get(next)?.tab.focus();
   });
-  const copy = element('button', { type: 'button', class: 'cosm-playground-copy' }, labels.copy);
+  const copy = element(
+    'cosm-button',
+    {
+      type: 'button',
+      variant: 'outline',
+      tone: 'neutral',
+      size: 'sm',
+      class: 'cosm-docs-action-button cosm-playground-copy',
+      ...themeAttributes(),
+    },
+    labels.copy
+  );
   const status = element('span', { role: 'status', class: 'cosm-playground-status' });
-  copy.addEventListener('click', async () => {
+  copy.addEventListener('cosm-press', async () => {
     try {
       if (!clipboard) throw new Error('Clipboard unavailable');
       await clipboard.writeText(controller.code());
