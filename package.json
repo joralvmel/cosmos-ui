@@ -46,12 +46,12 @@
   "homepage": "https://github.com/joralvmel/cosmos-ui#readme",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "^2.6.6",
+    "@biomejs/biome": "^2.6.7",
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
     "@types/node": "^24.19.2",
     "happy-dom": "^21.0.4",
-    "turbo": "^2.11.10",
+    "turbo": "^2.11.11",
     "typescript": "~6.0.3",
     "vitest": "^5.1.0"
   }
