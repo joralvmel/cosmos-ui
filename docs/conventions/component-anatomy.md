@@ -64,6 +64,12 @@ JSDoc on the class, in this order: description, `@tag`, `@slot`, `@csspart`, `@f
 1. Imports. 2. `export const chipEvents = {…}` (React names → DOM events). 3. `export const Chip = createComponent({…})`.
 4. `export type ChipProps = …`.
 
+When a contract state requires React to forward binding-ownership metadata that `createComponent`
+cannot express, keep its result as a private base component and export a thin `React.forwardRef`
+adapter. That adapter may set ownership metadata, forward refs and synchronize React DOM updates
+while forwarding state-proposal events with `flushSync`. It must not implement component behavior
+or duplicate state.
+
 ### Angular proxy (`chip.component.ts`)
 
 1. Imports (Angular, core types, element types, side-effect import of the element).

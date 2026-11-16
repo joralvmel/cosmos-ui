@@ -89,6 +89,59 @@ Events: none.
   element.icon = house;
 </script>
 ```
+### `<cosm-text-field>`
+
+Accepts a single line of text with an accessible label, optional help and error text, and native form validation on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Accessible name for the editable control. It is rendered above the control unless visually hidden. |
+| `labelHidden` (`label-hidden`) | boolean | `false` | Visually hides the label while keeping it available to assistive technology. |
+| `value` | string | — | Current text. When bound, edits are proposals and the component waits for the owner to supply the accepted value. |
+| `defaultValue` (`default-value`) | string | `` | Initial value for autonomous use. Web form reset restores this value; it does not control subsequent edits. |
+| `type` | 'text' \| 'email' \| 'password' \| 'tel' \| 'url' \| 'search' | `text` | Single-line input type. Native maps it to supported keyboard, autofill and secure-entry behavior. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Visual treatment of the editable control. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size or a positive finite minimum editable-control height in CSS pixels on web and logical units on native. |
+| `placeholder` | string | — | Short input hint; it never replaces the accessible label. |
+| `helpText` (`help-text`) | string | — | Optional supporting text associated with the editable control. |
+| `error` | string | — | Optional externally supplied error text associated with the editable control. |
+| `invalid` | boolean | `false` | External invalid state, independent of browser constraints or consumer business validation. |
+| `required` | boolean | `false` | Exposes required semantics. On web, participates in native HTML constraint validation. |
+| `disabled` | boolean | `false` | Disables editing and interaction. On web, follows disabled fieldsets and excludes the value from form submission. |
+| `readOnly` (`read-only`) | boolean | `false` | Prevents editing while remaining focusable and form-submittable on web; distinct from disabled. |
+| `minLength` (`min-length`) | number | — | Minimum number of characters. Web uses native HTML validity; native business validation remains the consumer’s responsibility. |
+| `maxLength` (`max-length`) | number | — | Maximum number of characters. Web uses native HTML validity and native applies supported input limits. |
+| `pattern` | string | — | Web-only HTML pattern constraint. Native does not emulate HTML regular-expression validation. |
+| `name` | string | — | Form field name on web. React Native has no HTML form association or name-based submission. |
+| `autoComplete` (`auto-complete`) | string | — | Consumer-provided completion/autofill hint, mapped to attributes supported by each platform. |
+| `inputMode` (`input-mode`) | 'none' \| 'text' \| 'decimal' \| 'numeric' \| 'tel' \| 'search' \| 'email' \| 'url' | — | Input or keyboard hint (none, text, decimal, numeric, tel, search, email or url); it does not add numeric or multiline field behavior. |
+| `startIcon` (`start-icon`) | IconDefinition | — | Optional structured decorative icon before the editable text. |
+| `endIcon` (`end-icon`) | IconDefinition | — | Optional structured decorative icon after the editable text. |
+| `iconFocusScope` (`icon-focus-scope`) | 'control' \| 'input' | `control` | When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override. |
+| `prefix` | string | — | Optional non-interactive text decoration before the editable text. |
+| `suffix` | string | — | Optional non-interactive text decoration after the editable text. |
+| `clearable` | boolean | `false` | Shows a clear action for non-empty editable fields. Supply clearLabel when enabled. |
+| `clearLabel` (`clear-label`) | string | — | Consumer-supplied localized accessible name for the clear action. |
+| `passwordReveal` (`password-reveal`) | boolean | `false` | Opts into a reveal action for password fields. Supply both revealPasswordLabel and hidePasswordLabel when enabled. |
+| `revealPasswordLabel` (`reveal-password-label`) | string | — | Consumer-supplied localized accessible name while the password is concealed. |
+| `hidePasswordLabel` (`hide-password-label`) | string | — | Consumer-supplied localized accessible name while the password is revealed. |
+
+Events: `cosm-change` → `TextFieldChangeDetail`, `cosm-submit` → `TextFieldSubmitDetail`.
+
+```html
+<cosm-text-field label="TextField"></cosm-text-field>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/text-field';
+  import { search } from '@joralvmel/cosmos-icons/search';
+
+  const element = document.querySelector('cosm-text-field');
+  element.startIcon = search;
+  element.endIcon = search;
+  element.addEventListener('cosm-change', event => console.log(event.detail));
+  element.addEventListener('cosm-submit', event => console.log(event.detail));
+</script>
+```
 
 ## Themes
 

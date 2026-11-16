@@ -1,0 +1,107 @@
+---
+interface Props {
+  label: string;
+  value: string;
+  clearLabel: string;
+  acceptLabel: string;
+  rejectLabel: string;
+  pendingMessage: string;
+  acceptedMessage: string;
+  rejectedMessage: string;
+}
+
+const {
+  label,
+  value,
+  clearLabel,
+  acceptLabel,
+  rejectLabel,
+  pendingMessage,
+  acceptedMessage,
+  rejectedMessage,
+} = Astro.props;
+---
+
+<div
+  class="text-field-ownership-demo"
+  data-text-field-ownership-demo
+  data-pending={pendingMessage}
+  data-accepted={acceptedMessage}
+  data-rejected={rejectedMessage}
+>
+  <cosm-text-field
+    data-controlled-field
+    label={label}
+    value={value}
+    clearable
+    clear-label={clearLabel}
+  ></cosm-text-field>
+  <div class="text-field-ownership-actions">
+    <button type="button" data-accept disabled>{acceptLabel}</button>
+    <button type="button" data-reject disabled>{rejectLabel}</button>
+  </div>
+  <p data-status role="status" aria-live="polite"></p>
+</div>
+
+<script>
+  import '@joralvmel/cosmos-elements/text-field';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-text-field-ownership-demo]')) {
+    const field = root.querySelector<HTMLElement & { valueControlled?: boolean }>(
+      '[data-controlled-field]'
+    );
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const accept = root.querySelector<HTMLButtonElement>('[data-accept]');
+    const reject = root.querySelector<HTMLButtonElement>('[data-reject]');
+    if (!field || !status || !accept || !reject) continue;
+
+    field.valueControlled = true;
+    let proposal: string | undefined;
+    const finish = (message: string) => {
+      status.textContent = message;
+      proposal = undefined;
+      accept.disabled = true;
+      reject.disabled = true;
+    };
+
+    field.addEventListener('cosm-change', event => {
+      proposal = (event as CustomEvent<{ value: string }>).detail.value;
+      status.textContent = root.dataset.pending ?? '';
+      accept.disabled = false;
+      reject.disabled = false;
+    });
+    accept.addEventListener('click', () => {
+      if (proposal === undefined) return;
+      (field as HTMLElement & { value: string }).value = proposal;
+      finish(root.dataset.accepted ?? '');
+    });
+    reject.addEventListener('click', () => {
+      if (proposal === undefined) return;
+      finish(root.dataset.rejected ?? '');
+    });
+  }
+</script>
+
+<style>
+  .text-field-ownership-demo {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 32rem;
+    padding: 1rem;
+    border: 1px solid var(--cosm-border, oklch(0.78 0.01 268));
+    border-radius: var(--cosm-radius-md, 0.5rem);
+  }
+  .text-field-ownership-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .text-field-ownership-actions button {
+    min-height: 2.5rem;
+    padding-inline: 0.75rem;
+  }
+  [data-status] {
+    min-height: 1.25em;
+    margin: 0;
+  }
+</style>

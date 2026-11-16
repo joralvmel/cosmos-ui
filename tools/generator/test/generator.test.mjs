@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -56,6 +56,16 @@ describe('names', () => {
 describe('component target', () => {
   it('writes every layer and registers the component in the real anchor files', () => {
     const root = copyRepoFiles();
+    const registeredComponents = source =>
+      source
+        .match(/COSMOS_COMPONENTS\s*=\s*\[([\s\S]*?)\] as const/)[1]
+        .trim()
+        .replace(/,$/, '')
+        .split(',')
+        .map(name => name.trim());
+    const existingComponents = registeredComponents(
+      readFileSync(join(root, 'packages/angular/src/index.ts'), 'utf8')
+    );
     const files = apply(root, plan('component', names('date-picker')));
     expect(files).toEqual(
       expect.arrayContaining([
@@ -74,9 +84,10 @@ describe('component target', () => {
     expect(core).toContain("'date-picker': datePickerContract,");
     expect(core).toContain("import { datePickerContract } from './specs/date-picker.js';");
     const angular = readFileSync(join(root, 'packages/angular/src/index.ts'), 'utf8');
-    expect(angular).toMatch(
-      /\[CosmButtonComponent, CosmIconComponent, CosmDatePickerComponent\] as const/
-    );
+    expect(registeredComponents(angular)).toEqual([
+      ...existingComponents,
+      'CosmDatePickerComponent',
+    ]);
     const pkg = JSON.parse(readFileSync(join(root, 'packages/elements/package.json'), 'utf8'));
     expect(Object.keys(pkg.exports)).toContain('./date-picker');
     const screens = readFileSync(join(root, 'apps/native-demo/src/screens.ts'), 'utf8');
@@ -91,6 +102,22 @@ describe('component target', () => {
     apply(root, plan('component', names('chip')));
     expect(readFileSync(join(root, 'packages/core/src/catalog.ts'), 'utf8')).toContain(
       "entry({ name: 'chip', title: 'Chip'"
+    );
+  });
+
+  it('still registers Angular components in an inline array without a trailing comma', () => {
+    const root = copyRepoFiles();
+    const path = 'packages/angular/src/index.ts';
+    writeFileSync(
+      join(root, path),
+      'export const COSMOS_COMPONENTS = [CosmButtonComponent, CosmIconComponent] as const;\n'
+    );
+    apply(
+      root,
+      plan('component', names('chip')).filter(operation => operation.path === path)
+    );
+    expect(readFileSync(join(root, path), 'utf8')).toContain(
+      '[CosmButtonComponent, CosmIconComponent, CosmChipComponent] as const'
     );
   });
 

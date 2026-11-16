@@ -29,7 +29,8 @@ describe('Icon with react-native-svg web', () => {
     await act(async () => root.render(<Icon icon={house} />));
     const svg = container.querySelector('svg');
     expect(svg?.getAttribute('aria-hidden')).toBe('true');
-    expect(svg?.getAttribute('focusable')).toBe('false');
+    expect(svg?.hasAttribute('focusable')).toBe(false);
+    expect(svg?.hasAttribute('tabindex')).toBe(false);
     expect(svg?.hasAttribute('role')).toBe(false);
     expect(svg?.hasAttribute('accessible')).toBe(false);
     expect(svg?.hasAttribute('accessibilityElementsHidden')).toBe(false);
@@ -38,6 +39,7 @@ describe('Icon with react-native-svg web', () => {
     expect(svg?.getAttribute('role')).toBe('img');
     expect(svg?.getAttribute('aria-label')).toBe('Home');
     expect(svg?.hasAttribute('aria-hidden')).toBe(false);
+    expect(svg?.hasAttribute('tabindex')).toBe(false);
     expect(errors).not.toHaveBeenCalled();
     await act(async () => root.unmount());
   });

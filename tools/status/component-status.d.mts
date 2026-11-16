@@ -27,7 +27,7 @@ export interface ComponentReport {
   dependsOn: string[];
   pattern: string;
   target: ComponentStatus;
-  claimed: 'stable' | undefined;
+  claimed: 'stable' | 'in-progress' | undefined;
   notes: string[];
   status: ComponentStatus;
   pieces: Pieces;

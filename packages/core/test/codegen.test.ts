@@ -6,6 +6,7 @@ import {
   defineContract,
   generateSnippets,
   supportsTarget,
+  textFieldContract,
   toAttribute,
 } from '../src/index.js';
 
@@ -88,5 +89,28 @@ describe('codegen', () => {
 
   it('converts prop names to attributes', () => {
     expect(toAttribute('fullWidth')).toBe('full-width');
+  });
+
+  it('generates usable text-field examples without duplicate icon bindings or blank children', () => {
+    const snippets = generateSnippets(textFieldContract, {}, '');
+    for (const snippet of Object.values(snippets)) {
+      expect(snippet).toContain('label="TextField"');
+      expect(snippet.match(/import \{ search \} from/g)).toHaveLength(1);
+      expect(snippet).not.toMatch(/^[ \t]+$/m);
+    }
+    expect(snippets.angular?.match(/readonly search = search;/g)).toHaveLength(1);
+    expect(generateSnippets(textFieldContract, { label: 'Account name' }, '').react).toContain(
+      'label="Account name"'
+    );
+    const undecorated = generateSnippets(
+      textFieldContract,
+      { startIcon: undefined, endIcon: undefined },
+      ''
+    );
+    for (const snippet of Object.values(undecorated)) {
+      expect(snippet).not.toContain('cosmos-icons/');
+      expect(snippet).not.toContain('startIcon');
+      expect(snippet).not.toContain('endIcon');
+    }
   });
 });

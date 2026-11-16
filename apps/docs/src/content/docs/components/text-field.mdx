@@ -1,0 +1,201 @@
+---
+title: Text Field
+description: A labeled single-line text input with browser-native validation and form behavior.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+import TextFieldOwnershipDemo from '../../../components/TextFieldOwnershipDemo.astro';
+import TextFieldIconColorsDemo from '../../../components/TextFieldIconColorsDemo.astro';
+
+<StatusBadge name="text-field" />
+
+`<cosm-text-field>` is a labeled, single-line text-entry control. Use it for text, email, password,
+telephone, URL and search input. It supports browser constraints and web form association; use a
+separate number field or textarea for numeric or multiline editing.
+
+## Playground
+
+Use the dropdowns for type, variant, size, keyboard hint and a few sample icons, and the checkboxes
+for boolean features. Less common form, content and action-label settings are under **Advanced
+options**; the complete API remains below. The icon catalog is available on the Icon page rather
+than loaded into this playground.
+
+For digit entry, choose `text` and `inputMode="numeric"`; this requests a numeric keyboard, not
+numeric validation or filtering. Use web `pattern` or consumer-owned validation when appropriate.
+The example below lets you accept or reject a controlled value proposal:
+
+<Playground name="text-field" content="" />
+
+<TextFieldOwnershipDemo
+  label="Account name"
+  value="Cosmos"
+  clearLabel="Clear account name"
+  acceptLabel="Accept"
+  rejectLabel="Reject"
+  pendingMessage="A value proposal is waiting for your decision."
+  acceptedMessage="Proposal accepted."
+  rejectedMessage="Proposal rejected; the previous value remains."
+/>
+
+## Variants
+
+`outlined` is the default. `filled` changes only the control surface; semantic sizes are `sm`, `md`
+and `lg`. A positive finite numeric `size` sets a minimum editable-control height in CSS pixels.
+Label and supporting text remain outside that height.
+
+<Preview>
+  <cosm-text-field label="Outlined" placeholder="name@example.com"></cosm-text-field>
+  <cosm-text-field label="Filled" variant="filled" placeholder="name@example.com"></cosm-text-field>
+</Preview>
+
+<Preview>
+  <cosm-text-field label="Small" size="sm"></cosm-text-field>
+  <cosm-text-field label="Medium" size="md"></cosm-text-field>
+  <cosm-text-field label="Large" size="lg"></cosm-text-field>
+  <cosm-text-field label="Custom minimum height" size="56"></cosm-text-field>
+</Preview>
+
+## States
+
+Help and external error text are associated with the input. `required`, `type`, `pattern`,
+`minLength` and `maxLength` use browser-native validity on web. A custom error or `invalid` state is
+consumer-owned and is not inferred from business rules.
+
+<Preview>
+  <cosm-text-field label="Email" type="email" required help-text="Use your work email."></cosm-text-field>
+  <cosm-text-field label="Invalid account" value="taken" error="That name is unavailable." invalid></cosm-text-field>
+  <cosm-text-field
+    label="Password"
+    type="password"
+    password-reveal
+    reveal-password-label="Show password"
+    hide-password-label="Hide password"
+    value="sample secret"
+  ></cosm-text-field>
+  <cosm-text-field label="Search" prefix="In" suffix="All records" clearable clear-label="Clear search"></cosm-text-field>
+  <cosm-text-field label="Read-only" value="Cannot edit" read-only></cosm-text-field>
+  <cosm-text-field label="Disabled" value="Unavailable" disabled></cosm-text-field>
+</Preview>
+
+Structured `startIcon` and `endIcon` values are consumer-provided `IconDefinition`s; there is no
+global icon-name registry. Select icons in the playground, or pass the definition as a property.
+Clear and password-reveal actions use local native buttons. Supply localized `clearLabel`, and both
+`revealPasswordLabel` and `hidePasswordLabel`, whenever those actions are enabled. Actions are
+hidden while disabled or read-only.
+
+Password visibility resets when the field becomes disabled/read-only, reveal is turned off, or
+the type changes away from password. Re-enabling the feature starts concealed. Web disabled
+fieldsets follow the same rule.
+
+Long labels and messages wrap. Prefixes and suffixes are single-line decorations that truncate
+when space is limited, preserving room for editing. In web search fields, enabling `clearable`
+replaces the browser's built-in clear affordance instead of showing two clear buttons.
+
+On web, the custom element is form-associated: it submits `name` and `value`, follows disabled
+fieldsets, supports reset/state restoration, and exposes browser-native validity. An autonomous
+reset returns to `defaultValue`; a controlled reset emits a proposal and waits for its owner.
+Angular integrates with `ControlValueAccessor`, including touched state, reset, disabled state and
+`updateOn: 'blur'`. Native does not emulate HTML form submission, email validation or regex
+validation; its consumer owns business validation and submit handling.
+
+## Icon colors
+
+The field already renders the shared Icon component. Configure each decorative icon independently
+without changing input text, affixes, clear or reveal icons. Unset hooks preserve the current theme.
+A focus color is opt-in and falls back to the same icon's normal color when omitted.
+
+<TextFieldIconColorsDemo />
+
+HTML, React and Angular share these CSS hooks:
+
+```css
+.colored-icons {
+  --cosm-text-field-start-icon-color: var(--cosm-success-text);
+  --cosm-text-field-start-icon-focus-color: var(--cosm-primary-text);
+  --cosm-text-field-end-icon-color: var(--cosm-danger-text);
+  --cosm-text-field-end-icon-focus-color: var(--cosm-warning-text);
+}
+```
+
+Keep passing `startIcon` and `endIcon` definitions as usual. For example, with the shared CSS above:
+
+```html
+<cosm-text-field class="colored-icons" label="Search" icon-focus-scope="input"></cosm-text-field>
+```
+
+```tsx
+<TextField className="colored-icons" label="Search"
+  startIcon={search} endIcon={heart} iconFocusScope="input" />
+```
+
+```html
+<cosm-text-field class="colored-icons" label="Search"
+  [startIcon]="search" [endIcon]="heart" iconFocusScope="input"></cosm-text-field>
+```
+
+React Native uses the same four hooks in `appearance`, with native theme colors rather than CSS:
+
+```tsx
+<TextField label="Search" startIcon={search} endIcon={heart} iconFocusScope="input"
+  appearance={{
+    startIconColor: theme.colors['success-text'],
+    startIconFocusColor: theme.colors['primary-text'],
+    endIconColor: theme.colors['danger-text'],
+    endIconFocusColor: theme.colors['warning-text'],
+  }} />
+```
+
+`iconFocusScope="control"` (default) includes the editable input and its clear/reveal buttons;
+`"input"` applies the configured focus colors only while the editable input is focused. Without a
+focus-color hook, neither scope changes the icon color. No additional event handlers are needed.
+Custom colors remain the consumer's contrast responsibility; forced-colors mode may replace them
+with system colors. Native accessibility focus is not keyboard/input focus.
+
+## Accessibility
+
+- Always provide a meaningful `label`. `labelHidden` visually hides it without removing its
+  association with the editable input.
+- Placeholder text is only a hint, never a label. Help and error text use `aria-describedby`, and
+  invalid/required states are exposed on the input.
+- Clear/reveal controls have localized accessible names, visible focus indication and native button
+  keyboard behavior. They are unavailable in disabled or read-only states.
+- Web focus retains a single inward indicator in forced-colors mode, using the system highlight
+  color rather than relying on a box shadow.
+- React Native Web also draws focus on the outer control, without a second browser outline
+  around the editable input.
+- Decorative icons do not receive independent pointer or keyboard focus. Native reserves at
+  least 44 units of editable width; long affixes shrink before taking that space from the input.
+- The editable input remains keyboard-operable; Enter reports `cosm-submit` and web form submission
+  continues through the containing form.
+- Decorations follow logical inline direction for RTL. Font scaling may grow the control beyond a
+  custom minimum height; content is not clipped.
+- React Native 0.88 exposes no native accessibility states for required or invalid. On native,
+  include localized required wording in the existing label or help text and provide explicit error
+  text for invalid fields. Hints may be disabled; error text is readable and is an Android live
+  region, but TalkBack/VoiceOver behavior is not verified here. Do not assume semantic parity across
+  devices.
+
+The stable inventory status records implementation readiness with explicitly deferred validation:
+iOS/VoiceOver, desktop screen readers, axe, full TalkBack state/error coverage and non-Latin/web
+IME composition remain unverified. Representative Android TalkBack output, Latin Gboard candidate
+input and 200% Android text scaling have been checked; they do not certify the other environments.
+
+## API
+
+<ApiTable name="text-field" />
+
+## Events by platform
+
+`cosm-change` proposes `{ value }` for each edit or clear. An unbound field commits autonomously;
+when `value` is bound (including `''`), the owner accepts the proposal by updating the property.
+Rejected proposals restore the controlled text without discarding the caret or an active IME
+composition. Password reveal changes presentation only.
+
+`cosm-submit` reports `{ value }` when Enter invokes the submit action. React and Angular receive the
+original bubbling, composed `CustomEvent`; React Native receives the detail through its callback.
+
+<EventsTable name="text-field" />

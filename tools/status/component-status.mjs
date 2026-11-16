@@ -150,7 +150,11 @@ export function getStatusReport(root = ROOT, entries = catalog) {
       read(root, path).includes('TODO(generator)')
     );
     const detected = computeStatus(pieces);
-    const status = detected === 'stable' && todos.length > 0 ? 'in-progress' : detected;
+    const withoutMarkers = detected === 'stable' && todos.length > 0 ? 'in-progress' : detected;
+    const status =
+      withoutMarkers === 'stable' && entry.status === 'in-progress'
+        ? 'in-progress'
+        : withoutMarkers;
     return {
       name: entry.name,
       title: entry.title,
@@ -237,9 +241,11 @@ function toText(report) {
           ? item.blockedBy.length
             ? `  (blocked by ${item.blockedBy.join(', ')})`
             : ''
-          : item.missing.length > 0
-            ? `  missing: ${item.missing.join(', ')}`
-            : `  TODO(generator) markers in ${item.todos.length} file(s)`;
+          : item.claimed === 'in-progress' && item.missing.length === 0 && item.todos.length === 0
+            ? '  readiness override: in-progress'
+            : item.missing.length > 0
+              ? `  missing: ${item.missing.join(', ')}`
+              : `  TODO(generator) markers in ${item.todos.length} file(s)`;
     lines.push(`${item.status.padEnd(12)} ${String(item.priority).padEnd(2)} ${item.name}${extra}`);
   }
   lines.push('', `Next suggested: ${report.next.join(', ') || '—'}`);

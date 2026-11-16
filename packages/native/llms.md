@@ -2,6 +2,15 @@
 
 React Native components of Cosmos UI with the same contracts and themes as the web. Callbacks receive the event detail directly.
 
+On React Native Web, TextField draws its focus indicator on the outer control, without a second
+browser outline around the editable input.
+Icons do not take focus independently of their owning controls. TextField reserves at least
+44 units of editable width when long affixes and actions compete for space.
+Its `appearance` accepts `startIconColor`, `startIconFocusColor`, `endIconColor` and
+`endIconFocusColor` (native colors). Focus overrides are optional and fall back per icon.
+`iconFocusScope` is `control` (input and action buttons, default) or `input`; action icons,
+affixes and editable text retain their own colors.
+
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 
 ## Setup: React Native (Expo)
@@ -92,6 +101,60 @@ import { house } from '@joralvmel/cosmos-icons/house';
 export function Example() {
   return (
     <Icon icon={house}></Icon>
+  );
+}
+```
+### `TextField`
+
+Accepts a single line of text with an accessible label, optional help and error text, and native form validation on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Accessible name for the editable control. It is rendered above the control unless visually hidden. |
+| `labelHidden` | boolean | `false` | Visually hides the label while keeping it available to assistive technology. |
+| `value` | string | — | Current text. When bound, edits are proposals and the component waits for the owner to supply the accepted value. |
+| `defaultValue` | string | `` | Initial value for autonomous use. Web form reset restores this value; it does not control subsequent edits. |
+| `type` | 'text' \| 'email' \| 'password' \| 'tel' \| 'url' \| 'search' | `text` | Single-line input type. Native maps it to supported keyboard, autofill and secure-entry behavior. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Visual treatment of the editable control. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size or a positive finite minimum editable-control height in CSS pixels on web and logical units on native. |
+| `placeholder` | string | — | Short input hint; it never replaces the accessible label. |
+| `helpText` | string | — | Optional supporting text associated with the editable control. |
+| `error` | string | — | Optional externally supplied error text associated with the editable control. |
+| `invalid` | boolean | `false` | External invalid state, independent of browser constraints or consumer business validation. |
+| `required` | boolean | `false` | Exposes required semantics. On web, participates in native HTML constraint validation. |
+| `disabled` | boolean | `false` | Disables editing and interaction. On web, follows disabled fieldsets and excludes the value from form submission. |
+| `readOnly` | boolean | `false` | Prevents editing while remaining focusable and form-submittable on web; distinct from disabled. |
+| `minLength` | number | — | Minimum number of characters. Web uses native HTML validity; native business validation remains the consumer’s responsibility. |
+| `maxLength` | number | — | Maximum number of characters. Web uses native HTML validity and native applies supported input limits. |
+| `autoComplete` | string | — | Consumer-provided completion/autofill hint, mapped to attributes supported by each platform. |
+| `inputMode` | 'none' \| 'text' \| 'decimal' \| 'numeric' \| 'tel' \| 'search' \| 'email' \| 'url' | — | Input or keyboard hint (none, text, decimal, numeric, tel, search, email or url); it does not add numeric or multiline field behavior. |
+| `startIcon` | IconDefinition | — | Optional structured decorative icon before the editable text. |
+| `endIcon` | IconDefinition | — | Optional structured decorative icon after the editable text. |
+| `iconFocusScope` | 'control' \| 'input' | `control` | When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override. |
+| `prefix` | string | — | Optional non-interactive text decoration before the editable text. |
+| `suffix` | string | — | Optional non-interactive text decoration after the editable text. |
+| `clearable` | boolean | `false` | Shows a clear action for non-empty editable fields. Supply clearLabel when enabled. |
+| `clearLabel` | string | — | Consumer-supplied localized accessible name for the clear action. |
+| `passwordReveal` | boolean | `false` | Opts into a reveal action for password fields. Supply both revealPasswordLabel and hidePasswordLabel when enabled. |
+| `revealPasswordLabel` | string | — | Consumer-supplied localized accessible name while the password is concealed. |
+| `hidePasswordLabel` | string | — | Consumer-supplied localized accessible name while the password is revealed. |
+
+Events: `onValueChange` → `TextFieldChangeDetail`, `onSubmitEditing` → `TextFieldSubmitDetail`.
+
+```tsx
+import { TextField } from '@joralvmel/cosmos-native';
+import { search } from '@joralvmel/cosmos-icons/search';
+
+export function Example() {
+  return (
+    <TextField
+      label="TextField"
+      startIcon={search}
+      endIcon={search}
+      onValueChange={detail => console.log(detail)}
+      onSubmitEditing={detail => console.log(detail)}
+    >
+    </TextField>
   );
 }
 ```

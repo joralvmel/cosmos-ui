@@ -1,4 +1,5 @@
 import { iconContract } from './specs/icon.js';
+import { textFieldContract } from './specs/text-field.js';
 
 export {
   buildOrder,
@@ -41,6 +42,11 @@ export {
   type PressableState,
 } from './headless/pressable.js';
 export {
+  getTextFieldState,
+  type TextFieldState,
+  type TextFieldStateInput,
+} from './headless/text-field.js';
+export {
   componentReference,
   contractMarkdown,
   eventsMarkdown,
@@ -74,6 +80,7 @@ import { buttonContract } from './specs/button.js';
 export const contracts = {
   button: buttonContract,
   icon: iconContract,
+  'text-field': textFieldContract,
 } as const;
 export { iconContract } from './specs/icon.js';
 export {
@@ -81,3 +88,14 @@ export {
   iconScenarios,
   iconScenariosFor,
 } from './specs/icon.scenarios.js';
+export {
+  type TextFieldChangeDetail,
+  type TextFieldSubmitDetail,
+  textFieldContract,
+} from './specs/text-field.js';
+export {
+  type TextFieldAction,
+  type TextFieldScenario,
+  textFieldScenarios,
+  textFieldScenariosFor,
+} from './specs/text-field.scenarios.js';

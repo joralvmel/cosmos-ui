@@ -51,6 +51,19 @@ export interface ActiveProp {
   value: string | number | boolean;
 }
 
+function referenceImports(props: ActiveProp[], indent = '') {
+  return [
+    ...new Set(
+      props
+        .filter(({ spec }) => spec.type === 'reference')
+        .map(({ value }) => {
+          const slug = referenceSlug(String(value));
+          return `${indent}import { ${referenceBinding(slug)} } from '@joralvmel/cosmos-icons/${slug}';`;
+        })
+    ),
+  ];
+}
+
 /** Props that differ from their contract default and exist on the platform. */
 export function activeProps(
   contract: ComponentContract,
@@ -88,13 +101,7 @@ function html(contract: ComponentContract, values: ControlValues, content: strin
     '',
     '<script type="module">',
     `  import '@joralvmel/cosmos-elements/${contract.name}';`,
-    ...properties
-      .filter(({ spec }) => spec.type === 'reference')
-      .map(({ value }) => {
-        const slug = referenceSlug(String(value));
-        const binding = referenceBinding(slug);
-        return `  import { ${binding} } from '@joralvmel/cosmos-icons/${slug}';`;
-      }),
+    ...referenceImports(properties, '  '),
   ];
   const events = Object.values(contract.events);
   if (events.length > 0 || properties.length > 0) {
@@ -136,7 +143,7 @@ function jsxElement(component: string, attributes: string[], content: string) {
     `    <${component}`,
     ...attributes.map(item => `      ${item}`),
     '    >',
-    `      ${jsxText(content)}`,
+    ...(content ? [`      ${jsxText(content)}`] : []),
     `    </${component}>`,
   ];
 }
@@ -164,15 +171,10 @@ function react(contract: ComponentContract, values: ControlValues, content: stri
       event => `${event.names.react}={event => console.log(event.detail)}`
     ),
   ];
-  const referenceImports = props
-    .filter(({ spec }) => spec.type === 'reference')
-    .map(({ value }) => {
-      const slug = referenceSlug(String(value));
-      const binding = referenceBinding(slug);
-      return `import { ${binding} } from '@joralvmel/cosmos-icons/${slug}';`;
-    });
   return example(
-    [`import { ${component} } from '@joralvmel/cosmos-react';`, ...referenceImports].join('\n'),
+    [`import { ${component} } from '@joralvmel/cosmos-react';`, ...referenceImports(props)].join(
+      '\n'
+    ),
     jsxElement(component, attributes, content)
   );
 }
@@ -199,19 +201,16 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
   );
   const template = `<${[contract.tag, ...attributes, ...outputs].join(' ')}>${escapeText(content)}</${contract.tag}>`;
   const detailTypes = [...new Set(events.map(event => event.detail))];
-  const referenceImports = props
-    .filter(({ spec }) => spec.type === 'reference')
-    .map(({ value }) => {
-      const slug = referenceSlug(String(value));
-      const binding = referenceBinding(slug);
-      return `import { ${binding} } from '@joralvmel/cosmos-icons/${slug}';`;
-    });
-  const referenceFields = props
-    .filter(({ spec }) => spec.type === 'reference')
-    .map(({ value }) => {
-      const binding = referenceBinding(String(value));
-      return `  readonly ${binding} = ${binding};`;
-    });
+  const referenceFields = [
+    ...new Set(
+      props
+        .filter(({ spec }) => spec.type === 'reference')
+        .map(({ value }) => {
+          const binding = referenceBinding(String(value));
+          return `  readonly ${binding} = ${binding};`;
+        })
+    ),
+  ];
   const body = events.flatMap((event, index) => [
     ...(index > 0 ? [''] : []),
     `  ${handler(event.names.angular)}(detail: ${event.detail}) {`,
@@ -222,7 +221,7 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
   return [
     "import { Component } from '@angular/core';",
     `import { ${component} } from '@joralvmel/cosmos-angular';`,
-    ...referenceImports,
+    ...referenceImports(props),
     ...(detailTypes.length > 0
       ? [`import type { ${detailTypes.join(', ')} } from '@joralvmel/cosmos-core';`]
       : []),
@@ -267,16 +266,11 @@ function native(contract: ComponentContract, values: ControlValues, content: str
       event => `${event.names.native}={detail => console.log(detail)}`
     ),
   ];
-  const referenceImports = props
-    .filter(({ spec }) => spec.type === 'reference')
-    .map(({ value }) => {
-      const slug = referenceSlug(String(value));
-      const binding = referenceBinding(slug);
-      return `import { ${binding} } from '@joralvmel/cosmos-icons/${slug}';`;
-    });
   const imports = themed ? `${component}, useTheme` : component;
   return example(
-    [`import { ${imports} } from '@joralvmel/cosmos-native';`, ...referenceImports].join('\n'),
+    [`import { ${imports} } from '@joralvmel/cosmos-native';`, ...referenceImports(props)].join(
+      '\n'
+    ),
     jsxElement(component, attributes, content),
     themed ? ['  const theme = useTheme();'] : []
   );
@@ -296,7 +290,10 @@ export function generateSnippets(
   const builders = { html, react, angular, native };
   const sampleValues = { ...values };
   for (const [name, spec] of Object.entries(contract.props)) {
-    if (spec.type === 'reference' && sampleValues[name] === undefined && spec.example) {
+    if (spec.type === 'string' && spec.required && sampleValues[name] === undefined) {
+      sampleValues[name] = pascalCase(contract.name);
+    }
+    if (spec.type === 'reference' && !Object.hasOwn(values, name) && spec.example) {
       sampleValues[name] = spec.example;
     }
   }

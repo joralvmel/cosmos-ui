@@ -1,8 +1,11 @@
 // @vitest-environment happy-dom
-import { buttonContract, iconContract } from '@joralvmel/cosmos-core';
+import { buttonContract, iconContract, textFieldContract } from '@joralvmel/cosmos-core';
+import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
 import { iconCatalog, searchIconCatalog } from '@joralvmel/cosmos-icons';
 import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
+import { search } from '@joralvmel/cosmos-icons/search';
+import '@joralvmel/cosmos-elements/text-field';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   initPlayground,
@@ -24,6 +27,12 @@ const labels: PlaygroundLabels = {
   dark: 'Dark',
   nativeDemo: 'Native demo',
   tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
+  textFieldDefaults: {
+    label: 'Email address',
+    clearLabel: 'Clear text',
+    revealPasswordLabel: 'Show password',
+    hidePasswordLabel: 'Hide password',
+  },
 };
 
 function mount(options: { storage?: Map<string, string>; nativeDemoUrl?: string } = {}) {
@@ -204,6 +213,93 @@ describe('Playground', () => {
     icon.dispatchEvent(new Event('input'));
     expect(target.icon).toBe(heart);
     expect(controller.code('native')).toContain("from '@joralvmel/cosmos-icons/heart'");
+  });
+
+  it('offers typed text-field controls, optional sample icons and collapsed advanced options', async () => {
+    const root = document.createElement('div');
+    root.innerHTML =
+      '<div data-cosm-preview><cosm-text-field data-playground-target label="Email address" clear-label="Clear text" reveal-password-label="Show password" hide-password-label="Hide password"></cosm-text-field></div>';
+    document.body.append(root);
+    const target = root.querySelector('cosm-text-field') as CosmTextField;
+    const controller = initPlayground(root, {
+      contract: textFieldContract,
+      content: '',
+      labels,
+      themes: [],
+      referenceValues: { IconDefinition: { search, house, heart } },
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+
+    expect(target.label).toBe('Email address');
+    expect(target.clearLabel).toBe('Clear text');
+    expect(target.revealPasswordLabel).toBe('Show password');
+    expect(target.hidePasswordLabel).toBe('Hide password');
+    const advanced = root.querySelector('details');
+    expect(advanced?.open).toBe(false);
+    expect(advanced?.querySelector('[data-prop="pattern"]')).not.toBeNull();
+    expect(advanced?.querySelector('[data-prop="defaultValue"]')).not.toBeNull();
+    for (const name of ['clearable', 'passwordReveal', 'required', 'disabled', 'readOnly']) {
+      expect(root.querySelector<HTMLInputElement>(`[data-prop="${name}"]`)?.type).toBe('checkbox');
+    }
+    const type = root.querySelector<HTMLSelectElement>('select[data-prop="type"]');
+    if (!type) throw new Error('missing type select');
+    type.value = 'email';
+    type.dispatchEvent(new Event('input'));
+    expect(target.type).toBe('email');
+    const keyboard = root.querySelector<HTMLSelectElement>('select[data-prop="inputMode"]');
+    if (!keyboard) throw new Error('missing keyboard select');
+    keyboard.value = 'numeric';
+    keyboard.dispatchEvent(new Event('input'));
+    expect(target.inputMode).toBe('numeric');
+
+    const size = root.querySelector<HTMLSelectElement>('select[data-prop="size"]');
+    if (!size) throw new Error('missing size select');
+    size.value = 'custom';
+    size.dispatchEvent(new Event('input'));
+    const height = root.querySelector<HTMLInputElement>('input[type="number"][step="any"]');
+    if (!height) throw new Error('missing custom height');
+    expect(height.parentElement?.hidden).toBe(false);
+    height.value = '72';
+    height.dispatchEvent(new Event('input'));
+    expect(target.size).toBe(72);
+    height.value = '-1';
+    height.dispatchEvent(new Event('input'));
+    expect(target.size).toBe(72);
+    expect(root.textContent).toContain('valid positive size');
+    size.value = 'sm';
+    size.dispatchEvent(new Event('input'));
+    expect(height.parentElement?.hidden).toBe(true);
+    expect(target.size).toBe('sm');
+
+    const icon = root.querySelector<HTMLSelectElement>('select[data-prop="startIcon"]');
+    if (!icon) throw new Error('missing icon select');
+    expect(icon.options.length).toBeLessThanOrEqual(5);
+    expect(root.querySelector('.cosm-icon-gallery')).toBeNull();
+    expect(root.querySelector('input[type="search"]')).toBeNull();
+    expect(controller.code('react')).not.toContain('cosmos-icons/');
+    icon.value = 'heart';
+    icon.dispatchEvent(new Event('input'));
+    expect(target.startIcon).toBe(heart);
+    expect(controller.code('react')).toContain('cosmos-icons/heart');
+    icon.value = '';
+    icon.dispatchEvent(new Event('input'));
+    expect(target.startIcon).toBeUndefined();
+    expect(controller.code('react')).not.toContain('cosmos-icons/');
+
+    controller.set('value', 'secret');
+    controller.set('type', 'password');
+    controller.set('clearable', true);
+    controller.set('passwordReveal', true);
+    await target.updateComplete;
+    expect(
+      target.shadowRoot?.querySelector('[part="clear-button"]')?.getAttribute('aria-label')
+    ).toBe('Clear text');
+    expect(
+      target.shadowRoot?.querySelector('[part="reveal-button"]')?.getAttribute('aria-label')
+    ).toBe('Show password');
+    controller.set('label', '');
+    await target.updateComplete;
+    expect(target.label).toBe('Email address');
   });
 
   it('keeps stroke and fill independent and emits valid native theme colors', () => {
