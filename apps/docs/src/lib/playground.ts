@@ -30,6 +30,19 @@ export interface PlaygroundLabels {
   iconGallery?: string;
   iconMore?: string;
   iconPreviewError?: string;
+  iconCategory?: string;
+  iconAllCategories?: string;
+  iconPreviewSize?: string;
+  iconStyle?: string;
+  iconStroke?: string;
+  iconFill?: string;
+  iconInherited?: string;
+  iconOutline?: string;
+  iconFilled?: string;
+  iconFillNote?: string;
+  iconSelected?: string;
+  iconCategories?: Readonly<Record<string, string>>;
+  highlightError?: string;
   advanced?: string;
   none?: string;
   customSize?: string;
@@ -188,21 +201,26 @@ export function initPlayground(
       ''
     );
     theme.control.addEventListener('change', () => {
-      if (theme.control.value) {
-        preview.setAttribute('data-fixed', '');
-        preview.dataset.theme = theme.control.value;
-      } else {
-        preview.removeAttribute('data-fixed');
-        preview.dataset.theme = storage?.getItem(SITE_THEME_KEY) ?? options.themes[0]?.name ?? '';
+      for (const surface of root.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
+        if (theme.control.value) {
+          surface.setAttribute('data-fixed', '');
+          surface.dataset.theme = theme.control.value;
+        } else {
+          surface.removeAttribute('data-fixed');
+          surface.dataset.theme = storage?.getItem(SITE_THEME_KEY) ?? options.themes[0]?.name ?? '';
+        }
       }
     });
     mode.control.addEventListener('change', () => {
-      if (mode.control.value) {
-        preview.setAttribute('data-fixed-mode', '');
-        preview.dataset.mode = mode.control.value;
-      } else {
-        preview.removeAttribute('data-fixed-mode');
-        preview.dataset.mode = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      for (const surface of root.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
+        if (mode.control.value) {
+          surface.setAttribute('data-fixed-mode', '');
+          surface.dataset.mode = mode.control.value;
+        } else {
+          surface.removeAttribute('data-fixed-mode');
+          surface.dataset.mode =
+            document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+        }
       }
     });
     toolbar.append(theme.wrapper, mode.wrapper);
@@ -239,9 +257,42 @@ export function initPlayground(
   customHeightLabel.hidden = true;
   const referenceStatus = element('span', { role: 'status', 'aria-live': 'polite' });
   let referenceRequest = 0;
+  const refreshCatalogs: (() => void)[] = [];
+  let iconToolbar: HTMLDivElement | undefined;
   for (const [name, spec] of Object.entries(contract.props)) {
+    if (iconToolbar && name === 'size') continue;
+    const paintLabel =
+      contract.name === 'icon' && name === 'stroke'
+        ? (labels.iconStroke ?? 'Outline color (stroke)')
+        : contract.name === 'icon' && name === 'fill'
+          ? (labels.iconFill ?? 'Fill color (fill)')
+          : name;
+    if (iconToolbar && (name === 'stroke' || name === 'fill')) {
+      const color = select(
+        paintLabel,
+        [
+          ['currentColor', labels.iconInherited ?? 'Inherited (currentColor)'],
+          ['none', labels.none ?? 'None'],
+          ...semanticColors.map(
+            token => [`var(--cosm-${token})`, `--cosm-${token}`] as [string, string]
+          ),
+        ],
+        String(values[name])
+      );
+      color.control.dataset.prop = name;
+      color.control.title = spec.description;
+      color.control.addEventListener('change', () => controller.set(name, color.control.value));
+      refreshCatalogs.push(() => {
+        const value = String(values[name]);
+        if (![...color.control.options].some(option => option.value === value))
+          color.control.append(element('option', { value }, value));
+        color.control.value = value;
+      });
+      iconToolbar.append(color.wrapper);
+      continue;
+    }
     const label = element('label');
-    label.append(element('span', {}, name));
+    label.append(element('span', {}, paintLabel));
     let control: HTMLInputElement | HTMLSelectElement;
     const unionChoices =
       spec.type === 'union'
@@ -254,6 +305,7 @@ export function initPlayground(
       control = element('select');
       const catalog =
         spec.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
+      if (catalog?.preview) label.hidden = true;
       const choices = catalog
         ? catalog.items.map(item => item.name)
         : spec.type === 'enum'
@@ -273,6 +325,8 @@ export function initPlayground(
         control.append(element('option', { value: 'custom' }, labels.customSize ?? 'Custom'));
       }
       if (catalog) {
+        const catalogControls = element('div', { class: 'cosm-icon-toolbar' });
+        if (contract.name === 'icon') iconToolbar = catalogControls;
         const searchLabel = element('label');
         searchLabel.append(element('span', {}, labels.iconSearch ?? 'Search icons'));
         const searchInput = element('input', { type: 'search' });
@@ -285,6 +339,15 @@ export function initPlayground(
         const iconSelect = control;
         const gallery = element('div', {
           class: 'cosm-icon-gallery',
+          'data-cosm-preview': '',
+          'data-theme':
+            preview?.dataset.theme ??
+            storage?.getItem(SITE_THEME_KEY) ??
+            options.themes[0]?.name ??
+            'cosmos',
+          'data-mode':
+            preview?.dataset.mode ??
+            (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'),
           role: 'group',
           'aria-label': labels.iconGallery ?? 'Icon gallery',
         });
@@ -295,6 +358,89 @@ export function initPlayground(
         );
         let matches: readonly { name: string }[] = catalog.items;
         let shown = 0;
+        const category = select(
+          labels.iconCategory ?? 'Category',
+          [
+            ['', labels.iconAllCategories ?? 'All categories'],
+            ...[...new Set(catalog.items.map(item => item.category))]
+              .sort()
+              .map(value => [value, labels.iconCategories?.[value] ?? value] as [string, string]),
+          ],
+          ''
+        );
+        category.control.dataset.iconCategory = '';
+        const size = select(
+          labels.iconPreviewSize ?? 'Preview size',
+          [
+            ...['16', '20', '24', '32', '48'].map(
+              value => [value, `${value} px`] as [string, string]
+            ),
+            ['custom', labels.customSize ?? 'Custom'],
+          ],
+          '20'
+        );
+        size.control.dataset.iconSize = '';
+        size.control.dataset.prop = 'size';
+        const customSize = element('input', {
+          type: 'number',
+          min: '1',
+          step: 'any',
+          value: '32',
+          'data-icon-custom-size': '',
+          'aria-label': `${labels.customSize ?? 'Custom'} (px)`,
+        });
+        customSize.hidden = true;
+        const sizeGroup = element('div', { class: 'cosm-icon-size' });
+        sizeGroup.append(size.wrapper, customSize);
+        const style = select(
+          labels.iconStyle ?? 'Style',
+          [
+            ['outline', labels.iconOutline ?? 'Outline'],
+            ['filled', labels.iconFilled ?? 'Filled paths'],
+          ],
+          'outline'
+        );
+        style.control.dataset.iconStyle = '';
+        const previewSize = () =>
+          typeof values.size === 'number'
+            ? values.size
+            : values.size === 'sm'
+              ? 16
+              : values.size === 'lg'
+                ? 24
+                : 20;
+        const paintPreviews = () => {
+          const iconSize = previewSize();
+          for (const icon of gallery.querySelectorAll('cosm-icon')) {
+            icon.size = iconSize;
+            icon.fill = String(values.fill ?? 'none');
+            icon.stroke = String(values.stroke ?? 'currentColor');
+            icon.strokeWidth = Number(values.strokeWidth ?? 2);
+          }
+        };
+        refreshCatalogs.push(() => {
+          const value = String(previewSize());
+          const custom =
+            size.control.value === 'custom' ||
+            ![...size.control.options].some(option => option.value === value);
+          size.control.value = custom ? 'custom' : value;
+          customSize.hidden = !custom;
+          if (custom) customSize.value = value;
+          style.control.value = values.fill === 'none' ? 'outline' : 'filled';
+          paintPreviews();
+        });
+        size.control.addEventListener('change', () => {
+          controller.set(
+            'size',
+            Number(size.control.value === 'custom' ? customSize.value : size.control.value)
+          );
+        });
+        customSize.addEventListener('input', () => {
+          controller.set('size', Number(customSize.value));
+        });
+        style.control.addEventListener('change', () => {
+          controller.set('fill', style.control.value === 'filled' ? 'currentColor' : 'none');
+        });
         const appendPreviews = () => {
           const next = matches.slice(shown, shown + 24);
           shown += next.length;
@@ -315,7 +461,10 @@ export function initPlayground(
             gallery.append(button);
             catalog
               .preview?.(item.name)
-              .then(node => thumbnail.replaceChildren(node))
+              .then(node => {
+                thumbnail.replaceChildren(node);
+                paintPreviews();
+              })
               .catch(() => {
                 thumbnail.textContent = labels.iconPreviewError ?? 'Preview unavailable';
                 button.title = thumbnail.textContent;
@@ -323,8 +472,13 @@ export function initPlayground(
           }
         };
         more.addEventListener('click', appendPreviews);
-        searchInput.addEventListener('input', () => {
-          matches = catalog.search(searchInput.value);
+        const filter = () => {
+          const names = new Set(
+            catalog.items
+              .filter(item => !category.control.value || item.category === category.control.value)
+              .map(item => item.name)
+          );
+          matches = catalog.search(searchInput.value).filter(item => names.has(item.name));
           iconSelect.replaceChildren();
           for (const item of matches)
             iconSelect.append(element('option', { value: item.name }, item.name));
@@ -338,9 +492,22 @@ export function initPlayground(
             iconSelect.value = matches[0].name;
             controller.set(name, matches[0].name);
           }
-        });
+        };
+        searchInput.addEventListener('input', filter);
+        category.control.addEventListener('change', filter);
         searchLabel.append(searchInput);
-        fieldset.append(searchLabel, results);
+        catalogControls.append(searchLabel, category.wrapper, sizeGroup, style.wrapper);
+        fieldset.append(
+          catalogControls,
+          results,
+          element('p', { class: 'cosm-icon-note', 'data-icon-selection': '' }),
+          element(
+            'p',
+            { class: 'cosm-icon-note' },
+            labels.iconFillNote ??
+              'Filled paths use SVG fill; this is not a designed solid icon set.'
+          )
+        );
         if (catalog.preview) {
           appendPreviews();
           fieldset.append(gallery, more);
@@ -352,6 +519,10 @@ export function initPlayground(
     } else {
       control = element('input', { type: spec.type === 'number' ? 'number' : 'text' });
       if (values[name] !== undefined) control.value = String(values[name]);
+      if (contract.name === 'icon' && name === 'strokeWidth') {
+        control.min = '0';
+        control.step = 'any';
+      }
     }
     control.dataset.prop = name;
     control.title = spec.description;
@@ -387,6 +558,7 @@ export function initPlayground(
     label.append(control);
     if (contract.name === 'text-field' && !basicFieldProps.has(name))
       advancedControls.append(label);
+    else if (iconToolbar && name !== 'icon') iconToolbar.append(label);
     else fieldset.append(label);
     if (fieldSize) fieldset.append(customHeightLabel);
   }
@@ -473,9 +645,14 @@ export function initPlayground(
 
   let selected: SnippetTarget = targets[0] ?? 'html';
   let snippets = generateSnippets(contract, values, options.content);
+  let highlightRequest = 0;
 
   const render = () => {
     snippets = generateSnippets(contract, values, options.content);
+    for (const refresh of refreshCatalogs) refresh();
+    const selection = root.querySelector('[data-icon-selection]');
+    if (selection)
+      selection.textContent = `${labels.iconSelected ?? 'Selected icon'}: ${values.icon}`;
     for (const button of fieldset.querySelectorAll<HTMLElement>('[data-icon-name]')) {
       button.setAttribute('aria-pressed', String(button.dataset.iconName === values.icon));
     }
@@ -485,6 +662,21 @@ export function initPlayground(
       tab.tabIndex = active ? 0 : -1;
       panel.hidden = !active;
       code.textContent = snippets[item] ?? '';
+    }
+    const activeCode = panels.get(selected)?.code;
+    const source = snippets[selected] ?? '';
+    const request = ++highlightRequest;
+    if (activeCode) {
+      import('./highlight')
+        .then(({ highlightCode }) => {
+          if (request === highlightRequest) return highlightCode(activeCode, source, selected);
+        })
+        .catch(error => {
+          console.error('Could not highlight playground code.', error);
+          if (request === highlightRequest)
+            status.textContent =
+              labels.highlightError ?? 'Highlighting unavailable; code can still be copied.';
+        });
     }
   };
 

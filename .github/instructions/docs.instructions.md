@@ -10,9 +10,12 @@ applyTo: 'apps/docs/**'
 - Component pages (anatomy order): `<StatusBadge>` + introduction, `## Playground` (`<Playground>`),
   variants, states, accessibility, `## API` (`<ApiTable>`), events by platform (`<EventsTable>`).
 - `Playground`, `ApiTable`, `EventsTable` and `StatusBadge` read the contract and the inventory: never
-  duplicate API tables or per-platform code by hand. Snippets come from `src/lib/codegen.ts`.
+  duplicate API tables or per-platform code by hand. Snippets come from `packages/core/src/codegen.ts`.
 - Previews follow the Cosmos theme picked in the header and the site mode; use `data-fixed` /
   `data-fixed-mode` only for galleries that must show a specific theme or mode.
+- Use the shared Playground frame, contract controls and highlighted code tabs for every component.
+  Keep copying based on the raw generated snippet, never the highlighted DOM. Do not fork the frame
+  for individual components; extend shared controls with focused tests. Catalogs stay lazy-loaded.
 - Examples use neutral data (`example.com`, fictional names).
 - Client scripts never use `innerHTML`; update text with `textContent`.
 - Validate with `npx turbo run typecheck test build --filter=@joralvmel/cosmos-docs`.

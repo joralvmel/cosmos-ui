@@ -38,6 +38,7 @@ const styles = css`
     --_height: var(--cosm-control-md, 2.5rem);
     --_font-size: var(--cosm-text-sm, 0.875rem);
     display: block;
+    inline-size: 20ch;
     min-inline-size: 0;
     max-inline-size: 100%;
     color: var(--cosm-text-field-color, var(--cosm-fg, oklch(0.24 0.01 268)));

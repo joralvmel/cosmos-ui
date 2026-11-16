@@ -164,3 +164,8 @@ Custom themes: `defineTheme()` in `@joralvmel/cosmos-tokens` (https://joralvmel.
 - Use `<cosm-*>` elements and listen to `cosm-*` DOM events; import each component from `@joralvmel/cosmos-elements/<name>`.
 
 <!-- generated:end -->
+
+## Text-field layout
+
+The web text field defaults to `20ch`, capped at its container width. Override CSS `width` for
+your layout (for example `width: 100%`). Clear/reveal actions and decorations fit inside that width.

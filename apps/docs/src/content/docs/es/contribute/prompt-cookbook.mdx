@@ -25,6 +25,7 @@ Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un pro
 | Corregir un error | [Reproducir y corregir un bug](#reproducir-y-corregir-un-bug) | `modify-component`, `test-engineer` |
 | Corregir diferencias entre plataformas | [Recuperar la paridad](#recuperar-la-paridad) | Especialista del framework o nativo |
 | Mejorar ejemplos o controles | [Actualizar documentación y demos](#actualizar-documentación-y-demos) | `add-playground`, `docs-writer` |
+| Reutilizar componentes disponibles en las docs | [Adoptar componentes en los controles de las docs](#adoptar-componentes-en-los-controles-de-las-docs) | `adopt-docs-components` |
 | Revisar la calidad sin editar | [Revisar sin cambiar archivos](#revisar-sin-cambiar-archivos) | `reviewer`, `test-engineer` |
 | Cubrir un comportamiento con tests | [Añadir pruebas concretas](#añadir-pruebas-concretas) | `add-contract-tests` |
 | Añadir un tema, token o gráfica | [Otras tareas de la librería](#otras-tareas-de-la-librería) | `add-theme`, `add-token`, `create-chart` |
@@ -238,6 +239,30 @@ Actualiza las páginas EN/ES y los controles aplicables del Playground/demo nati
 ejemplos y controles en los entornos disponibles, revisando teclado, cambios de estado y consola.
 Informa de carencias del contrato o controles en vez de inventar una API. Valida los archivos
 afectados, crea un commit local y espera mi revisión.
+```
+
+### Adoptar componentes en los controles de las docs
+
+Ejecuta esta tarea por separado cuando haya nuevos componentes disponibles. Actualiza los controles
+del propio sitio, no la API pública del componente ni todos los ejemplos de código. Conserva los
+controles nativos si no existe un sustituto estable compatible. También puedes invocar directamente
+`adopt-docs-components`.
+
+```text
+Usa adopt-docs-components para actualizar los controles de las docs con los componentes estables
+de Cosmos disponibles.
+[Opcional: limita la revisión a estos componentes o zonas de las docs: ...]
+
+Trabaja en una rama de docs aislada desde develop, separada del desarrollo de componentes. Revisa
+el inventario y los contratos actuales; presenta un mapeo de sustituciones con las carencias de
+comportamiento, accesibilidad y formularios. Espera mi aprobación del alcance antes de sustituir.
+No crees componentes, no añadas dependencias ni cambies APIs de la librería. Conserva los controles
+nativos cuando no haya un equivalente estable que cubra el caso.
+
+Tras aprobarlo, actualiza los controles compartidos y las docs EN/ES sin duplicar comportamiento
+ni romper los snippets generados. Prueba las interacciones reales, teclado, foco, temas y pantallas
+estrechas en el navegador; añade regresiones concretas. Informa de sustituciones y aplazamientos,
+valida, crea un commit local y espera mi revisión sin push ni PR.
 ```
 
 ### Revisar sin cambiar archivos

@@ -33,6 +33,9 @@ Text-field start/end icons support independent `--cosm-text-field-start-icon-col
 `"input"` limits those focus colors to the editable input. Unset hooks preserve existing colors;
 affixes and action icons are unaffected.
 
+Text fields default to `20ch` wide, capped at the container width. Set CSS `width` to fit your
+layout. Clear/reveal actions and decorations take space inside the field without changing its width.
+
 ## License
 
 MIT

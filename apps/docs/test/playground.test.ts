@@ -11,6 +11,7 @@ import {
   initPlayground,
   isPortablePaint,
   type PlaygroundLabels,
+  SITE_THEME_KEY,
   TAB_STORAGE_KEY,
 } from '../src/lib/playground';
 
@@ -74,6 +75,166 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('combines catalog category and search, and copies the selected icon style and size', async () => {
+    const root = document.createElement('div');
+    const preview = document.createElement('div');
+    preview.dataset.cosmPreview = '';
+    preview.dataset.theme = 'cosmos';
+    preview.dataset.mode = 'light';
+    const target = document.createElement('cosm-icon');
+    target.dataset.playgroundTarget = '';
+    preview.append(target);
+    root.append(preview);
+    document.body.append(root);
+    const items = [
+      { name: 'house', category: 'navigation', tags: ['home'] },
+      { name: 'heart', category: 'shapes', tags: ['love'] },
+    ];
+    const writeText = vi.fn(async () => {});
+    const controller = initPlayground(root, {
+      contract: iconContract,
+      content: '',
+      labels,
+      themes: [
+        { name: 'cosmos', label: 'Cosmos' },
+        { name: 'nebula', label: 'Nebula' },
+      ],
+      referenceCatalogs: {
+        IconDefinition: {
+          items,
+          search: query => searchIconCatalog(items, query),
+          load: async name => (name === 'heart' ? heart : house),
+          preview: async () => document.createElement('cosm-icon'),
+        },
+      },
+      clipboard: { writeText },
+      storage: { getItem: key => (key === SITE_THEME_KEY ? 'nebula' : null), setItem: () => {} },
+    });
+    const category = root.querySelector<HTMLSelectElement>('[data-icon-category]');
+    const searchInput = root.querySelector<HTMLInputElement>('input[type="search"]');
+    const size = root.querySelector<HTMLSelectElement>('[data-icon-size]');
+    const style = root.querySelector<HTMLSelectElement>('[data-icon-style]');
+    if (!category || !searchInput || !size || !style) throw new Error('Missing catalog controls');
+    const gallery = root.querySelector<HTMLElement>('.cosm-icon-gallery');
+    if (!gallery) throw new Error('Missing gallery');
+    expect(gallery.hasAttribute('data-cosm-preview')).toBe(true);
+    expect(gallery.dataset.theme).toBe('cosmos');
+    expect(gallery.dataset.mode).toBe('light');
+    const [theme, mode] = root.querySelectorAll<HTMLSelectElement>(
+      '.cosm-playground-toolbar select'
+    );
+    if (!theme || !mode) throw new Error('Missing theme controls');
+    theme.value = 'nebula';
+    theme.dispatchEvent(new Event('change'));
+    mode.value = 'dark';
+    mode.dispatchEvent(new Event('change'));
+    expect(gallery.dataset.theme).toBe(preview.dataset.theme);
+    expect(gallery.dataset.mode).toBe(preview.dataset.mode);
+    expect(gallery.hasAttribute('data-fixed')).toBe(true);
+    expect(gallery.hasAttribute('data-fixed-mode')).toBe(true);
+    category.value = 'shapes';
+    category.dispatchEvent(new Event('change'));
+    await vi.waitFor(() => expect(controller.values.icon).toBe('heart'));
+    expect(root.querySelectorAll('[data-icon-name]')).toHaveLength(1);
+    searchInput.value = 'house';
+    searchInput.dispatchEvent(new Event('input'));
+    expect(root.querySelectorAll('[data-icon-name]')).toHaveLength(0);
+    expect(controller.values.icon).toBe('heart');
+    searchInput.value = 'love';
+    searchInput.dispatchEvent(new Event('input'));
+    size.value = '32';
+    size.dispatchEvent(new Event('change'));
+    style.value = 'filled';
+    style.dispatchEvent(new Event('change'));
+    await vi.waitFor(() => expect(target.icon).toBe(heart));
+    expect(target.size).toBe(32);
+    expect(target.fill).toBe('currentColor');
+    expect(root.querySelector('cosm-icon[data-playground-target]')).toBe(target);
+    for (const technology of ['html', 'react', 'angular', 'native'] as const) {
+      controller.select(technology);
+      root.querySelector<HTMLButtonElement>('.cosm-playground-copy')?.click();
+      await vi.waitFor(() => expect(writeText).toHaveBeenLastCalledWith(controller.code()));
+      expect(controller.code()).toContain('cosmos-icons/heart');
+      expect(controller.code()).toContain('32');
+    }
+    await vi.waitFor(() => {
+      const thumbnail = root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon');
+      expect(thumbnail?.size).toBe(32);
+      expect(thumbnail?.fill).toBe('currentColor');
+    });
+    size.value = 'custom';
+    size.dispatchEvent(new Event('change'));
+    expect(root.querySelector<HTMLInputElement>('[data-icon-custom-size]')?.hidden).toBe(false);
+    controller.set('size', 37);
+    controller.set('fill', 'none');
+    expect(size.value).toBe('custom');
+    const customSize = root.querySelector<HTMLInputElement>('[data-icon-custom-size]');
+    if (!customSize) throw new Error('Missing custom size control');
+    expect(customSize.hidden).toBe(false);
+    expect(customSize.value).toBe('37');
+    customSize.value = '41';
+    customSize.dispatchEvent(new Event('input'));
+    expect(target.size).toBe(41);
+    expect(root.querySelectorAll('[data-prop="size"]')).toHaveLength(1);
+    expect(root.querySelector('details [data-prop="size"]')).toBeNull();
+    expect(style.value).toBe('outline');
+    expect(root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon')?.size).toBe(41);
+    for (const [name, color] of [
+      ['stroke', 'var(--cosm-primary)'],
+      ['fill', 'var(--cosm-danger)'],
+    ] as const) {
+      const control = root.querySelector<HTMLSelectElement>(`select[data-prop="${name}"]`);
+      if (!control) throw new Error(`Missing ${name} control`);
+      expect(control.closest('.cosm-icon-toolbar')).not.toBeNull();
+      control.value = color;
+      control.dispatchEvent(new Event('change'));
+    }
+    expect(style.value).toBe('filled');
+    expect(target.stroke).toBe('var(--cosm-primary)');
+    expect(target.fill).toBe('var(--cosm-danger)');
+    const thumbnail = root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon');
+    expect(thumbnail?.stroke).toBe('var(--cosm-primary)');
+    expect(thumbnail?.fill).toBe('var(--cosm-danger)');
+    for (const technology of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(technology)).toContain(
+        technology === 'native' ? 'theme.colors.primary' : 'var(--cosm-primary)'
+      );
+      expect(controller.code(technology)).toContain(
+        technology === 'native' ? 'theme.colors.danger' : 'var(--cosm-danger)'
+      );
+    }
+    style.value = 'outline';
+    style.dispatchEvent(new Event('change'));
+    expect(root.querySelector<HTMLSelectElement>('[data-prop="fill"]')?.value).toBe('none');
+    expect(root.querySelector('details')).toBeNull();
+    const width = root.querySelector<HTMLInputElement>(
+      '.cosm-icon-toolbar [data-prop="strokeWidth"]'
+    );
+    const label = root.querySelector<HTMLInputElement>('.cosm-icon-toolbar [data-prop="label"]');
+    const decorative = root.querySelector<HTMLInputElement>(
+      '.cosm-icon-toolbar [data-prop="decorative"]'
+    );
+    if (!width || !label || !decorative) throw new Error('Missing icon controls');
+    width.value = '1.5';
+    width.dispatchEvent(new Event('input'));
+    label.value = 'Favorite';
+    label.dispatchEvent(new Event('input'));
+    decorative.checked = false;
+    decorative.dispatchEvent(new Event('input'));
+    expect(target.strokeWidth).toBe(1.5);
+    expect(target.label).toBe('Favorite');
+    expect(target.decorative).toBe(false);
+    theme.value = '';
+    theme.dispatchEvent(new Event('change'));
+    mode.value = '';
+    mode.dispatchEvent(new Event('change'));
+    expect(gallery.hasAttribute('data-fixed')).toBe(false);
+    expect(gallery.hasAttribute('data-fixed-mode')).toBe(false);
+    expect(gallery.dataset.theme).toBe('nebula');
+    expect(gallery.dataset.theme).toBe(preview.dataset.theme);
+    expect(gallery.dataset.mode).toBe(preview.dataset.mode);
+  });
+
   it('builds one control per contract prop and four code tabs', () => {
     const { root } = mount();
     expect(root.querySelectorAll('[data-prop]')).toHaveLength(
