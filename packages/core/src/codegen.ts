@@ -74,7 +74,13 @@ export function activeProps(
   for (const [name, spec] of Object.entries(contract.props)) {
     if (spec.platforms && !spec.platforms.includes(platform)) continue;
     const value = values[name];
-    if (value === undefined || ('default' in spec && value === spec.default)) continue;
+    if (
+      value === undefined ||
+      ('default' in spec &&
+        value === spec.default &&
+        !contract.states.some(state => state.prop === name))
+    )
+      continue;
     result.push({ name, spec, value });
   }
   return result;
@@ -186,13 +192,15 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
   const attributes = props.map(({ name, spec, value }) =>
     spec.type === 'reference'
       ? `[${name}]="${referenceBinding(String(value))}"`
-      : spec.type === 'boolean' && value === false
-        ? `[${name}]="false"`
-        : value === true
-          ? name
-          : typeof value === 'number'
-            ? `[${name}]="${value}"`
-            : `${name}="${escapeAttribute(String(value))}"`
+      : spec.type === 'boolean' && contract.states.some(state => state.prop === name)
+        ? `[${name}]="${value}"`
+        : spec.type === 'boolean' && value === false
+          ? `[${name}]="false"`
+          : value === true
+            ? name
+            : typeof value === 'number'
+              ? `[${name}]="${value}"`
+              : `${name}="${escapeAttribute(String(value))}"`
   );
   const events = Object.values(contract.events);
   const handler = (output: string) => `on${pascalCase(output)}`;
@@ -304,4 +312,77 @@ export function generateSnippets(
     }
   }
   return result;
+}
+
+export interface SnippetChild {
+  contract: ComponentContract;
+  values: ControlValues;
+}
+
+/** Compose a default-slot child into each platform's generated example. */
+export function generateComposedSnippets(
+  contract: ComponentContract,
+  values: ControlValues,
+  content: string,
+  child?: SnippetChild
+): Partial<Record<SnippetTarget, string>> {
+  if (!child) return generateSnippets(contract, values, content);
+  const marker = 'COSMOS_PLAYGROUND_CHILD';
+  const parents = generateSnippets(contract, values, marker);
+  const children = generateSnippets(child.contract, child.values, '');
+  const component = pascalCase(child.contract.name);
+  for (const platform of snippetTargets) {
+    let parent = parents[platform];
+    const source = children[platform];
+    if (!parent || !source) continue;
+    const tag = platform === 'html' || platform === 'angular' ? child.contract.tag : component;
+    const start = source.indexOf(`<${tag}`);
+    const end = source.indexOf(`</${tag}>`, start) + tag.length + 3;
+    if (start < 0 || end < tag.length + 3) throw new Error('Missing generated child markup.');
+    parent = parent.replace(marker, source.slice(start, end));
+    const wrapperImport =
+      /import \{ ([^}]+) \} from '(@joralvmel\/cosmos-(?:react|native|angular))';/;
+    const childNames = wrapperImport.exec(source)?.[1];
+    if (childNames) {
+      parent = parent.replace(wrapperImport, (_, names: string, module: string) => {
+        const merged = [...new Set([...names.split(', '), ...childNames.split(', ')])];
+        return `import { ${merged.join(', ')} } from '${module}';`;
+      });
+    }
+    const imports = source
+      .split('\n')
+      .filter(line => /^\s*import /.test(line) && !wrapperImport.test(line))
+      .filter(line => !parent?.includes(line));
+    if (platform === 'html') {
+      parent = parent.replace(
+        '<script type="module">',
+        `<script type="module">\n${imports.join('\n')}`
+      );
+      if (source.includes('\n  const element =')) {
+        const setup = source.slice(
+          source.indexOf('\n  const element ='),
+          source.indexOf('</script>')
+        );
+        parent = parent.replace(
+          '</script>',
+          `${setup.replaceAll('element', 'childElement')}</script>`
+        );
+      }
+    } else {
+      parent = [...imports, parent].join('\n');
+      if (platform === 'angular') {
+        parent = parent.replace(
+          /imports: \[([^\]]+)\]/,
+          (_, names: string) => `imports: [${names}, Cosm${component}Component]`
+        );
+        const fields = source.split('\n').filter(line => /^\s+readonly /.test(line));
+        parent = parent.replace(
+          'export class ExampleComponent {',
+          `export class ExampleComponent {\n${fields.join('\n')}`
+        );
+      }
+    }
+    parents[platform] = parent;
+  }
+  return parents;
 }

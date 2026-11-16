@@ -171,6 +171,46 @@ export class ExampleComponent {
   }
 }
 ```
+### `CosmIconButtonComponent` (`<cosm-icon-button>`)
+
+Activates an action or toggles a boolean state using a labeled icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required localized accessible name. Missing, empty or whitespace-only labels are rejected. |
+| `mode` | 'action' \| 'toggle' | `action` | Action activates without toggle state; toggle exposes and changes pressed state. |
+| `variant` | 'solid' \| 'soft' \| 'outline' \| 'ghost' | `solid` | Visual emphasis, from highest (solid) to lowest (ghost). |
+| `tone` | 'primary' \| 'neutral' \| 'danger' | `primary` | Color role. Use danger for destructive actions. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Size of the square visual control. |
+| `disabled` | boolean | `false` | Prevents activation and removes the web button from the tab order. |
+| `type` | 'button' \| 'submit' \| 'reset' | `button` | Native web button form behavior. |
+| `pressed` | boolean | `false` | Toggle state. If supplied, including false, activation proposes changes without committing them until the owner updates this prop. |
+| `defaultPressed` | boolean | `false` | Initial toggle state when pressed is not supplied; it does not control later changes. |
+
+Events: `(press)` → `IconButtonPressDetail`, `(pressedChange)` → `IconButtonPressedChangeDetail`.
+
+```ts
+import { heart } from '@joralvmel/cosmos-icons/heart';
+import { Component } from '@angular/core';
+import { CosmIconButtonComponent, CosmIconComponent } from '@joralvmel/cosmos-angular';
+import type { IconButtonPressDetail, IconButtonPressedChangeDetail } from '@joralvmel/cosmos-core';
+
+@Component({
+  selector: 'app-example',
+  imports: [CosmIconButtonComponent, CosmIconComponent],
+  template: `<cosm-icon-button label="IconButton" (press)="onPress($event.detail)" (pressedChange)="onPressedChange($event.detail)"><cosm-icon [icon]="heart"></cosm-icon></cosm-icon-button>`,
+})
+export class ExampleComponent {
+  readonly heart = heart;
+  onPress(detail: IconButtonPressDetail) {
+    console.log(detail);
+  }
+
+  onPressedChange(detail: IconButtonPressedChangeDetail) {
+    console.log(detail);
+  }
+}
+```
 
 ## Themes
 

@@ -88,6 +88,8 @@ export const catalog: readonly CatalogEntry[] = [
     priority: 2,
     dependsOn: ['button', 'icon'],
     pattern: apg('button'),
+    status: 'in-progress',
+    notes: ['Runtime and assistive-technology acceptance checks remain outstanding.'],
   }),
   entry({
     name: 'badge',
@@ -154,7 +156,7 @@ export const catalog: readonly CatalogEntry[] = [
     dependsOn: ['icon', 'icon-button'],
     pattern: html('input.html'),
     notes: [
-      'icon-button is planned; clear and password-reveal actions use local accessible native button primitives until that dependency is stable.',
+      'icon-button is in progress; clear and password-reveal actions use local accessible native button primitives until that dependency is stable.',
       'Implementation complete; outstanding acceptance checks are explicitly deferred and remain unverified in docs/design/text-field.md.',
     ],
     status: 'stable',

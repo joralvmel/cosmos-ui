@@ -93,6 +93,7 @@ export function mdxToMarkdown(source, { report } = {}) {
       if (contract) output.push(snippetsMarkdown(contract, attribute(trimmed, 'content') ?? ''));
       continue;
     }
+    if (trimmed.startsWith('<IconButtonExamples')) continue;
     if (trimmed.startsWith('<ApiTable')) {
       const contract = contractOf(trimmed);
       if (contract) output.push(contractMarkdown(contract, { events: false }));

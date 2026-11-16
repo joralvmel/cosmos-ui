@@ -7,4 +7,9 @@ export const screens = [
     title: 'Text Field',
     description: 'Single-line text, actions and states.',
   },
+  {
+    route: '/icon-button',
+    title: 'Icon Button',
+    description: 'Labeled icon actions, variants and toggle states.',
+  },
 ] as const;

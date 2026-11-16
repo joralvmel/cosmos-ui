@@ -48,6 +48,10 @@
       "types": "./dist/components/text-field/cosm-text-field.d.ts",
       "default": "./dist/components/text-field/cosm-text-field.js"
     },
+    "./icon-button": {
+      "types": "./dist/components/icon-button/cosm-icon-button.d.ts",
+      "default": "./dist/components/icon-button/cosm-icon-button.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

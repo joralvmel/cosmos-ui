@@ -1,4 +1,5 @@
 import { iconContract } from './specs/icon.js';
+import { iconButtonContract } from './specs/icon-button.js';
 import { textFieldContract } from './specs/text-field.js';
 
 export {
@@ -14,8 +15,10 @@ export {
   activeProps,
   type ControlValue,
   type ControlValues,
+  generateComposedSnippets,
   generateSnippets,
   pascalCase,
+  type SnippetChild,
   type SnippetTarget,
   snippetTargets,
   supportsTarget,
@@ -81,6 +84,7 @@ export const contracts = {
   button: buttonContract,
   icon: iconContract,
   'text-field': textFieldContract,
+  'icon-button': iconButtonContract,
 } as const;
 export { iconContract } from './specs/icon.js';
 export {
@@ -88,6 +92,17 @@ export {
   iconScenarios,
   iconScenariosFor,
 } from './specs/icon.scenarios.js';
+export {
+  type IconButtonPressDetail,
+  type IconButtonPressedChangeDetail,
+  iconButtonContract,
+} from './specs/icon-button.js';
+export {
+  type IconButtonAction,
+  type IconButtonScenario,
+  iconButtonScenarios,
+  iconButtonScenariosFor,
+} from './specs/icon-button.scenarios.js';
 export {
   type TextFieldChangeDetail,
   type TextFieldSubmitDetail,

@@ -4,6 +4,7 @@ import {
   componentReference,
   contractMarkdown,
   eventsMarkdown,
+  iconButtonContract,
   propsMarkdown,
   snippetsMarkdown,
 } from '../src/index.js';
@@ -39,5 +40,11 @@ describe('contract markdown', () => {
     expect(componentReference(buttonContract, 'web')).toContain(
       '```html\n<cosm-button>Button</cosm-button>'
     );
+  });
+
+  it('includes a real decorative icon in icon-button references', () => {
+    expect(snippetsMarkdown(iconButtonContract)).toContain('<cosm-icon></cosm-icon>');
+    expect(componentReference(iconButtonContract, 'react')).toContain('<Icon icon={heart}></Icon>');
+    expect(componentReference(iconButtonContract, 'native')).toContain('cosmos-icons/heart');
   });
 });

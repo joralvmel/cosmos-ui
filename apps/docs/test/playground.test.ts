@@ -1,5 +1,10 @@
 // @vitest-environment happy-dom
-import { buttonContract, iconContract, textFieldContract } from '@joralvmel/cosmos-core';
+import {
+  buttonContract,
+  iconButtonContract,
+  iconContract,
+  textFieldContract,
+} from '@joralvmel/cosmos-core';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
 import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
 import { iconCatalog, searchIconCatalog } from '@joralvmel/cosmos-icons';
@@ -7,6 +12,7 @@ import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
 import { search } from '@joralvmel/cosmos-icons/search';
 import '@joralvmel/cosmos-elements/button';
+import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/text-field';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -85,6 +91,60 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('supports icon children, localized required labels and explicit toggle ownership', async () => {
+    const root = document.createElement('div');
+    const preview = document.createElement('div');
+    preview.dataset.cosmPreview = '';
+    const target = document.createElement('cosm-icon-button');
+    target.dataset.playgroundTarget = '';
+    const icon = document.createElement('cosm-icon');
+    icon.icon = heart;
+    target.append(icon);
+    preview.append(target);
+    root.append(preview);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: iconButtonContract,
+      content: '',
+      child: { contract: iconContract, values: { icon: 'heart' } },
+      labels: { ...labels, iconButtonLabel: 'Favorito', autonomous: 'Autónomo' },
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    expect(controller.values.label).toBe('Favorito');
+    expect(controller.values.pressed).toBeUndefined();
+    expect(root.querySelector('[data-prop="pressed"] option')?.textContent).toBe('Autónomo');
+    for (const name of Object.keys(iconButtonContract.props)) {
+      expect(root.querySelector(`[data-prop="${name}"]`), name).not.toBeNull();
+    }
+    controller.set('label', ' ');
+    expect(controller.values.label).toBe('Favorito');
+    controller.set('mode', 'toggle');
+    const pressed = root.querySelector<HTMLSelectElement>('[data-prop="pressed"]');
+    if (!pressed) throw new Error('Missing pressed control');
+    pressed.value = 'false';
+    pressed.dispatchEvent(new Event('input'));
+    await target.updateComplete;
+    expect(controller.values.pressed).toBe(false);
+    expect(target.pressedControlled).toBe(true);
+    target.click();
+    await target.updateComplete;
+    expect(target.pressed).toBe(false);
+    controller.set('pressed', true);
+    await target.updateComplete;
+    target.click();
+    expect(target.pressed).toBe(true);
+    controller.set('pressed', undefined);
+    expect(target.pressedControlled).toBe(false);
+    await target.updateComplete;
+    target.click();
+    await target.updateComplete;
+    expect(target.pressed).toBe(false);
+    expect(target.firstElementChild).toBe(icon);
+    expect(icon.icon).toBe(heart);
+    expect(controller.code('react')).toContain('<Icon icon={heart}></Icon>');
+  });
+
   it('combines catalog category and search, and copies the selected icon style and size', async () => {
     const root = document.createElement('div');
     const preview = document.createElement('div');

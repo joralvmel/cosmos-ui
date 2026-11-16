@@ -5,6 +5,7 @@ import {
   type ComponentContract,
   defineContract,
   generateSnippets,
+  iconButtonContract,
   supportsTarget,
   textFieldContract,
   toAttribute,
@@ -54,6 +55,21 @@ describe('codegen', () => {
     const snippets = generateSnippets(buttonContract, { ...defaults, type: 'submit' }, 'Go');
     expect(snippets.react).toContain('type="submit"');
     expect(snippets.native).not.toContain('type=');
+  });
+
+  it('preserves explicit controlled toggle values, including the default false', () => {
+    for (const pressed of [false, true]) {
+      const snippets = generateSnippets(iconButtonContract, { label: 'Favorite', pressed }, '');
+      expect(snippets.angular).toContain(`[pressed]="${pressed}"`);
+      expect(snippets.react).toContain(pressed ? ' pressed' : 'pressed={false}');
+      expect(snippets.native).toContain(pressed ? ' pressed' : 'pressed={false}');
+      if (pressed) expect(snippets.html).toContain(' pressed');
+      else expect(snippets.html).toContain('element.pressed = false;');
+    }
+    const autonomous = generateSnippets(iconButtonContract, { label: 'Favorite' }, '');
+    for (const source of Object.values(autonomous)) {
+      expect(source).not.toMatch(/(?:\s|\.)pressed(?:[= >])/);
+    }
   });
 
   it('escapes user text in HTML and JSX', () => {

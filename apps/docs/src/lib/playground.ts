@@ -1,7 +1,6 @@
 import {
   type ComponentContract,
   type ControlValues,
-  generateSnippets,
   type SnippetTarget,
   snippetTargets,
   supportsTarget,
@@ -10,6 +9,7 @@ import {
 import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/text-field';
 import { semanticColors } from '@joralvmel/cosmos-tokens';
+import { type PlaygroundChild, playgroundSnippets } from './playground-snippets';
 
 export interface PlaygroundLabels {
   controls: string;
@@ -50,6 +50,9 @@ export interface PlaygroundLabels {
   customSize?: string;
   customHeight?: string;
   textFieldInvalid?: string;
+  iconButtonLabel?: string;
+  iconButtonInvalid?: string;
+  autonomous?: string;
   textFieldDefaults?: {
     label: string;
     clearLabel: string;
@@ -62,6 +65,7 @@ export interface PlaygroundLabels {
 export interface PlaygroundOptions {
   contract: ComponentContract;
   content: string;
+  child?: PlaygroundChild;
   labels: PlaygroundLabels;
   themes: readonly { name: string; label: string }[];
   /** Link to the screen of the component in the native demo app (optional). */
@@ -163,6 +167,10 @@ export function initPlayground(
   }
   if (contract.name === 'text-field' && labels.textFieldDefaults) {
     Object.assign(values, labels.textFieldDefaults);
+  }
+  if (contract.name === 'icon-button') {
+    values.label = labels.iconButtonLabel ?? 'Favorite';
+    values.pressed = undefined;
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -548,6 +556,15 @@ export function initPlayground(
           fieldset.append(gallery, more);
         }
       }
+    } else if (contract.name === 'icon-button' && name === 'pressed') {
+      control = element('select');
+      for (const [value, text] of [
+        ['', labels.autonomous ?? 'Autonomous'],
+        ['false', 'false'],
+        ['true', 'true'],
+      ] as const) {
+        control.append(element('option', { value }, text));
+      }
     } else if (spec.type === 'boolean') {
       control = element('input', { type: 'checkbox' });
       control.checked = spec.default;
@@ -572,21 +589,25 @@ export function initPlayground(
         return;
       }
       const value =
-        input.type === 'checkbox'
-          ? input.checked
-          : input.type === 'number'
-            ? input.value === ''
-              ? undefined
-              : Number(input.value)
-            : spec.type === 'union' &&
-                control.value.trim() !== '' &&
-                Number.isFinite(Number(control.value))
-              ? Number(control.value)
-              : contract.name === 'text-field' &&
-                  (spec.type === 'reference' || enumUnion) &&
-                  control.value === ''
+        contract.name === 'icon-button' && name === 'pressed'
+          ? input.value === ''
+            ? undefined
+            : input.value === 'true'
+          : input.type === 'checkbox'
+            ? input.checked
+            : input.type === 'number'
+              ? input.value === ''
                 ? undefined
-                : control.value;
+                : Number(input.value)
+              : spec.type === 'union' &&
+                  control.value.trim() !== '' &&
+                  Number.isFinite(Number(control.value))
+                ? Number(control.value)
+                : contract.name === 'text-field' &&
+                    (spec.type === 'reference' || enumUnion) &&
+                    control.value === ''
+                  ? undefined
+                  : control.value;
       controller.set(name, value);
       if (input.type === 'checkbox') input.checked = values[name] === true;
     });
@@ -690,11 +711,11 @@ export function initPlayground(
   }
 
   let selected: SnippetTarget = targets[0] ?? 'html';
-  let snippets = generateSnippets(contract, values, options.content);
+  let snippets = playgroundSnippets(contract, values, options.content, options.child);
   let highlightRequest = 0;
 
   const render = () => {
-    snippets = generateSnippets(contract, values, options.content);
+    snippets = playgroundSnippets(contract, values, options.content, options.child);
     for (const refresh of refreshCatalogs) refresh();
     const selection = root.querySelector('[data-icon-selection]');
     if (selection)
@@ -734,6 +755,15 @@ export function initPlayground(
     set(name, value) {
       const spec = contract.props[name];
       const onWeb = spec && (!spec.platforms || spec.platforms.includes('web'));
+      if (
+        contract.name === 'icon-button' &&
+        name === 'label' &&
+        (typeof value !== 'string' || !value.trim())
+      ) {
+        referenceStatus.textContent = labels.iconButtonInvalid ?? 'Enter a non-empty label.';
+        return;
+      }
+      referenceStatus.textContent = '';
       if (contract.name === 'text-field') {
         const invalidSize =
           name === 'size' &&
@@ -812,20 +842,26 @@ export function initPlayground(
       }
       values[name] = value;
       if (target && onWeb) {
+        if (contract.name === 'icon-button' && name === 'pressed') {
+          Reflect.set(target, 'pressedControlled', value !== undefined);
+        }
         if (contract.name === 'text-field' && name === 'value') {
           Reflect.set(target, 'valueControlled', value !== undefined);
         }
         const resolved =
           spec?.type === 'reference' && typeof value === 'string'
             ? options.referenceValues?.[spec.reference]?.[value]
-            : (value ?? (spec && 'default' in spec ? spec.default : undefined));
+            : contract.name === 'icon-button' && name === 'pressed'
+              ? value
+              : (value ?? (spec && 'default' in spec ? spec.default : undefined));
         if (spec?.type === 'reference' && value !== undefined && resolved === undefined) {
           throw new Error(
             `No playground value configured for ${spec.reference} "${String(value)}".`
           );
         }
         Reflect.set(target, name, resolved);
-        if (spec?.type === 'boolean') target.toggleAttribute(toAttribute(name), value === true);
+        if (spec?.type === 'boolean' && !(contract.name === 'icon-button' && name === 'pressed'))
+          target.toggleAttribute(toAttribute(name), value === true);
       }
       status.textContent = '';
       render();
