@@ -37,6 +37,34 @@
   align-items: center;
 }
 
+.cosm-playground-controls [hidden] {
+  display: none;
+}
+
+.cosm-playground-controls input[type="checkbox"] {
+  appearance: auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+  accent-color: var(--sl-color-text-accent);
+}
+
+.cosm-playground-advanced {
+  grid-column: 1 / -1;
+}
+
+.cosm-playground-advanced summary {
+  cursor: pointer;
+  font-size: var(--sl-text-sm);
+}
+
+.cosm-playground-advanced-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  padding-block-start: 0.75rem;
+}
+
 .cosm-icon-gallery {
   display: grid;
   grid-column: 1 / -1;

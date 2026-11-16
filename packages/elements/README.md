@@ -23,6 +23,7 @@ import '@joralvmel/cosmos-elements/button';
 | Element         | Import                              | Description                        |
 | --------------- | ----------------------------------- | ---------------------------------- |
 | `<cosm-button>` | `@joralvmel/cosmos-elements/button` | Action or form submit/reset button |
+| `<cosm-text-field>` | `@joralvmel/cosmos-elements/text-field` | Labeled single-line entry with browser form validation |
 
 The Custom Elements Manifest is published as `@joralvmel/cosmos-elements/custom-elements.json`.
 

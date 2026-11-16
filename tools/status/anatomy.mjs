@@ -174,29 +174,50 @@ export function checkAnatomy(root, kebab, platforms) {
       ...checkClassBody(file, text),
       ...checkJsDocTags(file, text, `Cosm${n.pascal}`),
     ]);
-    check(paths.react, (file, text) =>
-      checkOrder(file, text, [
+    check(paths.react, (file, text) => {
+      const base = [
         {
           label: `export const ${n.camel}Events`,
           pattern: new RegExp(`^export const ${n.camel}Events = \\{`, 'm'),
         },
         {
-          label: `export const ${n.pascal} = createComponent`,
-          pattern: new RegExp(`^export const ${n.pascal} = createComponent\\(`, 'm'),
-        },
-        {
           label: `export type ${n.pascal}Props`,
           pattern: new RegExp(`^export type ${n.pascal}Props = `, 'm'),
         },
-      ])
-    );
+      ];
+      if (new RegExp(`^export const ${n.pascal} = createComponent\\(`, 'm').test(text)) {
+        return checkOrder(file, text, [
+          base[0],
+          {
+            label: `export const ${n.pascal} = createComponent`,
+            pattern: new RegExp(`^export const ${n.pascal} = createComponent\\(`, 'm'),
+          },
+          base[1],
+        ]);
+      }
+      return checkOrder(file, text, [
+        base[0],
+        {
+          label: `const ${n.pascal}Element = createComponent`,
+          pattern: new RegExp(`^const ${n.pascal}Element = createComponent\\(`, 'm'),
+        },
+        {
+          label: `export const ${n.pascal} = React.forwardRef`,
+          pattern: new RegExp(`^export const ${n.pascal} = React\\.forwardRef`, 'm'),
+        },
+        base[1],
+      ]);
+    });
     check(paths.angular, (file, text) =>
       checkOrder(file, text, [
         { label: '@Component', pattern: /^@Component\(\{/m },
         { label: `selector '${n.tag}'`, pattern: new RegExp(`selector: '${n.tag}'`) },
         {
           label: `class Cosm${n.pascal}Component`,
-          pattern: new RegExp(`^export class Cosm${n.pascal}Component \\{`, 'm'),
+          pattern: new RegExp(
+            `^export class Cosm${n.pascal}Component(?: implements [^{]+)? \\{`,
+            'm'
+          ),
         },
         { label: 'readonly element', pattern: /^ {2}readonly element: /m },
         { label: '@Input()', pattern: /^ {2}@Input\(/m, optional: true },

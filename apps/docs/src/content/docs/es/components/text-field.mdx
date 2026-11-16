@@ -1,0 +1,132 @@
+---
+title: Campo de texto
+description: Un campo de texto de una línea con etiqueta, validación y comportamiento de formulario del navegador.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+import TextFieldOwnershipDemo from '../../../../components/TextFieldOwnershipDemo.astro';
+
+<StatusBadge name="text-field" />
+
+`<cosm-text-field>` es un control de texto de una línea con etiqueta. Admite texto, correo
+electrónico, contraseña, teléfono, URL y búsqueda. Participa en los formularios y las restricciones
+nativas del navegador; usa un campo numérico o un área de texto para números o edición multilínea.
+
+## Playground
+
+Usa los desplegables para elegir tipo, variante, tamaño, teclado y unos pocos iconos de ejemplo, y
+las casillas para activar las opciones booleanas. Los ajustes menos habituales de formulario,
+contenido y etiquetas de acciones están en **Opciones avanzadas**; la API completa sigue disponible
+más abajo. El catálogo de iconos está en la página de Icono y no se carga en este playground.
+
+Para introducir dígitos, elige `text` e `inputMode="numeric"`: solicita un teclado numérico, no
+valida ni filtra números. Usa `pattern` en web o validación del consumidor según corresponda.
+En el ejemplo siguiente puedes aceptar o rechazar una propuesta de valor controlado:
+
+<Playground name="text-field" content="" />
+
+<TextFieldOwnershipDemo
+  label="Nombre de la cuenta"
+  value="Cosmos"
+  clearLabel="Borrar nombre de cuenta"
+  acceptLabel="Aceptar"
+  rejectLabel="Rechazar"
+  pendingMessage="Hay una propuesta de valor pendiente."
+  acceptedMessage="Propuesta aceptada."
+  rejectedMessage="Propuesta rechazada; se conserva el valor anterior."
+/>
+
+## Variantes
+
+`outlined` es la variante predeterminada. `filled` solo cambia la superficie del control. Los
+tamaños semánticos son `sm`, `md` y `lg`. Un valor numérico positivo y finito de `size` define la
+altura mínima del control editable en píxeles CSS. La etiqueta y el texto de ayuda quedan fuera de
+esa altura.
+
+<Preview>
+  <cosm-text-field label="Contorno" placeholder="nombre@ejemplo.com"></cosm-text-field>
+  <cosm-text-field label="Relleno" variant="filled" placeholder="nombre@ejemplo.com"></cosm-text-field>
+</Preview>
+
+<Preview>
+  <cosm-text-field label="Pequeño" size="sm"></cosm-text-field>
+  <cosm-text-field label="Mediano" size="md"></cosm-text-field>
+  <cosm-text-field label="Grande" size="lg"></cosm-text-field>
+  <cosm-text-field label="Altura mínima personalizada" size="56"></cosm-text-field>
+</Preview>
+
+## Estados
+
+El texto de ayuda y el error externo se asocian al campo. En web, `required`, `type`, `pattern`,
+`minLength` y `maxLength` usan la validación nativa del navegador. `error` e `invalid` pertenecen al
+consumidor y no se deducen de reglas de negocio.
+
+<Preview>
+  <cosm-text-field label="Correo" type="email" required help-text="Usa tu correo de trabajo."></cosm-text-field>
+  <cosm-text-field label="Cuenta no válida" value="ocupada" error="Ese nombre no está disponible." invalid></cosm-text-field>
+  <cosm-text-field
+    label="Contraseña"
+    type="password"
+    password-reveal
+    reveal-password-label="Mostrar contraseña"
+    hide-password-label="Ocultar contraseña"
+    value="secreto de ejemplo"
+  ></cosm-text-field>
+  <cosm-text-field label="Buscar" prefix="En" suffix="Todos los registros" clearable clear-label="Borrar búsqueda"></cosm-text-field>
+  <cosm-text-field label="Solo lectura" value="No editable" read-only></cosm-text-field>
+  <cosm-text-field label="Deshabilitado" value="No disponible" disabled></cosm-text-field>
+</Preview>
+
+`startIcon` y `endIcon` reciben definiciones `IconDefinition` estructuradas por el consumidor; no
+existe un registro global de nombres de iconos. Elige iconos en el playground o pasa la definición
+como propiedad. Las acciones de borrar y mostrar contraseña usan botones nativos locales. Proporciona
+una etiqueta localizada en `clearLabel` y en `revealPasswordLabel` y `hidePasswordLabel` al activar
+esas acciones. No aparecen en campos deshabilitados o de solo lectura.
+
+En web, el elemento participa en formularios: envía `name` y `value`, respeta fieldsets
+deshabilitados, permite restablecer y restaurar el estado y expone la validez nativa del navegador.
+Al restablecer un campo autónomo vuelve a `defaultValue`; uno controlado emite una propuesta y espera
+la decisión de su propietario. La integración Angular usa `ControlValueAccessor` para el estado
+touched, el restablecimiento, la deshabilitación y `updateOn: 'blur'`. Native no simula formularios
+HTML, validación de correo ni expresiones regulares; el consumidor controla la validación de negocio
+y el envío.
+
+## Accesibilidad
+
+- Proporciona siempre una `label` significativa. `labelHidden` oculta la etiqueta visualmente sin
+  eliminar su asociación con el campo.
+- El placeholder es una sugerencia, nunca una etiqueta. La ayuda y el error se enlazan mediante
+  `aria-describedby`; los estados de error y requerido se exponen en el campo.
+- Las acciones de borrar y mostrar contraseña tienen nombres accesibles localizados, foco visible y
+  comportamiento de teclado de un botón nativo. No están disponibles en estados deshabilitados o de
+  solo lectura.
+- El campo se opera con el teclado; Enter emite `cosm-submit` y el formulario web conserva su
+  comportamiento nativo.
+- Las decoraciones respetan la dirección lógica en RTL. El escalado del texto puede aumentar la
+  altura por encima del mínimo personalizado; el contenido no se recorta.
+- React Native 0.88 no ofrece estados de accesibilidad nativos para requerido o no válido. En
+  native, incluye una indicación localizada de obligatoriedad en la etiqueta o el texto de ayuda y
+  proporciona texto de error explícito para campos no válidos. Las sugerencias pueden desactivarse;
+  el texto de error se puede leer y es una región activa en Android, pero aquí no se ha verificado
+  TalkBack ni VoiceOver. No des por sentada la paridad semántica entre dispositivos.
+
+## API
+
+<ApiTable name="text-field" />
+
+## Eventos por plataforma
+
+`cosm-change` propone `{ value }` con cada edición o borrado. Sin enlace, el campo confirma el cambio
+de forma autónoma; si `value` está enlazado (incluido `''`), el propietario acepta la propuesta al
+actualizar la propiedad. Si la rechaza, se restaura el texto controlado sin perder el cursor ni una
+composición IME activa. Mostrar la contraseña solo cambia su presentación.
+
+`cosm-submit` informa `{ value }` cuando Enter inicia la acción de envío. React y Angular reciben el
+`CustomEvent` original que burbujea y atraviesa el shadow DOM; React Native recibe el detalle en su
+callback.
+
+<EventsTable name="text-field" />

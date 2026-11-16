@@ -45,6 +45,23 @@ describe('component status', () => {
     }
   });
 
+  it('keeps text-field in progress when its complete file inventory lacks device evidence', () => {
+    const textField = report.components.find(component => component.name === 'text-field');
+    expect(textField?.missing).toEqual([]);
+    expect(textField?.todos).toEqual([]);
+    expect(textField?.claimed).toBe('in-progress');
+    expect(computeStatus(textField?.pieces ?? {})).toBe('stable');
+    expect(textField?.status).toBe('in-progress');
+  });
+
+  it('does not apply readiness downgrades to other catalog entries', () => {
+    const entry = catalog.find(item => item.name === 'button');
+    if (!entry) throw new Error('button missing from the catalog');
+    const [button] = getStatusReport(ROOT, [{ ...entry, status: undefined }]).components;
+    expect(button?.claimed).toBeUndefined();
+    expect(button?.status).toBe(computeStatus(button?.pieces ?? {}));
+  });
+
   it('marks pieces that do not apply to native-only components', () => {
     const base = catalog.find(item => item.name === 'bottom-sheet');
     if (!base) throw new Error('bottom-sheet missing from the catalog');

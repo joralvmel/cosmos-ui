@@ -106,6 +106,10 @@ File presence, a successful inventory command or coverage alone does not establi
 Keep a component `in-progress` when required acceptance checks are failed or unavailable.
 The user may explicitly defer unavailable checks, but they remain unverified in the evidence and
 any readiness statement; never fabricate device, screen-reader or browser results.
+For a complete file inventory with outstanding runtime evidence, maintainers may set the catalog
+entry's optional `status: 'in-progress'`. The status report treats this as a downgrade only: it
+never promotes an incomplete component, and other entries keep their computed status unless they
+explicitly opt in.
 
 ## 5. Local commit and review gate
 

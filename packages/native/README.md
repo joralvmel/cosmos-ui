@@ -18,6 +18,32 @@ export default function App() {
 
 `useTheme()` returns the active theme (colors, spacing, radius, typography as numbers).
 
+## Text field
+
+`TextField` supports single-line text, email, password, telephone, URL and search input, semantic or
+numeric minimum heights, optional decorations and opt-in clear/reveal actions. Use it inside
+`CosmosThemeProvider`:
+
+```tsx
+<TextField
+  label="Email"
+  type="email"
+  autoComplete="email"
+  clearable
+  clearLabel="Clear email"
+  onValueChange={({ value }) => console.log(value)}
+/>
+```
+
+Bind `value` to control acceptance; otherwise `defaultValue` initializes autonomous editing.
+Native callbacks receive `{ value }`, not DOM events. Provide localized labels for optional
+actions and localized required/error wording in the label or supporting text. Native does not
+emulate HTML form submission, email constraints or regular-expression validation.
+
+Customize independently through `appearance` (background, text, placeholder, border, focus and
+radius) and the component style props. The component remains in progress pending required device,
+screen-reader and real IME validation; see the [design evidence](../../docs/design/text-field.md).
+
 ## License
 
 MIT

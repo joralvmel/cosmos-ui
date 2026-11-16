@@ -30,6 +30,17 @@ export interface PlaygroundLabels {
   iconGallery?: string;
   iconMore?: string;
   iconPreviewError?: string;
+  advanced?: string;
+  none?: string;
+  customSize?: string;
+  customHeight?: string;
+  textFieldInvalid?: string;
+  textFieldDefaults?: {
+    label: string;
+    clearLabel: string;
+    revealPasswordLabel: string;
+    hidePasswordLabel: string;
+  };
   tabs: Record<SnippetTarget, string>;
 }
 
@@ -128,16 +139,31 @@ export function initPlayground(
   const targets = snippetTargets.filter(item => supportsTarget(contract, item));
   const values: ControlValues = {};
   for (const [name, spec] of Object.entries(contract.props)) {
-    values[name] = spec.type === 'reference' ? spec.example : spec.default;
+    values[name] =
+      spec.type === 'reference'
+        ? contract.name === 'text-field'
+          ? undefined
+          : spec.example
+        : spec.default;
+  }
+  if (contract.name === 'text-field' && labels.textFieldDefaults) {
+    Object.assign(values, labels.textFieldDefaults);
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
-      if (spec.type !== 'reference' || !spec.example) continue;
-      const sample = options.referenceValues?.[spec.reference]?.[spec.example];
-      if (sample === undefined && !options.referenceCatalogs?.[spec.reference]) {
-        throw new Error(`No playground value configured for ${spec.reference} "${spec.example}".`);
+      if (spec.type === 'reference') {
+        const selected = values[name];
+        if (typeof selected !== 'string') continue;
+        const sample = options.referenceValues?.[spec.reference]?.[selected];
+        if (sample === undefined && !options.referenceCatalogs?.[spec.reference]) {
+          throw new Error(
+            `No playground value configured for ${spec.reference} "${spec.example}".`
+          );
+        }
+        if (sample !== undefined) Reflect.set(target, name, sample);
+        continue;
       }
-      if (sample !== undefined) Reflect.set(target, name, sample);
+      if (values[name] !== undefined) Reflect.set(target, name, values[name]);
     }
   }
 
@@ -186,13 +212,45 @@ export function initPlayground(
   // Controls generated from the contract.
   const fieldset = element('fieldset', { class: 'cosm-playground-controls not-content' });
   fieldset.append(element('legend', {}, labels.controls));
+  const advanced = element('details', { class: 'cosm-playground-advanced' });
+  advanced.append(element('summary', {}, labels.advanced ?? 'Advanced options'));
+  const advancedControls = element('div', { class: 'cosm-playground-advanced-controls' });
+  advanced.append(advancedControls);
+  const basicFieldProps = new Set([
+    'label',
+    'placeholder',
+    'type',
+    'variant',
+    'size',
+    'inputMode',
+    'required',
+    'disabled',
+    'readOnly',
+    'invalid',
+    'clearable',
+    'passwordReveal',
+    'startIcon',
+    'endIcon',
+  ]);
+  const customHeightLabel = element('label');
+  customHeightLabel.append(element('span', {}, labels.customHeight ?? 'Custom minimum height'));
+  const customHeight = element('input', { type: 'number', min: '1', step: 'any', value: '56' });
+  customHeightLabel.append(customHeight);
+  customHeightLabel.hidden = true;
   const referenceStatus = element('span', { role: 'status', 'aria-live': 'polite' });
   let referenceRequest = 0;
   for (const [name, spec] of Object.entries(contract.props)) {
     const label = element('label');
     label.append(element('span', {}, name));
     let control: HTMLInputElement | HTMLSelectElement;
-    if (spec.type === 'enum' || spec.type === 'reference') {
+    const unionChoices =
+      spec.type === 'union'
+        ? spec.variants.flatMap(variant => (variant.type === 'enum' ? variant.values : []))
+        : [];
+    const fieldSize = contract.name === 'text-field' && name === 'size';
+    const enumUnion =
+      spec.type === 'union' && spec.variants.every(variant => variant.type === 'enum');
+    if (spec.type === 'enum' || spec.type === 'reference' || fieldSize || enumUnion) {
       control = element('select');
       const catalog =
         spec.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
@@ -200,11 +258,19 @@ export function initPlayground(
         ? catalog.items.map(item => item.name)
         : spec.type === 'enum'
           ? spec.values
-          : (spec.options ?? []);
+          : spec.type === 'reference'
+            ? (spec.options ?? [])
+            : unionChoices;
+      if (contract.name === 'text-field' && (spec.type === 'reference' || enumUnion)) {
+        control.append(element('option', { value: '' }, labels.none ?? 'None'));
+      }
       for (const value of choices) {
         const option = element('option', { value }, value);
-        option.selected = value === (spec.type === 'enum' ? spec.default : spec.example);
+        option.selected = value === values[name];
         control.append(option);
+      }
+      if (fieldSize) {
+        control.append(element('option', { value: 'custom' }, labels.customSize ?? 'Custom'));
       }
       if (catalog) {
         const searchLabel = element('label');
@@ -285,12 +351,20 @@ export function initPlayground(
       control.checked = spec.default;
     } else {
       control = element('input', { type: spec.type === 'number' ? 'number' : 'text' });
-      if (spec.default !== undefined) control.value = String(spec.default);
+      if (values[name] !== undefined) control.value = String(values[name]);
     }
     control.dataset.prop = name;
     control.title = spec.description;
     control.addEventListener('input', () => {
       const input = control as HTMLInputElement;
+      if (fieldSize) {
+        customHeightLabel.hidden = control.value !== 'custom';
+        controller.set(
+          name,
+          control.value === 'custom' ? Number(customHeight.value) : control.value
+        );
+        return;
+      }
       const value =
         input.type === 'checkbox'
           ? input.checked
@@ -302,13 +376,24 @@ export function initPlayground(
                 control.value.trim() !== '' &&
                 Number.isFinite(Number(control.value))
               ? Number(control.value)
-              : control.value;
+              : contract.name === 'text-field' &&
+                  (spec.type === 'reference' || enumUnion) &&
+                  control.value === ''
+                ? undefined
+                : control.value;
       controller.set(name, value);
       if (input.type === 'checkbox') input.checked = values[name] === true;
     });
     label.append(control);
-    fieldset.append(label);
+    if (contract.name === 'text-field' && !basicFieldProps.has(name))
+      advancedControls.append(label);
+    else fieldset.append(label);
+    if (fieldSize) fieldset.append(customHeightLabel);
   }
+  customHeight.addEventListener('input', () => {
+    controller.set('size', Number(customHeight.value));
+  });
+  if (contract.name === 'text-field') fieldset.append(advanced);
   fieldset.append(referenceStatus);
   root.append(fieldset);
 
@@ -411,6 +496,28 @@ export function initPlayground(
     set(name, value) {
       const spec = contract.props[name];
       const onWeb = spec && (!spec.platforms || spec.platforms.includes('web'));
+      if (contract.name === 'text-field') {
+        const invalidSize =
+          name === 'size' &&
+          value !== 'sm' &&
+          value !== 'md' &&
+          value !== 'lg' &&
+          !(typeof value === 'number' && Number.isFinite(value) && value > 0);
+        const actionLabels = ['clearLabel', 'revealPasswordLabel', 'hidePasswordLabel'];
+        const invalidLabel =
+          (name === 'label' || actionLabels.includes(name)) &&
+          (typeof value !== 'string' || !value.trim());
+        const invalidLength =
+          (name === 'minLength' || name === 'maxLength') &&
+          value !== undefined &&
+          !(typeof value === 'number' && Number.isInteger(value) && value >= 0);
+        if (invalidSize || invalidLabel || invalidLength) {
+          referenceStatus.textContent =
+            labels.textFieldInvalid ?? 'Enter a non-empty label or a valid positive size/length.';
+          return;
+        }
+        referenceStatus.textContent = '';
+      }
       if (contract.name === 'icon') {
         const label = name === 'label' ? value : values.label;
         const decorative = name === 'decorative' ? value : values.decorative;
@@ -467,11 +574,14 @@ export function initPlayground(
       }
       values[name] = value;
       if (target && onWeb) {
+        if (contract.name === 'text-field' && name === 'value') {
+          Reflect.set(target, 'valueControlled', value !== undefined);
+        }
         const resolved =
           spec?.type === 'reference' && typeof value === 'string'
             ? options.referenceValues?.[spec.reference]?.[value]
             : (value ?? (spec && 'default' in spec ? spec.default : undefined));
-        if (spec?.type === 'reference' && resolved === undefined) {
+        if (spec?.type === 'reference' && value !== undefined && resolved === undefined) {
           throw new Error(
             `No playground value configured for ${spec.reference} "${String(value)}".`
           );
@@ -509,8 +619,12 @@ export function initPlayground(
   });
   render();
   for (const [name, spec] of Object.entries(contract.props)) {
-    if (spec.type === 'reference' && spec.example && options.referenceCatalogs?.[spec.reference])
-      controller.set(name, spec.example);
+    if (
+      spec.type === 'reference' &&
+      typeof values[name] === 'string' &&
+      options.referenceCatalogs?.[spec.reference]
+    )
+      controller.set(name, values[name]);
   }
   return controller;
 }

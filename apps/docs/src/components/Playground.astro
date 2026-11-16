@@ -15,6 +15,15 @@ const contract: ComponentContract = contracts[name];
 const s = t(Astro.currentLocale);
 // Dynamic custom element tag; typed as a generic element for the Astro checker.
 const Element = contract.tag as unknown as 'div';
+const fieldActionLabels =
+  name === 'text-field'
+    ? {
+        label: s.playground.textFieldDefaults?.label,
+        'clear-label': s.playground.textFieldDefaults?.clearLabel,
+        'reveal-password-label': s.playground.textFieldDefaults?.revealPasswordLabel,
+        'hide-password-label': s.playground.textFieldDefaults?.hidePasswordLabel,
+      }
+    : {};
 const web = supports(contract, 'web');
 const hasDemo = getStatusReport().components.find(item => item.name === name)?.pieces.nativeDemo;
 const nativeDemoUrl = hasDemo
@@ -35,7 +44,10 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
   {
     web && (
       <div class="cosm-preview not-content" data-cosm-preview data-theme="cosmos" data-mode="light">
-        <Element data-playground-target>{content}</Element>
+        <Element
+          data-playground-target
+          {...fieldActionLabels}
+        >{content}</Element>
       </div>
     )
   }
@@ -45,6 +57,10 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
 <script>
   import '@joralvmel/cosmos-elements';
   import { contracts } from '@joralvmel/cosmos-core';
+  import { heart } from '@joralvmel/cosmos-icons/heart';
+  import { house } from '@joralvmel/cosmos-icons/house';
+  import { search } from '@joralvmel/cosmos-icons/search';
+  import { star } from '@joralvmel/cosmos-icons/star';
   import { initPlayground } from '../lib/playground';
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
@@ -72,6 +88,11 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
           message.textContent = options.labels.iconCatalogError;
           root.append(message);
         });
+    } else if (contract.name === 'text-field') {
+      initPlayground(root, {
+        ...options,
+        referenceValues: { IconDefinition: { heart, house, search, star } },
+      });
     } else {
       initPlayground(root, options);
     }

@@ -35,10 +35,10 @@ export interface CatalogEntry {
   /** Status the component should reach in the current milestone. */
   target: ComponentStatus;
   /**
-   * Status claimed by maintainers. Only `stable` is ever written here, and only when the status
-   * report confirms every piece exists (a test enforces it).
+   * Optional readiness floor set by maintainers. `in-progress` can downgrade a complete inventory
+   * while required runtime evidence is outstanding; metadata never promotes a component to stable.
    */
-  status?: 'stable';
+  status?: 'stable' | 'in-progress';
   /** Traceable TODO notes (e.g. "uses a native <select> until listbox exists"). Never in code. */
   notes?: readonly string[];
 }
@@ -151,8 +151,13 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'form',
     batch: 'B',
     priority: 1,
-    dependsOn: ['icon'],
+    dependsOn: ['icon', 'icon-button'],
     pattern: html('input.html'),
+    notes: [
+      'icon-button is planned; clear and password-reveal actions use local accessible native button primitives until that dependency is stable.',
+      'Keep readiness in-progress until required browser, React Native Web, Android and iOS acceptance evidence is available.',
+    ],
+    status: 'in-progress',
   }),
   entry({
     name: 'textarea',

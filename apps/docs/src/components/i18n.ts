@@ -39,6 +39,11 @@ const strings = {
     cancelable: 'cancelable',
     playground: {
       controls: 'Controls',
+      advanced: 'Advanced options',
+      none: 'None',
+      customSize: 'Custom',
+      customHeight: 'Minimum height (px)',
+      textFieldInvalid: 'Use non-empty labels, a positive height and non-negative whole lengths.',
       code: 'Code',
       copy: 'Copy code',
       copied: 'Copied',
@@ -61,6 +66,12 @@ const strings = {
       iconMore: 'Show more icons',
       iconPreviewError: 'Preview unavailable',
       iconCatalogError: 'Could not load the icon catalog. Reload the page to try again.',
+      textFieldDefaults: {
+        label: 'Email address',
+        clearLabel: 'Clear text',
+        revealPasswordLabel: 'Show password',
+        hidePasswordLabel: 'Hide password',
+      },
       tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
     },
     eventsNote:
@@ -117,6 +128,12 @@ const strings = {
     cancelable: 'cancelable',
     playground: {
       controls: 'Controles',
+      advanced: 'Opciones avanzadas',
+      none: 'Ninguno',
+      customSize: 'Personalizado',
+      customHeight: 'Altura mínima (px)',
+      textFieldInvalid:
+        'Usa etiquetas no vacías, una altura positiva y longitudes enteras no negativas.',
       code: 'Código',
       copy: 'Copiar código',
       copied: 'Copiado',
@@ -140,6 +157,12 @@ const strings = {
       iconPreviewError: 'Vista previa no disponible',
       iconCatalogError:
         'No se pudo cargar el catálogo de iconos. Recarga la página para reintentar.',
+      textFieldDefaults: {
+        label: 'Correo electrónico',
+        clearLabel: 'Borrar texto',
+        revealPasswordLabel: 'Mostrar contraseña',
+        hidePasswordLabel: 'Ocultar contraseña',
+      },
       tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
     },
     eventsNote:

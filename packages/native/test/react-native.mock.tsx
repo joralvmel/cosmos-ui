@@ -1,5 +1,5 @@
 // Minimal DOM stand-ins for the React Native primitives used by the components under test.
-import { createElement, type ReactNode } from 'react';
+import { createElement, forwardRef, type ReactNode } from 'react';
 
 type AnyProps = Record<string, unknown> & { children?: ReactNode };
 
@@ -39,8 +39,16 @@ export function Pressable({ children, onPress, disabled, style, ...props }: AnyP
   );
 }
 
-export function Text({ children, style }: AnyProps) {
-  return createElement('span', { 'data-style': JSON.stringify(flatten(style)) }, children);
+export function Text({ children, style, ...props }: AnyProps) {
+  return createElement(
+    'span',
+    {
+      'data-style': JSON.stringify(flatten(style)),
+      'aria-live': props.accessibilityLiveRegion,
+      id: props.nativeID,
+    },
+    children
+  );
 }
 
 export function View({ children, ...props }: AnyProps) {
@@ -51,10 +59,46 @@ export function View({ children, ...props }: AnyProps) {
       'data-testid': props.testID,
       'aria-disabled': state?.disabled ? 'true' : undefined,
       'aria-busy': state?.busy ? 'true' : undefined,
+      'aria-hidden': props['aria-hidden'],
+      'data-hidden-ios': props.accessibilityElementsHidden,
+      'data-hidden-android': props.importantForAccessibility,
+      'data-style': JSON.stringify(flatten(props.style)),
     },
     children
   );
 }
+
+export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => {
+  const state = props.accessibilityState as { disabled?: boolean } | undefined;
+  return createElement('input', {
+    ref,
+    value: props.value,
+    readOnly: !props.editable,
+    disabled: props.disabled,
+    'aria-disabled': state?.disabled ? 'true' : undefined,
+    'aria-label': props.accessibilityLabel,
+    'aria-description': props.accessibilityHint,
+    'aria-required': props['aria-required'],
+    'aria-invalid': props['aria-invalid'],
+    'aria-readonly': props['aria-readonly'],
+    'aria-describedby': props['aria-describedby'],
+    placeholder: props.placeholder,
+    maxLength: props.maxLength,
+    type: props.secureTextEntry ? 'password' : 'text',
+    'data-keyboard': props.keyboardType,
+    'data-input-mode': props.inputMode,
+    'data-autocomplete': props.autoComplete,
+    'data-placeholder-color': props.placeholderTextColor,
+    'data-style': JSON.stringify(flatten(props.style)),
+    onFocus: props.onFocus,
+    onBlur: props.onBlur,
+    onInput: (event: { currentTarget: HTMLInputElement }) =>
+      (props.onChangeText as ((value: string) => void) | undefined)?.(event.currentTarget.value),
+    onKeyDown: (event: { key: string }) => {
+      if (event.key === 'Enter') (props.onSubmitEditing as (() => void) | undefined)?.();
+    },
+  });
+});
 
 export function ActivityIndicator() {
   return createElement('span', { 'data-testid': 'activity-indicator' });
