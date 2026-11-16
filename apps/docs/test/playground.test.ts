@@ -1,10 +1,12 @@
 // @vitest-environment happy-dom
 import { buttonContract, iconContract, textFieldContract } from '@joralvmel/cosmos-core';
+import type { CosmButton } from '@joralvmel/cosmos-elements/button';
 import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
 import { iconCatalog, searchIconCatalog } from '@joralvmel/cosmos-icons';
 import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
 import { search } from '@joralvmel/cosmos-icons/search';
+import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/text-field';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -66,6 +68,14 @@ function mount(options: { storage?: Map<string, string>; nativeDemoUrl?: string 
 const tabs = (root: HTMLElement) => [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
 const visibleCode = (root: HTMLElement) =>
   root.querySelector('[role="tabpanel"]:not([hidden]) code')?.textContent ?? '';
+
+async function editTextField(field: CosmTextField, value: string) {
+  await field.updateComplete;
+  const input = field.shadowRoot?.querySelector<HTMLInputElement>('[part="input"]');
+  if (!input) throw new Error('Missing text field input');
+  input.value = value;
+  input.dispatchEvent(new Event('input'));
+}
 
 beforeEach(() => {
   document.documentElement.removeAttribute('data-theme');
@@ -152,7 +162,7 @@ describe('Playground', () => {
     expect(root.querySelector('cosm-icon[data-playground-target]')).toBe(target);
     for (const technology of ['html', 'react', 'angular', 'native'] as const) {
       controller.select(technology);
-      root.querySelector<HTMLButtonElement>('.cosm-playground-copy')?.click();
+      root.querySelector<CosmButton>('.cosm-playground-copy')?.click();
       await vi.waitFor(() => expect(writeText).toHaveBeenLastCalledWith(controller.code()));
       expect(controller.code()).toContain('cosmos-icons/heart');
       expect(controller.code()).toContain('32');
@@ -210,19 +220,22 @@ describe('Playground', () => {
     const width = root.querySelector<HTMLInputElement>(
       '.cosm-icon-toolbar [data-prop="strokeWidth"]'
     );
-    const label = root.querySelector<HTMLInputElement>('.cosm-icon-toolbar [data-prop="label"]');
+    const label = root.querySelector<CosmTextField>(
+      '.cosm-icon-toolbar cosm-text-field[data-prop="label"]'
+    );
     const decorative = root.querySelector<HTMLInputElement>(
       '.cosm-icon-toolbar [data-prop="decorative"]'
     );
     if (!width || !label || !decorative) throw new Error('Missing icon controls');
     width.value = '1.5';
     width.dispatchEvent(new Event('input'));
-    label.value = 'Favorite';
-    label.dispatchEvent(new Event('input'));
+    await editTextField(label, 'Favorite');
+    await vi.waitFor(() => expect(target.label).toBe('Favorite'));
     decorative.checked = false;
     decorative.dispatchEvent(new Event('input'));
     expect(target.strokeWidth).toBe(1.5);
     expect(target.label).toBe('Favorite');
+    expect(controller.code('html')).toContain('label="Favorite"');
     expect(target.decorative).toBe(false);
     theme.value = '';
     theme.dispatchEvent(new Event('change'));
@@ -303,7 +316,10 @@ describe('Playground', () => {
   it('copies the visible snippet and announces it', async () => {
     const { root, writeText, controller } = mount();
     controller.select('react');
-    root.querySelector<HTMLButtonElement>('.cosm-playground-copy')?.click();
+    const copy = root.querySelector<CosmButton>('.cosm-playground-copy');
+    if (!copy) throw new Error('missing copy button');
+    await copy.updateComplete;
+    copy.click();
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith(controller.code('react')));
     expect(root.querySelector('.cosm-playground-status')?.textContent).toBe('Copied');
   });
@@ -395,6 +411,16 @@ describe('Playground', () => {
     expect(target.clearLabel).toBe('Clear text');
     expect(target.revealPasswordLabel).toBe('Show password');
     expect(target.hidePasswordLabel).toBe('Hide password');
+    const labelControl = root.querySelector<CosmTextField>(
+      '.cosm-playground-controls cosm-text-field[data-prop="label"]'
+    );
+    if (!labelControl) throw new Error('missing text field label editor');
+    expect(labelControl).not.toBe(target);
+    expect(labelControl.value).toBe('Email address');
+    await editTextField(labelControl, 'Account name');
+    await vi.waitFor(() => expect(target.label).toBe('Account name'));
+    expect(controller.code('html')).toContain('label="Account name"');
+    expect(controller.code('html')).not.toContain('cosm-playground-text-control');
     const advanced = root.querySelector('details');
     expect(advanced?.open).toBe(false);
     expect(advanced?.querySelector('[data-prop="pattern"]')).not.toBeNull();
@@ -460,7 +486,7 @@ describe('Playground', () => {
     ).toBe('Show password');
     controller.set('label', '');
     await target.updateComplete;
-    expect(target.label).toBe('Email address');
+    expect(target.label).toBe('Account name');
   });
 
   it('keeps stroke and fill independent and emits valid native theme colors', () => {
@@ -656,8 +682,10 @@ describe('Playground', () => {
     });
     expect(preview).toHaveBeenCalledTimes(24);
     expect(root.querySelectorAll('.cosm-icon-choice')).toHaveLength(24);
-    const more = root.querySelector<HTMLButtonElement>('.cosm-icon-more');
-    more?.click();
+    const more = root.querySelector<CosmButton>('.cosm-icon-more');
+    if (!more) throw new Error('missing more button');
+    await more.updateComplete;
+    more.click();
     expect(preview).toHaveBeenCalledTimes(48);
     const button = root.querySelector<HTMLButtonElement>('.cosm-icon-choice');
     if (!button) throw new Error('missing gallery choice');

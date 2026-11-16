@@ -37,22 +37,38 @@ const {
     clear-label={clearLabel}
   ></cosm-text-field>
   <div class="text-field-ownership-actions">
-    <button type="button" data-accept disabled>{acceptLabel}</button>
-    <button type="button" data-reject disabled>{rejectLabel}</button>
+    <cosm-button
+      type="button"
+      variant="outline"
+      tone="neutral"
+      class="cosm-docs-action-button"
+      data-accept
+      disabled
+    >{acceptLabel}</cosm-button>
+    <cosm-button
+      type="button"
+      variant="outline"
+      tone="neutral"
+      class="cosm-docs-action-button"
+      data-reject
+      disabled
+    >{rejectLabel}</cosm-button>
   </div>
   <p data-status role="status" aria-live="polite"></p>
 </div>
 
 <script>
+  import '@joralvmel/cosmos-elements/button';
   import '@joralvmel/cosmos-elements/text-field';
+  import type { CosmButton } from '@joralvmel/cosmos-elements/button';
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-text-field-ownership-demo]')) {
     const field = root.querySelector<HTMLElement & { valueControlled?: boolean }>(
       '[data-controlled-field]'
     );
     const status = root.querySelector<HTMLElement>('[data-status]');
-    const accept = root.querySelector<HTMLButtonElement>('[data-accept]');
-    const reject = root.querySelector<HTMLButtonElement>('[data-reject]');
+    const accept = root.querySelector<CosmButton>('[data-accept]');
+    const reject = root.querySelector<CosmButton>('[data-reject]');
     if (!field || !status || !accept || !reject) continue;
 
     field.valueControlled = true;
@@ -70,12 +86,12 @@ const {
       accept.disabled = false;
       reject.disabled = false;
     });
-    accept.addEventListener('click', () => {
+    accept.addEventListener('cosm-press', () => {
       if (proposal === undefined) return;
       (field as HTMLElement & { value: string }).value = proposal;
       finish(root.dataset.accepted ?? '');
     });
-    reject.addEventListener('click', () => {
+    reject.addEventListener('cosm-press', () => {
       if (proposal === undefined) return;
       finish(root.dataset.rejected ?? '');
     });
@@ -95,10 +111,6 @@ const {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-  }
-  .text-field-ownership-actions button {
-    min-height: 2.5rem;
-    padding-inline: 0.75rem;
   }
   [data-status] {
     min-height: 1.25em;
