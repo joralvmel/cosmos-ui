@@ -218,6 +218,37 @@ describe('cosm-text-field', () => {
     expect(change).not.toHaveBeenCalled();
   });
 
+  it.each(['disabled', 'readOnly', 'passwordReveal', 'type', 'fieldset'] as const)(
+    'does not preserve revealed password state after changing %s',
+    async state => {
+      const el = await fixture<CosmTextField>(
+        '<cosm-text-field label="Password" value="secret" type="password" password-reveal reveal-password-label="Show" hide-password-label="Hide"></cosm-text-field>'
+      );
+      const change = vi.fn();
+      el.addEventListener('cosm-change', change);
+      el.shadowRoot?.querySelector<HTMLButtonElement>('[part="reveal-button"]')?.click();
+      await el.updateComplete;
+      expect(input(el).type).toBe('text');
+      if (state === 'fieldset') el.formDisabledCallback(true);
+      else if (state === 'type') el.type = 'text';
+      else if (state === 'passwordReveal') el.passwordReveal = false;
+      else el[state] = true;
+      await el.updateComplete;
+      if (state !== 'type') expect(input(el).type).toBe('password');
+      if (state === 'fieldset') el.formDisabledCallback(false);
+      else if (state === 'type') el.type = 'password';
+      else if (state === 'passwordReveal') el.passwordReveal = true;
+      else el[state] = false;
+      await el.updateComplete;
+      expect(input(el).type).toBe('password');
+      expect(
+        el.shadowRoot?.querySelector('[part="reveal-button"]')?.getAttribute('aria-label')
+      ).toBe('Show');
+      expect(el.value).toBe('secret');
+      expect(change).not.toHaveBeenCalled();
+    }
+  );
+
   it('uses the FACE host name and value for form submission', async () => {
     const form = document.createElement('form');
     const el = document.createElement('cosm-text-field') as CosmTextField;

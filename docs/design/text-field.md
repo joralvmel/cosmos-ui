@@ -136,6 +136,14 @@ loads only four sample icon definitions. Numeric keyboard hints do not add a num
 filter text. React DOM 19 is an explicit peer of the React adapter to synchronously forward
 value-proposal handlers with `flushSync`; state and rollback behavior remain owned by Lit.
 
+The final hardening revision resets revealed passwords when editing/reveal is disabled or the
+type changes, including inherited web fieldset disabledness. Windows forced-colors focus uses
+an inward system-highlight outline instead of a shadow. Custom search clearing replaces the
+browser clear affordance only when enabled. Long labels/messages wrap; prefix/suffix regions
+share the available space and truncate visually without modifying their text or the input value.
+Native prefix/suffix text also uses single-line tail truncation and shrinkable bounded width.
+No new public properties, number/date types, counters or icon catalogs are introduced.
+
 ## Shared acceptance scenarios
 
 1. A required accessible label is associated with the input; `labelHidden` only changes visual
@@ -188,6 +196,7 @@ changeset accompany the implementation.
 | Angular browser | Actual `FormControl` with `updateOn: 'blur'`: input remains a view draft until blur, then updates value/touched; reset and disabled propagation verified. |
 | React browser | Actual keyboard typing of `123456789` is accepted without dropped characters using an ordinary consumer `setState` handler. Rejected edits/clear, controlled empty string, original `CustomEvent` forwarding and accepted clear retaining input focus verified in Chromium. |
 | Docs/browser review | Boolean checkboxes, type/keyboard/size selects, custom height and optional icons exercised. Each icon select has four samples plus None; no icon catalog module is fetched. Advanced options start collapsed. Focus uses a same-color inset boundary, including filled/invalid fields; clear hover remains transparent. All eight Cosmos/Nebula light/dark outlined/filled combinations have boundary contrast at least 3.07:1 and text at least 15.07:1. Mobile-width layout and logical RTL verified at a 390-pixel viewport. |
+| Final hardening browser checks | Chromium: actual reveal/read-only/re-enable controls restore concealed password state. Forced-colors emulation produces a 2-pixel inward solid outline with no box shadow. A focused search preview visually shows one custom clear action. At a 260-pixel container, long label/help/error and both long affixes leave the control within its bounds and a 53-pixel editable input; affixes truncate with ellipsis. WebKit-specific rendering and native-device long-affix layout remain unverified. |
 | Native tests | Mocked React Native behavior and shared scenarios, plus a real React Native Web renderer regression for required/read-only DOM semantics. |
 | Native web browser | Accepted/rejected edits and clear, focus retention, password reveal, read-only action suppression and an 80-unit control verified through real browser interactions. |
 | Android runtime | Expo Go on the Pixel 9 API 35 emulator: keyboard editing, controlled acceptance/rejection, accepted/rejected clear, password conceal/reveal and disabled/read-only states exercised. Exact outer numeric height was not measured on Android. |

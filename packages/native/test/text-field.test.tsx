@@ -315,22 +315,32 @@ describe('TextField (native)', () => {
     );
     expect(container.querySelectorAll('button')).toHaveLength(0);
   });
-  it('conceals passwords after switching away and back', async () => {
-    const props = {
-      label: 'Password',
-      value: 'secret',
-      passwordReveal: true,
-      revealPasswordLabel: 'Show',
-      hidePasswordLabel: 'Hide',
-    } as const;
-    await render(<TextField {...props} type="password" />);
-    await act(async () => button('Show')?.click());
-    expect(input().type).toBe('text');
-    await update(<TextField {...props} type="text" />);
-    await update(<TextField {...props} type="password" />);
-    expect(input().type).toBe('password');
-    expect(button('Show')).not.toBeNull();
-  });
+  it.each(['type', 'disabled', 'readOnly', 'passwordReveal'] as const)(
+    'conceals passwords after changing %s and restoring it',
+    async state => {
+      const props = {
+        label: 'Password',
+        value: 'secret',
+        passwordReveal: true,
+        revealPasswordLabel: 'Show',
+        hidePasswordLabel: 'Hide',
+      } as const;
+      await render(<TextField {...props} type="password" />);
+      await act(async () => button('Show')?.click());
+      expect(input().type).toBe('text');
+      const changed: Partial<TextFieldProps> =
+        state === 'type'
+          ? { type: 'text' }
+          : state === 'passwordReveal'
+            ? { passwordReveal: false }
+            : { [state]: true };
+      await update(<TextField {...props} type="password" {...changed} />);
+      if (state !== 'type') expect(input().type).toBe('password');
+      await update(<TextField {...props} type="password" />);
+      expect(input().type).toBe('password');
+      expect(button('Show')).not.toBeNull();
+    }
+  );
   it('submits the current value without generating changes', async () => {
     const submit = vi.fn();
     const change = vi.fn();

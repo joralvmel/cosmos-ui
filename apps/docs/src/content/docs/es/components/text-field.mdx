@@ -87,6 +87,14 @@ como propiedad. Las acciones de borrar y mostrar contraseña usan botones nativo
 una etiqueta localizada en `clearLabel` y en `revealPasswordLabel` y `hidePasswordLabel` al activar
 esas acciones. No aparecen en campos deshabilitados o de solo lectura.
 
+La contraseña vuelve a ocultarse al deshabilitar el campo, activar solo lectura, desactivar la
+opción de mostrarla o cambiar a otro tipo. Al reactivar la función permanece oculta. En web
+también se respeta la deshabilitación mediante un fieldset.
+
+Las etiquetas y los mensajes largos se ajustan en varias líneas. Los prefijos y sufijos son
+decoraciones de una línea que se truncan si falta espacio, conservando sitio para editar.
+En búsquedas web, `clearable` sustituye la acción de borrado del navegador en lugar de duplicarla.
+
 En web, el elemento participa en formularios: envía `name` y `value`, respeta fieldsets
 deshabilitados, permite restablecer y restaurar el estado y expone la validez nativa del navegador.
 Al restablecer un campo autónomo vuelve a `defaultValue`; uno controlado emite una propuesta y espera
@@ -104,6 +112,8 @@ y el envío.
 - Las acciones de borrar y mostrar contraseña tienen nombres accesibles localizados, foco visible y
   comportamiento de teclado de un botón nativo. No están disponibles en estados deshabilitados o de
   solo lectura.
+- En web, el modo de colores forzados conserva un único indicador de foco interior con el color de
+  resaltado del sistema, sin depender de una sombra.
 - El campo se opera con el teclado; Enter emite `cosm-submit` y el formulario web conserva su
   comportamiento nativo.
 - Las decoraciones respetan la dirección lógica en RTL. El escalado del texto puede aumentar la

@@ -38,6 +38,8 @@ const styles = css`
     --_height: var(--cosm-control-md, 2.5rem);
     --_font-size: var(--cosm-text-sm, 0.875rem);
     display: block;
+    min-inline-size: 0;
+    max-inline-size: 100%;
     color: var(--cosm-text-field-color, var(--cosm-fg, oklch(0.24 0.01 268)));
     font-family: var(--cosm-font-sans, system-ui, sans-serif);
   }
@@ -51,6 +53,7 @@ const styles = css`
   }
   .label {
     display: block;
+    overflow-wrap: anywhere;
     margin-block-end: var(--cosm-space-xs, 0.25rem);
     font-size: var(--cosm-text-sm, 0.875rem);
     font-weight: var(--cosm-weight-medium, 500);
@@ -66,6 +69,7 @@ const styles = css`
   }
   .control {
     display: flex;
+    min-inline-size: 0;
     align-items: center;
     gap: var(--cosm-space-sm, 0.5rem);
     min-height: max(var(--_height), var(--_minimum-height, 0px));
@@ -91,7 +95,9 @@ const styles = css`
   }
   .decoration {
     display: inline-flex;
-    flex: none;
+    flex: 0 1 auto;
+    min-inline-size: 0;
+    max-inline-size: 25%;
     align-items: center;
     gap: var(--cosm-space-xs, 0.25rem);
     color: var(--cosm-text-field-color, var(--cosm-fg-muted, oklch(0.48 0.01 268)));
@@ -99,8 +105,14 @@ const styles = css`
     white-space: nowrap;
   }
   .decoration cosm-icon {
+    flex: none;
     width: 1.25em;
     height: 1.25em;
+  }
+  .affix {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   input {
     flex: 1;
@@ -117,6 +129,9 @@ const styles = css`
   input::placeholder {
     color: var(--cosm-text-field-placeholder, var(--cosm-fg-muted, oklch(0.48 0.01 268)));
     opacity: 1;
+  }
+  :host([clearable]) input[type='search']::-webkit-search-cancel-button {
+    -webkit-appearance: none;
   }
   input:focus-visible {
     outline: none;
@@ -143,6 +158,7 @@ const styles = css`
   }
   .message {
     display: block;
+    overflow-wrap: anywhere;
     margin-block-start: var(--cosm-space-xs, 0.25rem);
     color: var(--cosm-fg-muted, oklch(0.48 0.01 268));
     font-size: var(--cosm-text-xs, 0.75rem);
@@ -152,6 +168,14 @@ const styles = css`
   }
   :host([disabled]) {
     opacity: 0.58;
+  }
+  @media (forced-colors: active) {
+    :host .control:focus-within {
+      border-color: Highlight;
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+      box-shadow: none;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .control {
@@ -383,6 +407,15 @@ export class CosmTextField extends CosmElement {
   }
 
   protected override willUpdate(changed: Map<PropertyKey, unknown>): void {
+    if (
+      this.type !== 'password' ||
+      !this.passwordReveal ||
+      this.disabled ||
+      this.#formDisabled ||
+      this.readOnly
+    ) {
+      this.#passwordVisible = false;
+    }
     if (
       typeof this.size !== 'number' &&
       this.size !== 'sm' &&
@@ -639,7 +672,7 @@ export class CosmTextField extends CosmElement {
                   ? html`<cosm-icon .icon=${this.startIcon} decorative size="md"></cosm-icon>`
                   : nothing
               }
-              ${this.prefix}
+              ${this.prefix ? html`<span class="affix">${this.prefix}</span>` : nothing}
             </span>`
             : nothing
         }
@@ -670,7 +703,7 @@ export class CosmTextField extends CosmElement {
         ${
           this.suffix || this.endIcon
             ? html`<span part="end" class="decoration">
-              ${this.suffix}
+              ${this.suffix ? html`<span class="affix">${this.suffix}</span>` : nothing}
               ${
                 this.endIcon
                   ? html`<cosm-icon .icon=${this.endIcon} decorative size="md"></cosm-icon>`

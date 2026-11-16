@@ -301,7 +301,12 @@ export function TextField({
     else forceRender(previous => previous + 1);
     onValueChange?.({ value: next });
   };
-  const decoration = { color: appearance?.text ?? theme.colors.fg, fontSize: theme.text.md };
+  const decoration = {
+    color: appearance?.text ?? theme.colors.fg,
+    fontSize: theme.text.md,
+    flexShrink: 1,
+    maxWidth: '25%',
+  } satisfies TextStyle;
   const actionStyle: ViewStyle = {
     minWidth: MIN_TARGET,
     minHeight: MIN_TARGET,
@@ -347,7 +352,7 @@ export function TextField({
       >
         {startIcon && <DecorativeIcon icon={startIcon} />}
         {prefix && (
-          <Text accessible={false} style={decoration}>
+          <Text accessible={false} numberOfLines={1} ellipsizeMode="tail" style={decoration}>
             {prefix}
           </Text>
         )}
@@ -383,7 +388,7 @@ export function TextField({
           ]}
         />
         {suffix && (
-          <Text accessible={false} style={decoration}>
+          <Text accessible={false} numberOfLines={1} ellipsizeMode="tail" style={decoration}>
             {suffix}
           </Text>
         )}

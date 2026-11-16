@@ -86,6 +86,14 @@ Clear and password-reveal actions use local native buttons. Supply localized `cl
 `revealPasswordLabel` and `hidePasswordLabel`, whenever those actions are enabled. Actions are
 hidden while disabled or read-only.
 
+Password visibility resets when the field becomes disabled/read-only, reveal is turned off, or
+the type changes away from password. Re-enabling the feature starts concealed. Web disabled
+fieldsets follow the same rule.
+
+Long labels and messages wrap. Prefixes and suffixes are single-line decorations that truncate
+when space is limited, preserving room for editing. In web search fields, enabling `clearable`
+replaces the browser's built-in clear affordance instead of showing two clear buttons.
+
 On web, the custom element is form-associated: it submits `name` and `value`, follows disabled
 fieldsets, supports reset/state restoration, and exposes browser-native validity. An autonomous
 reset returns to `defaultValue`; a controlled reset emits a proposal and waits for its owner.
@@ -101,6 +109,8 @@ validation; its consumer owns business validation and submit handling.
   invalid/required states are exposed on the input.
 - Clear/reveal controls have localized accessible names, visible focus indication and native button
   keyboard behavior. They are unavailable in disabled or read-only states.
+- Web focus retains a single inward indicator in forced-colors mode, using the system highlight
+  color rather than relying on a box shadow.
 - The editable input remains keyboard-operable; Enter reports `cosm-submit` and web form submission
   continues through the containing form.
 - Decorations follow logical inline direction for RTL. Font scaling may grow the control beyond a
