@@ -70,6 +70,18 @@ describe('cosm-icon-button: contract drift', () => {
 });
 
 describe('cosm-icon-button', () => {
+  it('uses a centered layout for decorative icon content', async () => {
+    const el = await fixture<CosmIconButton>(
+      '<cosm-icon-button label="Favorite"><svg width="20" height="20"></svg></cosm-icon-button>'
+    );
+    const iconContainer = inner(el).querySelector<HTMLElement>('[aria-hidden="true"]');
+    if (!iconContainer) throw new Error('Missing decorative icon container.');
+    const style = getComputedStyle(iconContainer);
+    expect(style.display).toBe('flex');
+    expect(style.alignItems).toBe('center');
+    expect(style.justifyContent).toBe('center');
+  });
+
   it('returns to autonomous mode when the pressed attribute is removed', async () => {
     const el = await fixture<CosmIconButton>(
       '<cosm-icon-button label="Favorite" mode="toggle" pressed></cosm-icon-button>'

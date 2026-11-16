@@ -6,4 +6,4 @@
 '@joralvmel/cosmos-native': minor
 ---
 
-Add the Icon Button component (`<cosm-icon-button>`) with its contract, React, Angular and React Native implementations.
+Add the Icon Button component (`<cosm-icon-button>`) with centered icon content and React, Angular and React Native implementations.

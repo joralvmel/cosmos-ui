@@ -54,6 +54,11 @@ const styles = css`
     cursor: pointer;
     transition: background-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
   }
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   :host([variant='soft']) .base { --_bg: var(--_subtle); --_fg: var(--_text); }
   :host([variant='outline']) .base {
     --_bg: transparent;
@@ -208,7 +213,7 @@ export class CosmIconButton extends CosmElement {
       aria-label=${this.label}
       aria-pressed=${this.mode === 'toggle' ? String(this.#pressed) : nothing}
       @pointerdown=${this.#onPointerDown} @keydown=${this.#onKeyDown} @click=${this.#onClick}
-    ><span aria-hidden="true"><slot></slot></span></button>`;
+    ><span class="icon" aria-hidden="true"><slot></slot></span></button>`;
   }
 }
 
