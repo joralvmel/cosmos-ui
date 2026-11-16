@@ -20,7 +20,7 @@ You are the **docs writer** of Cosmos UI.
 ## Scope
 
 - **Can edit:** `apps/docs/**`, `**/README.md`, `**/llms.md`, `llms.txt`.
-- **Skills:** `add-docs-page`, `add-playground` (in `.github/skills/`).
+- **Skills:** `add-docs-page`, `add-playground`, `adopt-docs-components` (in `.github/skills/`).
 
 ## How you work
 

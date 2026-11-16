@@ -11,6 +11,7 @@ import {
   initPlayground,
   isPortablePaint,
   type PlaygroundLabels,
+  SITE_THEME_KEY,
   TAB_STORAGE_KEY,
 } from '../src/lib/playground';
 
@@ -78,6 +79,8 @@ describe('Playground', () => {
     const root = document.createElement('div');
     const preview = document.createElement('div');
     preview.dataset.cosmPreview = '';
+    preview.dataset.theme = 'cosmos';
+    preview.dataset.mode = 'light';
     const target = document.createElement('cosm-icon');
     target.dataset.playgroundTarget = '';
     preview.append(target);
@@ -92,7 +95,10 @@ describe('Playground', () => {
       contract: iconContract,
       content: '',
       labels,
-      themes: [],
+      themes: [
+        { name: 'cosmos', label: 'Cosmos' },
+        { name: 'nebula', label: 'Nebula' },
+      ],
       referenceCatalogs: {
         IconDefinition: {
           items,
@@ -102,13 +108,30 @@ describe('Playground', () => {
         },
       },
       clipboard: { writeText },
-      storage: { getItem: () => null, setItem: () => {} },
+      storage: { getItem: key => (key === SITE_THEME_KEY ? 'nebula' : null), setItem: () => {} },
     });
     const category = root.querySelector<HTMLSelectElement>('[data-icon-category]');
     const searchInput = root.querySelector<HTMLInputElement>('input[type="search"]');
     const size = root.querySelector<HTMLSelectElement>('[data-icon-size]');
     const style = root.querySelector<HTMLSelectElement>('[data-icon-style]');
     if (!category || !searchInput || !size || !style) throw new Error('Missing catalog controls');
+    const gallery = root.querySelector<HTMLElement>('.cosm-icon-gallery');
+    if (!gallery) throw new Error('Missing gallery');
+    expect(gallery.hasAttribute('data-cosm-preview')).toBe(true);
+    expect(gallery.dataset.theme).toBe('cosmos');
+    expect(gallery.dataset.mode).toBe('light');
+    const [theme, mode] = root.querySelectorAll<HTMLSelectElement>(
+      '.cosm-playground-toolbar select'
+    );
+    if (!theme || !mode) throw new Error('Missing theme controls');
+    theme.value = 'nebula';
+    theme.dispatchEvent(new Event('change'));
+    mode.value = 'dark';
+    mode.dispatchEvent(new Event('change'));
+    expect(gallery.dataset.theme).toBe(preview.dataset.theme);
+    expect(gallery.dataset.mode).toBe(preview.dataset.mode);
+    expect(gallery.hasAttribute('data-fixed')).toBe(true);
+    expect(gallery.hasAttribute('data-fixed-mode')).toBe(true);
     category.value = 'shapes';
     category.dispatchEvent(new Event('change'));
     await vi.waitFor(() => expect(controller.values.icon).toBe('heart'));
@@ -183,6 +206,33 @@ describe('Playground', () => {
     style.value = 'outline';
     style.dispatchEvent(new Event('change'));
     expect(root.querySelector<HTMLSelectElement>('[data-prop="fill"]')?.value).toBe('none');
+    expect(root.querySelector('details')).toBeNull();
+    const width = root.querySelector<HTMLInputElement>(
+      '.cosm-icon-toolbar [data-prop="strokeWidth"]'
+    );
+    const label = root.querySelector<HTMLInputElement>('.cosm-icon-toolbar [data-prop="label"]');
+    const decorative = root.querySelector<HTMLInputElement>(
+      '.cosm-icon-toolbar [data-prop="decorative"]'
+    );
+    if (!width || !label || !decorative) throw new Error('Missing icon controls');
+    width.value = '1.5';
+    width.dispatchEvent(new Event('input'));
+    label.value = 'Favorite';
+    label.dispatchEvent(new Event('input'));
+    decorative.checked = false;
+    decorative.dispatchEvent(new Event('input'));
+    expect(target.strokeWidth).toBe(1.5);
+    expect(target.label).toBe('Favorite');
+    expect(target.decorative).toBe(false);
+    theme.value = '';
+    theme.dispatchEvent(new Event('change'));
+    mode.value = '';
+    mode.dispatchEvent(new Event('change'));
+    expect(gallery.hasAttribute('data-fixed')).toBe(false);
+    expect(gallery.hasAttribute('data-fixed-mode')).toBe(false);
+    expect(gallery.dataset.theme).toBe('nebula');
+    expect(gallery.dataset.theme).toBe(preview.dataset.theme);
+    expect(gallery.dataset.mode).toBe(preview.dataset.mode);
   });
 
   it('builds one control per contract prop and four code tabs', () => {

@@ -201,21 +201,26 @@ export function initPlayground(
       ''
     );
     theme.control.addEventListener('change', () => {
-      if (theme.control.value) {
-        preview.setAttribute('data-fixed', '');
-        preview.dataset.theme = theme.control.value;
-      } else {
-        preview.removeAttribute('data-fixed');
-        preview.dataset.theme = storage?.getItem(SITE_THEME_KEY) ?? options.themes[0]?.name ?? '';
+      for (const surface of root.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
+        if (theme.control.value) {
+          surface.setAttribute('data-fixed', '');
+          surface.dataset.theme = theme.control.value;
+        } else {
+          surface.removeAttribute('data-fixed');
+          surface.dataset.theme = storage?.getItem(SITE_THEME_KEY) ?? options.themes[0]?.name ?? '';
+        }
       }
     });
     mode.control.addEventListener('change', () => {
-      if (mode.control.value) {
-        preview.setAttribute('data-fixed-mode', '');
-        preview.dataset.mode = mode.control.value;
-      } else {
-        preview.removeAttribute('data-fixed-mode');
-        preview.dataset.mode = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      for (const surface of root.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
+        if (mode.control.value) {
+          surface.setAttribute('data-fixed-mode', '');
+          surface.dataset.mode = mode.control.value;
+        } else {
+          surface.removeAttribute('data-fixed-mode');
+          surface.dataset.mode =
+            document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+        }
       }
     });
     toolbar.append(theme.wrapper, mode.wrapper);
@@ -334,6 +339,15 @@ export function initPlayground(
         const iconSelect = control;
         const gallery = element('div', {
           class: 'cosm-icon-gallery',
+          'data-cosm-preview': '',
+          'data-theme':
+            preview?.dataset.theme ??
+            storage?.getItem(SITE_THEME_KEY) ??
+            options.themes[0]?.name ??
+            'cosmos',
+          'data-mode':
+            preview?.dataset.mode ??
+            (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'),
           role: 'group',
           'aria-label': labels.iconGallery ?? 'Icon gallery',
         });
@@ -505,6 +519,10 @@ export function initPlayground(
     } else {
       control = element('input', { type: spec.type === 'number' ? 'number' : 'text' });
       if (values[name] !== undefined) control.value = String(values[name]);
+      if (contract.name === 'icon' && name === 'strokeWidth') {
+        control.min = '0';
+        control.step = 'any';
+      }
     }
     control.dataset.prop = name;
     control.title = spec.description;
@@ -538,18 +556,16 @@ export function initPlayground(
       if (input.type === 'checkbox') input.checked = values[name] === true;
     });
     label.append(control);
-    if (
-      (contract.name === 'text-field' && !basicFieldProps.has(name)) ||
-      (contract.name === 'icon' && !['icon', 'stroke', 'fill'].includes(name))
-    )
+    if (contract.name === 'text-field' && !basicFieldProps.has(name))
       advancedControls.append(label);
+    else if (iconToolbar && name !== 'icon') iconToolbar.append(label);
     else fieldset.append(label);
     if (fieldSize) fieldset.append(customHeightLabel);
   }
   customHeight.addEventListener('input', () => {
     controller.set('size', Number(customHeight.value));
   });
-  if (contract.name === 'text-field' || contract.name === 'icon') fieldset.append(advanced);
+  if (contract.name === 'text-field') fieldset.append(advanced);
   fieldset.append(referenceStatus);
   root.append(fieldset);
 

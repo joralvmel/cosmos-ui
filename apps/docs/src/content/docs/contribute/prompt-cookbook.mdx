@@ -25,6 +25,7 @@ Remove anything that does not apply; never paste credentials or private data int
 | Fix an error | [Reproduce and fix a bug](#reproduce-and-fix-a-bug) | `modify-component`, `test-engineer` |
 | Fix a platform-specific difference | [Restore platform parity](#restore-platform-parity) | Framework/native specialist |
 | Improve examples or controls | [Update documentation and demos](#update-documentation-and-demos) | `add-playground`, `docs-writer` |
+| Reuse available components in the docs | [Adopt components in the docs UI](#adopt-components-in-the-docs-ui) | `adopt-docs-components` |
 | Check quality without edits | [Review without changing files](#review-without-changing-files) | `reviewer`, `test-engineer` |
 | Cover a missing behavior with tests | [Add focused tests](#add-focused-tests) | `add-contract-tests` |
 | Add a theme, token or chart | [Other library work](#other-library-work) | `add-theme`, `add-token`, `create-chart` |
@@ -229,6 +230,27 @@ Update EN/ES pages and applicable Playground/native demo controls. Try the examp
 in the available environments, checking keyboard, state changes and console diagnostics.
 Report any contract/control gap instead of silently inventing an API. Validate the affected
 files, create a local commit and wait for my review.
+```
+
+### Adopt components in the docs UI
+
+Run this as a separate docs task after new components are available. It updates the site's own
+controls, not the public component API or every code sample. Native controls stay when there is
+no compatible stable replacement. You can also invoke `adopt-docs-components` directly.
+
+```text
+Use adopt-docs-components to update docs-owned controls with the available stable Cosmos components.
+[Optional: limit the review to component names or docs areas: ...]
+
+Work on an isolated docs branch from develop, separately from component work. Check the current
+inventory and contracts, then show a replacement mapping with behavior, accessibility and form gaps.
+Wait for my scope approval before replacing controls. Do not create components, add dependencies
+or change library APIs; retain native controls where no stable equivalent covers the requirement.
+
+After approval, update shared controls and EN/ES docs without duplicating behavior or breaking
+generated snippets. Verify actual interactions, keyboard, focus, themes and narrow layouts in the
+browser, and add focused regressions. Report replacements and deferrals, validate, create a local
+commit and wait for my review without push or PR.
 ```
 
 ### Review without changing files
