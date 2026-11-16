@@ -386,7 +386,7 @@ export function TextField({
           style={[
             {
               flex: 1,
-              minWidth: 0,
+              minWidth: MIN_TARGET,
               minHeight: MIN_TARGET,
               // Browsers can still paint an auto outline when its computed width is zero.
               outlineWidth: Platform.OS === 'web' ? 0 : undefined,

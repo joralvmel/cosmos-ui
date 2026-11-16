@@ -1,3 +1,4 @@
+import { heart } from '@joralvmel/cosmos-icons/heart';
 import { search } from '@joralvmel/cosmos-icons/search';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -19,6 +20,47 @@ import { TextField } from '../src/components/text-field.js';
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
 describe('TextField with React Native Web', () => {
+  it('keeps artwork passive and reserves editing space with all adornments and actions', async () => {
+    const container = document.createElement('div');
+    document.body.append(container);
+    const root = createRoot(container);
+    try {
+      await act(async () =>
+        root.render(
+          <TextField
+            label="Password"
+            type="password"
+            defaultValue="Secret"
+            startIcon={search}
+            endIcon={heart}
+            prefix={'Long prefix'.repeat(20)}
+            suffix={'Long suffix'.repeat(20)}
+            clearable
+            clearLabel="Clear password"
+            passwordReveal
+            revealPasswordLabel="Show password"
+            hidePasswordLabel="Hide password"
+          />
+        )
+      );
+      const artwork = container.querySelectorAll('svg');
+      expect(artwork).toHaveLength(4);
+      for (const svg of artwork) {
+        expect(svg.hasAttribute('tabindex')).toBe(false);
+        expect(svg.getAttribute('aria-hidden')).toBe('true');
+      }
+      const actions = container.querySelectorAll('[role="button"]');
+      expect(actions).toHaveLength(2);
+      for (const action of actions) expect(action.getAttribute('tabindex')).toBe('0');
+      const input = container.querySelector('input');
+      if (!input) throw new Error('Text field input is missing');
+      expect(Number.parseFloat(getComputedStyle(input).minWidth)).toBeGreaterThanOrEqual(44);
+    } finally {
+      await act(async () => root.unmount());
+      container.remove();
+    }
+  });
+
   it.each(['md', 80] as const)(
     'keeps one themed focus boundary for size %s without an inner browser outline',
     async size => {

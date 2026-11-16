@@ -45,6 +45,10 @@ radius) and the component style props. On React Native Web, the outer control ow
 inward focus indicator; the editable input does not add a second browser outline. The focused
 boundary remains visible in forced-colors mode.
 
+Icons are passive artwork, not independent pointer or keyboard focus targets; clear/reveal
+buttons retain their own focus and keyboard behavior. With long affixes, icons and both actions,
+the editable input reserves at least 44 units of width while affixes shrink and truncate.
+
 The implementation is stable with explicitly deferred platform and accessibility checks;
 see the [design evidence](../../docs/design/text-field.md) for what is verified and what is not.
 

@@ -4,6 +4,8 @@ React Native components of Cosmos UI with the same contracts and themes as the w
 
 On React Native Web, TextField draws its focus indicator on the outer control, without a second
 browser outline around the editable input.
+Icons do not take focus independently of their owning controls. TextField reserves at least
+44 units of editable width when long affixes and actions compete for space.
 
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 

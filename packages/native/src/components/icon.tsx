@@ -88,7 +88,8 @@ export function Icon({
           'aria-hidden': decorative ? true : undefined,
           role: decorative ? undefined : ('img' as const),
           'aria-label': decorative ? undefined : label,
-          focusable: false,
+          // RN Web maps focusable=false to tabindex=-1, which still permits pointer focus.
+          // Passive SVGs need no focus prop: they are not focusable by default.
         }
       : {
           accessible: !decorative,

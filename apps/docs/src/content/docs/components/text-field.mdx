@@ -113,6 +113,8 @@ validation; its consumer owns business validation and submit handling.
   color rather than relying on a box shadow.
 - React Native Web also draws focus on the outer control, without a second browser outline
   around the editable input.
+- Decorative icons do not receive independent pointer or keyboard focus. Native reserves at
+  least 44 units of editable width; long affixes shrink before taking that space from the input.
 - The editable input remains keyboard-operable; Enter reports `cosm-submit` and web form submission
   continues through the containing form.
 - Decorations follow logical inline direction for RTL. Font scaling may grow the control beyond a

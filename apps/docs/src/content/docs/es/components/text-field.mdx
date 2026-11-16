@@ -116,6 +116,8 @@ y el envío.
   resaltado del sistema, sin depender de una sombra.
 - React Native Web también dibuja el foco en el contenedor exterior, sin añadir un segundo
   contorno del navegador alrededor del campo editable.
+- Los iconos decorativos no reciben foco independiente mediante pulsaciones ni teclado. Native
+  reserva al menos 44 unidades de ancho editable; los afijos largos ceden ese espacio al campo.
 - El campo se opera con el teclado; Enter emite `cosm-submit` y el formulario web conserva su
   comportamiento nativo.
 - Las decoraciones respetan la dirección lógica en RTL. El escalado del texto puede aumentar la
