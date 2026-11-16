@@ -34,6 +34,8 @@ export interface PlaygroundLabels {
   iconAllCategories?: string;
   iconPreviewSize?: string;
   iconStyle?: string;
+  iconStroke?: string;
+  iconFill?: string;
   iconOutline?: string;
   iconFilled?: string;
   iconFillNote?: string;
@@ -252,7 +254,13 @@ export function initPlayground(
   const refreshCatalogs: (() => void)[] = [];
   for (const [name, spec] of Object.entries(contract.props)) {
     const label = element('label');
-    label.append(element('span', {}, name));
+    const paintLabel =
+      contract.name === 'icon' && name === 'stroke'
+        ? (labels.iconStroke ?? 'Outline color (stroke)')
+        : contract.name === 'icon' && name === 'fill'
+          ? (labels.iconFill ?? 'Fill color (fill)')
+          : name;
+    label.append(element('span', {}, paintLabel));
     let control: HTMLInputElement | HTMLSelectElement;
     const unionChoices =
       spec.type === 'union'
@@ -486,7 +494,7 @@ export function initPlayground(
     label.append(control);
     if (
       (contract.name === 'text-field' && !basicFieldProps.has(name)) ||
-      (contract.name === 'icon' && name !== 'icon')
+      (contract.name === 'icon' && !['icon', 'stroke', 'fill'].includes(name))
     )
       advancedControls.append(label);
     else fieldset.append(label);

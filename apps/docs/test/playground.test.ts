@@ -144,6 +144,26 @@ describe('Playground', () => {
     expect(size.value).toBe('37');
     expect(style.value).toBe('outline');
     expect(root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon')?.size).toBe(37);
+    for (const [name, color] of [
+      ['stroke', '#123456'],
+      ['fill', '#abcdef'],
+    ] as const) {
+      const control = root.querySelector<HTMLInputElement>(`[data-prop="${name}"]`);
+      if (!control) throw new Error(`Missing ${name} control`);
+      expect(control.closest('details')).toBeNull();
+      control.value = color;
+      control.dispatchEvent(new Event('input'));
+    }
+    expect(style.value).toBe('filled');
+    expect(target.stroke).toBe('#123456');
+    expect(target.fill).toBe('#abcdef');
+    const thumbnail = root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon');
+    expect(thumbnail?.stroke).toBe('#123456');
+    expect(thumbnail?.fill).toBe('#abcdef');
+    for (const technology of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(technology)).toContain('#123456');
+      expect(controller.code(technology)).toContain('#abcdef');
+    }
   });
 
   it('builds one control per contract prop and four code tabs', () => {

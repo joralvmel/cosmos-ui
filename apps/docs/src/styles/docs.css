@@ -3,7 +3,7 @@
 .cosm-preview {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--cosm-space-md);
   margin-block: 1rem;
   padding: var(--cosm-space-xl);
@@ -69,6 +69,10 @@
   flex-direction: row-reverse;
   justify-content: flex-end;
   align-items: center;
+  align-self: start;
+  box-sizing: border-box;
+  padding-block-start: calc(1lh + 0.25rem);
+  min-block-size: calc(1lh + 0.25rem + 2.5rem);
 }
 
 .cosm-playground-controls [hidden] {

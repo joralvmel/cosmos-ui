@@ -47,6 +47,10 @@ The example below lets you accept or reject a controlled value proposal:
 and `lg`. A positive finite numeric `size` sets a minimum editable-control height in CSS pixels.
 Label and supporting text remain outside that height.
 
+On web the field defaults to `20ch`, capped at its container width. Override CSS `width` (for example
+`width: 100%`) for your layout. Clear/reveal actions and decorations consume space inside that width
+instead of expanding it.
+
 <Preview>
   <cosm-text-field label="Outlined" placeholder="name@example.com"></cosm-text-field>
   <cosm-text-field label="Filled" variant="filled" placeholder="name@example.com"></cosm-text-field>

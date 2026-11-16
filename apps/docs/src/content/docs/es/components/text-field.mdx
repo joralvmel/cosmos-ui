@@ -48,6 +48,10 @@ tamaños semánticos son `sm`, `md` y `lg`. Un valor numérico positivo y finito
 altura mínima del control editable en píxeles CSS. La etiqueta y el texto de ayuda quedan fuera de
 esa altura.
 
+En web el ancho predeterminado es `20ch`, limitado al ancho del contenedor. Puedes personalizarlo
+con CSS `width` (por ejemplo, `width: 100%`). Las acciones de borrar/mostrar contraseña y las
+decoraciones ocupan espacio dentro de ese ancho, sin ensanchar el campo.
+
 <Preview>
   <cosm-text-field label="Contorno" placeholder="nombre@ejemplo.com"></cosm-text-field>
   <cosm-text-field label="Relleno" variant="filled" placeholder="nombre@ejemplo.com"></cosm-text-field>
