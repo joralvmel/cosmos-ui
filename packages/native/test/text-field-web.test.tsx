@@ -12,8 +12,10 @@ vi.mock('react-native', async () => {
   return { ...nativeWeb, Platform: { OS: 'web' }, processColor: (value: string) => value };
 });
 vi.mock('react-native-svg', async () => {
-  // @ts-expect-error The package does not publish declarations for its internal web entry.
-  return import('../node_modules/react-native-svg/lib/module/elements.web.js');
+  const { createRequire } = await import('node:module');
+  return import(
+    createRequire(import.meta.url).resolve('react-native-svg/lib/module/elements.web.js')
+  );
 });
 
 import { TextField } from '../src/components/text-field.js';
