@@ -7,8 +7,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // Exercise the actual react-native-svg web renderer instead of the SVG test stand-in.
 vi.mock('react-native-svg', async () => {
-  // @ts-expect-error The package does not publish declarations for its internal web entry.
-  return import('../node_modules/react-native-svg/lib/module/elements.web.js');
+  const { createRequire } = await import('node:module');
+  return import(
+    createRequire(import.meta.url).resolve('react-native-svg/lib/module/elements.web.js')
+  );
 });
 
 import { Icon } from '../src/components/icon.js';
