@@ -36,6 +36,7 @@ export interface PlaygroundLabels {
   iconStyle?: string;
   iconStroke?: string;
   iconFill?: string;
+  iconInherited?: string;
   iconOutline?: string;
   iconFilled?: string;
   iconFillNote?: string;
@@ -252,14 +253,40 @@ export function initPlayground(
   const referenceStatus = element('span', { role: 'status', 'aria-live': 'polite' });
   let referenceRequest = 0;
   const refreshCatalogs: (() => void)[] = [];
+  let iconToolbar: HTMLDivElement | undefined;
   for (const [name, spec] of Object.entries(contract.props)) {
-    const label = element('label');
+    if (iconToolbar && name === 'size') continue;
     const paintLabel =
       contract.name === 'icon' && name === 'stroke'
         ? (labels.iconStroke ?? 'Outline color (stroke)')
         : contract.name === 'icon' && name === 'fill'
           ? (labels.iconFill ?? 'Fill color (fill)')
           : name;
+    if (iconToolbar && (name === 'stroke' || name === 'fill')) {
+      const color = select(
+        paintLabel,
+        [
+          ['currentColor', labels.iconInherited ?? 'Inherited (currentColor)'],
+          ['none', labels.none ?? 'None'],
+          ...semanticColors.map(
+            token => [`var(--cosm-${token})`, `--cosm-${token}`] as [string, string]
+          ),
+        ],
+        String(values[name])
+      );
+      color.control.dataset.prop = name;
+      color.control.title = spec.description;
+      color.control.addEventListener('change', () => controller.set(name, color.control.value));
+      refreshCatalogs.push(() => {
+        const value = String(values[name]);
+        if (![...color.control.options].some(option => option.value === value))
+          color.control.append(element('option', { value }, value));
+        color.control.value = value;
+      });
+      iconToolbar.append(color.wrapper);
+      continue;
+    }
+    const label = element('label');
     label.append(element('span', {}, paintLabel));
     let control: HTMLInputElement | HTMLSelectElement;
     const unionChoices =
@@ -294,6 +321,7 @@ export function initPlayground(
       }
       if (catalog) {
         const catalogControls = element('div', { class: 'cosm-icon-toolbar' });
+        if (contract.name === 'icon') iconToolbar = catalogControls;
         const searchLabel = element('label');
         searchLabel.append(element('span', {}, labels.iconSearch ?? 'Search icons'));
         const searchInput = element('input', { type: 'search' });
@@ -329,10 +357,27 @@ export function initPlayground(
         category.control.dataset.iconCategory = '';
         const size = select(
           labels.iconPreviewSize ?? 'Preview size',
-          ['16', '20', '24', '32', '48'].map(value => [value, `${value} px`]),
+          [
+            ...['16', '20', '24', '32', '48'].map(
+              value => [value, `${value} px`] as [string, string]
+            ),
+            ['custom', labels.customSize ?? 'Custom'],
+          ],
           '20'
         );
         size.control.dataset.iconSize = '';
+        size.control.dataset.prop = 'size';
+        const customSize = element('input', {
+          type: 'number',
+          min: '1',
+          step: 'any',
+          value: '32',
+          'data-icon-custom-size': '',
+          'aria-label': `${labels.customSize ?? 'Custom'} (px)`,
+        });
+        customSize.hidden = true;
+        const sizeGroup = element('div', { class: 'cosm-icon-size' });
+        sizeGroup.append(size.wrapper, customSize);
         const style = select(
           labels.iconStyle ?? 'Style',
           [
@@ -361,22 +406,23 @@ export function initPlayground(
         };
         refreshCatalogs.push(() => {
           const value = String(previewSize());
-          if (![...size.control.options].some(option => option.value === value)) {
-            size.control.querySelector('[data-custom-size]')?.remove();
-            size.control.append(
-              element('option', { value, 'data-custom-size': '' }, `${value} px`)
-            );
-          }
-          size.control.value = value;
+          const custom =
+            size.control.value === 'custom' ||
+            ![...size.control.options].some(option => option.value === value);
+          size.control.value = custom ? 'custom' : value;
+          customSize.hidden = !custom;
+          if (custom) customSize.value = value;
           style.control.value = values.fill === 'none' ? 'outline' : 'filled';
-          const sizeInput = fieldset.querySelector<HTMLInputElement>('[data-prop="size"]');
-          if (sizeInput) sizeInput.value = String(values.size);
-          const fillInput = fieldset.querySelector<HTMLInputElement>('[data-prop="fill"]');
-          if (fillInput) fillInput.value = String(values.fill);
           paintPreviews();
         });
         size.control.addEventListener('change', () => {
-          controller.set('size', Number(size.control.value));
+          controller.set(
+            'size',
+            Number(size.control.value === 'custom' ? customSize.value : size.control.value)
+          );
+        });
+        customSize.addEventListener('input', () => {
+          controller.set('size', Number(customSize.value));
         });
         style.control.addEventListener('change', () => {
           controller.set('fill', style.control.value === 'filled' ? 'currentColor' : 'none');
@@ -436,7 +482,7 @@ export function initPlayground(
         searchInput.addEventListener('input', filter);
         category.control.addEventListener('change', filter);
         searchLabel.append(searchInput);
-        catalogControls.append(searchLabel, category.wrapper, size.wrapper, style.wrapper);
+        catalogControls.append(searchLabel, category.wrapper, sizeGroup, style.wrapper);
         fieldset.append(
           catalogControls,
           results,

@@ -58,6 +58,12 @@
   font-size: var(--sl-text-xs);
 }
 
+.cosm-icon-size {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+}
+
 .cosm-playground-controls label {
   display: flex;
   flex-direction: column;

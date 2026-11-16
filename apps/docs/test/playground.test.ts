@@ -139,31 +139,50 @@ describe('Playground', () => {
       expect(thumbnail?.size).toBe(32);
       expect(thumbnail?.fill).toBe('currentColor');
     });
+    size.value = 'custom';
+    size.dispatchEvent(new Event('change'));
+    expect(root.querySelector<HTMLInputElement>('[data-icon-custom-size]')?.hidden).toBe(false);
     controller.set('size', 37);
     controller.set('fill', 'none');
-    expect(size.value).toBe('37');
+    expect(size.value).toBe('custom');
+    const customSize = root.querySelector<HTMLInputElement>('[data-icon-custom-size]');
+    if (!customSize) throw new Error('Missing custom size control');
+    expect(customSize.hidden).toBe(false);
+    expect(customSize.value).toBe('37');
+    customSize.value = '41';
+    customSize.dispatchEvent(new Event('input'));
+    expect(target.size).toBe(41);
+    expect(root.querySelectorAll('[data-prop="size"]')).toHaveLength(1);
+    expect(root.querySelector('details [data-prop="size"]')).toBeNull();
     expect(style.value).toBe('outline');
-    expect(root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon')?.size).toBe(37);
+    expect(root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon')?.size).toBe(41);
     for (const [name, color] of [
-      ['stroke', '#123456'],
-      ['fill', '#abcdef'],
+      ['stroke', 'var(--cosm-primary)'],
+      ['fill', 'var(--cosm-danger)'],
     ] as const) {
-      const control = root.querySelector<HTMLInputElement>(`[data-prop="${name}"]`);
+      const control = root.querySelector<HTMLSelectElement>(`select[data-prop="${name}"]`);
       if (!control) throw new Error(`Missing ${name} control`);
-      expect(control.closest('details')).toBeNull();
+      expect(control.closest('.cosm-icon-toolbar')).not.toBeNull();
       control.value = color;
-      control.dispatchEvent(new Event('input'));
+      control.dispatchEvent(new Event('change'));
     }
     expect(style.value).toBe('filled');
-    expect(target.stroke).toBe('#123456');
-    expect(target.fill).toBe('#abcdef');
+    expect(target.stroke).toBe('var(--cosm-primary)');
+    expect(target.fill).toBe('var(--cosm-danger)');
     const thumbnail = root.querySelector('.cosm-icon-gallery')?.querySelector('cosm-icon');
-    expect(thumbnail?.stroke).toBe('#123456');
-    expect(thumbnail?.fill).toBe('#abcdef');
+    expect(thumbnail?.stroke).toBe('var(--cosm-primary)');
+    expect(thumbnail?.fill).toBe('var(--cosm-danger)');
     for (const technology of ['html', 'react', 'angular', 'native'] as const) {
-      expect(controller.code(technology)).toContain('#123456');
-      expect(controller.code(technology)).toContain('#abcdef');
+      expect(controller.code(technology)).toContain(
+        technology === 'native' ? 'theme.colors.primary' : 'var(--cosm-primary)'
+      );
+      expect(controller.code(technology)).toContain(
+        technology === 'native' ? 'theme.colors.danger' : 'var(--cosm-danger)'
+      );
     }
+    style.value = 'outline';
+    style.dispatchEvent(new Event('change'));
+    expect(root.querySelector<HTMLSelectElement>('[data-prop="fill"]')?.value).toBe('none');
   });
 
   it('builds one control per contract prop and four code tabs', () => {
