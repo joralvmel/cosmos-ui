@@ -1,5 +1,12 @@
 # @joralvmel/cosmos-mcp
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`9da9229`](https://github.com/joralvmel/cosmos-ui/commit/9da9229078d91c98fca01b5b68a2f5fb01275530), [`8f6a5c5`](https://github.com/joralvmel/cosmos-ui/commit/8f6a5c51af2605fd90c3c63a2530943cc075f949), [`1c7b97d`](https://github.com/joralvmel/cosmos-ui/commit/1c7b97de1075f66dba3c26c31d3ce93ad4d59e95), [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3), [`1c7b97d`](https://github.com/joralvmel/cosmos-ui/commit/1c7b97de1075f66dba3c26c31d3ce93ad4d59e95), [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3), [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3)]:
+  - @joralvmel/cosmos-core@0.3.0
+
 ## 0.1.1
 
 ### Patch Changes

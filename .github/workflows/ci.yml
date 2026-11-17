@@ -56,7 +56,7 @@ jobs:
 
   changeset:
     name: Changeset present
-    if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -71,10 +71,14 @@ jobs:
       - run: npm ci --ignore-scripts
 
       # Fails when a publishable package changed without a changeset (`npm run changeset`).
+      # Same-repository Changesets release PRs to main have already consumed their changesets.
+      # Keep the job running so the required check reports success rather than being skipped.
       # Same-repository main -> develop syncs contain already-published, consumed changesets.
       # Dependabot pull requests are classified by the next step instead.
       - name: Check changesets
         if: >-
+          !(github.head_ref == 'changeset-release/main' && github.base_ref == 'main' &&
+            github.event.pull_request.head.repo.full_name == github.repository) &&
           !(github.head_ref == 'main' && github.base_ref == 'develop' &&
             github.event.pull_request.head.repo.full_name == github.repository) &&
           github.event.pull_request.user.login != 'dependabot[bot]'

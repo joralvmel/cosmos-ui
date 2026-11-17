@@ -1,5 +1,39 @@
 # @joralvmel/cosmos-native
 
+## 0.3.0
+
+### Minor Changes
+
+- [#28](https://github.com/joralvmel/cosmos-ui/pull/28) [`9da9229`](https://github.com/joralvmel/cosmos-ui/commit/9da9229078d91c98fca01b5b68a2f5fb01275530) Thanks [@joralvmel](https://github.com/joralvmel)! - Add the Icon Button component (`<cosm-icon-button>`) with centered icon content and React, Angular and React Native implementations.
+
+- [#33](https://github.com/joralvmel/cosmos-ui/pull/33) [`8f6a5c5`](https://github.com/joralvmel/cosmos-ui/commit/8f6a5c51af2605fd90c3c63a2530943cc075f949) Thanks [@joralvmel](https://github.com/joralvmel)! - Add accessible single- and multiple-selection Listbox across web, React, Angular and React Native
+  with grouped options, descriptions and icons, controlled or autonomous state, keyboard navigation
+  and typeahead, and customizable variants and row sizing.
+
+- [#32](https://github.com/joralvmel/cosmos-ui/pull/32) [`1c7b97d`](https://github.com/joralvmel/cosmos-ui/commit/1c7b97de1075f66dba3c26c31d3ce93ad4d59e95) Thanks [@joralvmel](https://github.com/joralvmel)! - Add the Popover component (`<cosm-popover>`) with its contract, React, Angular and React Native implementations.
+
+- [#24](https://github.com/joralvmel/cosmos-ui/pull/24) [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3) Thanks [@joralvmel](https://github.com/joralvmel)! - Add the Text Field component (`<cosm-text-field>`) with browser-native form behavior and React, Angular and React Native implementations.
+
+  Require React DOM 19 as a peer of the React package to synchronize controlled value proposals
+  without losing rapid keystrokes. Report iOS validation and manual screen-reader runs as optional
+  and unverified by default; keep separately deferred IME coverage disclosed.
+
+- [#32](https://github.com/joralvmel/cosmos-ui/pull/32) [`1c7b97d`](https://github.com/joralvmel/cosmos-ui/commit/1c7b97de1075f66dba3c26c31d3ce93ad4d59e95) Thanks [@joralvmel](https://github.com/joralvmel)! - Add optional Popover close buttons, accessible hover activation, configurable spacing and a decorative arrow, with IconButton-based examples; use an 8-unit default gap on every platform.
+
+- [#24](https://github.com/joralvmel/cosmos-ui/pull/24) [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3) Thanks [@joralvmel](https://github.com/joralvmel)! - Add independent optional normal and focus colors for text-field start/end icons, with configurable input-only or whole-control focus scope across platforms.
+
+### Patch Changes
+
+- [#24](https://github.com/joralvmel/cosmos-ui/pull/24) [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3) Thanks [@joralvmel](https://github.com/joralvmel)! - Harden text-field password concealment, forced-colors focus, search clearing and long-content layout without adding public properties.
+
+- [#24](https://github.com/joralvmel/cosmos-ui/pull/24) [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3) Thanks [@joralvmel](https://github.com/joralvmel)! - Prevent passive icon artwork from receiving browser focus and preserve editable text-field space when long affixes and actions compete on narrow screens.
+
+- [#24](https://github.com/joralvmel/cosmos-ui/pull/24) [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3) Thanks [@joralvmel](https://github.com/joralvmel)! - Remove the duplicate inner browser focus outline from React Native Web text fields while preserving a themed inward focus indicator and forced-colors visibility.
+
+- [#29](https://github.com/joralvmel/cosmos-ui/pull/29) [`1a056bc`](https://github.com/joralvmel/cosmos-ui/commit/1a056bc5e92f5586182f8049d518a3a3ab2eb43c) Thanks [@dependabot](https://github.com/apps/dependabot)! - Update the tested Angular patch release and native SVG runtime dependency without changing public APIs or peer compatibility.
+- Updated dependencies [[`9da9229`](https://github.com/joralvmel/cosmos-ui/commit/9da9229078d91c98fca01b5b68a2f5fb01275530), [`8f6a5c5`](https://github.com/joralvmel/cosmos-ui/commit/8f6a5c51af2605fd90c3c63a2530943cc075f949), [`1c7b97d`](https://github.com/joralvmel/cosmos-ui/commit/1c7b97de1075f66dba3c26c31d3ce93ad4d59e95), [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3), [`1c7b97d`](https://github.com/joralvmel/cosmos-ui/commit/1c7b97de1075f66dba3c26c31d3ce93ad4d59e95), [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3), [`dffa344`](https://github.com/joralvmel/cosmos-ui/commit/dffa344aac0d30018c3cdb19afc8e4dc822734a3)]:
+  - @joralvmel/cosmos-core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
