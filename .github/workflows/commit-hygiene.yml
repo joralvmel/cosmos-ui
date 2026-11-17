@@ -3,7 +3,8 @@ name: Commit hygiene
 # Commit emails must not contain blocked terms (list in the COSMOS_BLOCKED_TERMS secret), and pull
 # request titles become squash-merge commits, so they must follow Conventional Commits.
 # Runs on pushes and on pull requests from this repository (forks do not receive secrets).
-# Bots (Dependabot, Changesets "Version Packages", GitHub web merges) are skipped.
+# Dependabot jobs are skipped; bot identities and GitHub web merge identities are ignored by
+# the email validator. Changesets release PRs still run email and Conventional Commit title checks.
 on:
   push:
     branches: [main, develop]
@@ -19,8 +20,7 @@ jobs:
     if: >-
       github.actor != 'dependabot[bot]' &&
       (github.event_name == 'push' ||
-       (github.event.pull_request.head.repo.full_name == github.repository &&
-        github.head_ref != 'changeset-release/main'))
+       github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
