@@ -73,13 +73,24 @@ describe('release synchronization', () => {
     expect(protection?.allow_deletions).toBe(false);
   });
 
-  it('exempts only same-repository main-to-develop PRs from adding new changesets', () => {
+  it('runs the changeset job on release PRs while exempting consumed changesets from status', () => {
     const workflow = read('.github/workflows/ci.yml');
+    const job = workflow.split('\n  changeset:\n')[1]?.split('\n  dependency-review:')[0];
     const condition = workflow.split('- name: Check changesets')[1]?.split('run:')[0];
+    expect(job).toContain("if: github.event_name == 'pull_request'");
+    expect(job).not.toContain("github.head_ref != 'changeset-release/main'");
     expect(condition?.replace(/\s+/g, ' ').trim()).toBe(
-      "if: >- !(github.head_ref == 'main' && github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository) && github.event.pull_request.user.login != 'dependabot[bot]'"
+      "if: >- !(github.head_ref == 'changeset-release/main' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository) && !(github.head_ref == 'main' && github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository) && github.event.pull_request.user.login != 'dependabot[bot]'"
     );
     expect(workflow).toContain('run: npx changeset status --since=origin/');
+  });
+
+  it('runs commit hygiene checks on same-repository Changesets release PRs', () => {
+    const workflow = read('.github/workflows/commit-hygiene.yml');
+    const job = workflow.split('\n  hygiene:\n')[1]?.split('\n    runs-on:')[0];
+    expect(job).toContain("github.actor != 'dependabot[bot]'");
+    expect(job).toContain('github.event.pull_request.head.repo.full_name == github.repository');
+    expect(job).not.toContain("github.head_ref != 'changeset-release/main'");
   });
 });
 
