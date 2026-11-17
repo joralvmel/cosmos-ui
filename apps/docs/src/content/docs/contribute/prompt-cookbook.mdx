@@ -25,6 +25,7 @@ Remove anything that does not apply; never paste credentials or private data int
 | Fix an error | [Reproduce and fix a bug](#reproduce-and-fix-a-bug) | `modify-component`, `test-engineer` |
 | Fix a platform-specific difference | [Restore platform parity](#restore-platform-parity) | Framework/native specialist |
 | Improve examples or controls | [Update documentation and demos](#update-documentation-and-demos) | `add-playground`, `docs-writer` |
+| Reuse available components in the docs | [Adopt components in the docs UI](#adopt-components-in-the-docs-ui) | `adopt-docs-components` |
 | Check quality without edits | [Review without changing files](#review-without-changing-files) | `reviewer`, `test-engineer` |
 | Cover a missing behavior with tests | [Add focused tests](#add-focused-tests) | `add-contract-tests` |
 | Add a theme, token or chart | [Other library work](#other-library-work) | `add-theme`, `add-token`, `create-chart` |
@@ -231,6 +232,31 @@ Report any contract/control gap instead of silently inventing an API. Validate t
 files, create a local commit and wait for my review.
 ```
 
+### Adopt components in the docs UI
+
+Run this as a separate docs task after new components are available. It updates the site's own
+controls, not the public component API or every code sample. Native controls stay when there is
+no compatible stable replacement. You can also invoke `adopt-docs-components` directly.
+
+```text
+Use adopt-docs-components to update docs-owned controls with the available stable Cosmos components.
+[Optional: limit the review to component names or docs areas: ...]
+
+Work on an isolated docs branch from develop, separately from component work. Check the current
+inventory and contracts, then show a replacement mapping with behavior, accessibility and form gaps.
+Wait for my scope approval before replacing controls. Do not create components, add dependencies
+or change library APIs; retain native controls where no stable equivalent covers the requirement.
+
+After approval, update shared controls and EN/ES docs without duplicating behavior or breaking
+generated snippets. Verify actual interactions, keyboard, focus, themes and narrow layouts in the
+browser, and add focused regressions. Adopted controls must use the active Cosmos theme and mode,
+including Playground overrides and return to the site setting; do not mask their tokens with
+Starlight-only colors. Check their rendered colors, focus and contrast against their actual
+background in at least two themes and both modes, not just the preview's attributes.
+Report replacements and deferrals, validate, create a local commit and wait for my review
+without push or PR.
+```
+
 ### Review without changing files
 
 ```text
@@ -287,6 +313,23 @@ A work PR goes to `develop`; releasing is a separate decision. The usual flow is
 major) and explains why; you approve before anything is opened or published.
 See [release and publishing](../publishing/) for setup and commands. These prompts do not authorize
 automatic merges, changes to publishing permissions, or a release while work is still unmerged.
+
+### Coordinate a release end-to-end
+
+Use one prompt for the whole workflow. The agent recommends the release, opens or reuses PRs,
+checks publication and isolated consumers, and prepares synchronization. It asks for approval at
+each merge or publication gate and resumes after your answer. If interactive questions are not
+available, reply in chat; if the session ends, resume from the reported stage and PR.
+
+```text
+Coordinate the next release end-to-end using release and release-manager. Assess and recommend the
+release type, prepare prerequisites and PRs, verify publication and isolated consumers, and
+synchronize main back into develop. Ask for my explicit approval at each merge or publication gate,
+then verify the current state and continue in this conversation. Report failures and unavailable
+checks; do not bypass protections or publish without approval.
+```
+
+The focused prompts below remain useful for assessment, review or recovery on their own.
 
 ### Plan the next release
 

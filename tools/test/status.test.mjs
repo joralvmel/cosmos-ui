@@ -1,4 +1,5 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { catalog } from '@joralvmel/cosmos-core';
 import { describe, expect, it } from 'vitest';
@@ -34,6 +35,35 @@ describe('component status', () => {
     expect(computeStatus({ contract: true, web: undefined, native: true })).toBe('stable');
   });
 
+  it.each([
+    [
+      '### `<cosm-listbox>`\nEvents: `cosm-selection-change`.',
+      '### `Listbox`\nSelect an option.',
+      false,
+    ],
+    ['### `<cosm-select>`', '### `Listbox`', false],
+    ['### `<cosm-listbox>`', '### `Select`', false],
+    ['### `<cosm-select>`', '### `Select`', true],
+  ])(
+    'requires exact reference headings on every supported platform (%#)',
+    (web, native, expected) => {
+      const entry = catalog.find(item => item.name === 'select');
+      if (!entry) throw new Error('select missing from the catalog');
+      const root = mkdtempSync(join(tmpdir(), 'cosmos-status-'));
+      try {
+        mkdirSync(join(root, 'packages/elements'), { recursive: true });
+        mkdirSync(join(root, 'packages/native'), { recursive: true });
+        writeFileSync(join(root, 'packages/elements/llms.md'), web);
+        writeFileSync(join(root, 'packages/native/llms.md'), native);
+        const [select] = getStatusReport(root, [entry]).components;
+        expect(select?.pieces.llms).toBe(expected);
+        expect(select?.status).toBe(expected ? 'in-progress' : 'planned');
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
+    }
+  );
+
   it('every implemented component is in the catalog', () => {
     for (const name of implementedNames()) expect(names, name).toContain(name);
   });
@@ -43,6 +73,25 @@ describe('component status', () => {
       expect(item.missing, item.name).toEqual([]);
       expect(item.status, item.name).toBe('stable');
     }
+  });
+
+  it('honors an explicit readiness downgrade for a complete component', () => {
+    const entry = catalog.find(item => item.name === 'text-field');
+    if (!entry) throw new Error('text-field missing from the catalog');
+    const [textField] = getStatusReport(ROOT, [{ ...entry, status: 'in-progress' }]).components;
+    expect(textField?.missing).toEqual([]);
+    expect(textField?.todos).toEqual([]);
+    expect(textField?.claimed).toBe('in-progress');
+    expect(computeStatus(textField?.pieces ?? {})).toBe('stable');
+    expect(textField?.status).toBe('in-progress');
+  });
+
+  it('does not apply readiness downgrades to other catalog entries', () => {
+    const entry = catalog.find(item => item.name === 'button');
+    if (!entry) throw new Error('button missing from the catalog');
+    const [button] = getStatusReport(ROOT, [{ ...entry, status: undefined }]).components;
+    expect(button?.claimed).toBeUndefined();
+    expect(button?.status).toBe(computeStatus(button?.pieces ?? {}));
   });
 
   it('marks pieces that do not apply to native-only components', () => {

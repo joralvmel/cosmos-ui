@@ -137,7 +137,7 @@ export function plan(target, n, options = {}) {
         {
           type: 'insert',
           path: 'packages/angular/src/index.ts',
-          before: /\] as const;/,
+          before: /(?<=\w)(?=,?\s*\] as const;)/,
           content: `, Cosm${n.pascal}Component`,
         },
         {

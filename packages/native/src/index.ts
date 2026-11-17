@@ -1,7 +1,38 @@
-export type { ButtonPressDetail, PressSource } from '@joralvmel/cosmos-core';
+export type {
+  ButtonPressDetail,
+  ListboxGroup,
+  ListboxItem,
+  ListboxOption,
+  ListboxSelectionChangeDetail,
+  ListboxSelectionMode,
+  PopoverAlign,
+  PopoverCloseReason,
+  PopoverOpenChangeDetail,
+  PopoverSide,
+  PressSource,
+} from '@joralvmel/cosmos-core';
 export type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
 export { Button, type ButtonProps, buttonPropNames } from './components/button.js';
 export { Icon, type IconProps, iconPropNames } from './components/icon.js';
+export { IconButton, type IconButtonProps, iconButtonPropNames } from './components/icon-button.js';
+export {
+  Listbox,
+  type ListboxAppearance,
+  type ListboxProps,
+  listboxPropNames,
+} from './components/listbox.js';
+export {
+  Popover,
+  type PopoverHandle,
+  type PopoverProps,
+  PopoverProvider,
+  type PopoverProviderProps,
+  type PopoverSafeAreaInsets,
+  type PopoverTriggerProps,
+  popoverPropNames,
+  usePopoverHost,
+} from './components/popover.js';
+export { TextField, type TextFieldProps, textFieldPropNames } from './components/text-field.js';
 export {
   CosmosThemeProvider,
   type CosmosThemeProviderProps,

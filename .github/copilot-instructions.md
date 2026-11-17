@@ -46,3 +46,7 @@ Biome 2 · Astro 7 + Starlight · Changesets · culori.
   require another pause; do not amend by default. Scope approval is not permission to publish.
 - Report real validation evidence and unavailable checks honestly: mocks, builds and React Native
   Web do not establish native-device behavior.
+- Follow the [readiness policy](../docs/conventions/component-workflow.md#default-readiness-policy):
+  iOS validation and manual screen-reader testing are optional/non-blocking by default. Do not
+  attempt them unless explicitly requested or ask for per-component waivers. Disclose them as
+  not verified; they alone do not prevent `stable`. Required checks and known defects still block.

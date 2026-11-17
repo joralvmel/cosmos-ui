@@ -1,0 +1,69 @@
+---
+import Preview from './Preview.astro';
+
+interface Props {
+  section: 'variants' | 'states';
+  locale?: 'en' | 'es';
+}
+
+const { section, locale = 'en' } = Astro.props;
+const es = locale === 'es';
+const favorite = es ? 'Favorito' : 'Favorite';
+---
+
+<Preview>
+  {
+    section === 'variants' ? (
+      <>
+        {['solid', 'soft', 'outline', 'ghost'].map(variant => (
+          <cosm-icon-button label={`${favorite} (${variant})`} variant={variant}>
+            <cosm-icon data-icon-button-example="heart" />
+          </cosm-icon-button>
+        ))}
+        {['primary', 'neutral', 'danger'].map(tone => (
+          <cosm-icon-button label={`${es ? 'Eliminar' : 'Delete'} (${tone})`} tone={tone}>
+            <cosm-icon data-icon-button-example="trash" />
+          </cosm-icon-button>
+        ))}
+        {['sm', 'md', 'lg'].map(size => (
+          <cosm-icon-button label={`${es ? 'Buscar' : 'Search'} (${size})`} size={size}>
+            <cosm-icon data-icon-button-example="search" />
+          </cosm-icon-button>
+        ))}
+      </>
+    ) : (
+      <>
+        <cosm-icon-button label={es ? 'Buscar (desactivado)' : 'Search (disabled)'} disabled>
+          <cosm-icon data-icon-button-example="search" />
+        </cosm-icon-button>
+        <cosm-icon-button label={favorite} mode="toggle" default-pressed>
+          <cosm-icon data-icon-button-example="heart" />
+        </cosm-icon-button>
+        <cosm-icon-button label={es ? 'Fijar' : 'Pin'} mode="toggle" data-controlled-icon-button>
+          <cosm-icon data-icon-button-example="pin" />
+        </cosm-icon-button>
+      </>
+    )
+  }
+</Preview>
+
+<script>
+  import '@joralvmel/cosmos-elements';
+  import { heart } from '@joralvmel/cosmos-icons/heart';
+  import { pin } from '@joralvmel/cosmos-icons/pin';
+  import { search } from '@joralvmel/cosmos-icons/search';
+  import { trash } from '@joralvmel/cosmos-icons/trash';
+
+  const icons = { heart, pin, search, trash };
+  for (const icon of document.querySelectorAll<HTMLElementTagNameMap['cosm-icon']>(
+    'cosm-icon[data-icon-button-example]'
+  )) {
+    icon.icon = icons[icon.dataset.iconButtonExample as keyof typeof icons];
+  }
+  for (const button of document.querySelectorAll<HTMLElement>('[data-controlled-icon-button]')) {
+    Reflect.set(button, 'pressed', false);
+    button.addEventListener('cosm-pressed-change', event => {
+      Reflect.set(button, 'pressed', (event as CustomEvent<{ pressed: boolean }>).detail.pressed);
+    });
+  }
+</script>

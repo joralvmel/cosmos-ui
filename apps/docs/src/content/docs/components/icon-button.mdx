@@ -1,0 +1,94 @@
+---
+title: Icon Button
+description: An accessible icon-only action or toggle for Web Components, React, Angular and React Native.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import IconButtonExamples from '../../../components/IconButtonExamples.astro';
+import Playground from '../../../components/Playground.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="icon-button" />
+
+`<cosm-icon-button>` performs an action or toggles a boolean state using a single decorative
+[Cosmos Icon](/components/icon/). It follows the
+[WAI-ARIA button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+Use it for familiar, compact actions; prefer a [Button](/components/button/) with visible text
+when the meaning is not obvious. It is not a navigation link.
+
+## Playground
+
+<Playground name="icon-button" />
+
+Try `label`, `mode`, `variant`, `tone`, `size`, `disabled`, `pressed`, `defaultPressed` and web
+`type`. The **pressed** control offers autonomous state or an explicitly controlled `false` or
+`true`. Controlled values stay fixed on activation until you change them; autonomous toggles
+update themselves. Switch to `mode="toggle"` to see pressed state. `defaultPressed` seeds
+autonomous state, not a controlled value; set it before the first interaction.
+
+The code tabs generate Web Component, React, Angular and React Native examples from the same
+contract. The icon is a child, **not an icon-definition prop on Icon Button**: use the default
+slot on the web and children in React and React Native. Import each definition from its own
+module, such as `@joralvmel/cosmos-icons/heart`; do not import a catalog or icon-name registry.
+The child Icon stays decorative because the button supplies the accessible name.
+
+## Variants
+
+`variant` controls emphasis: `solid`, `soft`, `outline` or `ghost`. `tone` is `primary`, `neutral`
+or `danger`. The examples also show `sm`, `md` and `lg` square controls.
+Defaults are `solid`, `primary` and `md`.
+
+<IconButtonExamples section="variants" />
+
+Customize the existing Icon child with its own `size`, `strokeWidth`, `stroke` or `fill`;
+keep it decorative. Its inherited foreground follows the button's tone and state. A filled
+path is not a separate solid icon collection; see the Icon page's geometry guidance.
+
+## States
+
+<IconButtonExamples section="states" />
+
+From left to right: disabled action, autonomous Favorite toggle (initially pressed), and controlled
+Pin toggle (initially unpressed). The controlled example accepts each proposed value and writes
+it back to `pressed`.
+
+- `mode="action"` emits `press` without toggling. `mode="toggle"` also proposes a boolean
+  through `pressedChange`; mixed state is not supported.
+- Omit `pressed` for autonomous state and use `defaultPressed` for its initial value.
+- Bind `pressed` for controlled state, **including `false`**. Accept the proposal by updating
+  your bound value; ignoring it leaves the current state unchanged.
+- In Web Components, listen for `cosm-pressed-change` and assign `event.detail.pressed` to
+  the element's `pressed` property. React uses `onPressedChange` with
+  `setPressed(event.detail.pressed)`; Angular uses `[pressed]` and
+  `(pressedChange)="pressed = $event.detail.pressed"`. React Native's `onPressedChange`
+  receives the detail directly: `setPressed(detail.pressed)`.
+- `disabled` blocks activation and both events. Hover, active, focus-visible and pressed
+  styling follow theme tokens. There is no loading state.
+- On the web, `type="button"` is the safe default; use `submit` or `reset` inside an HTML
+  form for those actions. React Native has no `type` prop or HTML form submission/reset.
+
+## Accessibility
+
+- A non-empty, localized `label` is required. Name the action, not the glyph: “Delete”, not
+  “Trash icon”. A missing or blank label is invalid.
+- Web uses a native button: <kbd>Enter</kbd> and <kbd>Space</kbd> activate it. Disabled buttons
+  leave the tab order. Keep the focus-visible indicator.
+- Toggle mode exposes `aria-pressed` on the web. Keep its label stable (“Favorite”), rather
+  than changing it to describe the next action. Action mode has no pressed semantics.
+- Keep the Icon child decorative and non-interactive; do not add another label or focus stop.
+  Do not nest links or buttons inside the control.
+- React Native exposes button semantics and disabled/checked accessibility state (React Native Web
+  uses `aria-pressed` for toggles); the touch
+  target is at least 44 by 44 logical points, even for the small visual size. Web dimensions
+  use the control tokens instead of native touch-target sizing.
+- Do not communicate destructive intent or pressed state through color alone. A label is an
+  accessible name, not a tooltip; no tooltip is provided.
+
+## API
+
+<ApiTable name="icon-button" />
+
+## Events by platform
+
+<EventsTable name="icon-button" />

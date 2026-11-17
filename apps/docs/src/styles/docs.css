@@ -1,9 +1,9 @@
-/* Docs chrome only. Component styles come from Cosmos tokens inside .cosm-preview areas. */
+/* Docs chrome; adopted controls inherit tokens from their Cosmos theme scopes. */
 
 .cosm-preview {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--cosm-space-md);
   margin-block: 1rem;
   padding: var(--cosm-space-xl);
@@ -20,8 +20,65 @@
   gap: 0.75rem;
   margin: 0;
   padding: 1rem;
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 0.5rem;
+  border: 0;
+  border-block-start: 1px solid var(--sl-color-gray-5);
+  min-inline-size: 0;
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
+}
+
+.cosm-playground-controls legend {
+  padding-inline: 0.5rem;
+  color: var(--cosm-primary-text);
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+}
+
+.cosm-playground :is(input:not([type="checkbox"]), select) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 2.5rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 0.375rem;
+  background: var(--sl-color-bg);
+  color: var(--sl-color-text);
+  font: inherit;
+}
+
+.cosm-playground .cosm-playground-text-control {
+  inline-size: 100%;
+}
+
+.cosm-docs-action-button {
+  background: var(--cosm-bg);
+  border-radius: var(--cosm-radius-md);
+}
+
+.cosm-playground-controls :is(input:not([type="checkbox"]), select) {
+  border-color: var(--cosm-border-strong);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
+}
+
+.cosm-icon-toolbar {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 0.75rem;
+}
+
+.cosm-icon-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--cosm-fg-muted);
+  font-size: var(--sl-text-xs);
+}
+
+.cosm-icon-size {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
 }
 
 .cosm-playground-controls label {
@@ -35,6 +92,38 @@
   flex-direction: row-reverse;
   justify-content: flex-end;
   align-items: center;
+  align-self: start;
+  box-sizing: border-box;
+  padding-block-start: calc(1lh + 0.25rem);
+  min-block-size: calc(1lh + 0.25rem + 2.5rem);
+}
+
+.cosm-playground-controls [hidden] {
+  display: none;
+}
+
+.cosm-playground-controls input[type="checkbox"] {
+  appearance: auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: none;
+  accent-color: var(--cosm-primary);
+}
+
+.cosm-playground-advanced {
+  grid-column: 1 / -1;
+}
+
+.cosm-playground-advanced summary {
+  cursor: pointer;
+  font-size: var(--sl-text-sm);
+}
+
+.cosm-playground-advanced-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  padding-block-start: 0.75rem;
 }
 
 .cosm-icon-gallery {
@@ -45,10 +134,13 @@
   padding: var(--cosm-space-sm);
   background: var(--cosm-bg);
   color: var(--cosm-fg);
+  max-block-size: 26rem;
+  overflow: auto;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
 }
 
-.cosm-icon-choice,
-.cosm-icon-more {
+.cosm-icon-choice {
   min-height: 44px;
   padding: var(--cosm-space-sm);
   border: 1px solid var(--cosm-border);
@@ -73,16 +165,36 @@
   outline: 1px solid var(--cosm-primary);
 }
 
-.cosm-icon-choice:focus-visible,
-.cosm-icon-more:focus-visible {
+.cosm-icon-choice:focus-visible {
   outline: 2px solid var(--cosm-focus-ring);
   outline-offset: 2px;
 }
 
+.cosm-icon-more::part(base) {
+  min-height: 44px;
+}
+
 .cosm-playground {
   display: grid;
-  gap: 0.75rem;
+  gap: 0;
   margin-block: 1rem;
+  min-inline-size: 0;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.875rem;
+  background: var(--sl-color-bg);
+  overflow: clip;
+  box-shadow: 0 0.25rem 1rem color-mix(in srgb, var(--sl-color-gray-5) 25%, transparent);
+}
+
+.cosm-playground > * {
+  min-inline-size: 0;
+}
+
+.cosm-playground > .cosm-preview[data-cosm-preview] {
+  min-block-size: 11rem;
+  justify-content: center;
+  border: 0;
+  border-radius: 0;
 }
 
 .cosm-playground .cosm-preview {
@@ -95,6 +207,9 @@
   justify-content: flex-end;
   gap: 0.75rem;
   font-size: var(--sl-text-sm);
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--sl-color-gray-5);
+  background: var(--sl-color-gray-6);
 }
 
 .cosm-playground-toolbar label {
@@ -104,8 +219,7 @@
 }
 
 .cosm-playground-code {
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 0.5rem;
+  border-block-start: 1px solid var(--sl-color-gray-5);
   overflow: hidden;
 }
 
@@ -123,10 +237,11 @@
   display: flex;
   flex: 1;
   gap: 0.25rem;
+  overflow-x: auto;
+  min-inline-size: 0;
 }
 
-.cosm-playground-code [role="tab"],
-.cosm-playground-copy {
+.cosm-playground-code [role="tab"] {
   padding: 0.25rem 0.75rem;
   border: 1px solid transparent;
   border-radius: 0.375rem;
@@ -145,14 +260,9 @@
 }
 
 .cosm-playground-code [role="tab"]:focus-visible,
-.cosm-playground-copy:focus-visible,
 .cosm-playground-code [role="tabpanel"]:focus-visible {
   outline: 2px solid var(--sl-color-accent);
   outline-offset: 2px;
-}
-
-.cosm-playground-copy {
-  border-color: var(--sl-color-gray-4);
 }
 
 .cosm-playground-status {
@@ -165,10 +275,52 @@
   padding: 1rem;
   overflow-x: auto;
   font-size: var(--sl-text-sm);
+  max-block-size: 28rem;
+  background: #fff;
+  color: #24292e;
+  tab-size: 2;
+  line-height: 1.7;
+}
+
+.cosm-playground-code code {
+  padding: 0;
+  background: transparent;
+  font-size: inherit;
+  white-space: pre;
+}
+
+.cosm-playground-code :where(code span) {
+  color: var(--code-light);
+}
+
+:root[data-theme="dark"] .cosm-playground-code pre {
+  background: #24292e;
+  color: #e1e4e8;
+}
+
+:where(:root[data-theme="dark"]) .cosm-playground-code :where(code span) {
+  color: var(--code-dark);
+}
+
+.cosm-playground :is(input, select, button, summary):focus-visible {
+  outline: 2px solid var(--cosm-focus-ring, var(--sl-color-text-accent));
+  outline-offset: 2px;
 }
 
 .cosm-playground-native {
   font-size: var(--sl-text-sm);
+  padding: 0.75rem 1rem;
+  border-block-start: 1px solid var(--sl-color-gray-5);
+}
+
+@media (max-width: 35rem) {
+  .cosm-playground-code-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+  .cosm-playground-code [role="tablist"] {
+    grid-column: 1 / -1;
+  }
 }
 
 .cosm-gallery-theme {

@@ -37,6 +37,51 @@ describe('AI layer files', () => {
   describe('component workflow approval gates', () => {
     const workflow = readFileSync(workflowPath, 'utf8');
 
+    it('does not gate stable on default optional checks or hide known defects', () => {
+      const policy =
+        workflow.split('### Default readiness policy')[1]?.split('### Evidence matrix')[0] ?? '';
+      expect(policy).toContain('without a per-component waiver');
+      expect(policy).toMatch(/\*\*Required:\*\*[\s\S]*Accessibility semantics/);
+      expect(policy).toMatch(/\*\*Optional and non-blocking:\*\* all iOS validation/);
+      expect(policy).toContain('manual screen-reader testing on any');
+      expect(policy).toContain(
+        'Do not attempt optional checks unless the user explicitly requests'
+      );
+      expect(policy).toContain('not verified (optional)');
+      expect(policy).toMatch(/Missing optional evidence alone must not cause an `in-progress`/);
+      expect(policy).toContain('Known functional or accessibility defects remain blockers');
+      expect(policy).toContain('never mark an unrun check passed');
+    });
+
+    it('connects status, creation, native, audit and review entry points to the same readiness policy', () => {
+      const files = [
+        resolve(github, '..', 'AGENTS.md'),
+        join(github, 'copilot-instructions.md'),
+        ...[
+          'component-status',
+          'create-component',
+          'create-native-component',
+          'audit-a11y',
+          'finish-work',
+        ].map(name => join(github, 'skills', name, 'SKILL.md')),
+        ...['native-expert', 'test-engineer'].map(name =>
+          join(github, 'agents', `${name}.agent.md`)
+        ),
+      ];
+      for (const file of files) {
+        const link = /\]\(([^)]+component-workflow\.md)#default-readiness-policy\)/.exec(
+          readFileSync(file, 'utf8')
+        )?.[1];
+        expect(link, file).toBeTruthy();
+        expect(resolve(dirname(file), link ?? ''), file).toBe(workflowPath);
+      }
+      const template = read('pull_request_template.md');
+      expect(template).toMatch(/\| iOS build \/ runtime \(optional;.*\| Not verified \(optional\)/);
+      expect(template).toMatch(
+        /\| Manual screen readers \(optional\) \| Not verified \(optional\)/
+      );
+    });
+
     it('orders research and scope approval before implementation, then local review before delivery', () => {
       const phases = [
         '## 1. Research before decisions',
@@ -168,6 +213,33 @@ describe('AI layer files', () => {
     expect(convention).toContain('`modes.light` / `modes.dark` overrides');
     expect(convention).toContain('React/Angular wrap web components; they are not React Native');
     expect(convention).toContain('Finish implementation with a verified local commit');
+  });
+
+  it('coordinates release approval, publication evidence and synchronization in order', () => {
+    const skill = read('skills', 'release', 'SKILL.md');
+    const steps = [
+      '**Assess and prepare.**',
+      '**Promote.**',
+      '**Review Version Packages.**',
+      '**Verify publication.**',
+      '**Test as a consumer.**',
+      '**Synchronize.**',
+    ];
+    let previous = -1;
+    for (const step of steps) {
+      const position = skill.indexOf(step);
+      expect(position, step).toBeGreaterThan(previous);
+      previous = position;
+    }
+    expect(skill).toContain('separate explicit approval to merge **and publish**');
+    expect(skill).toContain('head or base invalidates the approval');
+    expect(skill).toContain('`vscode/askQuestions`');
+    expect(skill).toContain('workflow success alone does not');
+    expect(skill).toContain('`origin/main` is an ancestor of `origin/develop`');
+    expect(frontmatter(read('agents', 'release-manager.agent.md'))?.tools).toContain(
+      "'vscode/askQuestions'"
+    );
+    expect(read('prompts', 'release.prompt.md')).toContain('[release](../skills/release/SKILL.md)');
   });
 
   it.each(skills)('skill %s has name and description and a prompt', skill => {

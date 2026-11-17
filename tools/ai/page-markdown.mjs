@@ -93,6 +93,30 @@ export function mdxToMarkdown(source, { report } = {}) {
       if (contract) output.push(snippetsMarkdown(contract, attribute(trimmed, 'content') ?? ''));
       continue;
     }
+    if (trimmed.startsWith('<IconButtonExamples')) continue;
+    if (trimmed.startsWith('<ListboxExamples')) {
+      output.push(
+        snippetsMarkdown(contracts.listbox, '', {
+          variant: 'outlined',
+          size: 56,
+          ...(attribute(trimmed, 'kind') === 'states'
+            ? { selectionMode: 'multiple', selectedValues: 'empty' }
+            : {}),
+        })
+      );
+      continue;
+    }
+    if (trimmed.startsWith('<PopoverExamples')) {
+      output.push(
+        snippetsMarkdown(contracts.popover, 'Additional information.', {
+          closable: true,
+          arrow: true,
+          gap: 24,
+          triggerMode: 'hover',
+        })
+      );
+      continue;
+    }
     if (trimmed.startsWith('<ApiTable')) {
       const contract = contractOf(trimmed);
       if (contract) output.push(contractMarkdown(contract, { events: false }));

@@ -30,7 +30,7 @@ describe('MDX to Markdown', () => {
     expect(markdown).toMatch(/^# \S/);
     expect(markdown).not.toMatch(/^import .*(\.astro|@astrojs\/starlight\/components)';$/m);
     expect(markdown).not.toMatch(
-      /<(?:Playground|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
+      /<(?:Playground|IconButtonExamples|PopoverExamples|ListboxExamples|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
     );
   });
 
@@ -43,9 +43,35 @@ describe('MDX to Markdown', () => {
     expect(markdown).toContain('```html\n<cosm-button>Solid</cosm-button>');
   });
 
+  it('converts icon-button examples with their decorative icon on every platform', () => {
+    const markdown = convert('components/icon-button.mdx');
+    expect(markdown).not.toContain('<IconButtonExamples');
+    expect(markdown).toContain('<cosm-icon></cosm-icon>');
+    expect(markdown).toContain('<Icon icon={heart}></Icon>');
+    expect(markdown).toContain("from '@joralvmel/cosmos-icons/heart'");
+    expect(markdown).not.toContain('COSMOS_PLAYGROUND_CHILD');
+  });
+
   it('keeps tab contents as normal Markdown', () => {
     const markdown = convert('getting-started/installation.mdx');
     expect(markdown).toContain('**React**');
     expect(markdown).toMatch(/^```bash$/m);
+  });
+
+  it('converts popover examples into cross-platform interaction samples', () => {
+    const markdown = convert('components/popover.mdx');
+    expect(markdown).not.toContain('<PopoverExamples');
+    expect(markdown).toContain('trigger-mode="hover"');
+    expect(markdown).toContain('gap={24}');
+    expect(markdown).toContain("from '@joralvmel/cosmos-icons/info'");
+  });
+
+  it('converts collection examples without treating arrays as icon imports', () => {
+    const markdown = convert('components/listbox.mdx');
+    expect(markdown).not.toContain('<ListboxExamples');
+    expect(markdown).toContain('selectionMode="multiple"');
+    expect(markdown).toContain('size={56}');
+    expect(markdown).toContain('"options":[');
+    expect(markdown).not.toContain('cosmos-icons/grouped');
   });
 });

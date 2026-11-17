@@ -7,8 +7,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // Exercise the actual react-native-svg web renderer instead of the SVG test stand-in.
 vi.mock('react-native-svg', async () => {
-  // @ts-expect-error The package does not publish declarations for its internal web entry.
-  return import('../node_modules/react-native-svg/lib/module/elements.web.js');
+  const { createRequire } = await import('node:module');
+  return import(
+    createRequire(import.meta.url).resolve('react-native-svg/lib/module/elements.web.js')
+  );
 });
 
 import { Icon } from '../src/components/icon.js';
@@ -29,7 +31,8 @@ describe('Icon with react-native-svg web', () => {
     await act(async () => root.render(<Icon icon={house} />));
     const svg = container.querySelector('svg');
     expect(svg?.getAttribute('aria-hidden')).toBe('true');
-    expect(svg?.getAttribute('focusable')).toBe('false');
+    expect(svg?.hasAttribute('focusable')).toBe(false);
+    expect(svg?.hasAttribute('tabindex')).toBe(false);
     expect(svg?.hasAttribute('role')).toBe(false);
     expect(svg?.hasAttribute('accessible')).toBe(false);
     expect(svg?.hasAttribute('accessibilityElementsHidden')).toBe(false);
@@ -38,6 +41,7 @@ describe('Icon with react-native-svg web', () => {
     expect(svg?.getAttribute('role')).toBe('img');
     expect(svg?.getAttribute('aria-label')).toBe('Home');
     expect(svg?.hasAttribute('aria-hidden')).toBe(false);
+    expect(svg?.hasAttribute('tabindex')).toBe(false);
     expect(errors).not.toHaveBeenCalled();
     await act(async () => root.unmount());
   });

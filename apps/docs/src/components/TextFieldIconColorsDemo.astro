@@ -1,0 +1,114 @@
+---
+import { t } from './i18n';
+
+const s = t(Astro.currentLocale).textFieldIcons;
+const hooks = [
+  ['start-icon-color', s.start],
+  ['end-icon-color', s.end],
+  ['start-icon-focus-color', s.startFocus],
+  ['end-icon-focus-color', s.endFocus],
+];
+const colors = [
+  ['primary', s.primary],
+  ['success', s.success],
+  ['danger', s.danger],
+  ['warning', s.warning],
+];
+---
+
+<div
+  class="icon-colors-demo not-content"
+  data-icon-colors-demo
+  data-cosm-preview
+  data-theme="cosmos"
+  data-mode="light"
+>
+  <div class="color-controls">
+    {
+      hooks.map(([hook, label]) => (
+        <label>
+          {label}
+          <select data-icon-color={hook}>
+            <option value="">{s.fallback}</option>
+            {colors.map(([token, name]) => (
+              <option value={`var(--cosm-${token}-text)`}>{name}</option>
+            ))}
+          </select>
+        </label>
+      ))
+    }
+    <label>
+      {s.scope}
+      <select data-icon-focus-scope>
+        <option value="control">{s.control}</option>
+        <option value="input">{s.input}</option>
+      </select>
+    </label>
+  </div>
+  <cosm-text-field
+    label={s.label}
+    type="password"
+    value="sample"
+    clearable
+    clear-label={s.clear}
+    password-reveal
+    reveal-password-label={s.show}
+    hide-password-label={s.hide}
+  ></cosm-text-field>
+</div>
+
+<script>
+  import '@joralvmel/cosmos-elements/text-field';
+  import { heart } from '@joralvmel/cosmos-icons/heart';
+  import { search } from '@joralvmel/cosmos-icons/search';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-icon-colors-demo]')) {
+    const field = root.querySelector('cosm-text-field');
+    if (!field) throw new Error('Icon color demo requires a text field.');
+    field.startIcon = search;
+    field.endIcon = heart;
+    for (const control of root.querySelectorAll<HTMLSelectElement>('[data-icon-color]')) {
+      control.addEventListener('change', () => {
+        const property = `--cosm-text-field-${control.dataset.iconColor}`;
+        if (control.value) field.style.setProperty(property, control.value);
+        else field.style.removeProperty(property);
+      });
+    }
+    root.querySelector<HTMLSelectElement>('[data-icon-focus-scope]')?.addEventListener(
+      'change',
+      event => {
+        const value = (event.currentTarget as HTMLSelectElement).value;
+        if (value !== 'control' && value !== 'input')
+          throw new TypeError('Unknown icon focus scope.');
+        field.iconFocusScope = value;
+      }
+    );
+  }
+</script>
+
+<style>
+  .icon-colors-demo {
+    display: grid;
+    gap: var(--cosm-space-lg);
+    padding: var(--cosm-space-lg);
+    border: 1px solid var(--cosm-border);
+    border-radius: var(--cosm-radius-md);
+  }
+  .color-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cosm-space-md);
+  }
+  label {
+    display: grid;
+    gap: var(--cosm-space-xs);
+    font-size: var(--cosm-text-sm);
+  }
+  select {
+    padding: var(--cosm-space-xs);
+    color: var(--cosm-fg);
+    background: var(--cosm-bg);
+    border: 1px solid var(--cosm-border);
+    border-radius: var(--cosm-radius-sm);
+  }
+</style>

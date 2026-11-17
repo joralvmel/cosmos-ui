@@ -1,0 +1,136 @@
+---
+import Preview from './Preview.astro';
+
+const es = Astro.props.locale === 'es';
+const states = Astro.props.kind === 'states';
+---
+
+<Preview>
+  <div class="listbox-examples" data-listbox-examples data-locale={es ? 'es' : 'en'}>
+    {states ? (
+      <>
+        <section>
+          <cosm-listbox
+            data-listbox-controlled
+            label={es ? 'Destinos controlados' : 'Controlled destinations'}
+            selection-mode="multiple"
+            variant="outlined"
+          />
+          <cosm-button data-listbox-owner variant="soft">{es ? 'Aceptar cambios' : 'Accept changes'}</cosm-button>
+          <cosm-button data-listbox-reset variant="ghost">{es ? 'Restablecer selección' : 'Reset selection'}</cosm-button>
+          <output data-listbox-output aria-live="polite" />
+        </section>
+        <cosm-listbox data-listbox-example read-only label={es ? 'Solo lectura' : 'Read-only destinations'} variant="outlined" />
+        <cosm-listbox data-listbox-example disabled label={es ? 'Deshabilitado' : 'Disabled destinations'} variant="outlined" />
+      </>
+    ) : (
+      <>
+        <cosm-listbox data-listbox-example label={es ? 'Destino sin borde' : 'Plain destination'} />
+        <cosm-listbox
+          data-listbox-example
+          label={es ? 'Destino personalizado' : 'Custom destination'}
+          variant="outlined"
+          size="56"
+          class="custom-listbox"
+        />
+      </>
+    )}
+  </div>
+</Preview>
+
+<style>
+  .listbox-examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    width: 100%;
+    gap: var(--cosm-space-lg);
+    align-items: start;
+  }
+  section { display: grid; gap: var(--cosm-space-sm); }
+  output { overflow-wrap: anywhere; font-size: var(--cosm-text-sm); }
+  .custom-listbox {
+    --cosm-listbox-border: var(--cosm-primary);
+    --cosm-listbox-radius: var(--cosm-radius-lg);
+    --cosm-listbox-max-height: 18rem;
+  }
+</style>
+
+<script>
+  import type { ListboxItem, ListboxSelectionChangeDetail } from '@joralvmel/cosmos-core';
+  import '@joralvmel/cosmos-elements/listbox';
+  import '@joralvmel/cosmos-elements/button';
+  import type { IconDefinition } from '@joralvmel/cosmos-icons';
+  import { heart } from '@joralvmel/cosmos-icons/heart';
+  import { house } from '@joralvmel/cosmos-icons/house';
+  import { search } from '@joralvmel/cosmos-icons/search';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-listbox-examples]')) {
+    const es = root.dataset.locale === 'es';
+    const items: readonly ListboxItem<IconDefinition>[] = [
+      {
+        label: es ? 'Navegación' : 'Navigation',
+        options: [
+          { value: 'home', label: es ? 'Inicio' : 'Home', icon: house },
+          {
+            value: 'favorites',
+            label: es ? 'Favoritos' : 'Favorites',
+            description: es ? 'Destinos guardados' : 'Saved destinations',
+            icon: heart,
+          },
+        ],
+      },
+      {
+        label: es ? 'Herramientas' : 'Tools',
+        options: [
+          { value: 'search', label: es ? 'Buscar' : 'Search', icon: search },
+          { value: 'archive', label: es ? 'Archivo' : 'Archive', disabled: true },
+        ],
+      },
+    ];
+    for (const listbox of root.querySelectorAll<HTMLElementTagNameMap['cosm-listbox']>(
+      'cosm-listbox'
+    )) {
+      listbox.items = items;
+      listbox.locale = es ? 'es' : 'en';
+      if (listbox.readOnly || listbox.disabled) listbox.selectedValues = ['home'];
+    }
+    const controlled = root.querySelector<HTMLElementTagNameMap['cosm-listbox']>(
+      '[data-listbox-controlled]'
+    );
+    const owner = root.querySelector('[data-listbox-owner]');
+    const reset = root.querySelector('[data-listbox-reset]');
+    const output = root.querySelector('output');
+    if (!controlled || !owner || !reset || !output) continue;
+    let accept = true;
+    let selected: readonly string[] = ['home'];
+    let proposal: readonly string[] = [];
+    controlled.selectedValues = selected;
+    const render = () => {
+      owner.textContent = accept
+        ? es ? 'Aceptar cambios' : 'Accept changes'
+        : es ? 'Rechazar cambios' : 'Refuse changes';
+      owner.setAttribute('aria-pressed', String(!accept));
+      output.textContent = `${es ? 'Selección' : 'Selected'}: ${JSON.stringify(selected)}; ${es ? 'Propuesta' : 'Proposal'}: ${JSON.stringify(proposal)}`;
+    };
+    controlled.addEventListener('cosm-selection-change', event => {
+      const { detail } = event as CustomEvent<ListboxSelectionChangeDetail>;
+      proposal = detail.selectedValues;
+      if (accept) {
+        selected = detail.selectedValues;
+        controlled.selectedValues = selected;
+      }
+      render();
+    });
+    owner.addEventListener('cosm-press', () => {
+      accept = !accept;
+      render();
+    });
+    reset.addEventListener('cosm-press', () => {
+      selected = [];
+      proposal = [];
+      controlled.selectedValues = selected;
+      render();
+    });
+    render();
+  }
+</script>

@@ -25,6 +25,7 @@ Elimina lo que no aplique; nunca pegues credenciales ni datos privados en un pro
 | Corregir un error | [Reproducir y corregir un bug](#reproducir-y-corregir-un-bug) | `modify-component`, `test-engineer` |
 | Corregir diferencias entre plataformas | [Recuperar la paridad](#recuperar-la-paridad) | Especialista del framework o nativo |
 | Mejorar ejemplos o controles | [Actualizar documentación y demos](#actualizar-documentación-y-demos) | `add-playground`, `docs-writer` |
+| Reutilizar componentes disponibles en las docs | [Adoptar componentes en los controles de las docs](#adoptar-componentes-en-los-controles-de-las-docs) | `adopt-docs-components` |
 | Revisar la calidad sin editar | [Revisar sin cambiar archivos](#revisar-sin-cambiar-archivos) | `reviewer`, `test-engineer` |
 | Cubrir un comportamiento con tests | [Añadir pruebas concretas](#añadir-pruebas-concretas) | `add-contract-tests` |
 | Añadir un tema, token o gráfica | [Otras tareas de la librería](#otras-tareas-de-la-librería) | `add-theme`, `add-token`, `create-chart` |
@@ -240,6 +241,34 @@ Informa de carencias del contrato o controles en vez de inventar una API. Valida
 afectados, crea un commit local y espera mi revisión.
 ```
 
+### Adoptar componentes en los controles de las docs
+
+Ejecuta esta tarea por separado cuando haya nuevos componentes disponibles. Actualiza los controles
+del propio sitio, no la API pública del componente ni todos los ejemplos de código. Conserva los
+controles nativos si no existe un sustituto estable compatible. También puedes invocar directamente
+`adopt-docs-components`.
+
+```text
+Usa adopt-docs-components para actualizar los controles de las docs con los componentes estables
+de Cosmos disponibles.
+[Opcional: limita la revisión a estos componentes o zonas de las docs: ...]
+
+Trabaja en una rama de docs aislada desde develop, separada del desarrollo de componentes. Revisa
+el inventario y los contratos actuales; presenta un mapeo de sustituciones con las carencias de
+comportamiento, accesibilidad y formularios. Espera mi aprobación del alcance antes de sustituir.
+No crees componentes, no añadas dependencias ni cambies APIs de la librería. Conserva los controles
+nativos cuando no haya un equivalente estable que cubra el caso.
+
+Tras aprobarlo, actualiza los controles compartidos y las docs EN/ES sin duplicar comportamiento
+ni romper los snippets generados. Prueba las interacciones reales, teclado, foco, temas y pantallas
+estrechas en el navegador; añade regresiones concretas. Los controles adoptados deben usar el tema
+y modo Cosmos activos, incluidas las opciones propias del Playground y la vuelta a la configuración
+del sitio; no ocultes sus tokens con colores exclusivos de Starlight. Comprueba los colores, el foco
+y el contraste reales sobre su fondo en al menos dos temas y ambos modos, no solo los atributos de
+la vista previa. Informa de sustituciones y aplazamientos, valida, crea un commit local y espera mi
+revisión sin push ni PR.
+```
+
 ### Revisar sin cambiar archivos
 
 ```text
@@ -300,6 +329,23 @@ publicación. `release-pr` decide qué tipo de release encaja con el estado actu
 patch/minor o major) y explica por qué; tú apruebas antes de abrir o publicar nada.
 Consulta [releases y publicación](../publishing/) para la configuración y los comandos. Estos prompts
 no autorizan merges automáticos, cambios en permisos de publicación ni publicar trabajo sin integrar.
+
+### Coordinar una release completa
+
+Usa un solo prompt para todo el proceso. El agente recomienda la release, abre o reutiliza PRs,
+comprueba la publicación y consumidores aislados, y prepara la sincronización. Pide aprobación en
+cada merge o publicación y continúa tras tu respuesta. Si no hay cuestionario interactivo, responde
+en el chat; si termina la sesión, retómala desde la fase y PR indicadas.
+
+```text
+Coordina la siguiente release de principio a fin usando release y release-manager. Evalúa y
+recomienda el tipo de release, prepara los requisitos y las PRs, verifica la publicación y
+consumidores aislados, y sincroniza main con develop. Pide mi aprobación explícita para cada merge
+o publicación; después comprueba el estado actual y continúa en esta conversación. Informa de los
+fallos y comprobaciones no disponibles; no eludas protecciones ni publiques sin aprobación.
+```
+
+Los prompts siguientes siguen disponibles para evaluar, revisar o recuperar una fase concreta.
 
 ### Planificar la siguiente release
 

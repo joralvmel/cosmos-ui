@@ -1,7 +1,9 @@
 import { type ContractProps, iconContract } from '@joralvmel/cosmos-core';
 import { type IconDefinition, isIconDefinition } from '@joralvmel/cosmos-icons';
+import { useContext } from 'react';
 import { Platform, processColor } from 'react-native';
 import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect, Svg } from 'react-native-svg';
+import { IconColorContext } from '../internal/icon-color.js';
 import { useTheme } from '../theme/theme-provider.js';
 
 type ContractIconProps = ContractProps<
@@ -47,6 +49,9 @@ export function Icon({
   decorative = iconContract.props.decorative.default,
 }: IconProps) {
   const theme = useTheme();
+  const inheritedColor = useContext(IconColorContext);
+  const foreground =
+    inheritedColor === 'currentColor' ? theme.colors.fg : (inheritedColor ?? theme.colors.fg);
   if (!isIconDefinition(icon)) {
     throw new TypeError('Icon requires a valid IconDefinition in its "icon" property.');
   }
@@ -63,6 +68,7 @@ export function Icon({
   if (!Number.isFinite(strokeWidth) || strokeWidth < 0)
     throw new TypeError('Icon strokeWidth must be a nonnegative finite number.');
   const paint = (value: string) => {
+    if (value === 'currentColor') value = foreground;
     if (
       typeof value !== 'string' ||
       !value.trim() ||
@@ -71,7 +77,6 @@ export function Icon({
     )
       throw new TypeError('Icon paint must be a supported color without a URL.');
     if (value === 'none') return value;
-    if (value === 'currentColor') return theme.colors.fg;
     const css = (globalThis as { CSS?: { supports: (property: string, value: string) => boolean } })
       .CSS;
     const supported =
@@ -88,7 +93,8 @@ export function Icon({
           'aria-hidden': decorative ? true : undefined,
           role: decorative ? undefined : ('img' as const),
           'aria-label': decorative ? undefined : label,
-          focusable: false,
+          // RN Web maps focusable=false to tabindex=-1, which still permits pointer focus.
+          // Passive SVGs need no focus prop: they are not focusable by default.
         }
       : {
           accessible: !decorative,
@@ -100,14 +106,13 @@ export function Icon({
             : ('yes' as const),
         };
 
-  // Root color resolves currentColor in node attributes (e.g. brain-circuit dots) to the theme
-  // foreground, matching the inherited text color of the web element.
+  // Root color also resolves currentColor fills (e.g. brain-circuit dots), as on the web.
   return (
     <Svg
       width={dimension}
       height={dimension}
       viewBox={icon.viewBox}
-      color={theme.colors.fg}
+      color={paint('currentColor')}
       fill={paint(fill)}
       stroke={paint(stroke)}
       strokeWidth={strokeWidth}

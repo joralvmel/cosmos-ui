@@ -137,6 +137,172 @@ export function Example() {
   );
 }
 ```
+### `TextField`
+
+Accepts a single line of text with an accessible label, optional help and error text, and native form validation on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Accessible name for the editable control. It is rendered above the control unless visually hidden. |
+| `labelHidden` | boolean | `false` | Visually hides the label while keeping it available to assistive technology. |
+| `value` | string | — | Current text. When bound, edits are proposals and the component waits for the owner to supply the accepted value. |
+| `defaultValue` | string | `` | Initial value for autonomous use. Web form reset restores this value; it does not control subsequent edits. |
+| `type` | 'text' \| 'email' \| 'password' \| 'tel' \| 'url' \| 'search' | `text` | Single-line input type. Native maps it to supported keyboard, autofill and secure-entry behavior. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Visual treatment of the editable control. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size or a positive finite minimum editable-control height in CSS pixels on web and logical units on native. |
+| `placeholder` | string | — | Short input hint; it never replaces the accessible label. |
+| `helpText` | string | — | Optional supporting text associated with the editable control. |
+| `error` | string | — | Optional externally supplied error text associated with the editable control. |
+| `invalid` | boolean | `false` | External invalid state, independent of browser constraints or consumer business validation. |
+| `required` | boolean | `false` | Exposes required semantics. On web, participates in native HTML constraint validation. |
+| `disabled` | boolean | `false` | Disables editing and interaction. On web, follows disabled fieldsets and excludes the value from form submission. |
+| `readOnly` | boolean | `false` | Prevents editing while remaining focusable and form-submittable on web; distinct from disabled. |
+| `minLength` | number | — | Minimum number of characters. Web uses native HTML validity; native business validation remains the consumer’s responsibility. |
+| `maxLength` | number | — | Maximum number of characters. Web uses native HTML validity and native applies supported input limits. |
+| `pattern` | string | — | Web-only HTML pattern constraint. Native does not emulate HTML regular-expression validation. |
+| `name` | string | — | Form field name on web. React Native has no HTML form association or name-based submission. |
+| `autoComplete` | string | — | Consumer-provided completion/autofill hint, mapped to attributes supported by each platform. |
+| `inputMode` | 'none' \| 'text' \| 'decimal' \| 'numeric' \| 'tel' \| 'search' \| 'email' \| 'url' | — | Input or keyboard hint (none, text, decimal, numeric, tel, search, email or url); it does not add numeric or multiline field behavior. |
+| `startIcon` | IconDefinition | — | Optional structured decorative icon before the editable text. |
+| `endIcon` | IconDefinition | — | Optional structured decorative icon after the editable text. |
+| `iconFocusScope` | 'control' \| 'input' | `control` | When configured icon focus colors apply: control includes the input and clear/reveal buttons; input includes only the editable input. Does not change icons without a focus-color override. |
+| `prefix` | string | — | Optional non-interactive text decoration before the editable text. |
+| `suffix` | string | — | Optional non-interactive text decoration after the editable text. |
+| `clearable` | boolean | `false` | Shows a clear action for non-empty editable fields. Supply clearLabel when enabled. |
+| `clearLabel` | string | — | Consumer-supplied localized accessible name for the clear action. |
+| `passwordReveal` | boolean | `false` | Opts into a reveal action for password fields. Supply both revealPasswordLabel and hidePasswordLabel when enabled. |
+| `revealPasswordLabel` | string | — | Consumer-supplied localized accessible name while the password is concealed. |
+| `hidePasswordLabel` | string | — | Consumer-supplied localized accessible name while the password is revealed. |
+
+Events: `onChange` → `TextFieldChangeDetail`, `onSubmit` → `TextFieldSubmitDetail`.
+
+```tsx
+import { TextField } from '@joralvmel/cosmos-react';
+import { search } from '@joralvmel/cosmos-icons/search';
+
+export function Example() {
+  return (
+    <TextField
+      label="TextField"
+      startIcon={search}
+      endIcon={search}
+      onChange={event => console.log(event.detail)}
+      onSubmit={event => console.log(event.detail)}
+    >
+    </TextField>
+  );
+}
+```
+### `IconButton`
+
+Activates an action or toggles a boolean state using a labeled icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required localized accessible name. Missing, empty or whitespace-only labels are rejected. |
+| `mode` | 'action' \| 'toggle' | `action` | Action activates without toggle state; toggle exposes and changes pressed state. |
+| `variant` | 'solid' \| 'soft' \| 'outline' \| 'ghost' | `solid` | Visual emphasis, from highest (solid) to lowest (ghost). |
+| `tone` | 'primary' \| 'neutral' \| 'danger' | `primary` | Color role. Use danger for destructive actions. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Size of the square visual control. |
+| `disabled` | boolean | `false` | Prevents activation and removes the web button from the tab order. |
+| `type` | 'button' \| 'submit' \| 'reset' | `button` | Native web button form behavior. |
+| `pressed` | boolean | `false` | Toggle state. If supplied, including false, activation proposes changes without committing them until the owner updates this prop. |
+| `defaultPressed` | boolean | `false` | Initial toggle state when pressed is not supplied; it does not control later changes. |
+
+Events: `onPress` → `IconButtonPressDetail`, `onPressedChange` → `IconButtonPressedChangeDetail`.
+
+```tsx
+import { heart } from '@joralvmel/cosmos-icons/heart';
+import { IconButton, Icon } from '@joralvmel/cosmos-react';
+
+export function Example() {
+  return (
+    <IconButton
+      label="IconButton"
+      onPress={event => console.log(event.detail)}
+      onPressedChange={event => console.log(event.detail)}
+    >
+      <Icon icon={heart}></Icon>
+    </IconButton>
+  );
+}
+```
+### `Popover`
+
+Non-modal content anchored to a consumer trigger, with cancelable close requests and no imposed panel semantics.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | boolean | `false` | Committed visibility. Supplying this prop, including false, controls state; its metadata default does not establish a binding. |
+| `defaultOpen` | boolean | `false` | Initial autonomous visibility only; ignored when open is supplied. Later updates do not reset state. |
+| `triggerMode` | 'press' \| 'hover' | `press` | Hover adds pointer and keyboard-focus opening on web and React Native Web, while keeping press activation. Android/iOS use press. Does not change panel semantics. |
+| `closable` | boolean | `false` | Shows a built-in IconButton with an X. Requests a cancelable close with reason close-button. |
+| `closeLabel` | string | `Close` | Localized accessible name of the close button. Must be non-empty when closable is true. |
+| `gap` | number | `8` | Non-negative finite distance from trigger to panel, or to the arrow tip. CSS pixels on web, logical units on native. Viewport/safe-area collision handling takes priority. |
+| `arrow` | boolean | `false` | Shows a decorative triangular pointer (16 wide, 8 deep), following the actual side, panel background and border. Hidden if it cannot point to the trigger without crossing a corner or viewport edge. |
+| `closeOnEscape` | boolean | `true` | Requests closure on unhandled Escape on web and React Native Web. Native Android and iOS hardware Escape is not supported. |
+| `closeOnOutsidePress` | boolean | `true` | Requests closure on an outside press without preventing its interaction or restoring trigger focus. |
+| `initialFocus` | boolean | `false` | On committed opening (including initially open), focus the first focusable panel descendant, falling back to the panel without adding semantics. False leaves focus unchanged. Native moves accessible/input focus where supported. |
+| `restoreFocus` | boolean | `true` | After committed trigger, Escape, action or Back closure, restore focus only if still inside the panel and the trigger is connected and focusable. Never steal outside focus, restore after outside press, or restore for unsolicited prop closure. |
+| `side` | 'top' \| 'right' \| 'bottom' \| 'left' | `bottom` | Requested physical side; actual placement may flip. Recompute for trigger/panel size, viewport/safe-area, scrolling and orientation changes. |
+| `align` | 'start' \| 'center' \| 'end' | `center` | Cross-axis alignment. On top/bottom, start/end follow inline direction (RTL reverses them); on left/right they mean top/bottom. |
+| `flip` | boolean | `true` | Try the opposite side when the requested side overflows the available viewport/safe area; flip only if it reduces main-axis overflow. Ties keep the requested side. Runs before shift. |
+| `shift` | boolean | `true` | After flip, translate within available viewport/safe-area bounds to reduce overflow. Constrain oversized panels to that region regardless of collision flags; flags never change requested props. |
+
+Events: `onOpenChange` → `PopoverOpenChangeDetail`.
+
+```tsx
+import { Popover, IconButton, Icon } from '@joralvmel/cosmos-react';
+import { info } from '@joralvmel/cosmos-icons/info';
+
+export function Example() {
+  return (
+    <Popover
+      onOpenChange={event => console.log(event.detail)}
+    >
+      <IconButton slot="trigger" label="Details" variant="ghost" tone="neutral"><Icon icon={info} /></IconButton>
+      Popover
+    </Popover>
+  );
+}
+```
+### `Listbox`
+
+Selects one or more values from a named vertical collection, with groups, descriptions, icons and independent keyboard focus.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required nonempty accessible label, visible unless labelHidden is true. |
+| `labelHidden` | boolean | `false` | Visually hides the label without removing its accessible name. |
+| `items` | ListboxItems | Required | Readonly collection of options or named groups. Options have globally unique nonempty value and label strings, optional description, decorative IconDefinition and disabled. Groups have a nonempty label and options array. |
+| `selectionMode` | 'single' \| 'multiple' | `single` | Single permits at most one selected value; multiple toggles each activation. |
+| `selectedValues` | ListboxValues | — | Controlled selected values, including an empty array. Activation only proposes changes until the owner updates this prop. Missing collection values are retained, not automatically selected or removed. |
+| `defaultSelectedValues` | ListboxValues | — | Initial autonomous selected values (empty by default). Later changes do not reset selection. |
+| `variant` | 'plain' \| 'outlined' | `plain` | Plain composes inside a panel; outlined adds a standalone container boundary. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size or a positive finite minimum option height in CSS pixels/native logical units. Content may grow; native touch targets remain at least 44. |
+| `disabled` | boolean | `false` | Prevents interaction and removes the list from keyboard navigation. |
+| `readOnly` | boolean | `false` | Allows exploring options without proposing or committing selection changes. |
+| `locale` | string | — | BCP 47 locale for typeahead. Web inherits the nearest language; native uses the runtime locale when omitted. Invalid locale identifiers are rejected. |
+
+Events: `onSelectionChange` → `ListboxSelectionChangeDetail`.
+
+```tsx
+import { Listbox } from '@joralvmel/cosmos-react';
+const grouped = [{"label":"Fruit","options":[{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry","description":"Seasonal"}]},{"label":"Vegetables","options":[{"value":"carrot","label":"Carrot"},{"value":"broccoli","label":"Broccoli","disabled":true}]}] as const;
+const empty = [] as const;
+
+export function Example() {
+  return (
+    <Listbox
+      label="Listbox"
+      items={grouped}
+      defaultSelectedValues={empty}
+      onSelectionChange={event => console.log(event.detail)}
+    >
+    </Listbox>
+  );
+}
+```
 
 ## Themes
 

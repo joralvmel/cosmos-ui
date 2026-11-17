@@ -35,10 +35,10 @@ export interface CatalogEntry {
   /** Status the component should reach in the current milestone. */
   target: ComponentStatus;
   /**
-   * Status claimed by maintainers. Only `stable` is ever written here, and only when the status
-   * report confirms every piece exists (a test enforces it).
+   * Optional readiness floor set by maintainers. `in-progress` can downgrade a complete inventory
+   * while required runtime evidence is outstanding; metadata never promotes a component to stable.
    */
-  status?: 'stable';
+  status?: 'stable' | 'in-progress';
   /** Traceable TODO notes (e.g. "uses a native <select> until listbox exists"). Never in code. */
   notes?: readonly string[];
 }
@@ -88,6 +88,11 @@ export const catalog: readonly CatalogEntry[] = [
     priority: 2,
     dependsOn: ['button', 'icon'],
     pattern: apg('button'),
+    target: 'stable',
+    status: 'stable',
+    notes: [
+      'Android/iOS device, screen-reader, and full theme/contrast checks are explicitly deferred and remain unverified in docs/design/icon-button.md.',
+    ],
   }),
   entry({
     name: 'badge',
@@ -132,7 +137,7 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'primitive',
     batch: 'internal',
     priority: 1,
-    dependsOn: [],
+    dependsOn: ['icon'],
     pattern: apg('listbox'),
   }),
   entry({
@@ -151,8 +156,13 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'form',
     batch: 'B',
     priority: 1,
-    dependsOn: ['icon'],
+    dependsOn: ['icon', 'icon-button'],
     pattern: html('input.html'),
+    notes: [
+      'Clear and password-reveal actions use local accessible native button primitives; migration to icon-button is deferred.',
+      'Implementation complete; outstanding acceptance checks are explicitly deferred and remain unverified in docs/design/text-field.md.',
+    ],
+    status: 'stable',
   }),
   entry({
     name: 'textarea',
@@ -242,8 +252,9 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'overlay',
     batch: 'C',
     priority: 1,
-    dependsOn: [],
+    dependsOn: ['icon-button', 'icon'],
     pattern: 'https://open-ui.org/components/popover.research.explainer/',
+    notes: ['Hardware Escape dismissal is deferred on native iOS and Android; Android Back works.'],
   }),
   entry({
     name: 'tooltip',

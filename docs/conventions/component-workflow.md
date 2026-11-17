@@ -77,8 +77,36 @@ commit: `npx biome ci . && npx turbo run typecheck test build`, `npm run check-t
 `npm run status`. Check changesets when publishable packages changed. Do not install tools or
 dependencies merely to satisfy this list without the required authorization.
 
-Report this matrix for the affected component, with an exact command/test path or observed scenario
-and environment for every row:
+### Default readiness policy
+
+This policy applies to all current and future components without a per-component waiver.
+
+- **Required:** complete accepted implementation, platform/API parity, relevant unit/shared/drift
+  tests, repository checks, docs/demos and applicable web/wrapper/React Native Web runtime checks.
+  Accessibility semantics, names, roles, states, keyboard operation, visible focus, contrast,
+  reduced motion and native touch targets remain required. Android acceptance checks remain
+  governed by the approved scope; this policy does not waive them.
+- **Optional and non-blocking:** all iOS validation (exports, binary builds, simulator/device
+  interaction and iOS-specific visual/input checks) and manual screen-reader testing on any
+  platform (including NVDA, JAWS, VoiceOver and TalkBack).
+- Do not attempt optional checks unless the user explicitly requests them. Record them as
+  **not verified (optional)** by default. Do not request hardware, reader setup or repeated
+  approval to waive these categories. A task may make one required only when the user explicitly
+  requests that validation; do not infer a requirement from a template or supported platform.
+- A complete component may be `stable` when its required checks pass even if these optional
+  checks remain unverified. Missing optional evidence alone must not cause an `in-progress`
+  downgrade, prevent completion/PR/release, or require another user exception.
+- Known functional or accessibility defects remain blockers on every supported platform,
+  including defects found during an optional check. Fix them or obtain explicit approval to
+  narrow support; never hide a known defect by relabeling its check optional.
+
+`stable` records implementation readiness under these gates, not certification of every device
+or assistive technology. Keep optional limitations visible and never mark an unrun check passed.
+
+### Evidence matrix
+
+Report this matrix for the affected component, with an exact command/test path or observed
+scenario and environment for checks actually run. Use the default optional result where applicable:
 
 | Area | Evidence to collect |
 | --- | --- |
@@ -89,13 +117,14 @@ and environment for every row:
 | React Native unit tests | Shared scenarios and platform cases; identify mocks explicitly |
 | React Native Web | Demo controls, interaction, accessibility props and browser console |
 | Android | Native export/build separately from runtime interaction on a named emulator/device |
-| iOS | Native export/build separately from runtime interaction on a named simulator/device |
-| Visual/accessibility | Light/dark, built-in themes, narrow/wide layout, roles/names/states, motion and applicable assistive technology |
+| iOS (optional) | Not verified (optional) unless explicitly requested; separate export/build from runtime |
+| Visual/accessibility | Light/dark, built-in themes, narrow/wide layout, roles/names/states, motion, keyboard and focus |
+| Manual screen readers (optional) | Not verified (optional) unless explicitly requested; name the actual reader/device for any run |
 
-Use **passed / failed / unavailable / not applicable**. Explain unavailable environments and why an
-area is not applicable; do not turn an unavailable check into a pass. Existing limitations remain
-visible in the local review and PR. Fix regressions and new relevant console errors/warnings;
-distinguish unrelated existing diagnostics instead of hiding them.
+Use **passed / failed / unavailable / not applicable / not verified (optional)**. Explain unavailable
+required environments and why an area is not applicable; do not turn an unrun check into a pass.
+Existing limitations remain visible in the local review and PR. Fix regressions and new relevant
+console errors/warnings; distinguish unrelated existing diagnostics instead of hiding them.
 
 Mocks, typechecks and exports do not prove device behavior. React Native Web is not Android/iOS.
 A programmatic DOM click is not a real pointer, keyboard or touch test. If browser automation
@@ -104,8 +133,13 @@ passed. Verify generated snippets with the real framework integration when appli
 
 File presence, a successful inventory command or coverage alone does not establish readiness.
 Keep a component `in-progress` when required acceptance checks are failed or unavailable.
-The user may explicitly defer unavailable checks, but they remain unverified in the evidence and
-any readiness statement; never fabricate device, screen-reader or browser results.
+The user may explicitly defer other unavailable checks, but the default optional categories above
+already need no waiver. Deferred checks remain unverified in the evidence and any readiness
+statement; never fabricate device, screen-reader or browser results.
+For a complete file inventory with outstanding runtime evidence, maintainers may set the catalog
+entry's optional `status: 'in-progress'` for unresolved required checks, not default optional checks.
+The status report treats this as a downgrade only: it never promotes an incomplete component, and
+other entries keep their computed status unless they explicitly opt in.
 
 ## 5. Local commit and review gate
 

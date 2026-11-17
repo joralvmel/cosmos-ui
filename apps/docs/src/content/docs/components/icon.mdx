@@ -18,10 +18,17 @@ import StatusBadge from '../../../components/StatusBadge.astro';
 
 <Playground name="icon" content="" />
 
-Search all 2,052 icons by name, category or tag. The gallery loads thumbnails in batches;
-select one to update the preview and code. Edit `stroke`, `fill`, `strokeWidth`, and `size`
-independently. On the production site, the catalog and its module map load only on the Icon
-playground.
+Search by name or tag and filter by category. Choose a preview size and outline or filled paths;
+select a card to update the preview and the highlighted code. Switch between HTML, React, Angular
+and React Native, then use **Copy code** for the selected technology. Thumbnails load in batches.
+Filled paths use SVG `fill`, not a separate solid collection; see the geometry caveats below.
+The outline and fill color dropdowns sit alongside the filters. Choose inherited color, no paint
+or a Cosmos theme token; they update the selected icon, thumbnails and every snippet independently.
+**Preview size** is the only size control; choose **Custom** to enter a positive number of pixels.
+Stroke width, the informative label and the decorative checkbox are in the same toolbar; there
+is no separate advanced panel. Thumbnails share the preview's theme and light/dark mode so color
+tokens resolve consistently. The catalog and its
+module map load only on the Icon playground, not on other component pages.
 
 ## Variants
 

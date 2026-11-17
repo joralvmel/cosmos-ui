@@ -1,0 +1,97 @@
+---
+title: Icon Button
+description: Botón de solo icono accesible para acciones o estados activados en Web Components, React, Angular y React Native.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import IconButtonExamples from '../../../../components/IconButtonExamples.astro';
+import Playground from '../../../../components/Playground.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="icon-button" />
+
+`<cosm-icon-button>` ejecuta una acción o alterna un estado booleano con un único
+[Icon de Cosmos](/es/components/icon/) decorativo. Sigue el
+[patrón de botón de WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+Úsalo para acciones reconocibles en espacios reducidos; si el significado no resulta evidente,
+elige un [Button](/es/components/button/) con texto visible. No sustituye a un enlace de navegación.
+
+## Playground
+
+<Playground name="icon-button" />
+
+Prueba `label`, `mode`, `variant`, `tone`, `size`, `disabled`, `pressed`, `defaultPressed` y
+`type` en la web. El control **pressed** permite elegir estado autónomo o un valor controlado
+explícito: `false` o `true`. Un valor controlado no cambia al pulsar hasta que lo actualices;
+un botón autónomo gestiona su propio estado. Selecciona `mode="toggle"` para probarlo.
+`defaultPressed` establece el valor inicial autónomo, no el controlado: configúralo antes
+de la primera interacción.
+
+Las pestañas generan ejemplos para Web Components, React, Angular y React Native a partir del
+mismo contrato. El icono es contenido hijo, **no una propiedad de definición de Icon Button**:
+usa el slot predeterminado en la web y children en React y React Native. Importa cada definición
+desde su módulo, como `@joralvmel/cosmos-icons/heart`, sin cargar un catálogo ni un registro de
+nombres. El Icon hijo es decorativo porque el botón ya proporciona el nombre accesible.
+
+## Variantes
+
+`variant` determina el énfasis: `solid`, `soft`, `outline` o `ghost`. `tone` puede ser `primary`,
+`neutral` o `danger`. Los ejemplos también muestran controles cuadrados `sm`, `md` y `lg`.
+Los valores predeterminados son `solid`, `primary` y `md`.
+
+<IconButtonExamples section="variants" locale="es" />
+
+Personaliza el Icon hijo con sus propiedades `size`, `strokeWidth`, `stroke` o `fill`, sin
+dejar de ser decorativo. El color heredado sigue el tono y el estado del botón. Rellenar los
+trazos no equivale a usar otra colección de iconos sólidos; consulta las indicaciones de
+geometría en la página de Icon.
+
+## Estados
+
+<IconButtonExamples section="states" locale="es" />
+
+De izquierda a derecha: acción desactivada, Favorito autónomo (activado inicialmente) y Fijar
+controlado (desactivado inicialmente). El ejemplo controlado acepta cada propuesta y la
+asigna a `pressed`.
+
+- `mode="action"` emite `press` sin alternar el estado. `mode="toggle"` también propone un
+  booleano mediante `pressedChange`; no admite un estado mixto.
+- Omite `pressed` para usar estado autónomo y establece su valor inicial con `defaultPressed`.
+- Vincula `pressed` para controlar el estado, **también cuando sea `false`**. Actualiza el
+  valor vinculado para aceptar la propuesta; si la ignoras, el estado no cambia.
+- En Web Components, escucha `cosm-pressed-change` y asigna `event.detail.pressed` a la
+  propiedad `pressed` del elemento. En React usa `onPressedChange` con
+  `setPressed(event.detail.pressed)`; en Angular, `[pressed]` y
+  `(pressedChange)="pressed = $event.detail.pressed"`. En React Native, `onPressedChange`
+  recibe directamente el detalle: `setPressed(detail.pressed)`.
+- `disabled` impide la activación y ambos eventos. Los estilos al pasar el puntero, pulsar,
+  enfocar con el teclado y activar el estado usan tokens del tema. No hay estado de carga.
+- En la web, el valor seguro predeterminado es `type="button"`. Usa `submit` o `reset` dentro
+  de un formulario HTML para enviar o restablecerlo. React Native no tiene la propiedad
+  `type` ni envío o restablecimiento de formularios HTML.
+
+## Accesibilidad
+
+- `label` es obligatorio: debe estar localizado y no estar vacío. Describe la acción
+  (“Eliminar”), no el dibujo (“Icono de papelera”). Una etiqueta ausente o en blanco no es válida.
+- La web usa un botón nativo: <kbd>Intro</kbd> y <kbd>Espacio</kbd> lo activan. Un botón
+  desactivado sale del orden de tabulación. Conserva el indicador de foco visible.
+- El modo toggle expone `aria-pressed` en la web. Mantén una etiqueta estable (“Favorito”),
+  en lugar de describir la siguiente acción. El modo action no expone estado pulsado.
+- El Icon hijo debe ser decorativo y no interactivo, sin otra etiqueta ni parada de foco.
+  No anides enlaces ni botones dentro del control.
+- React Native expone semántica de botón y estados de accesibilidad desactivado/marcado; React
+  Native Web usa `aria-pressed` para los botones de alternancia.
+  Su área táctil mide al menos 44 por 44 puntos lógicos, incluso con tamaño visual pequeño.
+  Las dimensiones web usan los tokens de controles, no el tamaño del área táctil nativa.
+- No comuniques peligro ni estado activado solo mediante el color. `label` proporciona un
+  nombre accesible, no un tooltip; el componente no incluye tooltip.
+
+## API
+
+<ApiTable name="icon-button" />
+
+## Eventos por plataforma
+
+<EventsTable name="icon-button" />

@@ -5,7 +5,11 @@ import {
   type ComponentContract,
   defineContract,
   generateSnippets,
+  iconButtonContract,
+  listboxContract,
+  popoverContract,
   supportsTarget,
+  textFieldContract,
   toAttribute,
 } from '../src/index.js';
 
@@ -17,6 +21,26 @@ const defaults = Object.fromEntries(
 );
 
 describe('codegen', () => {
+  it('declares listbox collections and selection arrays on every platform', () => {
+    const snippets = generateSnippets(
+      listboxContract,
+      { selectionMode: 'multiple', selectedValues: 'apple-cherry', size: 57 },
+      ''
+    );
+    for (const source of Object.values(snippets)) {
+      expect(source).toContain('const grouped =');
+      expect(source).toContain('"options":[');
+      expect(source).toContain('const appleCherry = ["apple","cherry"]');
+      expect(source).not.toContain('cosmos-icons/grouped');
+      expect(source).not.toContain('cosmos-icons/apple-cherry');
+    }
+    expect(snippets.html).toContain('element.items = grouped;');
+    expect(snippets.html).toContain('element.selectedValues = appleCherry;');
+    expect(snippets.html).not.toContain('as const');
+    expect(snippets.react).toContain('selectedValues={appleCherry}');
+    expect(snippets.angular).toContain('[items]="grouped"');
+    expect(snippets.native).toContain('size={57}');
+  });
   it('omits props that keep their default value', () => {
     expect(activeProps(buttonContract, defaults, 'web')).toEqual([]);
     const snippets = generateSnippets(buttonContract, defaults, 'Save');
@@ -55,6 +79,55 @@ describe('codegen', () => {
     expect(snippets.native).not.toContain('type=');
   });
 
+  it('preserves explicit controlled toggle values, including the default false', () => {
+    for (const pressed of [false, true]) {
+      const snippets = generateSnippets(iconButtonContract, { label: 'Favorite', pressed }, '');
+      expect(snippets.angular).toContain(`[pressed]="${pressed}"`);
+      expect(snippets.react).toContain(pressed ? ' pressed' : 'pressed={false}');
+      expect(snippets.native).toContain(pressed ? ' pressed' : 'pressed={false}');
+      if (pressed) expect(snippets.html).toContain(' pressed');
+      else expect(snippets.html).toContain('element.pressed = false;');
+    }
+    const autonomous = generateSnippets(iconButtonContract, { label: 'Favorite' }, '');
+    for (const source of Object.values(autonomous)) {
+      expect(source).not.toMatch(/(?:\s|\.)pressed(?:[= >])/);
+    }
+  });
+
+  it('includes an accessible trigger in named-trigger web examples', () => {
+    const snippets = generateSnippets(popoverContract, { open: false }, 'More information');
+    for (const source of [snippets.html, snippets.react, snippets.angular]) {
+      expect(source).toContain('slot="trigger" label="Details"');
+      expect(source).toContain('@joralvmel/cosmos-icons/info');
+      expect(source).toContain('More information');
+    }
+    expect(snippets.html).toContain('element.open = false;');
+    expect(snippets.react).toContain('open={false}');
+    expect(snippets.angular).toContain('[open]="false"');
+    expect(snippets.native).toContain('import { Popover, PopoverProvider, IconButton, Icon }');
+    expect(snippets.native).toContain("import { Text } from 'react-native';");
+    expect(snippets.native).toContain('trigger={props => <IconButton {...props}');
+    expect(snippets.native).toContain('<Text>More information</Text>');
+    expect(snippets.native).toContain('<PopoverProvider>');
+  });
+
+  it('generates the optional popover interactions and zero distance across adapters', () => {
+    const snippets = generateSnippets(
+      popoverContract,
+      { closable: true, arrow: true, gap: 0, triggerMode: 'hover', closeLabel: 'Dismiss' },
+      'Details'
+    );
+    expect(snippets.html).toContain('gap="0"');
+    expect(snippets.react).toContain('gap={0}');
+    expect(snippets.angular).toContain('[gap]="0"');
+    expect(snippets.native).toContain('gap={0}');
+    for (const source of Object.values(snippets)) {
+      expect(source).toContain('closable');
+      expect(source).toContain('arrow');
+      expect(source).toContain('Dismiss');
+    }
+  });
+
   it('escapes user text in HTML and JSX', () => {
     const values = { ...defaults, label: 'Say "hi" <now>' };
     const snippets = generateSnippets(buttonContract, values, '<b>{x}</b>');
@@ -88,5 +161,28 @@ describe('codegen', () => {
 
   it('converts prop names to attributes', () => {
     expect(toAttribute('fullWidth')).toBe('full-width');
+  });
+
+  it('generates usable text-field examples without duplicate icon bindings or blank children', () => {
+    const snippets = generateSnippets(textFieldContract, {}, '');
+    for (const snippet of Object.values(snippets)) {
+      expect(snippet).toContain('label="TextField"');
+      expect(snippet.match(/import \{ search \} from/g)).toHaveLength(1);
+      expect(snippet).not.toMatch(/^[ \t]+$/m);
+    }
+    expect(snippets.angular?.match(/readonly search = search;/g)).toHaveLength(1);
+    expect(generateSnippets(textFieldContract, { label: 'Account name' }, '').react).toContain(
+      'label="Account name"'
+    );
+    const undecorated = generateSnippets(
+      textFieldContract,
+      { startIcon: undefined, endIcon: undefined },
+      ''
+    );
+    for (const snippet of Object.values(undecorated)) {
+      expect(snippet).not.toContain('cosmos-icons/');
+      expect(snippet).not.toContain('startIcon');
+      expect(snippet).not.toContain('endIcon');
+    }
   });
 });
