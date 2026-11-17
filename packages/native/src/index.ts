@@ -1,5 +1,10 @@
 export type {
   ButtonPressDetail,
+  ListboxGroup,
+  ListboxItem,
+  ListboxOption,
+  ListboxSelectionChangeDetail,
+  ListboxSelectionMode,
   PopoverAlign,
   PopoverCloseReason,
   PopoverOpenChangeDetail,
@@ -10,6 +15,12 @@ export type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
 export { Button, type ButtonProps, buttonPropNames } from './components/button.js';
 export { Icon, type IconProps, iconPropNames } from './components/icon.js';
 export { IconButton, type IconButtonProps, iconButtonPropNames } from './components/icon-button.js';
+export {
+  Listbox,
+  type ListboxAppearance,
+  type ListboxProps,
+  listboxPropNames,
+} from './components/listbox.js';
 export {
   Popover,
   type PopoverHandle,

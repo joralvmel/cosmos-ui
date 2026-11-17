@@ -4,6 +4,7 @@ import {
   type FocusEventHandler,
   forwardRef,
   type HTMLAttributes,
+  type KeyboardEventHandler,
   type ReactNode,
   useEffect,
   useImperativeHandle,
@@ -74,6 +75,7 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
       })
     );
     return (
+      // biome-ignore lint/a11y/useAriaPropsSupportedByRole: The stand-in role is dynamic for RN Web options.
       <button
         ref={node}
         type="button"
@@ -81,14 +83,29 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
         onClick={onPress as () => void}
         onFocus={props.onFocus as FocusEventHandler<HTMLButtonElement>}
         onBlur={props.onBlur as FocusEventHandler<HTMLButtonElement>}
+        id={props.id as string}
+        role={(props.role as string) ?? (props.accessibilityRole as string)}
+        tabIndex={props.tabIndex as number}
+        aria-selected={
+          props['aria-selected'] === undefined
+            ? Boolean((accessibilityState as { selected?: boolean })?.selected) || undefined
+            : Boolean(props['aria-selected'])
+        }
+        aria-describedby={props['aria-describedby'] as string}
         data-testid={props.testID as string}
         data-role={props.accessibilityRole as string}
         aria-label={props.accessibilityLabel as string}
         aria-expanded={(accessibilityState as { expanded?: boolean })?.expanded ? 'true' : 'false'}
         aria-busy={(accessibilityState as { busy?: boolean })?.busy ? 'true' : undefined}
         aria-disabled={
-          (accessibilityState as { disabled?: boolean })?.disabled ? 'true' : undefined
+          props['aria-disabled']
+            ? 'true'
+            : (accessibilityState as { disabled?: boolean })?.disabled
+              ? 'true'
+              : undefined
         }
+        aria-readonly={props['aria-readonly'] ? 'true' : undefined}
+        onKeyDownCapture={props.onKeyDownCapture as KeyboardEventHandler<HTMLButtonElement>}
         data-style={JSON.stringify(flatten(style))}
         data-hitslop={props.hitSlop as string}
       >
@@ -103,6 +120,7 @@ export function Text({ children, style, ...props }: AnyProps) {
     'span',
     {
       'data-style': JSON.stringify(flatten(style)),
+      'data-testid': props.testID as string,
       'aria-live': props.accessibilityLiveRegion,
       id: props.nativeID,
     } as unknown as HTMLAttributes<HTMLSpanElement>,
@@ -139,8 +157,12 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
       ref: node,
       tabIndex: props.tabIndex,
       'data-testid': props.testID,
+      role: props.role as string,
+      'aria-label': props.accessibilityLabel as string,
+      'aria-labelledby': props['aria-labelledby'] as string,
+      'aria-readonly': props['aria-readonly'] ? 'true' : undefined,
+      'aria-disabled': props['aria-disabled'] ? 'true' : state?.disabled ? 'true' : undefined,
       'data-popover-host': flatten(props.style).flex === 1 ? 'true' : undefined,
-      'aria-disabled': state?.disabled ? 'true' : undefined,
       'aria-busy': state?.busy ? 'true' : undefined,
       'aria-hidden': props['aria-hidden'],
       'data-hidden-ios': props.accessibilityElementsHidden,
@@ -151,12 +173,16 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
       onTouchEndCapture: props.onTouchEndCapture,
       onKeyDown: (event: { key: string }) =>
         (props.onKeyDown as ((event: unknown) => void) | undefined)?.(event),
+      onKeyDownCapture: (event: unknown) =>
+        (props.onKeyDownCapture as ((event: unknown) => void) | undefined)?.(event),
       onFocus: props.onFocus,
       onBlur: props.onBlur,
     } as unknown as HTMLAttributes<HTMLDivElement>,
     props.children as ReactNode
   );
 });
+
+export const ScrollView = View;
 
 export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => {
   const state = props.accessibilityState as { disabled?: boolean } | undefined;

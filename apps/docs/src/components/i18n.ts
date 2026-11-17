@@ -66,6 +66,13 @@ const strings = {
       triggerLabel: 'Details',
       popoverCloseLabel: 'Close',
       popoverInvalid: 'Use a non-negative distance and a non-empty close label.',
+      listboxLabel: 'Choose produce',
+      listboxInvalid:
+        'Use a non-empty label, positive height and values matching the selection mode.',
+      listboxSelected: 'Selected',
+      listboxProposal: 'Last proposal',
+      listboxResetNote:
+        'Changing mode or initial values resets this preview. A bound selection shows proposals until its owner accepts them.',
       iconButtonInvalid: 'Enter a non-empty accessible label.',
       autonomous: 'Autonomous',
       code: 'Code',
@@ -208,6 +215,13 @@ const strings = {
       triggerLabel: 'Detalles',
       popoverCloseLabel: 'Cerrar',
       popoverInvalid: 'Usa una distancia no negativa y una etiqueta de cierre que no esté vacía.',
+      listboxLabel: 'Elige productos',
+      listboxInvalid:
+        'Usa una etiqueta no vacía, altura positiva y valores adecuados al modo de selección.',
+      listboxSelected: 'Seleccionados',
+      listboxProposal: 'Última propuesta',
+      listboxResetNote:
+        'Cambiar el modo o los valores iniciales reinicia esta vista. Una selección controlada muestra propuestas hasta que su propietario las acepta.',
       iconButtonInvalid: 'Introduce una etiqueta accesible que no esté vacía.',
       autonomous: 'Autónomo',
       textFieldInvalid:

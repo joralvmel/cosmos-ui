@@ -105,9 +105,9 @@ export function detectPieces(root, entry, changesets = changesetTexts(root)) {
     native && paths.testsNative,
   ].filter(Boolean);
   const llms = [
-    web && read(root, 'packages/elements/llms.md').includes(tag),
-    native && new RegExp(`\\b${component}\\b`).test(read(root, 'packages/native/llms.md')),
-  ].filter(value => value !== false);
+    web ? read(root, 'packages/elements/llms.md').includes(`### \`<${tag}>\``) : undefined,
+    native ? read(root, 'packages/native/llms.md').includes(`### \`${component}\``) : undefined,
+  ].filter(value => value !== undefined);
 
   return {
     contract:

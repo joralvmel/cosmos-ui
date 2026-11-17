@@ -290,6 +290,73 @@ Non-modal content anchored to a consumer trigger, with cancelable close requests
 | `Tab`, `Shift+Tab` | Moves focus normally without a focus trap or automatic dismissal. |
 | `Android Back` | Requests close while open on Android only. |
 
+### `listbox` (`<cosm-listbox>`)
+
+Selects one or more values from a named vertical collection, with groups, descriptions, icons and independent keyboard focus.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required nonempty accessible label, visible unless labelHidden is true. |
+| `labelHidden` | boolean | `false` | Visually hides the label without removing its accessible name. |
+| `items` | ListboxItems | Required | Readonly collection of options or named groups. Options have globally unique nonempty value and label strings, optional description, decorative IconDefinition and disabled. Groups have a nonempty label and options array. |
+| `selectionMode` | 'single' \| 'multiple' | `single` | Single permits at most one selected value; multiple toggles each activation. |
+| `selectedValues` | ListboxValues | — | Controlled selected values, including an empty array. Activation only proposes changes until the owner updates this prop. Missing collection values are retained, not automatically selected or removed. |
+| `defaultSelectedValues` | ListboxValues | — | Initial autonomous selected values (empty by default). Later changes do not reset selection. |
+| `variant` | 'plain' \| 'outlined' | `plain` | Plain composes inside a panel; outlined adds a standalone container boundary. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size or a positive finite minimum option height in CSS pixels/native logical units. Content may grow; native touch targets remain at least 44. |
+| `disabled` | boolean | `false` | Prevents interaction and removes the list from keyboard navigation. |
+| `readOnly` | boolean | `false` | Allows exploring options without proposing or committing selection changes. |
+| `locale` | string | — | BCP 47 locale for typeahead. Web inherits the nearest language; native uses the runtime locale when omitted. Invalid locale identifiers are rejected. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-selection-change` | `onSelectionChange` | `(selectionChange)` | `onSelectionChange` | `ListboxSelectionChangeDetail` | Proposes the next selectedValues for an enabled activation. Autonomous selection commits; controlled selection waits for the owner. Arrows and typeahead never select. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Outer container. |
+| `label` | Visible or visually hidden accessible label. |
+| `list` | Scrollable listbox. |
+| `group` | Named option group. |
+| `group-label` | Noninteractive group heading. |
+| `option` | Selectable row; selected, disabled and active states are exposed on the row. |
+| `icon` | Decorative option icon. |
+| `content` | Text content wrapper. |
+| `option-label` | Primary option text. |
+| `description` | Optional supporting text. |
+| `indicator` | Decorative selected-state indicator. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-listbox-background` | Container background. |
+| `--cosm-listbox-color` | Primary foreground. |
+| `--cosm-listbox-border` | Outlined container border color. |
+| `--cosm-listbox-radius` | Container and option corner radius. |
+| `--cosm-listbox-option-height` | Minimum option height. |
+| `--cosm-listbox-option-padding` | Option padding. |
+| `--cosm-listbox-gap` | Space between icon, content and selection indicator. |
+| `--cosm-listbox-font-size` | Primary option text size. |
+| `--cosm-listbox-description-color` | Supporting text color. |
+| `--cosm-listbox-selected-background` | Selected option background. |
+| `--cosm-listbox-selected-color` | Selected option foreground. |
+| `--cosm-listbox-focus` | Visible keyboard focus outline color. |
+| `--cosm-listbox-max-height` | Maximum scrollable list height. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Enters or leaves the list as one Tab stop. |
+| `ArrowDown`, `ArrowUp`, `Home`, `End` | Moves focus among enabled options without changing selection; stops at the ends. |
+| `Enter`, `Space` | Selects the focused option; multiple mode toggles it. Read-only never changes selection. |
+| `Printable characters` | Moves focus to a matching option using locale-aware typeahead without filtering. |
+
 
 ## Rules for AI assistants
 

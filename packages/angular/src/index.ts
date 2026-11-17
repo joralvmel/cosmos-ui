@@ -1,9 +1,11 @@
 import { CosmIconButtonComponent } from './components/icon-button.component.js';
+import { CosmListboxComponent } from './components/listbox.component.js';
 import { CosmPopoverComponent } from './components/popover.component.js';
 import { CosmTextFieldComponent } from './components/text-field.component.js';
 
 export type {
   ButtonPressDetail,
+  ListboxSelectionChangeDetail,
   PressSource,
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
@@ -21,7 +23,9 @@ export const COSMOS_COMPONENTS = [
   CosmTextFieldComponent,
   CosmIconButtonComponent,
   CosmPopoverComponent,
+  CosmListboxComponent,
 ] as const;
 export { CosmIconButtonComponent } from './components/icon-button.component.js';
+export { CosmListboxComponent } from './components/listbox.component.js';
 export { CosmPopoverComponent } from './components/popover.component.js';
 export { CosmTextFieldComponent } from './components/text-field.component.js';

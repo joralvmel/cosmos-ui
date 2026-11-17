@@ -13,4 +13,9 @@ export const screens = [
     description: 'Labeled icon actions, variants and toggle states.',
   },
   { route: '/popover', title: 'Popover', description: 'TODO(generator): short description.' },
+  {
+    route: '/listbox',
+    title: 'Listbox',
+    description: 'Grouped, keyboard-navigable single or multiple selection.',
+  },
 ] as const;
