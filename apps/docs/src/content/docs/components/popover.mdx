@@ -6,7 +6,7 @@ description: Non-modal content anchored to a consumer-supplied trigger.
 import ApiTable from '../../../components/ApiTable.astro';
 import EventsTable from '../../../components/EventsTable.astro';
 import Playground from '../../../components/Playground.astro';
-import Preview from '../../../components/Preview.astro';
+import PopoverExamples from '../../../components/PopoverExamples.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
 
 <StatusBadge name="popover" />
@@ -18,13 +18,16 @@ supplementary information or actions; it does not implement a menu, tooltip or m
 
 <Playground name="popover" content="Additional information." />
 
-Try the side, alignment, collision and dismissal controls. Choose autonomous or controlled open
+Try `closable`, `arrow`, `gap` (including zero), `triggerMode`, side, alignment and dismissal.
+The trigger is the library's IconButton with an individual information icon.
+Choose autonomous or controlled open
 state to see the difference: a controlled value changes only when its owner accepts a proposal.
 Changing `defaultOpen` remounts the preview to demonstrate its initial value. The native demo link
 opens the corresponding example screen.
 
 On React Native, wrap the app in `PopoverProvider` and supply safe-area insets when available.
-`trigger` is content inside the built-in accessible button, not another button. Pass
+`trigger` accepts content inside the built-in accessible button or a render function for composing
+an IconButton without nesting interactive controls (see the generated native example). Pass
 `usePopoverHost().onScroll` to scroll containers that can move a trigger, composing it with any
 existing scroll handler. Native `onOpenChange` receives the detail directly; use a ref to call
 `requestClose()` from a panel action.
@@ -34,12 +37,19 @@ existing scroll handler. Native `onOpenChange` receives the detail directly; use
 Popover has one neutral surface, sized to its content. Theme tokens and panel styling hooks allow
 customization; its trigger and content are supplied by the consumer.
 
-<Preview>
-  <cosm-popover>
-    <button slot="trigger" type="button">Details</button>
-    <p>Additional information.</p>
-  </cosm-popover>
-</Preview>
+<PopoverExamples />
+
+`closable` adds a neutral ghost IconButton with an X. Localize its `closeLabel`; activating it
+proposes reason `close-button` and respects cancellation and controlled state.
+
+`gap` defaults to 8 CSS pixels (native logical units). Zero joins the surfaces. With `arrow`,
+the distance is measured to the tip, not the panel edge. The decorative 16-by-8 pointer follows
+the actual side and trigger center after flip/shift; it is hidden when it cannot point without
+crossing a corner or viewport edge. Collision handling takes priority over the requested gap.
+
+Customize background, text and border via theme tokens or `cosm-popover::part(panel)`. The arrow
+follows the panel background and border. Native uses `panelStyle`; style consumer text directly.
+Heading, links and action layouts remain consumer content, not special Popover properties.
 
 ## States
 
@@ -56,6 +66,13 @@ supported on native Android or iOS.
 On browsers with the Popover API, the panel uses the top layer. The fixed-position fallback in
 older browsers can be clipped or displaced by ancestor overflow, transforms or containment.
 
+`triggerMode="hover"` adds pointer and keyboard-focus opening on web, React, Angular and React
+Native Web; press activation remains available. Android/iOS use press instead. Pointer or focus
+within the trigger/panel keeps it open, including pointer travel across the gap. Leaving both
+requests closure after 150ms. Escape or the X dismisses without immediate reopening until both
+pointer and focus leave. Hover/focus opening never moves focus into the panel, even with
+`initialFocus`. The mode does not turn the content into a tooltip.
+
 ## Accessibility
 
 - Supply a keyboard-operable, named trigger and semantics and a label appropriate to the content.
@@ -64,6 +81,9 @@ older browsers can be clipped or displaced by ancestor overflow, transforms or c
   Focus restoration depends on the close reason and does not steal focus from an outside target.
 - The consumer is responsible for making the trigger and panel controls accessible and for
   providing appropriate touch target sizes on native.
+- Hover content must remain dismissible, hoverable and persistent
+  ([WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html)).
+  Keep Escape enabled in hover mode when the panel can obscure meaningful content.
 
 ## API
 

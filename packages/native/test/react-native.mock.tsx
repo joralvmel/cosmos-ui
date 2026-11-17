@@ -58,6 +58,11 @@ const flatten = (style: unknown, state = { pressed: false }): Record<string, unk
   return (value as Record<string, unknown>) ?? {};
 };
 
+let pressableRect = { x: 0, y: 0, width: 100, height: 44 };
+export const __setPressableRect = (rect?: typeof pressableRect) => {
+  pressableRect = rect ?? { x: 0, y: 0, width: 100, height: 44 };
+};
+
 export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
   ({ children, onPress, disabled, style, accessibilityState, ...props }, ref) => {
     const node = useRef<HTMLButtonElement>(null);
@@ -65,7 +70,7 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
       Object.assign(node.current as HTMLButtonElement, {
         measureInWindow: (
           callback: (x: number, y: number, width: number, height: number) => void
-        ) => callback(0, 0, 100, 44),
+        ) => callback(pressableRect.x, pressableRect.y, pressableRect.width, pressableRect.height),
       })
     );
     return (
@@ -239,4 +244,4 @@ export function Svg({ children, accessibilityLabel, accessibilityRole, ...props 
   );
 }
 
-export const StyleSheet = { create: <T,>(styles: T) => styles };
+export const StyleSheet = { create: <T,>(styles: T) => styles, flatten };

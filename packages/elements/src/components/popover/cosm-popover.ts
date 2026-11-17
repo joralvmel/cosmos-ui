@@ -4,7 +4,10 @@ import {
   type PopoverOpenChangeDetail,
   popoverContract,
 } from '@joralvmel/cosmos-core';
-import { css, html, LitElement } from 'lit';
+import { x } from '@joralvmel/cosmos-icons/x';
+import { css, html, LitElement, nothing } from 'lit';
+import '../icon/cosm-icon.js';
+import '../icon-button/cosm-icon-button.js';
 import { CosmElement } from '../../internal/cosm-element.js';
 import { define } from '../../internal/define.js';
 import { boxSizing, focusRing } from '../../internal/styles.js';
@@ -34,8 +37,13 @@ const styles = css`
     background: var(--cosm-bg, oklch(0.985 0.007 268));
     color: var(--cosm-fg, oklch(0.24 0.01 268));
     box-shadow: var(--cosm-popover-shadow, var(--cosm-shadow-lg, 0 8px 24px oklch(0 0 0 / 16%)));
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
   }
+  .body { min-height: 0; overflow: auto; }
+  .close { align-self: flex-end; flex: none; margin-bottom: var(--cosm-space-xs, 0.25rem); }
+  .arrow { position: absolute; overflow: visible; pointer-events: none; }
   .panel[hidden] {
     display: none;
   }
@@ -62,6 +70,9 @@ type Bounds = { left: number; top: number; right: number; bottom: number };
  * @slot - Consumer-supplied panel content and semantics.
  * @csspart trigger - Container for the trigger slot.
  * @csspart panel - Non-modal anchored surface.
+ * @csspart body - Scrollable content.
+ * @csspart close - Optional close IconButton.
+ * @csspart arrow - Decorative pointer matching the panel.
  * @fires {CustomEvent<PopoverOpenChangeDetail>} cosm-open-change - Proposes a visibility change.
  * @cssprop --cosm-popover-z-index - Stacking level of the panel.
  * @cssprop --cosm-popover-padding - Panel padding.
@@ -80,6 +91,11 @@ export class CosmPopover extends CosmElement {
   static override properties = {
     open: { type: Boolean, reflect: true },
     defaultOpen: { type: Boolean, attribute: 'default-open' },
+    triggerMode: { attribute: 'trigger-mode' },
+    closable: { type: Boolean },
+    closeLabel: { attribute: 'close-label' },
+    gap: { type: Number },
+    arrow: { type: Boolean },
     closeOnEscape: { type: Boolean, attribute: 'close-on-escape' },
     closeOnOutsidePress: { type: Boolean, attribute: 'close-on-outside-press' },
     initialFocus: { type: Boolean, attribute: 'initial-focus' },
@@ -93,6 +109,11 @@ export class CosmPopover extends CosmElement {
   static override styles = [boxSizing, focusRing, styles];
 
   declare defaultOpen: Props['defaultOpen'];
+  declare triggerMode: Props['triggerMode'];
+  declare closable: Props['closable'];
+  declare closeLabel: Props['closeLabel'];
+  declare gap: Props['gap'];
+  declare arrow: Props['arrow'];
   declare closeOnEscape: Props['closeOnEscape'];
   declare closeOnOutsidePress: Props['closeOnOutsidePress'];
   declare initialFocus: Props['initialFocus'];
@@ -115,6 +136,13 @@ export class CosmPopover extends CosmElement {
   #inTopLayer = false;
   #resizeObserver: ResizeObserver | undefined;
   #triggerAttributes = new Map<Element, string | null>();
+  #hovered = false;
+  #focused = false;
+  #hoverDismissed = false;
+  #hoverTimer: ReturnType<typeof setTimeout> | undefined;
+  #openingReason: 'trigger' | 'hover' | 'focus' | undefined;
+  #themeObserver: MutationObserver | undefined;
+  #pressStartedClosed = false;
 
   get open(): boolean {
     return this.#open;
@@ -133,6 +161,11 @@ export class CosmPopover extends CosmElement {
     super();
     const props = popoverContract.props;
     this.defaultOpen = props.defaultOpen.default;
+    this.triggerMode = props.triggerMode.default;
+    this.closable = props.closable.default;
+    this.closeLabel = props.closeLabel.default;
+    this.gap = props.gap.default;
+    this.arrow = props.arrow.default;
     this.closeOnEscape = props.closeOnEscape.default;
     this.closeOnOutsidePress = props.closeOnOutsidePress.default;
     this.initialFocus = props.initialFocus.default;
@@ -147,6 +180,19 @@ export class CosmPopover extends CosmElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('click', this.#onHostClick);
+    this.addEventListener('pointerdown', this.#onTriggerPointerDown);
+    this.addEventListener('pointerover', this.#onPointerOver);
+    this.addEventListener('pointerout', this.#onPointerOut);
+    this.addEventListener('focusin', this.#onFocusIn);
+    this.addEventListener('focusout', this.#onFocusOut);
+    document.addEventListener('pointermove', this.#onPointerMove);
+    this.#themeObserver = new MutationObserver(() => this.#positionPanel());
+    for (let ancestor: HTMLElement | null = this; ancestor; ancestor = ancestor.parentElement) {
+      this.#themeObserver.observe(ancestor, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme', 'data-mode'],
+      });
+    }
     this.#syncTriggerExpanded();
     if (this.open) {
       void this.updateComplete.then(() => {
@@ -161,6 +207,14 @@ export class CosmPopover extends CosmElement {
 
   override disconnectedCallback(): void {
     this.removeEventListener('click', this.#onHostClick);
+    this.removeEventListener('pointerdown', this.#onTriggerPointerDown);
+    this.removeEventListener('pointerover', this.#onPointerOver);
+    this.removeEventListener('pointerout', this.#onPointerOut);
+    this.removeEventListener('focusin', this.#onFocusIn);
+    this.removeEventListener('focusout', this.#onFocusOut);
+    document.removeEventListener('pointermove', this.#onPointerMove);
+    clearTimeout(this.#hoverTimer);
+    this.#themeObserver?.disconnect();
     this.#hidePanelFromTopLayer();
     this.#removeOpenListeners();
     this.#restoreTriggerAttributes();
@@ -168,6 +222,12 @@ export class CosmPopover extends CosmElement {
   }
 
   protected override willUpdate(): void {
+    if (!Number.isFinite(this.gap) || this.gap < 0) {
+      throw new RangeError('cosm-popover gap must be a finite non-negative number.');
+    }
+    if (this.closable && !this.closeLabel?.trim()) {
+      throw new Error('cosm-popover requires a non-empty closeLabel when closable.');
+    }
     if (!this.#initialized) {
       this.#initialized = true;
       if (!this.openControlled && !this.#edited) this.#setOpen(this.defaultOpen);
@@ -181,7 +241,13 @@ export class CosmPopover extends CosmElement {
         this.#showPanelInTopLayer();
         this.#installOpenListeners();
         this.#positionPanel();
-        if (this.initialFocus) this.#focusPanel();
+        if (
+          this.initialFocus &&
+          this.#openingReason !== 'hover' &&
+          this.#openingReason !== 'focus'
+        ) {
+          this.#focusPanel();
+        }
       } else {
         this.#hidePanelFromTopLayer();
         this.#removeOpenListeners();
@@ -196,9 +262,16 @@ export class CosmPopover extends CosmElement {
       changed.has('side') ||
       changed.has('align') ||
       changed.has('flip') ||
-      changed.has('shift')
+      changed.has('shift') ||
+      changed.has('gap') ||
+      changed.has('arrow') ||
+      changed.has('closable')
     ) {
       this.#positionPanel();
+    }
+    if (changed.has('triggerMode')) {
+      clearTimeout(this.#hoverTimer);
+      this.#hoverDismissed = false;
     }
   }
 
@@ -222,15 +295,18 @@ export class CosmPopover extends CosmElement {
     this.#writingOpen = false;
   }
 
-  #propose(open: boolean, reason: PopoverCloseReason | 'trigger'): void {
+  #propose(open: boolean, reason: PopoverCloseReason): void {
     if (open === this.open) return;
     this.#edited = true;
-    if (open) this.#pendingRestoreReason = undefined;
+    if (open) {
+      this.#pendingRestoreReason = undefined;
+      this.#openingReason = reason === 'hover' || reason === 'focus' ? reason : 'trigger';
+    }
 
     let event: CustomEvent<PopoverOpenChangeDetail>;
     if (open) {
       event = new CustomEvent<PopoverOpenChangeDetail>('cosm-open-change', {
-        detail: { open: true, reason: 'trigger' },
+        detail: { open: true, reason: this.#openingReason ?? 'trigger' },
         bubbles: true,
         composed: true,
         cancelable: false,
@@ -269,6 +345,10 @@ export class CosmPopover extends CosmElement {
       return;
     }
 
+    if (reason !== 'hover' && reason !== 'focus' && this.triggerMode === 'hover') {
+      this.#hoverDismissed = this.#hovered || this.#focused;
+      clearTimeout(this.#hoverTimer);
+    }
     this.#pendingRestoreReason = reason;
     if (!this.openControlled) this.#commitOpen(false);
   }
@@ -284,8 +364,123 @@ export class CosmPopover extends CosmElement {
         ?.assignedElements({ flatten: true })
         .some(element => path.includes(element))
     ) {
+      // Touch focus can open hover mode between pointerdown and its resulting click.
+      if (this.#pressStartedClosed && this.open && this.#openingReason === 'focus') {
+        this.#pressStartedClosed = false;
+        return;
+      }
+      this.#pressStartedClosed = false;
       this.#onTriggerClick();
     }
+  };
+
+  #onTriggerPointerDown = (event: PointerEvent): void => {
+    const trigger = this.#triggerElement();
+    this.#pressStartedClosed = Boolean(
+      this.triggerMode === 'hover' &&
+        !this.open &&
+        trigger &&
+        event.composedPath().includes(trigger)
+    );
+  };
+
+  #inside(target: EventTarget | null): boolean {
+    if (!(target instanceof Node)) return false;
+    let node: Node | null = target;
+    while (node) {
+      if (node === this || this.contains(node)) return true;
+      const root = node.getRootNode();
+      node = root instanceof ShadowRoot ? root.host : null;
+    }
+    return false;
+  }
+
+  #scheduleHoverClose(reason: 'hover' | 'focus'): void {
+    clearTimeout(this.#hoverTimer);
+    if (this.#hovered || this.#focused) return;
+    this.#hoverDismissed = false;
+    if (!this.open || this.triggerMode !== 'hover') return;
+    this.#hoverTimer = setTimeout(() => {
+      if (!this.#hovered && !this.#focused) this.#propose(false, reason);
+    }, 150);
+  }
+
+  #onPointerOver = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch' || this.triggerMode !== 'hover') return;
+    this.#hovered = true;
+    clearTimeout(this.#hoverTimer);
+    const trigger = this.#triggerElement();
+    if (!this.#hoverDismissed && trigger && event.composedPath().includes(trigger)) {
+      this.#propose(true, 'hover');
+    }
+  };
+
+  #onPointerOut = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch' || this.#inside(event.relatedTarget)) return;
+    this.#hovered = false;
+    this.#scheduleHoverClose('hover');
+  };
+
+  #inHoverBridge(x: number, y: number): boolean {
+    const trigger = this.#triggerElement()?.getBoundingClientRect();
+    const panel = this.#panel();
+    if (!trigger || !panel || !this.open) return false;
+    const rect = panel.getBoundingClientRect();
+    const side = panel.dataset.placement;
+    const vertical = side === 'top' || side === 'bottom';
+    const start = vertical
+      ? side === 'bottom'
+        ? trigger.bottom
+        : rect.bottom
+      : side === 'right'
+        ? trigger.right
+        : rect.right;
+    const end = vertical
+      ? side === 'bottom'
+        ? rect.top
+        : trigger.top
+      : side === 'right'
+        ? rect.left
+        : trigger.left;
+    const main = vertical ? y : x;
+    if (end <= start || main < start || main > end) return false;
+    const from = side === 'bottom' || side === 'right' ? trigger : rect;
+    const to = from === trigger ? rect : trigger;
+    const progress = (main - start) / (end - start);
+    const min = vertical ? 'left' : 'top';
+    const max = vertical ? 'right' : 'bottom';
+    const low = from[min] + (to[min] - from[min]) * progress;
+    const high = from[max] + (to[max] - from[max]) * progress;
+    const cross = vertical ? x : y;
+    return cross >= low - 4 && cross <= high + 4;
+  }
+
+  #onPointerMove = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch' || this.triggerMode !== 'hover') return;
+    this.#hovered =
+      event.composedPath().includes(this) || this.#inHoverBridge(event.clientX, event.clientY);
+    if (this.#hovered) clearTimeout(this.#hoverTimer);
+    else this.#scheduleHoverClose('hover');
+  };
+
+  #onFocusIn = (event: FocusEvent): void => {
+    this.#focused = true;
+    clearTimeout(this.#hoverTimer);
+    const trigger = this.#triggerElement();
+    if (
+      this.triggerMode === 'hover' &&
+      !this.#hoverDismissed &&
+      trigger &&
+      event.composedPath().includes(trigger)
+    ) {
+      this.#propose(true, 'focus');
+    }
+  };
+
+  #onFocusOut = (event: FocusEvent): void => {
+    if (this.#inside(event.relatedTarget)) return;
+    this.#focused = false;
+    this.#scheduleHoverClose('focus');
   };
 
   #onTriggerSlotChange = (): void => {
@@ -386,7 +581,12 @@ export class CosmPopover extends CosmElement {
   }
 
   #syncTriggerExpanded(): void {
-    const current = new Set(this.#triggerSlot()?.assignedElements({ flatten: true }) ?? []);
+    const assigned = this.#triggerSlot()?.assignedElements({ flatten: true }) ?? [];
+    const current = new Set(assigned);
+    for (const element of assigned) {
+      const button = element.shadowRoot?.querySelector('button');
+      if (button) current.add(button);
+    }
     for (const [element, previous] of this.#triggerAttributes) {
       if (!current.has(element)) {
         if (previous === null) element.removeAttribute('aria-expanded');
@@ -399,6 +599,17 @@ export class CosmPopover extends CosmElement {
         this.#triggerAttributes.set(element, element.getAttribute('aria-expanded'));
       }
       element.setAttribute('aria-expanded', String(this.open));
+    }
+    for (const element of assigned) {
+      if (
+        element.localName === 'cosm-icon-button' &&
+        'updateComplete' in element &&
+        !element.shadowRoot?.querySelector('button')
+      ) {
+        void Promise.resolve(element.updateComplete).then(() => {
+          if (element.isConnected && this.isConnected) this.#syncTriggerExpanded();
+        });
+      }
     }
   }
 
@@ -414,6 +625,8 @@ export class CosmPopover extends CosmElement {
     if (element.hasAttribute('hidden') || element.closest('[hidden], [inert]')) return false;
     if ('disabled' in element && (element as HTMLButtonElement).disabled) return false;
     if (element.getAttribute('aria-disabled') === 'true') return false;
+    const button = element.shadowRoot?.querySelector<HTMLButtonElement>('button');
+    if (button) return !button.disabled;
     return (
       element.tabIndex >= 0 ||
       (element.hasAttribute('tabindex') && element.tabIndex === -1) ||
@@ -436,7 +649,11 @@ export class CosmPopover extends CosmElement {
   }
 
   #focusPanel(): void {
-    (this.#focusablePanelContent() ?? this.#panel())?.focus();
+    (
+      this.renderRoot.querySelector<HTMLElement>('.close') ??
+      this.#focusablePanelContent() ??
+      this.#panel()
+    )?.focus();
   }
 
   #activeElement(): Element | null {
@@ -507,15 +724,16 @@ export class CosmPopover extends CosmElement {
           ? trigger.top
           : trigger.bottom - panelHeight;
 
+    const distance = this.gap + (this.arrow ? 8 : 0);
     switch (side) {
       case 'top':
-        return { left: horizontalAlign, top: trigger.top - panelHeight };
+        return { left: horizontalAlign, top: trigger.top - panelHeight - distance };
       case 'bottom':
-        return { left: horizontalAlign, top: trigger.bottom };
+        return { left: horizontalAlign, top: trigger.bottom + distance };
       case 'left':
-        return { left: trigger.left - panelWidth, top: verticalAlign };
+        return { left: trigger.left - panelWidth - distance, top: verticalAlign };
       case 'right':
-        return { left: trigger.right, top: verticalAlign };
+        return { left: trigger.right + distance, top: verticalAlign };
     }
   }
 
@@ -585,6 +803,85 @@ export class CosmPopover extends CosmElement {
     panel.style.left = `${point.left}px`;
     panel.style.top = `${point.top}px`;
     panel.dataset.placement = side;
+    this.#positionArrow(panel, triggerRect, panelRect, point, side, bounds);
+  }
+
+  #positionArrow(
+    panel: HTMLElement,
+    trigger: DOMRect,
+    rect: DOMRect,
+    point: { left: number; top: number },
+    side: PopoverSide,
+    bounds: Bounds
+  ): void {
+    const arrow = this.renderRoot.querySelector<SVGSVGElement>('.arrow');
+    if (!arrow) return;
+    const vertical = side === 'top' || side === 'bottom';
+    const center = vertical
+      ? trigger.left + trigger.width / 2 - point.left
+      : trigger.top + trigger.height / 2 - point.top;
+    const computed = getComputedStyle(panel);
+    const radius = Math.max(
+      ...[
+        computed.borderTopLeftRadius,
+        computed.borderTopRightRadius,
+        computed.borderBottomLeftRadius,
+        computed.borderBottomRightRadius,
+      ].map(value => Number.parseFloat(value) || 0)
+    );
+    const size = vertical ? rect.width : rect.height;
+    const border = Number.parseFloat(computed.borderTopWidth) || 0;
+    const depth = 8;
+    const tip =
+      side === 'top'
+        ? point.top + rect.height + depth
+        : side === 'bottom'
+          ? point.top - depth
+          : side === 'left'
+            ? point.left + rect.width + depth
+            : point.left - depth;
+    const facing =
+      side === 'top'
+        ? tip <= trigger.top
+        : side === 'bottom'
+          ? tip >= trigger.bottom
+          : side === 'left'
+            ? tip <= trigger.left
+            : tip >= trigger.right;
+    const tipWithinBounds = vertical
+      ? tip >= bounds.top && tip <= bounds.bottom
+      : tip >= bounds.left && tip <= bounds.right;
+    arrow.style.display =
+      this.arrow && facing && tipWithinBounds && center >= radius + 8 && center <= size - radius - 8
+        ? ''
+        : 'none';
+    arrow.style.height = vertical ? `${8 + border}px` : '16px';
+    arrow.style.width = vertical ? '16px' : `${8 + border}px`;
+    arrow.style.left = vertical
+      ? `${center - 8 - border}px`
+      : side === 'right'
+        ? `${-8 - border}px`
+        : `${rect.width - border * 2}px`;
+    arrow.style.top = vertical
+      ? side === 'bottom'
+        ? `${-8 - border}px`
+        : `${rect.height - border * 2}px`
+      : `${center - 8 - border}px`;
+    const path = arrow.querySelector('path');
+    if (!path) return;
+    path.setAttribute(
+      'd',
+      vertical
+        ? side === 'bottom'
+          ? `M0 ${8 + border} L8 0 L16 ${8 + border}`
+          : `M0 0 L8 ${8 + border} L16 0`
+        : side === 'right'
+          ? `M${8 + border} 0 L0 8 L${8 + border} 16`
+          : `M0 0 L${8 + border} 8 L0 16`
+    );
+    path.setAttribute('fill', computed.backgroundColor);
+    path.setAttribute('stroke', computed.borderTopColor);
+    path.setAttribute('stroke-width', String(border));
   }
 
   protected override render() {
@@ -597,7 +894,16 @@ export class CosmPopover extends CosmElement {
         <slot name="trigger" @slotchange=${this.#onTriggerSlotChange}></slot>
       </div>
       <div part="panel" class="panel" popover="manual" ?hidden=${!this.open} tabindex="-1">
-        <slot></slot>
+        ${this.arrow ? html`<svg part="arrow" class="arrow" aria-hidden="true" focusable="false"><path /></svg>` : nothing}
+        ${
+          this.closable
+            ? html`<cosm-icon-button
+          part="close" class="close" variant="ghost" tone="neutral" size="sm"
+          .label=${this.closeLabel} @cosm-press=${() => this.#propose(false, 'close-button')}
+        ><cosm-icon .icon=${x}></cosm-icon></cosm-icon-button>`
+            : nothing
+        }
+        <div part="body" class="body"><slot></slot></div>
       </div>
       <span class="safe-area-probe" aria-hidden="true"></span>
     `;

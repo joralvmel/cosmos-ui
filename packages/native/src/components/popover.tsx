@@ -5,6 +5,7 @@ import {
   type PopoverSide,
   popoverContract,
 } from '@joralvmel/cosmos-core';
+import { x } from '@joralvmel/cosmos-icons/x';
 import {
   type ComponentRef,
   createContext,
@@ -30,20 +31,31 @@ import {
   Platform,
   Pressable,
   type StyleProp,
+  StyleSheet,
   Text,
   useWindowDimensions,
   View,
   type ViewStyle,
 } from 'react-native';
+import { Polygon, Svg } from 'react-native-svg';
 import { useTheme } from '../theme/theme-provider.js';
+import { Icon } from './icon.js';
+import { IconButton } from './icon-button.js';
 
 type ContractPopoverProps = ContractProps<typeof popoverContract, 'native'>;
 
 export type PopoverHandle = ContractPopoverHandle;
 
+/** Props to spread onto a single interactive native trigger. */
+export interface PopoverTriggerProps {
+  onPress(): void;
+  ref: Ref<ComponentRef<typeof Pressable>>;
+  accessibilityState: { expanded: boolean };
+}
+
 export interface PopoverProps extends ContractPopoverProps {
-  /** Consumer-supplied trigger content, rendered inside the accessible trigger button. */
-  trigger: ReactNode;
+  /** Content for the default button, or a render function for a single interactive trigger. */
+  trigger: ReactNode | ((props: PopoverTriggerProps) => ReactNode);
   /** Consumer-supplied panel content and semantics. */
   children?: ReactNode;
   /** Receives the contract proposal detail; call `preventDefault()` to veto a close. */
@@ -79,9 +91,12 @@ interface Rect extends Point {
 
 // Structural browser capabilities keep DOM globals/types out of native builds.
 interface WebObservedEvent {
+  type: string;
   clientX: number;
   clientY: number;
   target: unknown;
+  relatedTarget?: unknown;
+  pointerType?: string;
   key?: string;
   defaultPrevented: boolean;
 }
@@ -400,6 +415,11 @@ function canFocus(element: WebElement) {
 export const popoverPropNames = [
   'open',
   'defaultOpen',
+  'triggerMode',
+  'closable',
+  'closeLabel',
+  'gap',
+  'arrow',
   'closeOnEscape',
   'closeOnOutsidePress',
   'initialFocus',
@@ -518,6 +538,11 @@ function makeCloseDetail(reason: Extract<PopoverOpenChangeDetail, { open: false 
 export function Popover({
   open,
   defaultOpen = popoverContract.props.defaultOpen.default,
+  triggerMode = popoverContract.props.triggerMode.default,
+  closable = popoverContract.props.closable.default,
+  closeLabel = popoverContract.props.closeLabel.default,
+  gap = popoverContract.props.gap.default,
+  arrow = popoverContract.props.arrow.default,
   closeOnEscape = popoverContract.props.closeOnEscape.default,
   closeOnOutsidePress = popoverContract.props.closeOnOutsidePress.default,
   initialFocus = popoverContract.props.initialFocus.default,
@@ -535,6 +560,10 @@ export function Popover({
   panelTestID,
   ref,
 }: PopoverProps) {
+  if (!Number.isFinite(gap) || gap < 0)
+    throw new TypeError('Popover gap must be finite and non-negative.');
+  if (closable && (typeof closeLabel !== 'string' || !closeLabel.trim()))
+    throw new TypeError('Popover closeLabel must be non-empty when closable.');
   const theme = useTheme();
   const host = useContext(PopoverHostContext);
   if (!host) throw new Error('Popover requires a PopoverProvider above the component.');
@@ -556,7 +585,21 @@ export function Popover({
   const triggerRect = useRef<Rect | undefined>(undefined);
   const panelRect = useRef<Rect | undefined>(undefined);
   const [panelSize, setPanelSize] = useState({ width: 0, height: 0 });
-  const [placement, setPlacement] = useState({ left: 0, top: 0 });
+  const [placement, setPlacement] = useState<{
+    left: number;
+    top: number;
+    actualSide: PopoverSide;
+  }>({
+    left: 0,
+    top: 0,
+    actualSide: side,
+  });
+  const hoverInside = useRef(false);
+  const focusInside = useRef(false);
+  const suppressed = useRef(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const openingReason = useRef<'trigger' | 'hover' | 'focus' | undefined>(undefined);
+  const pointerStartedClosed = useRef(false);
   const focusedInPanel = useRef(false);
   const closeIntent = useRef<
     Extract<PopoverOpenChangeDetail, { open: false }>['reason'] | undefined
@@ -615,14 +658,15 @@ export function Popover({
           panel,
           bounds,
           wrapper: rect,
-          gap: theme.space.xs,
+          gap: gap + (arrow ? 8 : 0),
         });
         const nextPosition = hostOrigin
           ? {
               left: next.left + rect.x - hostOrigin.x,
               top: next.top + rect.y - hostOrigin.y,
+              actualSide: next.actualSide,
             }
-          : { left: next.left, top: next.top };
+          : { left: next.left, top: next.top, actualSide: next.actualSide };
         panelRect.current = {
           x: (hostOrigin?.x ?? rect.x) + nextPosition.left,
           y: (hostOrigin?.y ?? rect.y) + nextPosition.top,
@@ -630,15 +674,12 @@ export function Popover({
           height: panelSize.height,
         };
         setPlacement(current =>
-          current.left === nextPosition.left && current.top === nextPosition.top
+          current.left === nextPosition.left &&
+          current.top === nextPosition.top &&
+          current.actualSide === nextPosition.actualSide
             ? current
             : nextPosition
         );
-        requestAnimationFrame(() => {
-          measureInWindow(panelRef.current, panelRectValue => {
-            panelRect.current = panelRectValue;
-          });
-        });
       });
     });
   }, [
@@ -651,7 +692,8 @@ export function Popover({
     panelSize,
     shift,
     side,
-    theme.space.xs,
+    gap,
+    arrow,
   ]);
 
   const refresh = useCallback(() => updatePlacement(), [updatePlacement]);
@@ -674,6 +716,8 @@ export function Popover({
       onOpenChange?.(detail);
       closeIntent.current = detail.defaultPrevented ? undefined : reason;
       if (detail.defaultPrevented) return;
+      if (reason === 'escape' || reason === 'close-button')
+        suppressed.current = hoverInside.current || focusInside.current;
       if (!controlled) setUncontrolledOpen(false);
     },
     [controlled, onOpenChange]
@@ -725,6 +769,7 @@ export function Popover({
       updatePlacement();
       return;
     }
+    openingReason.current = undefined;
     if (
       closeIntent.current &&
       closeIntent.current !== 'outside' &&
@@ -739,7 +784,13 @@ export function Popover({
   }, [focus, isOpen, restoreFocus, updatePlacement]);
 
   useEffect(() => {
-    if (!isOpen || !initialFocusRef.current) return;
+    if (
+      !isOpen ||
+      !initialFocusRef.current ||
+      openingReason.current === 'hover' ||
+      openingReason.current === 'focus'
+    )
+      return;
     const frame = requestAnimationFrame(() => {
       if (!isOpenRef.current || !panelRef.current) return;
       const panelElement = webElement(panelRef.current);
@@ -758,6 +809,111 @@ export function Popover({
     });
     return () => cancelAnimationFrame(frame);
   }, [focus, isOpen]);
+
+  const requestOpen = useCallback(
+    (reason: 'trigger' | 'hover' | 'focus') => {
+      if (isOpenRef.current) return;
+      openingReason.current = reason;
+      onOpenChange?.({ open: true, reason });
+      closeIntent.current = undefined;
+      if (!controlled) setUncontrolledOpen(true);
+    },
+    [controlled, onOpenChange]
+  );
+  const hoverOpenRef = useRef(requestOpen);
+  const hoverCloseRef = useRef(requestClose);
+  hoverOpenRef.current = requestOpen;
+  hoverCloseRef.current = requestClose;
+
+  useEffect(() => {
+    const document = (globalThis as unknown as { document?: WebDocument }).document;
+    if (Platform.OS !== 'web' || triggerMode !== 'hover' || !document) return;
+    const inside = (target: unknown) =>
+      typeof target === 'object' &&
+      target !== null &&
+      'nodeType' in target &&
+      Boolean(
+        webElement(triggerRef.current)?.contains(target) ||
+          webElement(panelRef.current)?.contains(target)
+      );
+    const cancelTimer = () => {
+      if (hoverTimer.current !== undefined) clearTimeout(hoverTimer.current);
+      hoverTimer.current = undefined;
+    };
+    const schedule = (reason: 'hover' | 'focus') => {
+      cancelTimer();
+      if (!hoverInside.current && !focusInside.current) {
+        suppressed.current = false;
+        hoverTimer.current = setTimeout(() => {
+          if (!hoverInside.current && !focusInside.current) hoverCloseRef.current(reason);
+        }, 150);
+      }
+    };
+    const pointer = (event: WebObservedEvent) => {
+      if (event.pointerType === 'touch') return;
+      const target = event.type === 'pointerout' ? event.relatedTarget : event.target;
+      const trigger = triggerRect.current;
+      const panel = panelRect.current;
+      const bridge =
+        hoverInside.current &&
+        trigger &&
+        panel &&
+        event.clientX >= Math.min(trigger.x, panel.x) &&
+        event.clientX <= Math.max(trigger.x + trigger.width, panel.x + panel.width) &&
+        event.clientY >= Math.min(trigger.y, panel.y) &&
+        event.clientY <= Math.max(trigger.y + trigger.height, panel.y + panel.height);
+      hoverInside.current = inside(target) || Boolean(bridge);
+      if (hoverInside.current) {
+        cancelTimer();
+        const element = webElement(triggerRef.current);
+        if (!suppressed.current && inside(target) && element && canFocus(element))
+          hoverOpenRef.current('hover');
+      } else schedule('hover');
+    };
+    const focusIn = (event: WebObservedEvent) => {
+      focusInside.current = inside(event.target);
+      if (focusInside.current) {
+        cancelTimer();
+        if (!suppressed.current) hoverOpenRef.current('focus');
+      } else schedule('focus');
+    };
+    const focusOut = (event: WebObservedEvent) => {
+      focusInside.current = inside(event.relatedTarget);
+      if (!focusInside.current) schedule('focus');
+    };
+    const pointerDown = (event: WebObservedEvent) => {
+      pointerStartedClosed.current = inside(event.target) && !isOpenRef.current;
+    };
+    const resetPress = () => {
+      pointerStartedClosed.current = false;
+    };
+    document.addEventListener('pointermove', pointer);
+    document.addEventListener('pointerover', pointer);
+    document.addEventListener('pointerout', pointer);
+    document.addEventListener('pointerdown', pointerDown, true);
+    // Touch compatibility focus/click may arrive in a later task than pointerup.
+    // Retain intent until activation, cancellation, or a new keyboard gesture.
+    document.addEventListener('click', resetPress);
+    document.addEventListener('pointercancel', resetPress, true);
+    document.addEventListener('keydown', resetPress, true);
+    document.addEventListener('focusin', focusIn);
+    document.addEventListener('focusout', focusOut);
+    return () => {
+      cancelTimer();
+      pointerStartedClosed.current = false;
+      hoverInside.current = false;
+      focusInside.current = false;
+      document.removeEventListener('pointermove', pointer);
+      document.removeEventListener('pointerover', pointer);
+      document.removeEventListener('pointerout', pointer);
+      document.removeEventListener('pointerdown', pointerDown, true);
+      document.removeEventListener('click', resetPress);
+      document.removeEventListener('pointercancel', resetPress, true);
+      document.removeEventListener('keydown', resetPress, true);
+      document.removeEventListener('focusin', focusIn);
+      document.removeEventListener('focusout', focusOut);
+    };
+  }, [triggerMode]);
 
   useEffect(() => {
     if (Platform.OS !== 'android' || !isOpen) return;
@@ -785,12 +941,87 @@ export function Popover({
         current.width === width && current.height === height ? current : { width, height }
       );
       updatePlacement();
-      measureInWindow(panelRef.current, rect => {
-        panelRect.current = rect;
-      });
     },
     [updatePlacement]
   );
+
+  const surface =
+    StyleSheet.flatten([
+      {
+        backgroundColor: theme.colors.surface,
+        borderColor: theme.colors['border-strong'],
+        borderWidth: 1,
+        borderRadius: theme.radius.md,
+      },
+      panelStyle,
+    ]) ?? {};
+  const bounds = hostBounds ?? { x: 0, y: 0, width: dimensions.width, height: dimensions.height };
+  const panelX = (hostOrigin?.x ?? 0) + placement.left;
+  const panelY = (hostOrigin?.y ?? 0) + placement.top;
+  const vertical = placement.actualSide === 'top' || placement.actualSide === 'bottom';
+  const center = triggerRect.current
+    ? vertical
+      ? triggerRect.current.x + triggerRect.current.width / 2 - panelX
+      : triggerRect.current.y + triggerRect.current.height / 2 - panelY
+    : NaN;
+  const radius = Math.max(
+    ...[
+      surface.borderRadius ?? theme.radius.md,
+      surface.borderTopLeftRadius,
+      surface.borderTopRightRadius,
+      surface.borderBottomLeftRadius,
+      surface.borderBottomRightRadius,
+    ].map(value => (typeof value === 'number' ? value : 0))
+  );
+  const length = vertical ? panelSize.width : panelSize.height;
+  const arrowX = vertical
+    ? panelX + center - 8
+    : placement.actualSide === 'right'
+      ? panelX - 8
+      : panelX + panelSize.width;
+  const arrowY = vertical
+    ? placement.actualSide === 'bottom'
+      ? panelY - 8
+      : panelY + panelSize.height
+    : panelY + center - 8;
+  const arrowWidth = vertical ? 16 : 8;
+  const arrowHeight = vertical ? 8 : 16;
+  // Absolute children are positioned from the panel's inner border edge on
+  // both RN Web and native. Geometry above is measured from the outer edge.
+  const leftBorder =
+    surface.borderLeftWidth ??
+    (I18nManager.isRTL ? surface.borderEndWidth : surface.borderStartWidth) ??
+    surface.borderWidth ??
+    0;
+  const topBorder = surface.borderTopWidth ?? surface.borderWidth ?? 0;
+  const measuredTrigger = triggerRect.current;
+  const validSide =
+    measuredTrigger &&
+    (placement.actualSide === 'bottom'
+      ? arrowY >= measuredTrigger.y + measuredTrigger.height
+      : placement.actualSide === 'top'
+        ? arrowY + 8 <= measuredTrigger.y
+        : placement.actualSide === 'right'
+          ? arrowX >= measuredTrigger.x + measuredTrigger.width
+          : arrowX + 8 <= measuredTrigger.x);
+  const showArrow =
+    arrow &&
+    validSide &&
+    Number.isFinite(center) &&
+    center - 8 >= radius &&
+    center + 8 <= length - radius &&
+    arrowX >= bounds.x &&
+    arrowY >= bounds.y &&
+    arrowX + arrowWidth <= bounds.x + bounds.width &&
+    arrowY + arrowHeight <= bounds.y + bounds.height;
+  const arrowPoints =
+    placement.actualSide === 'bottom'
+      ? '0,8 8,0 16,8'
+      : placement.actualSide === 'top'
+        ? '0,0 8,8 16,0'
+        : placement.actualSide === 'right'
+          ? '8,0 0,8 8,16'
+          : '0,0 8,8 0,16';
 
   const panel = useMemo(
     () =>
@@ -825,25 +1056,75 @@ export function Popover({
             panelStyle,
           ]}
         >
+          {showArrow && (
+            <View
+              pointerEvents="none"
+              accessible={false}
+              aria-hidden
+              testID="popover-arrow"
+              style={{
+                position: 'absolute',
+                left: arrowX - panelX - leftBorder,
+                top: arrowY - panelY - topBorder,
+                width: arrowWidth,
+                height: arrowHeight,
+              }}
+            >
+              <Svg width={arrowWidth} height={arrowHeight} aria-hidden>
+                <Polygon
+                  points={arrowPoints}
+                  fill={surface.backgroundColor}
+                  stroke={surface.borderColor}
+                  strokeWidth={surface.borderWidth}
+                />
+              </Svg>
+            </View>
+          )}
+          {closable && (
+            <IconButton
+              label={closeLabel}
+              variant="ghost"
+              tone="neutral"
+              onPress={() => requestClose('close-button')}
+            >
+              <Icon icon={x} />
+            </IconButton>
+          )}
           {children}
         </View>
       ) : null,
     [
       children,
+      arrowHeight,
+      arrowPoints,
+      arrowWidth,
+      arrowX,
+      arrowY,
+      closable,
+      closeLabel,
       dimensions.height,
       dimensions.width,
       hostBounds?.height,
       hostBounds?.width,
       isOpen,
+      leftBorder,
       onPanelLayout,
       panelStyle,
       panelTestID,
       placement.left,
       placement.top,
+      panelX,
+      panelY,
+      requestClose,
+      showArrow,
+      surface.backgroundColor,
+      surface.borderColor,
+      surface.borderWidth,
       theme.colors,
       theme.radius.md,
       theme.shadow.md,
       theme.space.md,
+      topBorder,
       setPanelRef,
     ]
   );
@@ -860,6 +1141,15 @@ export function Popover({
     [overlayKey, setHostOverlay]
   );
 
+  const activateTrigger = () => {
+    const focusOpenedDuringPress =
+      pointerStartedClosed.current && openingReason.current === 'focus' && isOpenRef.current;
+    pointerStartedClosed.current = false;
+    if (focusOpenedDuringPress) return;
+    if (isOpenRef.current) requestClose('trigger');
+    else requestOpen('trigger');
+  };
+
   return (
     <View
       ref={wrapperRef}
@@ -867,40 +1157,39 @@ export function Popover({
       onLayout={onWrapperLayout}
       style={{ alignSelf: 'flex-start', zIndex: isOpen ? 1 : 0 }}
     >
-      <Pressable
-        ref={triggerRef}
-        testID={testID}
-        accessibilityRole="button"
-        accessibilityState={{ expanded: isOpen }}
-        onPress={() => {
-          if (isOpenRef.current) {
-            requestClose('trigger');
-            return;
-          }
-          const detail: PopoverOpenChangeDetail = { open: true, reason: 'trigger' };
-          onOpenChange?.(detail);
-          closeIntent.current = undefined;
-          if (!controlled) setUncontrolledOpen(true);
-        }}
-        onLayout={updatePlacement}
-        hitSlop={Math.max(0, (44 - theme.control.md) / 2)}
-        style={[
-          {
-            minHeight: 44,
-            minWidth: 44,
-            alignItems: 'center',
-            justifyContent: 'center',
-            alignSelf: 'flex-start',
-          },
-          triggerStyle,
-        ]}
-      >
-        {typeof trigger === 'string' || typeof trigger === 'number' ? (
-          <Text style={{ color: theme.colors.fg, fontSize: theme.text.md }}>{trigger}</Text>
-        ) : (
-          trigger
-        )}
-      </Pressable>
+      {typeof trigger === 'function' ? (
+        trigger({
+          ref: triggerRef,
+          accessibilityState: { expanded: isOpen },
+          onPress: activateTrigger,
+        })
+      ) : (
+        <Pressable
+          ref={triggerRef}
+          testID={testID}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: isOpen }}
+          onPress={activateTrigger}
+          onLayout={updatePlacement}
+          hitSlop={Math.max(0, (44 - theme.control.md) / 2)}
+          style={[
+            {
+              minHeight: 44,
+              minWidth: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignSelf: 'flex-start',
+            },
+            triggerStyle,
+          ]}
+        >
+          {typeof trigger === 'string' || typeof trigger === 'number' ? (
+            <Text style={{ color: theme.colors.fg, fontSize: theme.text.md }}>{trigger}</Text>
+          ) : (
+            trigger
+          )}
+        </Pressable>
+      )}
     </View>
   );
 }

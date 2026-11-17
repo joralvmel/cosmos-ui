@@ -6,7 +6,7 @@ description: Contenido no modal anclado a un activador proporcionado por la apli
 import ApiTable from '../../../../components/ApiTable.astro';
 import EventsTable from '../../../../components/EventsTable.astro';
 import Playground from '../../../../components/Playground.astro';
-import Preview from '../../../../components/Preview.astro';
+import PopoverExamples from '../../../../components/PopoverExamples.astro';
 import StatusBadge from '../../../../components/StatusBadge.astro';
 
 <StatusBadge name="popover" />
@@ -18,14 +18,17 @@ información o acciones complementarias; no implementa un menú, tooltip ni diá
 
 <Playground name="popover" content="Información adicional." />
 
-Prueba los controles de posición, alineación, colisión y cierre. Elige entre estado autónomo o
+Prueba `closable`, `arrow`, `gap` (incluido cero), `triggerMode`, posición, alineación y cierre.
+El activador usa el IconButton de la biblioteca con un icono individual de información.
+Elige entre estado autónomo o
 controlado: un valor controlado solo cambia cuando su propietario acepta la propuesta. El enlace
 de la demostración nativa abre la pantalla correspondiente. Al cambiar `defaultOpen`, la vista
 previa se vuelve a montar para mostrar el valor inicial.
 
 En React Native, envuelve la aplicación con `PopoverProvider` y proporciona los márgenes de área
-segura cuando estén disponibles. `trigger` es contenido dentro del botón accesible integrado, no
-otro botón. Pasa `usePopoverHost().onScroll` a los contenedores cuyo desplazamiento pueda mover el
+segura cuando estén disponibles. `trigger` acepta contenido dentro del botón accesible integrado o
+una función de renderizado para componer un IconButton sin anidar controles interactivos (consulta
+el ejemplo nativo generado). Pasa `usePopoverHost().onScroll` a los contenedores cuyo desplazamiento pueda mover el
 activador, combinándolo con cualquier manejador existente. `onOpenChange` recibe el detalle
 directamente; usa una referencia para llamar a `requestClose()` desde una acción del panel.
 
@@ -35,12 +38,20 @@ Popover ofrece una superficie neutra cuyo tamaño depende del contenido. Los tok
 los puntos de personalización del panel permiten adaptarla; la aplicación proporciona el activador
 y el contenido.
 
-<Preview>
-  <cosm-popover>
-    <button slot="trigger" type="button">Detalles</button>
-    <p>Información adicional.</p>
-  </cosm-popover>
-</Preview>
+<PopoverExamples locale="es" />
+
+`closable` añade un IconButton neutro de estilo ghost con una X. Traduce `closeLabel`; al activarlo
+propone el cierre con motivo `close-button`, respetando la cancelación y el estado controlado.
+
+`gap` vale 8 por defecto, en píxeles CSS o unidades lógicas nativas. Cero une las superficies.
+Con `arrow`, la distancia se mide hasta la punta, no hasta el borde del panel. La flecha decorativa
+de 16 por 8 sigue el lado efectivo y el centro del activador tras los ajustes de posición. Se oculta
+si no puede apuntar sin invadir una esquina o salir de la pantalla. Las colisiones tienen prioridad
+sobre la separación solicitada.
+
+Personaliza fondo, texto y borde mediante tokens o `cosm-popover::part(panel)`. La flecha sigue el
+fondo y borde del panel. En nativo, usa `panelStyle` y personaliza el texto del contenido directamente.
+Los títulos, enlaces y acciones siguen siendo contenido de la aplicación, no propiedades específicas.
 
 ## Estados
 
@@ -59,6 +70,13 @@ En navegadores compatibles con Popover API, el panel usa la capa superior. La al
 posición fija en navegadores antiguos puede quedar recortada o desplazada por desbordamiento,
 transformaciones o contención de sus ancestros.
 
+`triggerMode="hover"` añade apertura con puntero y foco de teclado en web, React, Angular y React
+Native Web, conservando la pulsación. Android/iOS usan pulsación. El panel permanece abierto mientras
+el puntero o el foco estén en el activador o panel, incluido el recorrido por la separación. Al salir
+ambos, solicita el cierre tras 150ms. Escape o la X lo descartan sin reapertura inmediata hasta que
+salgan el puntero y el foco. La apertura por hover/foco no mueve el foco al panel, ni siquiera con
+`initialFocus`. Este modo no convierte el contenido en un tooltip.
+
 ## Accesibilidad
 
 - Proporciona un activador con nombre y operable por teclado, y una semántica y etiqueta adecuadas
@@ -68,6 +86,9 @@ transformaciones o contención de sus ancestros.
   exterior.
 - La aplicación debe garantizar la accesibilidad de los controles y un tamaño de área táctil
   adecuado en plataformas nativas.
+- El contenido por hover debe poder descartarse, alcanzarse con el puntero y permanecer visible
+  ([WCAG 1.4.13](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html)).
+  Mantén Escape habilitado en modo hover si el panel puede ocultar contenido significativo.
 
 ## API
 

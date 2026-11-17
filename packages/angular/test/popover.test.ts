@@ -102,6 +102,8 @@ async function perform(
     return event;
   } else if (action.type === 'action' || action.type === 'back') {
     wrapper.requestClose();
+  } else if (action.type === 'close-button') {
+    el.shadowRoot?.querySelector<HTMLElement>('cosm-icon-button')?.click();
   } else if (action.type === 'sync') {
     wrapper.open = action.open;
   } else if (action.type === 'set-default') {

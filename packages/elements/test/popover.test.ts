@@ -89,6 +89,8 @@ async function perform(
     return sendOutside(action.focusable, outsideTargets).event;
   } else if (action.type === 'action' || action.type === 'back') {
     el.requestClose();
+  } else if (action.type === 'close-button') {
+    el.shadowRoot?.querySelector<HTMLElement>('cosm-icon-button')?.click();
   } else if (action.type === 'sync') {
     el.open = action.open;
   } else if (action.type === 'set-default') {
@@ -394,5 +396,146 @@ describe('cosm-popover', () => {
       Object.defineProperty(window, 'innerWidth', { configurable: true, value: oldWidth });
       Object.defineProperty(window, 'innerHeight', { configurable: true, value: oldHeight });
     }
+  });
+});
+
+describe('cosm-popover: revised interactions', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('does not immediately close when a touch press focuses and opens a hover trigger', async () => {
+    const el = await setup();
+    trigger(el).blur();
+    el.triggerMode = 'hover';
+    await el.updateComplete;
+    trigger(el).dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        composed: true,
+        pointerType: 'touch',
+      })
+    );
+    trigger(el).focus();
+    trigger(el).click();
+    await el.updateComplete;
+    expect(el.open).toBe(true);
+    trigger(el).dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        composed: true,
+        pointerType: 'touch',
+      })
+    );
+    trigger(el).click();
+    await el.updateComplete;
+    expect(el.open).toBe(false);
+  });
+
+  it('uses the real IconButton for trigger state, initial close focus and focus restoration', async () => {
+    const el = await setup({ closable: true, initialFocus: true });
+    const iconButton = document.createElement('cosm-icon-button');
+    iconButton.label = 'Information';
+    iconButton.slot = 'trigger';
+    trigger(el).replaceWith(iconButton);
+    await iconButton.updateComplete;
+    await new Promise(resolve => setTimeout(resolve, 0));
+    iconButton.click();
+    await el.updateComplete;
+    const close = el.shadowRoot?.querySelector('cosm-icon-button');
+    await close?.updateComplete;
+    expect(iconButton.shadowRoot?.querySelector('button')?.getAttribute('aria-expanded')).toBe(
+      'true'
+    );
+    expect(el.shadowRoot?.activeElement).toBe(close);
+    close?.click();
+    await el.updateComplete;
+    expect(el.open).toBe(false);
+    expect(document.activeElement).toBe(iconButton);
+    expect(iconButton.shadowRoot?.querySelector('button')?.getAttribute('aria-expanded')).toBe(
+      'false'
+    );
+  });
+
+  it('keeps focus opening non-modal, Escape dismisses until focus leaves and touch does not hover', async () => {
+    const el = await setup({ triggerMode: 'hover', initialFocus: true });
+    await el.updateComplete;
+    expect(el.open).toBe(true);
+    expect(document.activeElement).toBe(trigger(el));
+    sendEscape();
+    await el.updateComplete;
+    expect(el.open).toBe(false);
+    trigger(el).dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })
+    );
+    await el.updateComplete;
+    expect(el.open).toBe(false);
+    trigger(el).blur();
+    el.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' }));
+    trigger(el).dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, pointerType: 'touch' })
+    );
+    expect(el.open).toBe(false);
+    trigger(el).focus();
+    await el.updateComplete;
+    expect(el.open).toBe(true);
+  });
+
+  it('allows slow traversal across a large gap and closes only after pointer and focus leave', async () => {
+    const el = await setup({ triggerMode: 'hover', gap: 120 });
+    trigger(el).blur();
+    const surface = panel(el);
+    if (!surface) throw new Error('Missing panel');
+    trigger(el).getBoundingClientRect = () => new DOMRect(100, 100, 40, 20);
+    surface.getBoundingClientRect = () => new DOMRect(80, 240, 160, 100);
+    window.dispatchEvent(new Event('resize'));
+    vi.useFakeTimers();
+    el.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' }));
+    document.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        pointerType: 'mouse',
+        clientX: 120,
+        clientY: 180,
+      })
+    );
+    await vi.advanceTimersByTimeAsync(500);
+    expect(el.open).toBe(true);
+    document.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        pointerType: 'mouse',
+        clientX: 450,
+        clientY: 400,
+      })
+    );
+    await vi.advanceTimersByTimeAsync(151);
+    await el.updateComplete;
+    expect(el.open).toBe(false);
+  });
+
+  it('measures gap to the arrow tip, follows panel colors and hides invalid pointers', async () => {
+    const el = await setup({ open: true, gap: 20, arrow: true, flip: false, shift: false });
+    const surface = panel(el);
+    if (!surface) throw new Error('Missing panel');
+    trigger(el).getBoundingClientRect = () => new DOMRect(100, 100, 40, 20);
+    surface.getBoundingClientRect = () => new DOMRect(0, 0, 120, 80);
+    surface.style.backgroundColor = 'rgb(20, 30, 40)';
+    surface.style.borderColor = 'rgb(90, 100, 110)';
+    window.dispatchEvent(new Event('resize'));
+    expect(surface.style.top).toBe('148px');
+    const arrow = el.shadowRoot?.querySelector<SVGSVGElement>('[part="arrow"]');
+    expect(arrow?.style.display).not.toBe('none');
+    expect(arrow?.querySelector('path')?.getAttribute('fill')).toBe('rgb(20, 30, 40)');
+    expect(arrow?.querySelector('path')?.getAttribute('stroke')).toBe('rgb(90, 100, 110)');
+    el.gap = 0;
+    el.arrow = false;
+    await el.updateComplete;
+    expect(surface.style.top).toBe('120px');
+    el.arrow = true;
+    el.align = 'start';
+    trigger(el).getBoundingClientRect = () => new DOMRect(100, 100, 2, 20);
+    await el.updateComplete;
+    expect(el.shadowRoot?.querySelector<SVGSVGElement>('[part="arrow"]')?.style.display).toBe(
+      'none'
+    );
   });
 });

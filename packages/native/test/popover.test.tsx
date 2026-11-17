@@ -5,12 +5,15 @@ import {
   popoverScenariosFor,
   propNames,
 } from '@joralvmel/cosmos-core';
+import { info } from '@joralvmel/cosmos-icons/info';
 import { getNativeTheme } from '@joralvmel/cosmos-tokens/native';
 import { act, type ReactNode, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CosmosThemeProvider,
+  Icon,
+  IconButton,
   Popover,
   type PopoverHandle,
   type PopoverProps,
@@ -18,9 +21,28 @@ import {
   popoverPropNames,
   usePopoverHost,
 } from '../src/index.js';
-import { __accessibilityFocusCalls, __setPlatformOS, BackHandler } from './react-native.mock.js';
+import {
+  __accessibilityFocusCalls,
+  __setPlatformOS,
+  __setPressableRect,
+  BackHandler,
+} from './react-native.mock.js';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
+const runtime = vi.hoisted(() => ({ nativeWeb: false }));
+
+vi.mock('react-native', async importOriginal => {
+  const native = await importOriginal<typeof import('./react-native.mock.js')>();
+  // @ts-expect-error React Native Web does not publish declarations in this workspace.
+  const nativeWeb = await import('react-native-web');
+  const { createElement } = await import('react');
+  return {
+    ...native,
+    Pressable: (props: Parameters<typeof native.Pressable>[0]) =>
+      createElement(runtime.nativeWeb ? nativeWeb.Pressable : native.Pressable, props),
+  };
+});
 
 let root: Root | undefined;
 let container: HTMLElement | undefined;
@@ -42,7 +64,7 @@ async function render(node: ReactNode) {
   document.body.append(container);
   root = createRoot(container);
   await act(async () => root?.render(node));
-  container.querySelector<HTMLElement>('[data-testid="trigger"]')?.focus();
+  await act(async () => container?.querySelector<HTMLElement>('[data-testid="trigger"]')?.focus());
   await frames();
   return container;
 }
@@ -52,6 +74,8 @@ afterEach(async () => {
   container?.remove();
   BackHandler.__reset();
   __setPlatformOS('web');
+  __setPressableRect();
+  runtime.nativeWeb = false;
   __accessibilityFocusCalls.length = 0;
   vi.useRealTimers();
 });
@@ -144,6 +168,34 @@ function ScrollHookProbe() {
   );
 }
 
+function TouchFixture({ composed, changes }: { composed: boolean; changes: string[] }) {
+  const [, rerender] = useState(0);
+  return (
+    <PopoverProvider>
+      <Popover
+        triggerMode="hover"
+        trigger={
+          composed
+            ? props => (
+                <IconButton {...props} testID="touch-trigger" label="Details">
+                  <Icon icon={info} />
+                </IconButton>
+              )
+            : 'Details'
+        }
+        testID="touch-trigger"
+        panelTestID="panel"
+        onOpenChange={detail => {
+          changes.push(`${detail.open}:${detail.reason}`);
+          rerender(value => value + 1);
+        }}
+      >
+        Panel
+      </Popover>
+    </PopoverProvider>
+  );
+}
+
 describe('Popover (native): shared scenarios', () => {
   for (const scenario of popoverScenariosFor('native')) {
     it(scenario.name, async () => {
@@ -183,6 +235,8 @@ describe('Popover (native): shared scenarios', () => {
             trigger.click();
           } else if (action.type === 'action') {
             reference.current?.requestClose();
+          } else if (action.type === 'close-button') {
+            container?.querySelector<HTMLButtonElement>('[aria-label="Close"]')?.click();
           } else if (action.type === 'escape') {
             const event = new KeyboardEvent('keydown', {
               key: 'Escape',
@@ -256,6 +310,334 @@ describe('Popover (native): contract drift', () => {
 });
 
 describe('Popover (native)', () => {
+  it('keeps touch focus opening through delayed compatibility click on an actual RN Web IconButton SVG', async () => {
+    runtime.nativeWeb = true;
+    const changes: string[] = [];
+    await render(<TouchFixture composed changes={changes} />);
+    const button = target('touch-trigger');
+    const svg = button.querySelector('svg');
+    if (!svg) throw new Error('Missing real Icon SVG');
+    const dispatch = (type: 'pointerdown' | 'pointerup' | 'click') => {
+      const event = new MouseEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        clientX: 20,
+        clientY: 20,
+      });
+      Object.defineProperty(event, 'pointerType', { value: 'touch' });
+      svg.dispatchEvent(event);
+    };
+    await act(async () => dispatch('pointerdown'));
+    await act(async () => dispatch('pointerup'));
+    // Chromium touch synthesizes focus/click after pointerup in later tasks.
+    await act(async () => vi.advanceTimersByTimeAsync(10));
+    await act(async () => button.focus());
+    await act(async () => vi.advanceTimersByTimeAsync(10));
+    await act(async () => dispatch('click'));
+    expect(target('panel')).toBeDefined();
+    expect(changes).toEqual(['true:focus']);
+    await act(async () => dispatch('pointerdown'));
+    await act(async () => dispatch('pointerup'));
+    await act(async () => vi.advanceTimersByTimeAsync(10));
+    await act(async () => dispatch('click'));
+    expect(container?.querySelector('[data-testid="panel"]')).toBeNull();
+    expect(changes).toEqual(['true:focus', 'false:trigger']);
+  });
+
+  for (const composed of [false, true]) {
+    it(`does not toggle a focus-opened hover popover closed on touch (${composed ? 'IconButton' : 'content'} trigger)`, async () => {
+      const changes: string[] = [];
+      await render(<TouchFixture composed={composed} changes={changes} />);
+      const button = target('touch-trigger');
+      const touchPointer = (type: 'pointerdown' | 'pointerup') => {
+        const event = new MouseEvent(type, { bubbles: true, clientX: 20, clientY: 20 });
+        Object.defineProperty(event, 'pointerType', { value: 'touch' });
+        button.dispatchEvent(event);
+      };
+      await act(async () => touchPointer('pointerdown'));
+      await act(async () => button.focus());
+      await act(async () => {
+        touchPointer('pointerup');
+        button.click();
+      });
+      expect(target('panel')).toBeDefined();
+      expect(changes).toEqual(['true:focus']);
+      await act(async () => {
+        touchPointer('pointerdown');
+        touchPointer('pointerup');
+        button.click();
+      });
+      expect(container?.querySelector('[data-testid="panel"]')).toBeNull();
+      expect(changes).toEqual(['true:focus', 'false:trigger']);
+    });
+  }
+
+  it('composes one named IconButton host and activates once, including disabled state', async () => {
+    const change = vi.fn();
+    const fixture = (disabled: boolean) => (
+      <PopoverProvider>
+        <Popover
+          trigger={props => (
+            <IconButton {...props} testID="trigger" label="Details" disabled={disabled}>
+              <Icon icon={info} />
+            </IconButton>
+          )}
+          panelTestID="panel"
+          onOpenChange={change}
+        >
+          Panel
+        </Popover>
+      </PopoverProvider>
+    );
+    await render(fixture(false));
+    const button = target('trigger');
+    expect(button.getAttribute('aria-label')).toBe('Details');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(button.querySelector('button')).toBeNull();
+    await act(async () => button.click());
+    expect(change).toHaveBeenCalledTimes(1);
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    await act(async () => root?.render(fixture(true)));
+    await act(async () => button.click());
+    expect(change).toHaveBeenCalledTimes(1);
+  });
+
+  it('positions an arrow using the requested gap and panel override colors', async () => {
+    await render(
+      <PopoverProvider>
+        <Popover
+          defaultOpen
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          arrow
+          gap={0}
+          panelStyle={{ backgroundColor: 'red', borderColor: 'blue', borderWidth: 2 }}
+        >
+          Panel
+        </Popover>
+      </PopoverProvider>
+    );
+    await frames();
+    const style = JSON.parse(target('panel').getAttribute('data-style') ?? '{}');
+    expect(style.top).toBe(52);
+    const arrow = target('popover-arrow');
+    expect(arrow.querySelector('polygon')?.getAttribute('fill')).toBe('red');
+    expect(arrow.querySelector('polygon')?.getAttribute('stroke')).toBe('blue');
+    expect(arrow.querySelector('polygon')?.getAttribute('stroke-width')).toBe('2');
+  });
+
+  it('keeps the arrow tip at the requested gap on every side with panel borders', async () => {
+    const fixture = (side: NonNullable<PopoverProps['side']>, borderWidth: number) => (
+      <PopoverProvider>
+        <Popover
+          defaultOpen
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          side={side}
+          arrow
+          gap={8}
+          panelStyle={{ borderWidth }}
+        >
+          Panel
+        </Popover>
+      </PopoverProvider>
+    );
+    __setPressableRect({ x: 140, y: 250, width: 44, height: 44 });
+    await render(fixture('top', 1));
+    await act(async () => target('trigger').dispatchEvent(new Event('scroll')));
+    await frames();
+    for (const borderWidth of [1, 2]) {
+      for (const side of ['top', 'bottom', 'left', 'right'] as const) {
+        await act(async () => root?.render(fixture(side, borderWidth)));
+        await frames();
+        const panel = JSON.parse(target('panel').getAttribute('data-style') ?? '{}');
+        const arrowStyle = JSON.parse(target('popover-arrow').getAttribute('data-style') ?? '{}');
+        const x = panel.left + borderWidth + arrowStyle.left;
+        const y = panel.top + borderWidth + arrowStyle.top;
+        const tip = side === 'top' ? y + 8 : side === 'bottom' ? y : side === 'left' ? x + 8 : x;
+        expect(tip).toBe(
+          side === 'top' ? 242 : side === 'bottom' ? 302 : side === 'left' ? 132 : 192
+        );
+      }
+    }
+  });
+
+  it('flips the arrow with placement, hides it at corners, and uses edge gap without an arrow', async () => {
+    const fixture = (arrow: boolean, radius: number) => (
+      <PopoverProvider>
+        <Popover
+          defaultOpen
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          side="top"
+          gap={0}
+          arrow={arrow}
+          panelStyle={{ borderRadius: radius }}
+        >
+          Panel
+        </Popover>
+      </PopoverProvider>
+    );
+    await render(fixture(true, 4));
+    await frames();
+    expect(JSON.parse(target('panel').getAttribute('data-style') ?? '{}').top).toBe(52);
+    expect(target('popover-arrow').querySelector('polygon')?.getAttribute('points')).toBe(
+      '0,8 8,0 16,8'
+    );
+    await act(async () => root?.render(fixture(true, 50)));
+    expect(container?.querySelector('[data-testid="popover-arrow"]')).toBeNull();
+    await act(async () => root?.render(fixture(false, 4)));
+    await frames();
+    expect(JSON.parse(target('panel').getAttribute('data-style') ?? '{}').top).toBe(44);
+  });
+
+  it('closes after both pointer and focus leave for 150ms', async () => {
+    const change = vi.fn();
+    await render(
+      <PopoverProvider>
+        <Popover
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          triggerMode="hover"
+          onOpenChange={change}
+        >
+          Panel
+        </Popover>
+        <button type="button" data-testid="outside">
+          Outside
+        </button>
+      </PopoverProvider>
+    );
+    await act(async () => {
+      target('outside').focus();
+      await vi.advanceTimersByTimeAsync(149);
+    });
+    expect(target('panel')).toBeDefined();
+    await act(async () => vi.advanceTimersByTimeAsync(1));
+    expect(container?.querySelector('[data-testid="panel"]')).toBeNull();
+    expect(change).toHaveBeenLastCalledWith(
+      expect.objectContaining({ open: false, reason: 'focus' })
+    );
+  });
+
+  it('retains a controlled panel after an uncanceled close button proposal', async () => {
+    const change = vi.fn();
+    await render(
+      <PopoverProvider>
+        <Popover
+          open
+          closable
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          onOpenChange={change}
+        >
+          Panel
+        </Popover>
+      </PopoverProvider>
+    );
+    await act(async () =>
+      container?.querySelector<HTMLButtonElement>('[aria-label="Close"]')?.click()
+    );
+    expect(change).toHaveBeenCalledWith(
+      expect.objectContaining({ open: false, reason: 'close-button', defaultPrevented: false })
+    );
+    expect(target('panel')).toBeDefined();
+  });
+
+  it('hover and focus leave after a delay, bridge the gap, and explicit dismissal suppresses reopening', async () => {
+    const change = vi.fn();
+    await render(
+      <PopoverProvider>
+        <Popover
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          triggerMode="hover"
+          gap={100}
+          initialFocus
+          onOpenChange={change}
+        >
+          <button type="button" data-testid="panel-first">
+            Panel action
+          </button>
+        </Popover>
+        <button type="button" data-testid="outside">
+          Outside
+        </button>
+      </PopoverProvider>
+    );
+    // The test fixture focuses the trigger, opening by focus rather than moving focus.
+    expect(document.activeElement).toBe(target('trigger'));
+    expect(change).toHaveBeenCalledWith({ open: true, reason: 'focus' });
+    await act(async () => {
+      target('trigger').dispatchEvent(
+        new MouseEvent('pointerover', { bubbles: true, clientX: 50, clientY: 40 })
+      );
+      target('outside').focus();
+      document.dispatchEvent(
+        new MouseEvent('pointermove', { bubbles: true, clientX: 50, clientY: 100 })
+      );
+      await vi.advanceTimersByTimeAsync(500);
+    });
+    expect(target('panel')).toBeDefined();
+    await act(async () => {
+      target('panel').dispatchEvent(
+        new MouseEvent('pointerover', { bubbles: true, clientX: 50, clientY: 150 })
+      );
+      target('panel-first').focus();
+      target('panel-first').dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      );
+    });
+    expect(container?.querySelector('[data-testid="panel"]')).toBeNull();
+    await act(async () => {
+      target('trigger').dispatchEvent(
+        new MouseEvent('pointerover', { bubbles: true, clientX: 50, clientY: 40 })
+      );
+    });
+    expect(container?.querySelector('[data-testid="panel"]')).toBeNull();
+    await act(async () => {
+      target('outside').focus();
+      target('outside').dispatchEvent(
+        new MouseEvent('pointermove', { bubbles: true, clientX: 300, clientY: 400 })
+      );
+      await vi.advanceTimersByTimeAsync(151);
+      target('trigger').focus();
+    });
+    expect(target('panel')).toBeDefined();
+  });
+
+  it('close button proposals are canceled or controlled without committing', async () => {
+    const change = vi.fn((detail: PopoverOpenChangeDetail) => {
+      if (!detail.open) detail.preventDefault();
+    });
+    await render(
+      <PopoverProvider>
+        <Popover
+          open
+          closable
+          trigger="Open"
+          testID="trigger"
+          panelTestID="panel"
+          onOpenChange={change}
+        >
+          Panel
+        </Popover>
+      </PopoverProvider>
+    );
+    await act(async () =>
+      container?.querySelector<HTMLButtonElement>('[aria-label="Close"]')?.click()
+    );
+    expect(change).toHaveBeenCalledWith(
+      expect.objectContaining({ reason: 'close-button', defaultPrevented: true })
+    );
+    expect(target('panel')).toBeDefined();
+  });
   for (const committedOpen of [true, false]) {
     it(`preserves controlled ${committedOpen} on release and then toggles autonomously`, async () => {
       const onOpenChange = vi.fn();

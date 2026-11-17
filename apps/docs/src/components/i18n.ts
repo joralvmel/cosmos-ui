@@ -64,6 +64,8 @@ const strings = {
       textFieldInvalid: 'Use non-empty labels, a positive height and non-negative whole lengths.',
       iconButtonLabel: 'Favorite',
       triggerLabel: 'Details',
+      popoverCloseLabel: 'Close',
+      popoverInvalid: 'Use a non-negative distance and a non-empty close label.',
       iconButtonInvalid: 'Enter a non-empty accessible label.',
       autonomous: 'Autonomous',
       code: 'Code',
@@ -204,6 +206,8 @@ const strings = {
       customHeight: 'Altura mínima (px)',
       iconButtonLabel: 'Favorito',
       triggerLabel: 'Detalles',
+      popoverCloseLabel: 'Cerrar',
+      popoverInvalid: 'Usa una distancia no negativa y una etiqueta de cierre que no esté vacía.',
       iconButtonInvalid: 'Introduce una etiqueta accesible que no esté vacía.',
       autonomous: 'Autónomo',
       textFieldInvalid:

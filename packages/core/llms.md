@@ -235,6 +235,11 @@ Non-modal content anchored to a consumer trigger, with cancelable close requests
 | --- | --- | --- | --- |
 | `open` | boolean | `false` | Committed visibility. Supplying this prop, including false, controls state; its metadata default does not establish a binding. |
 | `defaultOpen` | boolean | `false` | Initial autonomous visibility only; ignored when open is supplied. Later updates do not reset state. |
+| `triggerMode` | 'press' \| 'hover' | `press` | Hover adds pointer and keyboard-focus opening on web and React Native Web, while keeping press activation. Android/iOS use press. Does not change panel semantics. |
+| `closable` | boolean | `false` | Shows a built-in IconButton with an X. Requests a cancelable close with reason close-button. |
+| `closeLabel` | string | `Close` | Localized accessible name of the close button. Must be non-empty when closable is true. |
+| `gap` | number | `8` | Non-negative finite distance from trigger to panel, or to the arrow tip. CSS pixels on web, logical units on native. Viewport/safe-area collision handling takes priority. |
+| `arrow` | boolean | `false` | Shows a decorative triangular pointer (16 wide, 8 deep), following the actual side, panel background and border. Hidden if it cannot point to the trigger without crossing a corner or viewport edge. |
 | `closeOnEscape` | boolean | `true` | Requests closure on unhandled Escape on web and React Native Web. Native Android and iOS hardware Escape is not supported. |
 | `closeOnOutsidePress` | boolean | `true` | Requests closure on an outside press without preventing its interaction or restoring trigger focus. |
 | `initialFocus` | boolean | `false` | On committed opening (including initially open), focus the first focusable panel descendant, falling back to the panel without adding semantics. False leaves focus unchanged. Native moves accessible/input focus where supported. |
@@ -248,13 +253,13 @@ Non-modal content anchored to a consumer trigger, with cancelable close requests
 
 | DOM | React | Angular | React Native | Detail | Description |
 | --- | --- | --- | --- | --- | --- |
-| `cosm-open-change` | `onOpenChange` | `(openChange)` | `onOpenChange` | `PopoverOpenChangeDetail` | Proposes opening by trigger or closing by trigger, Escape, outside press, panel action or Android Back. Closing only is cancelable, synchronously via the web event or detail.preventDefault(); native uses detail.preventDefault(). Not a committed-state notification. (cancelable) |
+| `cosm-open-change` | `onOpenChange` | `(openChange)` | `onOpenChange` | `PopoverOpenChangeDetail` | Proposes visibility changes by trigger, hover or focus, or closure by Escape, outside press, panel action, close button or Android Back. Closing only is cancelable, synchronously via the web event or detail.preventDefault(); native uses detail.preventDefault(). Not a committed-state notification. (cancelable) |
 
 **Slots**
 
 | Name | Description |
 | --- | --- |
-| `trigger` | Consumer-supplied accessible trigger; its appearance and label belong to the consumer. |
+| `trigger` | Consumer-supplied accessible trigger; its appearance and label belong to the consumer. Native accepts content or a render function receiving onPress, ref and accessibilityState for composing an IconButton without nested buttons. |
 | `(default)` | Consumer-supplied panel content and semantics. Native maps this content to children. |
 
 **CSS parts**
@@ -263,6 +268,9 @@ Non-modal content anchored to a consumer trigger, with cancelable close requests
 | --- | --- |
 | `trigger` | Trigger container. |
 | `panel` | Non-modal anchored surface. |
+| `body` | Scrollable consumer content. |
+| `close` | Optional close IconButton. |
+| `arrow` | Decorative pointer; follows panel colors. |
 
 **CSS custom properties**
 

@@ -10,14 +10,14 @@ export type PopoverAction =
   | { type: 'trigger'; source: 'pointer' | 'touch' | 'keyboard'; cancel?: boolean }
   | { type: 'escape'; handled?: boolean; cancel?: boolean }
   | { type: 'outside'; focusable: boolean; cancel?: boolean }
-  | { type: 'action' | 'back'; cancel?: boolean }
+  | { type: 'action' | 'back' | 'close-button'; cancel?: boolean }
   | { type: 'sync'; open: boolean }
   | { type: 'set-default'; defaultOpen: boolean }
   | { type: 'focus'; target: 'trigger' | 'panel' | 'outside' };
 
 /** Serializable projection of a proposal; cancellation functions are not snapshot data. */
 export type PopoverChangeExpectation =
-  | { open: true; reason: 'trigger'; canceled: false }
+  | { open: true; reason: 'trigger' | 'hover' | 'focus'; canceled: false }
   | { open: false; reason: PopoverCloseReason; canceled: boolean };
 
 export interface PopoverScenario {
@@ -58,6 +58,20 @@ const closing = (reason: PopoverCloseReason, canceled = false): PopoverChangeExp
  * or iOS. Back cases are native Android cases; native drivers must run them in Android mode.
  */
 export const popoverScenarios: readonly PopoverScenario[] = [
+  ...([false, true] as const).map(
+    (cancel): PopoverScenario => ({
+      name: `close button ${cancel ? 'respects cancellation' : 'closes autonomous state'}`,
+      props: { defaultOpen: true, closable: true },
+      actions: [{ type: 'close-button', cancel }],
+      expected: {
+        open: cancel,
+        openAfterEachAction: [cancel],
+        changes: [closing('close-button', cancel)],
+        focus: 'trigger',
+        outsidePresses: 0,
+      },
+    })
+  ),
   {
     name: 'closed by default without a proposal',
     props: {},

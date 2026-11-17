@@ -103,13 +103,21 @@ function html(contract: ComponentContract, values: ControlValues, content: strin
     ({ spec, value }) => spec.type === 'reference' || (spec.type === 'boolean' && value === false)
   );
   const trigger = Object.hasOwn(contract.slots, 'trigger')
-    ? '<button slot="trigger" type="button">Details</button>'
+    ? contract.name === 'popover'
+      ? '<cosm-icon-button slot="trigger" label="Details" variant="ghost" tone="neutral"><cosm-icon></cosm-icon></cosm-icon-button>'
+      : '<button slot="trigger" type="button">Details</button>'
     : '';
   const lines = [
     `<${[contract.tag, ...attributes].join(' ')}>${trigger}${escapeText(content)}</${contract.tag}>`,
     '',
     '<script type="module">',
     `  import '@joralvmel/cosmos-elements/${contract.name}';`,
+    ...(contract.name === 'popover'
+      ? [
+          "  import { info } from '@joralvmel/cosmos-icons/info';",
+          '  document.querySelector(\'cosm-popover [slot="trigger"] cosm-icon\').icon = info;',
+        ]
+      : []),
     ...referenceImports(properties, '  '),
   ];
   const events = Object.values(contract.events);
@@ -189,15 +197,21 @@ function react(contract: ComponentContract, values: ControlValues, content: stri
     ),
   ];
   return example(
-    [`import { ${component} } from '@joralvmel/cosmos-react';`, ...referenceImports(props)].join(
-      '\n'
-    ),
+    [
+      `import { ${component}${contract.name === 'popover' ? ', IconButton, Icon' : ''} } from '@joralvmel/cosmos-react';`,
+      ...(contract.name === 'popover'
+        ? ["import { info } from '@joralvmel/cosmos-icons/info';"]
+        : []),
+      ...referenceImports(props),
+    ].join('\n'),
     jsxElement(
       component,
       attributes,
       content,
       Object.hasOwn(contract.slots, 'trigger')
-        ? '<button slot="trigger" type="button">Details</button>'
+        ? contract.name === 'popover'
+          ? '<IconButton slot="trigger" label="Details" variant="ghost" tone="neutral"><Icon icon={info} /></IconButton>'
+          : '<button slot="trigger" type="button">Details</button>'
         : ''
     )
   );
@@ -226,7 +240,9 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
     event => `(${event.names.angular})="${handler(event.names.angular)}($event.detail)"`
   );
   const trigger = Object.hasOwn(contract.slots, 'trigger')
-    ? '<button slot="trigger" type="button">Details</button>'
+    ? contract.name === 'popover'
+      ? '<cosm-icon-button slot="trigger" label="Details" variant="ghost" tone="neutral"><cosm-icon [icon]="info" /></cosm-icon-button>'
+      : '<button slot="trigger" type="button">Details</button>'
     : '';
   const template = `<${[contract.tag, ...attributes, ...outputs].join(' ')}>${trigger}${escapeText(content)}</${contract.tag}>`;
   const detailTypes = [...new Set(events.map(event => event.detail))];
@@ -246,10 +262,18 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
     '    console.log(detail);',
     '  }',
   ]);
-  const classMembers = [...referenceFields, ...body];
+  const classMembers = [
+    ...(contract.name === 'popover' ? ['  readonly info = info;'] : []),
+    ...referenceFields,
+    ...body,
+  ];
+  const components = `${component}${contract.name === 'popover' ? ', CosmIconButtonComponent, CosmIconComponent' : ''}`;
   return [
     "import { Component } from '@angular/core';",
-    `import { ${component} } from '@joralvmel/cosmos-angular';`,
+    `import { ${components} } from '@joralvmel/cosmos-angular';`,
+    ...(contract.name === 'popover'
+      ? ["import { info } from '@joralvmel/cosmos-icons/info';"]
+      : []),
     ...referenceImports(props),
     ...(detailTypes.length > 0
       ? [`import type { ${detailTypes.join(', ')} } from '@joralvmel/cosmos-core';`]
@@ -257,7 +281,7 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
     '',
     '@Component({',
     "  selector: 'app-example',",
-    `  imports: [${component}],`,
+    `  imports: [${components}],`,
     `  template: \`${template.replaceAll('`', '\\`')}\`,`,
     '})',
     classMembers.length > 0
@@ -284,7 +308,11 @@ function native(contract: ComponentContract, values: ControlValues, content: str
   const isPopover = contract.name === 'popover';
   let themed = false;
   const attributes = [
-    ...(isPopover ? ['trigger="Details"'] : []),
+    ...(isPopover
+      ? [
+          'trigger={props => <IconButton {...props} label="Details" variant="ghost" tone="neutral"><Icon icon={info} /></IconButton>}',
+        ]
+      : []),
     ...props.map(prop => {
       const token = themedPaintProps[contract.name]?.includes(prop.name)
         ? colorToken(prop.value)
@@ -299,13 +327,14 @@ function native(contract: ComponentContract, values: ControlValues, content: str
   ];
   const imports = [
     component,
-    ...(isPopover ? ['PopoverProvider'] : []),
+    ...(isPopover ? ['PopoverProvider', 'IconButton', 'Icon'] : []),
     ...(themed ? ['useTheme'] : []),
   ].join(', ');
   const element = jsxElement(component, attributes, content, '', isPopover);
   return example(
     [
       `import { ${imports} } from '@joralvmel/cosmos-native';`,
+      ...(isPopover ? ["import { info } from '@joralvmel/cosmos-icons/info';"] : []),
       ...(isPopover && content ? ["import { Text } from 'react-native';"] : []),
       ...referenceImports(props),
     ].join('\n'),

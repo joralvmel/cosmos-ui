@@ -1,4 +1,7 @@
+import { info } from '@joralvmel/cosmos-icons/info';
 import {
+  Icon,
+  IconButton,
   Popover,
   type PopoverHandle,
   type PopoverOpenChangeDetail,
@@ -21,6 +24,10 @@ export default function PopoverScreen() {
   const [outsideDismissal, setOutsideDismissal] = useState(true);
   const [escapeDismissal, setEscapeDismissal] = useState(true);
   const [customPanel, setCustomPanel] = useState(false);
+  const [closable, setClosable] = useState(true);
+  const [arrow, setArrow] = useState(true);
+  const [hover, setHover] = useState(false);
+  const [gap, setGap] = useState(8);
   const [lastProposal, setLastProposal] = useState('No proposal yet');
   const side = sides[sideIndex % sides.length];
   const textStyle = { color: theme.colors.fg, fontSize: theme.text.md };
@@ -86,12 +93,51 @@ export default function PopoverScreen() {
         >
           <Text style={textStyle}>Panel style: {customPanel ? 'roomy outlined' : 'default'}</Text>
         </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: closable }}
+          onPress={() => setClosable(value => !value)}
+          style={controlStyle}
+        >
+          <Text style={textStyle}>Close button: {closable ? 'on' : 'off'}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: arrow }}
+          onPress={() => setArrow(value => !value)}
+          style={controlStyle}
+        >
+          <Text style={textStyle}>Arrow: {arrow ? 'on' : 'off'}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: hover }}
+          onPress={() => setHover(value => !value)}
+          style={controlStyle}
+        >
+          <Text style={textStyle}>Trigger: {hover ? 'hover / focus (web)' : 'press'}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setGap(value => (value === 0 ? 8 : value === 8 ? 48 : 0))}
+          style={controlStyle}
+        >
+          <Text style={textStyle}>Gap: {gap}</Text>
+        </Pressable>
       </View>
 
       <View style={{ gap: theme.space.sm }}>
         <Text style={textStyle}>Autonomous visibility · side: {side}</Text>
         <Popover
-          trigger={<Text style={textStyle}>Open placement example</Text>}
+          trigger={props => (
+            <IconButton {...props} label="Open placement example">
+              <Icon icon={info} />
+            </IconButton>
+          )}
+          closable={closable}
+          arrow={arrow}
+          triggerMode={hover ? 'hover' : 'press'}
+          gap={gap}
           side={side}
           align="start"
           closeOnOutsidePress={outsideDismissal}
@@ -127,7 +173,15 @@ export default function PopoverScreen() {
         <Popover
           open={controlledOpen}
           onOpenChange={onOpenChange}
-          trigger={<Text style={textStyle}>Open controlled panel</Text>}
+          trigger={props => (
+            <IconButton {...props} label="Open controlled panel">
+              <Icon icon={info} />
+            </IconButton>
+          )}
+          closable={closable}
+          arrow={arrow}
+          triggerMode={hover ? 'hover' : 'press'}
+          gap={gap}
           ref={closeRef}
           initialFocus
           closeOnOutsidePress={outsideDismissal}

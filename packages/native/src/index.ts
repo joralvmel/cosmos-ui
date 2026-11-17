@@ -17,6 +17,7 @@ export {
   PopoverProvider,
   type PopoverProviderProps,
   type PopoverSafeAreaInsets,
+  type PopoverTriggerProps,
   popoverPropNames,
   usePopoverHost,
 } from './components/popover.js';

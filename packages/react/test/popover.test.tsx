@@ -116,6 +116,8 @@ async function perform(
     return { props, outsideEvent };
   } else if (action.type === 'action' || action.type === 'back') {
     el.requestClose();
+  } else if (action.type === 'close-button') {
+    el.shadowRoot?.querySelector<HTMLElement>('cosm-icon-button')?.click();
   } else if (action.type === 'sync') {
     props = { ...props, open: action.open };
     await rerender(props, fixture);
@@ -204,6 +206,11 @@ describe('Popover: contract drift', () => {
     const values: Record<string, unknown> = {
       open: false,
       defaultOpen: true,
+      triggerMode: 'hover',
+      closable: true,
+      closeLabel: 'Dismiss',
+      gap: 20,
+      arrow: true,
       closeOnEscape: false,
       closeOnOutsidePress: false,
       initialFocus: true,

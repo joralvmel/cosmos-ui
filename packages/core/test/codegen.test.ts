@@ -76,17 +76,35 @@ describe('codegen', () => {
   it('includes an accessible trigger in named-trigger web examples', () => {
     const snippets = generateSnippets(popoverContract, { open: false }, 'More information');
     for (const source of [snippets.html, snippets.react, snippets.angular]) {
-      expect(source).toContain('<button slot="trigger" type="button">Details</button>');
+      expect(source).toContain('slot="trigger" label="Details"');
+      expect(source).toContain('@joralvmel/cosmos-icons/info');
       expect(source).toContain('More information');
     }
     expect(snippets.html).toContain('element.open = false;');
     expect(snippets.react).toContain('open={false}');
     expect(snippets.angular).toContain('[open]="false"');
-    expect(snippets.native).toContain('import { Popover, PopoverProvider }');
+    expect(snippets.native).toContain('import { Popover, PopoverProvider, IconButton, Icon }');
     expect(snippets.native).toContain("import { Text } from 'react-native';");
-    expect(snippets.native).toContain('trigger="Details"');
+    expect(snippets.native).toContain('trigger={props => <IconButton {...props}');
     expect(snippets.native).toContain('<Text>More information</Text>');
     expect(snippets.native).toContain('<PopoverProvider>');
+  });
+
+  it('generates the optional popover interactions and zero distance across adapters', () => {
+    const snippets = generateSnippets(
+      popoverContract,
+      { closable: true, arrow: true, gap: 0, triggerMode: 'hover', closeLabel: 'Dismiss' },
+      'Details'
+    );
+    expect(snippets.html).toContain('gap="0"');
+    expect(snippets.react).toContain('gap={0}');
+    expect(snippets.angular).toContain('[gap]="0"');
+    expect(snippets.native).toContain('gap={0}');
+    for (const source of Object.values(snippets)) {
+      expect(source).toContain('closable');
+      expect(source).toContain('arrow');
+      expect(source).toContain('Dismiss');
+    }
   });
 
   it('escapes user text in HTML and JSX', () => {

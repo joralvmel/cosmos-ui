@@ -50,7 +50,7 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
           data-playground-target
           {...fieldActionLabels}
         >
-          {Object.hasOwn(contract.slots, 'trigger') && <button {...{ slot: 'trigger' }} type="button">{s.playground.triggerLabel}</button>}
+          {Object.hasOwn(contract.slots, 'trigger') && <cosm-icon-button {...{ slot: 'trigger' }} label={s.playground.triggerLabel} variant="ghost" tone="neutral"><cosm-icon data-playground-trigger-icon /></cosm-icon-button>}
           {name === 'icon-button' ? <cosm-icon data-playground-child /> : content}
         </Element>
       </div>
@@ -64,11 +64,16 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
   import { contracts } from '@joralvmel/cosmos-core';
   import { heart } from '@joralvmel/cosmos-icons/heart';
   import { house } from '@joralvmel/cosmos-icons/house';
+  import { info } from '@joralvmel/cosmos-icons/info';
   import { search } from '@joralvmel/cosmos-icons/search';
   import { star } from '@joralvmel/cosmos-icons/star';
   import { initPlayground } from '../lib/playground';
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
+    const triggerIcon = root.querySelector<HTMLElementTagNameMap['cosm-icon']>(
+      '[data-playground-trigger-icon]'
+    );
+    if (triggerIcon) triggerIcon.icon = info;
     const contract = contracts[root.dataset.name as keyof typeof contracts];
     if (!contract) continue;
     const options = {

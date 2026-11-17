@@ -52,6 +52,8 @@ export interface PlaygroundLabels {
   textFieldInvalid?: string;
   iconButtonLabel?: string;
   iconButtonInvalid?: string;
+  popoverCloseLabel?: string;
+  popoverInvalid?: string;
   autonomous?: string;
   textFieldDefaults?: {
     label: string;
@@ -173,6 +175,9 @@ export function initPlayground(
   }
   if (contract.name === 'icon-button') {
     values.label = labels.iconButtonLabel ?? 'Favorite';
+  }
+  if (contract.name === 'popover') {
+    values.closeLabel = labels.popoverCloseLabel ?? 'Close';
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -766,6 +771,16 @@ export function initPlayground(
         return;
       }
       referenceStatus.textContent = '';
+      if (contract.name === 'popover') {
+        const invalidGap =
+          name === 'gap' && !(typeof value === 'number' && Number.isFinite(value) && value >= 0);
+        const invalidLabel = name === 'closeLabel' && (typeof value !== 'string' || !value.trim());
+        if (invalidGap || invalidLabel) {
+          referenceStatus.textContent =
+            labels.popoverInvalid ?? 'Use a non-negative distance and a non-empty close label.';
+          return;
+        }
+      }
       if (contract.name === 'text-field') {
         const invalidSize =
           name === 'size' &&

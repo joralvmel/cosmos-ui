@@ -49,6 +49,21 @@ export class CosmPopoverComponent {
   @Input({ transform: booleanAttribute }) set defaultOpen(value: boolean) {
     this.element.defaultOpen = value;
   }
+  @Input() set triggerMode(value: Props['triggerMode']) {
+    if (value !== undefined) this.element.triggerMode = value;
+  }
+  @Input({ transform: booleanAttribute }) set closable(value: boolean) {
+    this.element.closable = value;
+  }
+  @Input() set closeLabel(value: string) {
+    this.element.closeLabel = value;
+  }
+  @Input() set gap(value: number) {
+    this.element.gap = value;
+  }
+  @Input({ transform: booleanAttribute }) set arrow(value: boolean) {
+    this.element.arrow = value;
+  }
   @Input({ transform: booleanAttribute }) set closeOnEscape(value: boolean) {
     this.element.closeOnEscape = value;
   }

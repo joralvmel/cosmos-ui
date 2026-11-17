@@ -1,7 +1,15 @@
 import { defineContract } from '../contract.js';
 
 /** Cause of a close request, not notification that the panel has closed. */
-export type PopoverCloseReason = 'trigger' | 'escape' | 'outside' | 'action' | 'back';
+export type PopoverCloseReason =
+  | 'trigger'
+  | 'escape'
+  | 'outside'
+  | 'action'
+  | 'back'
+  | 'close-button'
+  | 'hover'
+  | 'focus';
 
 /**
  * An opening proposal cannot be vetoed. Closing proposals can be vetoed synchronously.
@@ -10,7 +18,7 @@ export type PopoverCloseReason = 'trigger' | 'escape' | 'outside' | 'action' | '
  * Returning false or canceling after dispatch has completed has no effect.
  */
 export type PopoverOpenChangeDetail =
-  | { open: true; reason: 'trigger' }
+  | { open: true; reason: 'trigger' | 'hover' | 'focus' }
   | {
       open: false;
       reason: PopoverCloseReason;
@@ -67,7 +75,15 @@ export interface PopoverHandle {
  * excluded.
  *
  * requestClose() is an imperative method, not a prop/event; see PopoverHandle.
- * No component dependencies, hover behavior, arrows, animation, sizes or tones are added.
+ * Hover mode adds pointer/focus opening on web (including React Native Web), never removes
+ * press activation, never steals focus on hover/focus opening, and keeps content reachable
+ * across the gap. Leaving both trigger and panel requests closure after 150ms unless focus
+ * remains inside. Escape/close-button dismissal suppresses reopening until pointer and focus
+ * leave. Android/iOS use press activation. No tooltip semantics are inferred.
+ * The optional close control uses IconButton and an individual Lucide X (ADR 0005).
+ * Arrow follows the actual side and trigger center, hiding when corners or collisions prevent
+ * a correct pointer. Gap measures free space to its tip (or panel edge without an arrow).
+ * No animation, named sizes or tones are added.
  */
 export const popoverContract = defineContract({
   name: 'popover',
@@ -89,6 +105,37 @@ export const popoverContract = defineContract({
       default: false,
       description:
         'Initial autonomous visibility only; ignored when open is supplied. Later updates do not reset state.',
+    },
+    triggerMode: {
+      type: 'enum',
+      values: ['press', 'hover'],
+      default: 'press',
+      description:
+        'Hover adds pointer and keyboard-focus opening on web and React Native Web, while keeping press activation. Android/iOS use press. Does not change panel semantics.',
+    },
+    closable: {
+      type: 'boolean',
+      default: false,
+      description:
+        'Shows a built-in IconButton with an X. Requests a cancelable close with reason close-button.',
+    },
+    closeLabel: {
+      type: 'string',
+      default: 'Close',
+      description:
+        'Localized accessible name of the close button. Must be non-empty when closable is true.',
+    },
+    gap: {
+      type: 'number',
+      default: 8,
+      description:
+        'Non-negative finite distance from trigger to panel, or to the arrow tip. CSS pixels on web, logical units on native. Viewport/safe-area collision handling takes priority.',
+    },
+    arrow: {
+      type: 'boolean',
+      default: false,
+      description:
+        'Shows a decorative triangular pointer (16 wide, 8 deep), following the actual side, panel background and border. Hidden if it cannot point to the trigger without crossing a corner or viewport edge.',
     },
     closeOnEscape: {
       type: 'boolean',
@@ -146,7 +193,7 @@ export const popoverContract = defineContract({
   events: {
     openChange: {
       description:
-        'Proposes opening by trigger or closing by trigger, Escape, outside press, panel action or Android Back. Closing only is cancelable, synchronously via the web event or detail.preventDefault(); native uses detail.preventDefault(). Not a committed-state notification.',
+        'Proposes visibility changes by trigger, hover or focus, or closure by Escape, outside press, panel action, close button or Android Back. Closing only is cancelable, synchronously via the web event or detail.preventDefault(); native uses detail.preventDefault(). Not a committed-state notification.',
       detail: 'PopoverOpenChangeDetail',
       cancelable: true,
       names: {
@@ -160,10 +207,16 @@ export const popoverContract = defineContract({
   states: [{ prop: 'open', event: 'openChange', defaultProp: 'defaultOpen' }],
   slots: {
     trigger:
-      'Consumer-supplied accessible trigger; its appearance and label belong to the consumer.',
+      'Consumer-supplied accessible trigger; its appearance and label belong to the consumer. Native accepts content or a render function receiving onPress, ref and accessibilityState for composing an IconButton without nested buttons.',
     '': 'Consumer-supplied panel content and semantics. Native maps this content to children.',
   },
-  parts: { trigger: 'Trigger container.', panel: 'Non-modal anchored surface.' },
+  parts: {
+    trigger: 'Trigger container.',
+    panel: 'Non-modal anchored surface.',
+    body: 'Scrollable consumer content.',
+    close: 'Optional close IconButton.',
+    arrow: 'Decorative pointer; follows panel colors.',
+  },
   cssProperties: {
     '--cosm-popover-z-index': 'Panel stacking level.',
     '--cosm-popover-padding': 'Panel padding.',

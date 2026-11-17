@@ -93,6 +93,33 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('validates popover spacing and close labels before updating the preview', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-popover');
+    target.dataset.playgroundTarget = '';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: popoverContract,
+      content: 'Details',
+      labels: { ...labels, popoverCloseLabel: 'Cerrar' },
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    controller.set('closable', true);
+    controller.set('arrow', true);
+    controller.set('gap', 0);
+    await target.updateComplete;
+    expect(target.gap).toBe(0);
+    expect(target.closeLabel).toBe('Cerrar');
+    expect(controller.code('react')).toContain('gap={0}');
+    controller.set('gap', -1);
+    controller.set('closeLabel', ' ');
+    expect(target.gap).toBe(0);
+    expect(target.closeLabel).toBe('Cerrar');
+    expect(root.textContent).toContain('non-empty close label');
+  });
+
   it('remounts the popover preview when its initial open state changes', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-popover');
