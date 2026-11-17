@@ -1,0 +1,55 @@
+---
+import Preview from './Preview.astro';
+
+const es = Astro.props.locale === 'es';
+---
+
+<Preview>
+  <cosm-popover closable arrow close-label={es ? 'Cerrar detalles' : 'Close details'} data-popover-example>
+    <cosm-icon-button {...{ slot: 'trigger' }} label={es ? 'Mostrar detalles' : 'Show details'} variant="outline" tone="neutral">
+      <cosm-icon data-popover-example-icon />
+    </cosm-icon-button>
+    <section aria-label={es ? 'Detalles' : 'Details'}>
+      <h3>{es ? 'Información contextual' : 'Contextual information'}</h3>
+      <p>{es ? 'Un panel con título, enlace y acción, sin bloquear la página.' : 'A panel with a heading, link and action, without blocking the page.'}</p>
+      <a href="https://example.com">{es ? 'Más información' : 'Learn more'}</a>
+      <cosm-button variant="soft" data-popover-action>{es ? 'Listo' : 'Done'}</cosm-button>
+    </section>
+  </cosm-popover>
+  <cosm-popover trigger-mode="hover" gap="24" closable arrow close-label={es ? 'Cerrar ayuda' : 'Close help'} class="roomy" data-popover-example>
+    <cosm-icon-button {...{ slot: 'trigger' }} label={es ? 'Ayuda al pasar el puntero o enfocar' : 'Help on hover or focus'} variant="ghost" tone="neutral">
+      <cosm-icon data-popover-example-icon />
+    </cosm-icon-button>
+    <section aria-label={es ? 'Ayuda' : 'Help'}>
+      <h3>{es ? 'Puntero, teclado o pulsación' : 'Pointer, keyboard or press'}</h3>
+      <p>{es ? 'Puedes atravesar la separación, entrar al panel y activar sus enlaces. Escape lo descarta sin mover el foco.' : 'Cross the gap, enter the panel and follow its links. Escape dismisses it without moving focus.'}</p>
+      <p>{es ? 'El contenido largo se desplaza dentro del panel. El fondo y el borde personalizados también se aplican a la flecha.' : 'Long content scrolls inside the panel. The custom background and border also apply to the arrow.'}</p>
+      <a href="https://example.com">{es ? 'Consultar documentación' : 'Read documentation'}</a>
+    </section>
+  </cosm-popover>
+</Preview>
+
+<style>
+  cosm-popover::part(panel) { max-width: min(20rem, calc(100vw - 2rem)); }
+  cosm-popover.roomy::part(panel) {
+    background: var(--cosm-surface);
+    border-color: var(--cosm-primary);
+    max-height: 16rem;
+  }
+  section { display: grid; gap: var(--cosm-space-sm); }
+  h3, p { margin: 0; }
+</style>
+
+<script>
+  import '@joralvmel/cosmos-elements';
+  import { info } from '@joralvmel/cosmos-icons/info';
+
+  for (const icon of document.querySelectorAll<HTMLElementTagNameMap['cosm-icon']>(
+    '[data-popover-example-icon]'
+  )) {
+    icon.icon = info;
+  }
+  for (const button of document.querySelectorAll('[data-popover-action]')) {
+    button.addEventListener('cosm-press', () => button.closest('cosm-popover')?.requestClose());
+  }
+</script>

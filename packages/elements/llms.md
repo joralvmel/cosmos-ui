@@ -176,6 +176,42 @@ Events: `cosm-press` → `IconButtonPressDetail`, `cosm-pressed-change` → `Ico
   childElement.icon = heart;
 </script>
 ```
+### `<cosm-popover>`
+
+Non-modal content anchored to a consumer trigger, with cancelable close requests and no imposed panel semantics.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | boolean | `false` | Committed visibility. Supplying this prop, including false, controls state; its metadata default does not establish a binding. |
+| `defaultOpen` (`default-open`) | boolean | `false` | Initial autonomous visibility only; ignored when open is supplied. Later updates do not reset state. |
+| `triggerMode` (`trigger-mode`) | 'press' \| 'hover' | `press` | Hover adds pointer and keyboard-focus opening on web and React Native Web, while keeping press activation. Android/iOS use press. Does not change panel semantics. |
+| `closable` | boolean | `false` | Shows a built-in IconButton with an X. Requests a cancelable close with reason close-button. |
+| `closeLabel` (`close-label`) | string | `Close` | Localized accessible name of the close button. Must be non-empty when closable is true. |
+| `gap` | number | `8` | Non-negative finite distance from trigger to panel, or to the arrow tip. CSS pixels on web, logical units on native. Viewport/safe-area collision handling takes priority. |
+| `arrow` | boolean | `false` | Shows a decorative triangular pointer (16 wide, 8 deep), following the actual side, panel background and border. Hidden if it cannot point to the trigger without crossing a corner or viewport edge. |
+| `closeOnEscape` (`close-on-escape`) | boolean | `true` | Requests closure on unhandled Escape on web and React Native Web. Native Android and iOS hardware Escape is not supported. |
+| `closeOnOutsidePress` (`close-on-outside-press`) | boolean | `true` | Requests closure on an outside press without preventing its interaction or restoring trigger focus. |
+| `initialFocus` (`initial-focus`) | boolean | `false` | On committed opening (including initially open), focus the first focusable panel descendant, falling back to the panel without adding semantics. False leaves focus unchanged. Native moves accessible/input focus where supported. |
+| `restoreFocus` (`restore-focus`) | boolean | `true` | After committed trigger, Escape, action or Back closure, restore focus only if still inside the panel and the trigger is connected and focusable. Never steal outside focus, restore after outside press, or restore for unsolicited prop closure. |
+| `side` | 'top' \| 'right' \| 'bottom' \| 'left' | `bottom` | Requested physical side; actual placement may flip. Recompute for trigger/panel size, viewport/safe-area, scrolling and orientation changes. |
+| `align` | 'start' \| 'center' \| 'end' | `center` | Cross-axis alignment. On top/bottom, start/end follow inline direction (RTL reverses them); on left/right they mean top/bottom. |
+| `flip` | boolean | `true` | Try the opposite side when the requested side overflows the available viewport/safe area; flip only if it reduces main-axis overflow. Ties keep the requested side. Runs before shift. |
+| `shift` | boolean | `true` | After flip, translate within available viewport/safe-area bounds to reduce overflow. Constrain oversized panels to that region regardless of collision flags; flags never change requested props. |
+
+Events: `cosm-open-change` → `PopoverOpenChangeDetail`.
+
+```html
+<cosm-popover><cosm-icon-button slot="trigger" label="Details" variant="ghost" tone="neutral"><cosm-icon></cosm-icon></cosm-icon-button>Popover</cosm-popover>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/popover';
+  import { info } from '@joralvmel/cosmos-icons/info';
+  document.querySelector('cosm-popover [slot="trigger"] cosm-icon').icon = info;
+
+  const element = document.querySelector('cosm-popover');
+  element.addEventListener('cosm-open-change', event => console.log(event.detail));
+</script>
+```
 
 ## Themes
 

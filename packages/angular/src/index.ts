@@ -1,4 +1,5 @@
 import { CosmIconButtonComponent } from './components/icon-button.component.js';
+import { CosmPopoverComponent } from './components/popover.component.js';
 import { CosmTextFieldComponent } from './components/text-field.component.js';
 
 export type {
@@ -19,6 +20,8 @@ export const COSMOS_COMPONENTS = [
   CosmIconComponent,
   CosmTextFieldComponent,
   CosmIconButtonComponent,
+  CosmPopoverComponent,
 ] as const;
 export { CosmIconButtonComponent } from './components/icon-button.component.js';
+export { CosmPopoverComponent } from './components/popover.component.js';
 export { CosmTextFieldComponent } from './components/text-field.component.js';

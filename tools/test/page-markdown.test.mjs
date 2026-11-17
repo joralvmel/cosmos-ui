@@ -30,7 +30,7 @@ describe('MDX to Markdown', () => {
     expect(markdown).toMatch(/^# \S/);
     expect(markdown).not.toMatch(/^import .*(\.astro|@astrojs\/starlight\/components)';$/m);
     expect(markdown).not.toMatch(
-      /<(?:Playground|IconButtonExamples|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
+      /<(?:Playground|IconButtonExamples|PopoverExamples|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
     );
   });
 
@@ -56,5 +56,13 @@ describe('MDX to Markdown', () => {
     const markdown = convert('getting-started/installation.mdx');
     expect(markdown).toContain('**React**');
     expect(markdown).toMatch(/^```bash$/m);
+  });
+
+  it('converts popover examples into cross-platform interaction samples', () => {
+    const markdown = convert('components/popover.mdx');
+    expect(markdown).not.toContain('<PopoverExamples');
+    expect(markdown).toContain('trigger-mode="hover"');
+    expect(markdown).toContain('gap={24}');
+    expect(markdown).toContain("from '@joralvmel/cosmos-icons/info'");
   });
 });

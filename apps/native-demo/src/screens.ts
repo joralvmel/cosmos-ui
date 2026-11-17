@@ -12,4 +12,5 @@ export const screens = [
     title: 'Icon Button',
     description: 'Labeled icon actions, variants and toggle states.',
   },
+  { route: '/popover', title: 'Popover', description: 'TODO(generator): short description.' },
 ] as const;

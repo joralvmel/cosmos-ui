@@ -5,7 +5,7 @@ import {
   iconButtonContract,
 } from '@joralvmel/cosmos-core';
 import type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
-import type { ReactNode } from 'react';
+import type { ComponentRef, ReactNode, Ref } from 'react';
 import { useState } from 'react';
 import {
   Platform,
@@ -29,6 +29,9 @@ export interface IconButtonProps extends ContractIconButtonProps {
   /** Native Pressable layout customization. The 44pt minimum touch target is retained. */
   style?: StyleProp<ViewStyle>;
   testID?: string;
+  /** Host ref and expanded state for composition with anchored surfaces. */
+  ref?: Ref<ComponentRef<typeof Pressable>>;
+  accessibilityState?: { expanded?: boolean };
 }
 
 /** Props handled by the native component; checked against the contract by the drift test. */
@@ -78,6 +81,8 @@ export function IconButton({
   onPressedChange,
   style,
   testID,
+  ref,
+  accessibilityState,
 }: IconButtonProps) {
   if (typeof label !== 'string' || !label.trim()) {
     throw new TypeError('IconButton requires a non-empty "label".');
@@ -98,13 +103,14 @@ export function IconButton({
     Platform.OS === 'web'
       ? {
           accessibilityRole: 'button' as const,
-          accessibilityState: { disabled },
+          accessibilityState: { disabled, ...accessibilityState },
           'aria-pressed': mode === 'toggle' ? currentPressed : undefined,
         }
       : {
           accessibilityRole: mode === 'toggle' ? ('togglebutton' as const) : ('button' as const),
           accessibilityState: {
             disabled,
+            ...accessibilityState,
             checked: mode === 'toggle' ? currentPressed : undefined,
           },
         };
@@ -124,6 +130,7 @@ export function IconButton({
 
   return (
     <Pressable
+      ref={ref}
       testID={testID}
       accessibilityLabel={label}
       {...accessibility}
