@@ -1,4 +1,5 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { catalog } from '@joralvmel/cosmos-core';
 import { describe, expect, it } from 'vitest';
@@ -33,6 +34,35 @@ describe('component status', () => {
     expect(computeStatus({ contract: true, web: false })).toBe('in-progress');
     expect(computeStatus({ contract: true, web: undefined, native: true })).toBe('stable');
   });
+
+  it.each([
+    [
+      '### `<cosm-listbox>`\nEvents: `cosm-selection-change`.',
+      '### `Listbox`\nSelect an option.',
+      false,
+    ],
+    ['### `<cosm-select>`', '### `Listbox`', false],
+    ['### `<cosm-listbox>`', '### `Select`', false],
+    ['### `<cosm-select>`', '### `Select`', true],
+  ])(
+    'requires exact reference headings on every supported platform (%#)',
+    (web, native, expected) => {
+      const entry = catalog.find(item => item.name === 'select');
+      if (!entry) throw new Error('select missing from the catalog');
+      const root = mkdtempSync(join(tmpdir(), 'cosmos-status-'));
+      try {
+        mkdirSync(join(root, 'packages/elements'), { recursive: true });
+        mkdirSync(join(root, 'packages/native'), { recursive: true });
+        writeFileSync(join(root, 'packages/elements/llms.md'), web);
+        writeFileSync(join(root, 'packages/native/llms.md'), native);
+        const [select] = getStatusReport(root, [entry]).components;
+        expect(select?.pieces.llms).toBe(expected);
+        expect(select?.status).toBe(expected ? 'in-progress' : 'planned');
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
+    }
+  );
 
   it('every implemented component is in the catalog', () => {
     for (const name of implementedNames()) expect(names, name).toContain(name);

@@ -1,0 +1,98 @@
+---
+title: Listbox
+description: Accessible single or multiple selection from a vertical collection.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import ListboxExamples from '../../../components/ListboxExamples.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="listbox" />
+
+Listbox selects one or more values from a named vertical collection. Use it as a standalone
+selection list or as the behavioral foundation of a future Select or Combobox. It does not open a
+panel, filter data or submit a form: compose those responsibilities separately.
+
+## Playground
+
+<Playground name="listbox" />
+
+Try single/multiple selection, flat/grouped collections, disabled/read-only, variants and sizes.
+Choose **Custom** to enter a positive minimum option height. Arrow keys move focus; Enter or Space
+selects. Type a prefix to navigate without filtering.
+
+The selection controls use named sample arrays. `selectedValues` is autonomous when omitted; choosing
+an array binds it and shows proposals without accepting them automatically. Changing mode or initial
+values remounts this preview. The native demo includes owner acceptance/refusal and external reset.
+
+## Variants
+
+`plain` has no container border and composes inside Popover. `outlined` adds a boundary for standalone
+use; neither adds a shadow. Both follow the selected theme and light/dark mode.
+
+<ListboxExamples />
+
+`size` accepts `sm`, `md` (default), `lg`, or a positive finite number: minimum **option** height in
+CSS pixels on web and logical units on native. Descriptions and text scaling can make rows taller.
+Native touch targets stay at least 44 units even with a smaller numeric value.
+
+Use the documented CSS variables and `::part()` hooks for colors, borders, radius, text and spacing.
+Set the host width and `--cosm-listbox-max-height` to control dimensions and scrolling. Native exposes
+typed style hooks for the equivalent surfaces and text; numeric sizing is not a fixed clipping height.
+Keep selected text/background and keyboard focus distinguishable when overriding colors.
+
+Native hooks are `style`, `listStyle`, `optionStyle`, `selectedStyle`, `labelStyle` and
+`descriptionStyle`. The typed `appearance` object controls `background`, `text`, `border`, `radius`,
+`optionPadding`, `gap`, `fontSize`, `descriptionColor`, `selectedBackground`, `selectedColor`, `focus`
+and `maxHeight`.
+
+Items contain a stable unique `value`, nonempty `label`, optional `description`, `icon` and `disabled`.
+Groups contain a nonempty `label` and nonempty `options`. Icon values are structured definitions from
+individual `@joralvmel/cosmos-icons/<name>` imports, rendered decoratively by Cosmos Icon (ADR 0005).
+No catalog import or icon-name registry is needed.
+
+## States
+
+<ListboxExamples kind="states" />
+
+Both selection modes use readonly string arrays: `[]`, `['home']`, or multiple values in multiple
+mode. Omit `selectedValues` for autonomous state initialized once from `defaultSelectedValues`.
+Bind `selectedValues`, including `[]`, to control it. Proposals commit only when the owner updates
+the bound value; later default changes do not reset an existing component. Repeated activation of
+an already selected single option does not emit a redundant change.
+
+React/Angular handlers receive the original typed `CustomEvent`; read `event.detail.selectedValues`
+and explicitly assign accepted values. Native `onSelectionChange` receives the detail directly.
+Absent collection keys are retained in selection; the component does not silently prune owner data.
+Single mode rejects more than one selected value, and duplicate option values are invalid.
+
+`disabled` prevents interaction. `readOnly` permits exploring options without changing selection.
+Individual disabled options cannot be activated and are skipped by keyboard navigation.
+
+## Accessibility
+
+- Supply a meaningful `label`; `labelHidden` hides it visually, not from accessibility APIs.
+- Web uses named listbox/option/group semantics, one Tab stop, visible roving focus and selected
+  states. Up/Down, Home/End and typeahead move focus without changing selection. Enter/Space commits;
+  multiple mode toggles without requiring modifier keys. Navigation stops at list boundaries.
+- Typeahead uses `locale`, otherwise inherited web language or the native runtime locale.
+  Active options scroll into view. Group headings do not receive option focus.
+- Options support concise text, descriptions and decorative icons, **not nested buttons, links or
+  interactive checkboxes**. See the [WAI-ARIA Listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/).
+- React Native Web is validated separately from native. Android/iOS use touch and native accessible
+  labels/selection/disabled states, not an assumed identical ARIA interaction model. Native hardware
+  keyboard/D-pad navigation is deferred; iOS and manual screen-reader runs are not verified (optional).
+- Future Combobox input/option references must share a compatible tree. Reuse shared headless logic;
+  do not point `aria-activedescendant` across private component shadow roots.
+- Filtering, asynchronous loading, virtualization, range/select-all shortcuts, loading/empty
+  presentation and form submission/validation are outside this primitive's initial scope.
+
+## API
+
+<ApiTable name="listbox" />
+
+## Events by platform
+
+<EventsTable name="listbox" />

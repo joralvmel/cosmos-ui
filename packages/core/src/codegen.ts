@@ -1,4 +1,38 @@
 import type { ComponentContract, Platform, PropSpec } from './contract.js';
+import type { ListboxItem } from './specs/listbox.js';
+
+/** Small, dependency-free collections shared by generated examples and documentation controls. */
+export const listboxItemExamples: Readonly<Record<string, readonly ListboxItem<never>[]>> = {
+  flat: [
+    { value: 'apple', label: 'Apple' },
+    { value: 'apricot', label: 'Apricot' },
+    { value: 'banana', label: 'Banana', disabled: true },
+    { value: 'cherry', label: 'Cherry', description: 'Seasonal' },
+  ],
+  grouped: [
+    {
+      label: 'Fruit',
+      options: [
+        { value: 'apple', label: 'Apple' },
+        { value: 'cherry', label: 'Cherry', description: 'Seasonal' },
+      ],
+    },
+    {
+      label: 'Vegetables',
+      options: [
+        { value: 'carrot', label: 'Carrot' },
+        { value: 'broccoli', label: 'Broccoli', disabled: true },
+      ],
+    },
+  ],
+};
+
+export const listboxValueExamples: Readonly<Record<string, readonly string[]>> = {
+  empty: [],
+  apple: ['apple'],
+  cherry: ['cherry'],
+  'apple-cherry': ['apple', 'cherry'],
+};
 
 /** Code tabs of the Playground. */
 export const snippetTargets = ['html', 'react', 'angular', 'native'] as const;
@@ -51,13 +85,23 @@ export interface ActiveProp {
   value: string | number | boolean;
 }
 
-function referenceImports(props: ActiveProp[], indent = '') {
+function referenceImports(props: ActiveProp[], indent = '', typescript = true) {
   return [
     ...new Set(
       props
         .filter(({ spec }) => spec.type === 'reference')
-        .map(({ value }) => {
+        .map(({ spec, value }) => {
           const slug = referenceSlug(String(value));
+          if (
+            spec.type === 'reference' &&
+            (spec.reference === 'ListboxItems' || spec.reference === 'ListboxValues')
+          ) {
+            const samples =
+              spec.reference === 'ListboxItems' ? listboxItemExamples : listboxValueExamples;
+            const sample = samples[slug];
+            if (!sample) throw new Error(`Unknown ${spec.reference} example "${slug}".`);
+            return `${indent}const ${referenceBinding(slug)} = ${JSON.stringify(sample)}${typescript ? ' as const' : ''};`;
+          }
           return `${indent}import { ${referenceBinding(slug)} } from '@joralvmel/cosmos-icons/${slug}';`;
         })
     ),
@@ -118,7 +162,7 @@ function html(contract: ComponentContract, values: ControlValues, content: strin
           '  document.querySelector(\'cosm-popover [slot="trigger"] cosm-icon\').icon = info;',
         ]
       : []),
-    ...referenceImports(properties, '  '),
+    ...referenceImports(properties, '  ', false),
   ];
   const events = Object.values(contract.events);
   if (events.length > 0 || properties.length > 0) {

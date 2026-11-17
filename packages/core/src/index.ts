@@ -1,5 +1,6 @@
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
+import { listboxContract } from './specs/listbox.js';
 import { popoverContract } from './specs/popover.js';
 import { textFieldContract } from './specs/text-field.js';
 
@@ -18,6 +19,8 @@ export {
   type ControlValues,
   generateComposedSnippets,
   generateSnippets,
+  listboxItemExamples,
+  listboxValueExamples,
   pascalCase,
   type SnippetChild,
   type SnippetTarget,
@@ -40,6 +43,15 @@ export {
   type StateSpec,
   supports,
 } from './contract.js';
+export {
+  findListboxMatch,
+  getListboxInitialActive,
+  getListboxOptions,
+  getListboxSelection,
+  moveListboxActive,
+  validateListboxSize,
+  validateListboxValues,
+} from './headless/listbox.js';
 export {
   getPressableState,
   type PressableInput,
@@ -87,6 +99,7 @@ export const contracts = {
   'text-field': textFieldContract,
   'icon-button': iconButtonContract,
   popover: popoverContract,
+  listbox: listboxContract,
 } as const;
 export { iconContract } from './specs/icon.js';
 export {
@@ -105,6 +118,21 @@ export {
   iconButtonScenarios,
   iconButtonScenariosFor,
 } from './specs/icon-button.scenarios.js';
+export {
+  type ListboxGroup,
+  type ListboxItem,
+  type ListboxOption,
+  type ListboxSelectionChangeDetail,
+  type ListboxSelectionMode,
+  listboxContract,
+} from './specs/listbox.js';
+export {
+  type ListboxAction,
+  type ListboxScenario,
+  listboxScenarioItems,
+  listboxScenarios,
+  listboxScenariosFor,
+} from './specs/listbox.scenarios.js';
 export {
   type PopoverAlign,
   type PopoverCloseReason,

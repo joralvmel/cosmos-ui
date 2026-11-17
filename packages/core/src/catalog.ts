@@ -137,7 +137,7 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'primitive',
     batch: 'internal',
     priority: 1,
-    dependsOn: [],
+    dependsOn: ['icon'],
     pattern: apg('listbox'),
   }),
   entry({

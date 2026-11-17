@@ -94,6 +94,18 @@ export function mdxToMarkdown(source, { report } = {}) {
       continue;
     }
     if (trimmed.startsWith('<IconButtonExamples')) continue;
+    if (trimmed.startsWith('<ListboxExamples')) {
+      output.push(
+        snippetsMarkdown(contracts.listbox, '', {
+          variant: 'outlined',
+          size: 56,
+          ...(attribute(trimmed, 'kind') === 'states'
+            ? { selectionMode: 'multiple', selectedValues: 'empty' }
+            : {}),
+        })
+      );
+      continue;
+    }
     if (trimmed.startsWith('<PopoverExamples')) {
       output.push(
         snippetsMarkdown(contracts.popover, 'Additional information.', {

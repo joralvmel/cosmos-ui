@@ -1,10 +1,14 @@
 import {
   type ComponentContract,
   type ControlValues,
+  type ListboxSelectionChangeDetail,
+  listboxValueExamples,
   type SnippetTarget,
   snippetTargets,
   supportsTarget,
   toAttribute,
+  validateListboxSize,
+  validateListboxValues,
 } from '@joralvmel/cosmos-core';
 import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/text-field';
@@ -54,6 +58,11 @@ export interface PlaygroundLabels {
   iconButtonInvalid?: string;
   popoverCloseLabel?: string;
   popoverInvalid?: string;
+  listboxLabel?: string;
+  listboxInvalid?: string;
+  listboxSelected?: string;
+  listboxProposal?: string;
+  listboxResetNote?: string;
   autonomous?: string;
   textFieldDefaults?: {
     label: string;
@@ -178,6 +187,9 @@ export function initPlayground(
   }
   if (contract.name === 'popover') {
     values.closeLabel = labels.popoverCloseLabel ?? 'Close';
+  }
+  if (contract.name === 'listbox') {
+    values.label = labels.listboxLabel ?? 'Choose produce';
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -342,7 +354,8 @@ export function initPlayground(
       spec.type === 'union'
         ? spec.variants.flatMap(variant => (variant.type === 'enum' ? variant.values : []))
         : [];
-    const fieldSize = contract.name === 'text-field' && name === 'size';
+    const fieldSize =
+      (contract.name === 'text-field' || contract.name === 'listbox') && name === 'size';
     const enumUnion =
       spec.type === 'union' && spec.variants.every(variant => variant.type === 'enum');
     if (spec.type === 'enum' || spec.type === 'reference' || fieldSize || enumUnion) {
@@ -359,6 +372,9 @@ export function initPlayground(
             : unionChoices;
       if (contract.name === 'text-field' && (spec.type === 'reference' || enumUnion)) {
         control.append(element('option', { value: '' }, labels.none ?? 'None'));
+      }
+      if (spec.type === 'reference' && contract.states.some(state => state.prop === name)) {
+        control.append(element('option', { value: '' }, labels.autonomous ?? 'Autonomous'));
       }
       for (const value of choices) {
         const option = element('option', { value }, value);
@@ -610,8 +626,9 @@ export function initPlayground(
                   control.value.trim() !== '' &&
                   Number.isFinite(Number(control.value))
                 ? Number(control.value)
-                : contract.name === 'text-field' &&
-                    (spec.type === 'reference' || enumUnion) &&
+                : ((contract.name === 'text-field' && (spec.type === 'reference' || enumUnion)) ||
+                      (spec.type === 'reference' &&
+                        contract.states.some(state => state.prop === name))) &&
                     control.value === ''
                   ? undefined
                   : control.value;
@@ -629,6 +646,37 @@ export function initPlayground(
     controller.set('size', Number(customHeight.value));
   });
   if (contract.name === 'text-field') fieldset.append(advanced);
+  let autonomousSelection: readonly string[] = [];
+  let lastProposal: readonly string[] = [];
+  const selectionOutput = element('output', {
+    'data-listbox-selection': '',
+    'aria-live': 'polite',
+  });
+  const updateSelectionOutput = () => {
+    const accepted =
+      typeof values.selectedValues === 'string'
+        ? (listboxValueExamples[values.selectedValues] ?? [])
+        : autonomousSelection;
+    selectionOutput.textContent = `${labels.listboxSelected ?? 'Selected'}: ${JSON.stringify(accepted)} · ${labels.listboxProposal ?? 'Last proposal'}: ${JSON.stringify(lastProposal)}`;
+  };
+  if (contract.name === 'listbox') {
+    root.addEventListener('cosm-selection-change', event => {
+      const { detail } = event as CustomEvent<ListboxSelectionChangeDetail>;
+      lastProposal = detail.selectedValues;
+      if (values.selectedValues === undefined) autonomousSelection = detail.selectedValues;
+      updateSelectionOutput();
+    });
+    fieldset.append(
+      selectionOutput,
+      element(
+        'p',
+        {},
+        labels.listboxResetNote ??
+          'Changing mode or initial values resets this preview. A bound selection shows proposals until its owner accepts them.'
+      )
+    );
+    updateSelectionOutput();
+  }
   fieldset.append(referenceStatus);
   root.append(fieldset);
 
@@ -760,6 +808,7 @@ export function initPlayground(
       return selected;
     },
     set(name, value) {
+      if (contract.name === 'listbox' && name === 'locale' && value === '') value = undefined;
       const spec = contract.props[name];
       const onWeb = spec && (!spec.platforms || spec.platforms.includes('web'));
       if (
@@ -771,6 +820,36 @@ export function initPlayground(
         return;
       }
       referenceStatus.textContent = '';
+      if (contract.name === 'listbox') {
+        const next = { ...values, [name]: value };
+        try {
+          if (typeof next.label !== 'string' || !next.label.trim()) {
+            throw new TypeError(labels.listboxInvalid ?? 'Enter a non-empty label.');
+          }
+          if (typeof next.size !== 'string' && typeof next.size !== 'number') {
+            throw new TypeError(labels.listboxInvalid ?? 'Enter a positive option height.');
+          }
+          validateListboxSize(next.size);
+          if (next.selectionMode !== 'single' && next.selectionMode !== 'multiple') {
+            throw new TypeError('Invalid selection mode.');
+          }
+          for (const prop of ['selectedValues', 'defaultSelectedValues']) {
+            const reference = next[prop];
+            if (reference === undefined) continue;
+            const selection =
+              typeof reference === 'string' ? listboxValueExamples[reference] : undefined;
+            if (!selection) throw new TypeError('Unknown selection example.');
+            validateListboxValues(selection, next.selectionMode);
+          }
+          if (next.locale !== undefined) {
+            if (typeof next.locale !== 'string') throw new TypeError('Invalid locale.');
+            new Intl.Collator(next.locale);
+          }
+        } catch (error) {
+          referenceStatus.textContent = `${labels.listboxInvalid ?? 'Invalid Listbox value.'} ${error instanceof Error ? error.message : String(error)}`;
+          return;
+        }
+      }
       if (contract.name === 'popover') {
         const invalidGap =
           name === 'gap' && !(typeof value === 'number' && Number.isFinite(value) && value >= 0);
@@ -858,17 +937,34 @@ export function initPlayground(
         return;
       }
       values[name] = value;
-      if (target && contract.name === 'popover' && name === 'defaultOpen') {
+      if (
+        target &&
+        ((contract.name === 'popover' && name === 'defaultOpen') ||
+          (contract.name === 'listbox' &&
+            (name === 'selectionMode' || name === 'defaultSelectedValues')))
+      ) {
         const replacement = document.createElement(contract.tag);
         for (const attribute of target.attributes) {
           if (attribute.name !== 'open') replacement.setAttribute(attribute.name, attribute.value);
         }
         while (target.firstChild) replacement.append(target.firstChild);
         for (const [prop, current] of Object.entries(values)) {
-          if (current !== undefined) Reflect.set(replacement, prop, current);
+          const propSpec = contract.props[prop];
+          const resolved =
+            propSpec?.type === 'reference' && typeof current === 'string'
+              ? options.referenceValues?.[propSpec.reference]?.[current]
+              : current;
+          if (resolved !== undefined) Reflect.set(replacement, prop, resolved);
         }
         target.replaceWith(replacement);
         target = replacement;
+        if (contract.name === 'listbox') {
+          autonomousSelection =
+            typeof values.defaultSelectedValues === 'string'
+              ? (listboxValueExamples[values.defaultSelectedValues] ?? [])
+              : [];
+          lastProposal = [];
+        }
       }
       if (target && onWeb) {
         if (contract.name === 'icon-button' && name === 'pressed') {
@@ -876,6 +972,9 @@ export function initPlayground(
         }
         if (contract.name === 'text-field' && name === 'value') {
           Reflect.set(target, 'valueControlled', value !== undefined);
+        }
+        if (contract.name === 'listbox' && name === 'selectedValues') {
+          Reflect.set(target, 'selectedValuesControlled', value !== undefined);
         }
         const resolved =
           spec?.type === 'reference' && typeof value === 'string'
@@ -893,6 +992,7 @@ export function initPlayground(
           target.toggleAttribute(toAttribute(name), value === true);
       }
       status.textContent = '';
+      if (contract.name === 'listbox') updateSelectionOutput();
       render();
     },
     select(next) {

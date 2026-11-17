@@ -3,6 +3,9 @@ import {
   buttonContract,
   iconButtonContract,
   iconContract,
+  listboxContract,
+  listboxItemExamples,
+  listboxValueExamples,
   popoverContract,
   textFieldContract,
 } from '@joralvmel/cosmos-core';
@@ -14,6 +17,7 @@ import { house } from '@joralvmel/cosmos-icons/house';
 import { search } from '@joralvmel/cosmos-icons/search';
 import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/icon-button';
+import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
 import '@joralvmel/cosmos-elements/text-field';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -93,6 +97,51 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('resolves collection controls, ownership and numeric sizes in the listbox preview', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-listbox');
+    target.dataset.playgroundTarget = '';
+    target.label = 'Choose produce';
+    target.items = listboxItemExamples.grouped ?? [];
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: listboxContract,
+      content: '',
+      labels,
+      themes: [],
+      referenceValues: {
+        ListboxItems: listboxItemExamples,
+        ListboxValues: listboxValueExamples,
+      },
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    controller.set('selectionMode', 'multiple');
+    controller.set('selectedValues', 'apple-cherry');
+    controller.set('size', 57);
+    const current = root.querySelector('cosm-listbox');
+    if (!current) throw new Error('Missing remounted Listbox');
+    await current.updateComplete;
+    expect(current.selectedValues).toEqual(['apple', 'cherry']);
+    expect(current.size).toBe(57);
+    expect(controller.code('html')).toContain('element.selectedValues = appleCherry;');
+    expect(controller.code('react')).toContain('size={57}');
+    controller.set('selectionMode', 'single');
+    expect(controller.values.selectionMode).toBe('multiple');
+    expect(root.querySelector('[role="status"]')?.textContent).toBeTruthy();
+    controller.set('selectedValues', undefined);
+    controller.set('defaultSelectedValues', 'cherry');
+    const autonomous = root.querySelector('cosm-listbox');
+    if (!autonomous) throw new Error('Missing autonomous Listbox');
+    await autonomous.updateComplete;
+    expect(autonomous.shadowRoot?.querySelectorAll('[aria-selected="true"]')).toHaveLength(1);
+    expect(controller.code('native')).not.toContain('selectedValues={');
+    controller.set('locale', '');
+    expect(controller.values.locale).toBeUndefined();
+    controller.set('size', 0);
+    expect(controller.values.size).toBe(57);
+  });
+
   it('validates popover spacing and close labels before updating the preview', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-popover');

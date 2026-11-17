@@ -30,7 +30,7 @@ describe('MDX to Markdown', () => {
     expect(markdown).toMatch(/^# \S/);
     expect(markdown).not.toMatch(/^import .*(\.astro|@astrojs\/starlight\/components)';$/m);
     expect(markdown).not.toMatch(
-      /<(?:Playground|IconButtonExamples|PopoverExamples|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
+      /<(?:Playground|IconButtonExamples|PopoverExamples|ListboxExamples|ApiTable|EventsTable|StatusBadge|StatusTable|ThemeGallery|SetupSteps|AgentsTable|Preview|Steps|Tabs|TabItem|Card|CardGrid)\b/
     );
   });
 
@@ -64,5 +64,14 @@ describe('MDX to Markdown', () => {
     expect(markdown).toContain('trigger-mode="hover"');
     expect(markdown).toContain('gap={24}');
     expect(markdown).toContain("from '@joralvmel/cosmos-icons/info'");
+  });
+
+  it('converts collection examples without treating arrays as icon imports', () => {
+    const markdown = convert('components/listbox.mdx');
+    expect(markdown).not.toContain('<ListboxExamples');
+    expect(markdown).toContain('selectionMode="multiple"');
+    expect(markdown).toContain('size={56}');
+    expect(markdown).toContain('"options":[');
+    expect(markdown).not.toContain('cosmos-icons/grouped');
   });
 });

@@ -6,6 +6,7 @@ import {
   defineContract,
   generateSnippets,
   iconButtonContract,
+  listboxContract,
   popoverContract,
   supportsTarget,
   textFieldContract,
@@ -20,6 +21,26 @@ const defaults = Object.fromEntries(
 );
 
 describe('codegen', () => {
+  it('declares listbox collections and selection arrays on every platform', () => {
+    const snippets = generateSnippets(
+      listboxContract,
+      { selectionMode: 'multiple', selectedValues: 'apple-cherry', size: 57 },
+      ''
+    );
+    for (const source of Object.values(snippets)) {
+      expect(source).toContain('const grouped =');
+      expect(source).toContain('"options":[');
+      expect(source).toContain('const appleCherry = ["apple","cherry"]');
+      expect(source).not.toContain('cosmos-icons/grouped');
+      expect(source).not.toContain('cosmos-icons/apple-cherry');
+    }
+    expect(snippets.html).toContain('element.items = grouped;');
+    expect(snippets.html).toContain('element.selectedValues = appleCherry;');
+    expect(snippets.html).not.toContain('as const');
+    expect(snippets.react).toContain('selectedValues={appleCherry}');
+    expect(snippets.angular).toContain('[items]="grouped"');
+    expect(snippets.native).toContain('size={57}');
+  });
   it('omits props that keep their default value', () => {
     expect(activeProps(buttonContract, defaults, 'web')).toEqual([]);
     const snippets = generateSnippets(buttonContract, defaults, 'Save');

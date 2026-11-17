@@ -1,0 +1,99 @@
+---
+title: Listbox
+description: Selección accesible simple o múltiple desde una colección vertical.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import ListboxExamples from '../../../../components/ListboxExamples.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="listbox" />
+
+Listbox permite seleccionar uno o varios valores de una colección vertical con nombre. Puede usarse
+como lista independiente o como base de comportamiento de un futuro Select o Combobox. No abre un
+panel, filtra datos ni envía formularios: esas responsabilidades se componen por separado.
+
+## Playground
+
+<Playground name="listbox" />
+
+Prueba los modos simple/múltiple, colecciones planas/agrupadas, estados, variantes y tamaños.
+Elige **Personalizado** para introducir una altura mínima positiva por opción. Las flechas mueven
+el foco; Enter o Espacio selecciona. Escribe un prefijo para navegar sin filtrar.
+
+Los controles de selección usan arrays de ejemplo. Omitir `selectedValues` permite el uso autónomo;
+elegir un array controla el valor y muestra propuestas sin aceptarlas automáticamente. Cambiar modo
+o valores iniciales reinicia esta vista. La demo nativa incluye aceptación/rechazo y reinicio externo.
+
+## Variantes
+
+`plain` no tiene borde y encaja dentro de Popover. `outlined` añade un borde para el uso independiente;
+ninguna variante añade sombra. Ambas siguen el tema y el modo claro/oscuro.
+
+<ListboxExamples locale="es" />
+
+`size` admite `sm`, `md` (predeterminado), `lg` o un número positivo finito: altura mínima de cada
+**opción**, en píxeles CSS en web y unidades lógicas en native. Las descripciones y el escalado del
+texto pueden aumentar la altura. En native el área táctil conserva un mínimo de 44 unidades.
+
+Personaliza colores, borde, radio, texto y espaciado mediante las variables CSS y `::part()`
+documentados. El ancho del elemento y `--cosm-listbox-max-height` controlan las dimensiones y el
+desplazamiento. Native expone estilos tipados equivalentes para superficies y texto; el tamaño
+numérico no es una altura fija que recorte contenido. Mantén distinguibles selección y foco.
+
+Los hooks nativos son `style`, `listStyle`, `optionStyle`, `selectedStyle`, `labelStyle` y
+`descriptionStyle`. El objeto tipado `appearance` controla `background`, `text`, `border`, `radius`,
+`optionPadding`, `gap`, `fontSize`, `descriptionColor`, `selectedBackground`, `selectedColor`, `focus`
+y `maxHeight`.
+
+Cada opción contiene un `value` único y estable, `label` no vacío y, opcionalmente, `description`,
+`icon` y `disabled`. Los grupos tienen `label` no vacío y un array `options` no vacío. Los iconos son
+definiciones estructuradas importadas individualmente de `@joralvmel/cosmos-icons/<name>`, renderizadas
+como decoración con Cosmos Icon (ADR 0005). No se carga el catálogo ni se usa un registro por nombre.
+
+## Estados
+
+<ListboxExamples kind="states" locale="es" />
+
+Ambos modos usan arrays de cadenas: `[]`, `['home']` o varios valores en modo múltiple. Sin
+`selectedValues`, el componente es autónomo y se inicializa una vez desde `defaultSelectedValues`.
+Vincular `selectedValues`, incluso `[]`, controla la selección. Las propuestas solo se aplican cuando
+el propietario actualiza el valor; cambiar después el predeterminado no reinicia el componente.
+Activar de nuevo la opción ya seleccionada en modo simple no emite un cambio redundante.
+
+React/Angular reciben el `CustomEvent` tipado original: lee `event.detail.selectedValues` y asigna
+explícitamente los valores aceptados. En native, `onSelectionChange` recibe directamente el detalle.
+Las claves ausentes de la colección se conservan: Listbox no elimina silenciosamente datos del
+propietario. El modo simple rechaza varios valores seleccionados; los valores de opción duplicados
+también son inválidos.
+
+`disabled` impide la interacción. `readOnly` permite explorar sin cambiar la selección. Las opciones
+deshabilitadas no se pueden activar y se omiten durante la navegación por teclado.
+
+## Accesibilidad
+
+- Proporciona un `label` significativo; `labelHidden` solo lo oculta visualmente.
+- En web hay semántica listbox/option/group con nombre, una parada de Tab, foco visible y estados de
+  selección. Arriba/Abajo, Home/End y los prefijos mueven el foco sin seleccionar. Enter/Espacio
+  confirma; el modo múltiple alterna opciones sin modificadores. La navegación se detiene en los extremos.
+- Los prefijos usan `locale`; si se omite, el idioma heredado en web o el del entorno nativo.
+  La opción activa se desplaza a la vista. Los encabezados de grupo no reciben foco de opción.
+- Admite texto breve, descripciones e iconos decorativos, **no botones, enlaces ni checkboxes
+  interactivos anidados**. Consulta el [patrón WAI-ARIA Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/).
+- RN Web se valida por separado. Android/iOS usan toque, nombres y estados accesibles nativos, sin
+  asumir el mismo modelo ARIA. Teclado físico/D-pad nativo queda diferido; iOS y lectores manuales
+  no se verifican por defecto (opcionales).
+- Un futuro Combobox debe mantener sus referencias de entrada/opciones en un árbol compatible.
+  Se reutiliza lógica compartida; no se cruza Shadow DOM privado mediante `aria-activedescendant`.
+- Quedan fuera filtrado, carga asíncrona, virtualización, selección por rangos/seleccionar todo,
+  presentación propia de carga/vacío y envío/validación de formularios.
+
+## API
+
+<ApiTable name="listbox" />
+
+## Eventos por plataforma
+
+<EventsTable name="listbox" />

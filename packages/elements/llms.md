@@ -212,6 +212,40 @@ Events: `cosm-open-change` → `PopoverOpenChangeDetail`.
   element.addEventListener('cosm-open-change', event => console.log(event.detail));
 </script>
 ```
+### `<cosm-listbox>`
+
+Selects one or more values from a named vertical collection, with groups, descriptions, icons and independent keyboard focus.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required nonempty accessible label, visible unless labelHidden is true. |
+| `labelHidden` (`label-hidden`) | boolean | `false` | Visually hides the label without removing its accessible name. |
+| `items` | ListboxItems | Required | Readonly collection of options or named groups. Options have globally unique nonempty value and label strings, optional description, decorative IconDefinition and disabled. Groups have a nonempty label and options array. |
+| `selectionMode` (`selection-mode`) | 'single' \| 'multiple' | `single` | Single permits at most one selected value; multiple toggles each activation. |
+| `selectedValues` (`selected-values`) | ListboxValues | — | Controlled selected values, including an empty array. Activation only proposes changes until the owner updates this prop. Missing collection values are retained, not automatically selected or removed. |
+| `defaultSelectedValues` (`default-selected-values`) | ListboxValues | — | Initial autonomous selected values (empty by default). Later changes do not reset selection. |
+| `variant` | 'plain' \| 'outlined' | `plain` | Plain composes inside a panel; outlined adds a standalone container boundary. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic size or a positive finite minimum option height in CSS pixels/native logical units. Content may grow; native touch targets remain at least 44. |
+| `disabled` | boolean | `false` | Prevents interaction and removes the list from keyboard navigation. |
+| `readOnly` (`read-only`) | boolean | `false` | Allows exploring options without proposing or committing selection changes. |
+| `locale` | string | — | BCP 47 locale for typeahead. Web inherits the nearest language; native uses the runtime locale when omitted. Invalid locale identifiers are rejected. |
+
+Events: `cosm-selection-change` → `ListboxSelectionChangeDetail`.
+
+```html
+<cosm-listbox label="Listbox"></cosm-listbox>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/listbox';
+  const grouped = [{"label":"Fruit","options":[{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry","description":"Seasonal"}]},{"label":"Vegetables","options":[{"value":"carrot","label":"Carrot"},{"value":"broccoli","label":"Broccoli","disabled":true}]}];
+  const empty = [];
+
+  const element = document.querySelector('cosm-listbox');
+  element.items = grouped;
+  element.defaultSelectedValues = empty;
+  element.addEventListener('cosm-selection-change', event => console.log(event.detail));
+</script>
+```
 
 ## Themes
 
