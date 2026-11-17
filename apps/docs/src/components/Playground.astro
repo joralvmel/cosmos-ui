@@ -49,7 +49,10 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
         <Element
           data-playground-target
           {...fieldActionLabels}
-        >{name === 'icon-button' ? <cosm-icon data-playground-child /> : content}</Element>
+        >
+          {Object.hasOwn(contract.slots, 'trigger') && <button {...{ slot: 'trigger' }} type="button">{s.playground.triggerLabel}</button>}
+          {name === 'icon-button' ? <cosm-icon data-playground-child /> : content}
+        </Element>
       </div>
     )
   }

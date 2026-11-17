@@ -254,6 +254,7 @@ export const catalog: readonly CatalogEntry[] = [
     priority: 1,
     dependsOn: [],
     pattern: 'https://open-ui.org/components/popover.research.explainer/',
+    notes: ['Hardware Escape dismissal is deferred on native iOS and Android; Android Back works.'],
   }),
   entry({
     name: 'tooltip',

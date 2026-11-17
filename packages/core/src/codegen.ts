@@ -102,8 +102,11 @@ function html(contract: ComponentContract, values: ControlValues, content: strin
   const properties = props.filter(
     ({ spec, value }) => spec.type === 'reference' || (spec.type === 'boolean' && value === false)
   );
+  const trigger = Object.hasOwn(contract.slots, 'trigger')
+    ? '<button slot="trigger" type="button">Details</button>'
+    : '';
   const lines = [
-    `<${[contract.tag, ...attributes].join(' ')}>${escapeText(content)}</${contract.tag}>`,
+    `<${[contract.tag, ...attributes].join(' ')}>${trigger}${escapeText(content)}</${contract.tag}>`,
     '',
     '<script type="module">',
     `  import '@joralvmel/cosmos-elements/${contract.name}';`,
@@ -141,15 +144,23 @@ function jsxAttributes(props: ActiveProp[]) {
   );
 }
 
-function jsxElement(component: string, attributes: string[], content: string) {
+function jsxElement(
+  component: string,
+  attributes: string[],
+  content: string,
+  trigger = '',
+  nativeText = false
+) {
+  const child = content && nativeText ? `<Text>${jsxText(content)}</Text>` : jsxText(content);
   const open = `<${[component, ...attributes].join(' ')}>`;
-  const inline = `    ${open}${jsxText(content)}</${component}>`;
+  const inline = `    ${open}${trigger}${child}</${component}>`;
   if (inline.length <= 80) return [inline];
   return [
     `    <${component}`,
     ...attributes.map(item => `      ${item}`),
     '    >',
-    ...(content ? [`      ${jsxText(content)}`] : []),
+    ...(trigger ? [`      ${trigger}`] : []),
+    ...(content ? [`      ${child}`] : []),
     `    </${component}>`,
   ];
 }
@@ -181,7 +192,14 @@ function react(contract: ComponentContract, values: ControlValues, content: stri
     [`import { ${component} } from '@joralvmel/cosmos-react';`, ...referenceImports(props)].join(
       '\n'
     ),
-    jsxElement(component, attributes, content)
+    jsxElement(
+      component,
+      attributes,
+      content,
+      Object.hasOwn(contract.slots, 'trigger')
+        ? '<button slot="trigger" type="button">Details</button>'
+        : ''
+    )
   );
 }
 
@@ -207,7 +225,10 @@ function angular(contract: ComponentContract, values: ControlValues, content: st
   const outputs = events.map(
     event => `(${event.names.angular})="${handler(event.names.angular)}($event.detail)"`
   );
-  const template = `<${[contract.tag, ...attributes, ...outputs].join(' ')}>${escapeText(content)}</${contract.tag}>`;
+  const trigger = Object.hasOwn(contract.slots, 'trigger')
+    ? '<button slot="trigger" type="button">Details</button>'
+    : '';
+  const template = `<${[contract.tag, ...attributes, ...outputs].join(' ')}>${trigger}${escapeText(content)}</${contract.tag}>`;
   const detailTypes = [...new Set(events.map(event => event.detail))];
   const referenceFields = [
     ...new Set(
@@ -260,8 +281,10 @@ function native(contract: ComponentContract, values: ControlValues, content: str
   content = contentFor(contract, content);
   const component = pascalCase(contract.name);
   const props = activeProps(contract, values, 'native');
+  const isPopover = contract.name === 'popover';
   let themed = false;
   const attributes = [
+    ...(isPopover ? ['trigger="Details"'] : []),
     ...props.map(prop => {
       const token = themedPaintProps[contract.name]?.includes(prop.name)
         ? colorToken(prop.value)
@@ -274,12 +297,21 @@ function native(contract: ComponentContract, values: ControlValues, content: str
       event => `${event.names.native}={detail => console.log(detail)}`
     ),
   ];
-  const imports = themed ? `${component}, useTheme` : component;
+  const imports = [
+    component,
+    ...(isPopover ? ['PopoverProvider'] : []),
+    ...(themed ? ['useTheme'] : []),
+  ].join(', ');
+  const element = jsxElement(component, attributes, content, '', isPopover);
   return example(
-    [`import { ${imports} } from '@joralvmel/cosmos-native';`, ...referenceImports(props)].join(
-      '\n'
-    ),
-    jsxElement(component, attributes, content),
+    [
+      `import { ${imports} } from '@joralvmel/cosmos-native';`,
+      ...(isPopover && content ? ["import { Text } from 'react-native';"] : []),
+      ...referenceImports(props),
+    ].join('\n'),
+    isPopover
+      ? ['    <PopoverProvider>', ...element.map(line => `  ${line}`), '    </PopoverProvider>']
+      : element,
     themed ? ['  const theme = useTheme();'] : []
   );
 }

@@ -52,6 +52,10 @@
       "types": "./dist/components/icon-button/cosm-icon-button.d.ts",
       "default": "./dist/components/icon-button/cosm-icon-button.js"
     },
+    "./popover": {
+      "types": "./dist/components/popover/cosm-popover.d.ts",
+      "default": "./dist/components/popover/cosm-popover.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

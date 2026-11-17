@@ -1,5 +1,6 @@
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
+import { popoverContract } from './specs/popover.js';
 import { textFieldContract } from './specs/text-field.js';
 
 export {
@@ -85,6 +86,7 @@ export const contracts = {
   icon: iconContract,
   'text-field': textFieldContract,
   'icon-button': iconButtonContract,
+  popover: popoverContract,
 } as const;
 export { iconContract } from './specs/icon.js';
 export {
@@ -103,6 +105,21 @@ export {
   iconButtonScenarios,
   iconButtonScenariosFor,
 } from './specs/icon-button.scenarios.js';
+export {
+  type PopoverAlign,
+  type PopoverCloseReason,
+  type PopoverHandle,
+  type PopoverOpenChangeDetail,
+  type PopoverSide,
+  popoverContract,
+} from './specs/popover.js';
+export {
+  type PopoverAction,
+  type PopoverChangeExpectation,
+  type PopoverScenario,
+  popoverScenarios,
+  popoverScenariosFor,
+} from './specs/popover.scenarios.js';
 export {
   type TextFieldChangeDetail,
   type TextFieldSubmitDetail,

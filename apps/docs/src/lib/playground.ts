@@ -154,7 +154,7 @@ export function initPlayground(
   const clipboard = options.clipboard ?? globalThis.navigator?.clipboard;
   const id = `cosm-playground-${++instances}`;
   const preview = root.querySelector<HTMLElement>('[data-cosm-preview]');
-  const target = root.querySelector<HTMLElement>('[data-playground-target]');
+  let target = root.querySelector<HTMLElement>('[data-playground-target]');
   const targets = snippetTargets.filter(item => supportsTarget(contract, item));
   const values: ControlValues = {};
   for (const [name, spec] of Object.entries(contract.props)) {
@@ -165,12 +165,14 @@ export function initPlayground(
           : spec.example
         : spec.default;
   }
+  for (const state of contract.states) {
+    if (contract.props[state.prop]?.type === 'boolean') values[state.prop] = undefined;
+  }
   if (contract.name === 'text-field' && labels.textFieldDefaults) {
     Object.assign(values, labels.textFieldDefaults);
   }
   if (contract.name === 'icon-button') {
     values.label = labels.iconButtonLabel ?? 'Favorite';
-    values.pressed = undefined;
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -556,7 +558,7 @@ export function initPlayground(
           fieldset.append(gallery, more);
         }
       }
-    } else if (contract.name === 'icon-button' && name === 'pressed') {
+    } else if (spec.type === 'boolean' && contract.states.some(state => state.prop === name)) {
       control = element('select');
       for (const [value, text] of [
         ['', labels.autonomous ?? 'Autonomous'],
@@ -589,7 +591,7 @@ export function initPlayground(
         return;
       }
       const value =
-        contract.name === 'icon-button' && name === 'pressed'
+        spec.type === 'boolean' && contract.states.some(state => state.prop === name)
           ? input.value === ''
             ? undefined
             : input.value === 'true'
@@ -841,6 +843,18 @@ export function initPlayground(
         return;
       }
       values[name] = value;
+      if (target && contract.name === 'popover' && name === 'defaultOpen') {
+        const replacement = document.createElement(contract.tag);
+        for (const attribute of target.attributes) {
+          if (attribute.name !== 'open') replacement.setAttribute(attribute.name, attribute.value);
+        }
+        while (target.firstChild) replacement.append(target.firstChild);
+        for (const [prop, current] of Object.entries(values)) {
+          if (current !== undefined) Reflect.set(replacement, prop, current);
+        }
+        target.replaceWith(replacement);
+        target = replacement;
+      }
       if (target && onWeb) {
         if (contract.name === 'icon-button' && name === 'pressed') {
           Reflect.set(target, 'pressedControlled', value !== undefined);
@@ -851,7 +865,7 @@ export function initPlayground(
         const resolved =
           spec?.type === 'reference' && typeof value === 'string'
             ? options.referenceValues?.[spec.reference]?.[value]
-            : contract.name === 'icon-button' && name === 'pressed'
+            : spec?.type === 'boolean' && contract.states.some(state => state.prop === name)
               ? value
               : (value ?? (spec && 'default' in spec ? spec.default : undefined));
         if (spec?.type === 'reference' && value !== undefined && resolved === undefined) {
@@ -860,7 +874,7 @@ export function initPlayground(
           );
         }
         Reflect.set(target, name, resolved);
-        if (spec?.type === 'boolean' && !(contract.name === 'icon-button' && name === 'pressed'))
+        if (spec?.type === 'boolean' && !contract.states.some(state => state.prop === name))
           target.toggleAttribute(toAttribute(name), value === true);
       }
       status.textContent = '';

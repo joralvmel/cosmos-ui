@@ -3,6 +3,7 @@ import {
   buttonContract,
   iconButtonContract,
   iconContract,
+  popoverContract,
   textFieldContract,
 } from '@joralvmel/cosmos-core';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
@@ -13,6 +14,7 @@ import { house } from '@joralvmel/cosmos-icons/house';
 import { search } from '@joralvmel/cosmos-icons/search';
 import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/icon-button';
+import '@joralvmel/cosmos-elements/popover';
 import '@joralvmel/cosmos-elements/text-field';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -91,6 +93,60 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('remounts the popover preview when its initial open state changes', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-popover');
+    target.dataset.playgroundTarget = '';
+    const trigger = document.createElement('button');
+    trigger.slot = 'trigger';
+    trigger.textContent = 'Details';
+    target.append(trigger);
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: popoverContract,
+      content: 'Details',
+      labels,
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    await target.updateComplete;
+    controller.set('defaultOpen', true);
+    const replacement = root.querySelector('cosm-popover');
+    if (!replacement) throw new Error('Missing remounted popover');
+    await replacement.updateComplete;
+    expect(replacement).not.toBe(target);
+    expect(replacement.open).toBe(true);
+    expect(replacement.openControlled).toBe(false);
+    expect(replacement.querySelector('button')).toBe(trigger);
+  });
+
+  it('starts boolean state controls autonomous and retains explicit false bindings', () => {
+    const root = document.createElement('div');
+    const target = document.createElement('div');
+    target.dataset.playgroundTarget = '';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: popoverContract,
+      content: 'Details',
+      labels,
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+    const open = root.querySelector<HTMLSelectElement>('[data-prop="open"]');
+    if (!open) throw new Error('Missing open control');
+    expect(controller.values.open).toBeUndefined();
+    open.value = 'false';
+    open.dispatchEvent(new Event('input'));
+    expect(controller.values.open).toBe(false);
+    expect(controller.code('react')).toContain('open={false}');
+    open.value = '';
+    open.dispatchEvent(new Event('input'));
+    expect(controller.values.open).toBeUndefined();
+    expect(controller.code('react')).not.toContain('open={false}');
+  });
+
   it('supports icon children, localized required labels and explicit toggle ownership', async () => {
     const root = document.createElement('div');
     const preview = document.createElement('div');

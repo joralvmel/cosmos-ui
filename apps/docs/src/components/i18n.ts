@@ -63,6 +63,7 @@ const strings = {
       customHeight: 'Minimum height (px)',
       textFieldInvalid: 'Use non-empty labels, a positive height and non-negative whole lengths.',
       iconButtonLabel: 'Favorite',
+      triggerLabel: 'Details',
       iconButtonInvalid: 'Enter a non-empty accessible label.',
       autonomous: 'Autonomous',
       code: 'Code',
@@ -202,6 +203,7 @@ const strings = {
       customSize: 'Personalizado',
       customHeight: 'Altura mínima (px)',
       iconButtonLabel: 'Favorito',
+      triggerLabel: 'Detalles',
       iconButtonInvalid: 'Introduce una etiqueta accesible que no esté vacía.',
       autonomous: 'Autónomo',
       textFieldInvalid:

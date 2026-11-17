@@ -6,6 +6,7 @@ import {
   defineContract,
   generateSnippets,
   iconButtonContract,
+  popoverContract,
   supportsTarget,
   textFieldContract,
   toAttribute,
@@ -70,6 +71,22 @@ describe('codegen', () => {
     for (const source of Object.values(autonomous)) {
       expect(source).not.toMatch(/(?:\s|\.)pressed(?:[= >])/);
     }
+  });
+
+  it('includes an accessible trigger in named-trigger web examples', () => {
+    const snippets = generateSnippets(popoverContract, { open: false }, 'More information');
+    for (const source of [snippets.html, snippets.react, snippets.angular]) {
+      expect(source).toContain('<button slot="trigger" type="button">Details</button>');
+      expect(source).toContain('More information');
+    }
+    expect(snippets.html).toContain('element.open = false;');
+    expect(snippets.react).toContain('open={false}');
+    expect(snippets.angular).toContain('[open]="false"');
+    expect(snippets.native).toContain('import { Popover, PopoverProvider }');
+    expect(snippets.native).toContain("import { Text } from 'react-native';");
+    expect(snippets.native).toContain('trigger="Details"');
+    expect(snippets.native).toContain('<Text>More information</Text>');
+    expect(snippets.native).toContain('<PopoverProvider>');
   });
 
   it('escapes user text in HTML and JSX', () => {

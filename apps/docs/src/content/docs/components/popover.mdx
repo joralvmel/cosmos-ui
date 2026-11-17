@@ -1,0 +1,74 @@
+---
+title: Popover
+description: Non-modal content anchored to a consumer-supplied trigger.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="popover" />
+
+Popover displays content next to a trigger without blocking the rest of the interface. Use it for
+supplementary information or actions; it does not implement a menu, tooltip or modal dialog.
+
+## Playground
+
+<Playground name="popover" content="Additional information." />
+
+Try the side, alignment, collision and dismissal controls. Choose autonomous or controlled open
+state to see the difference: a controlled value changes only when its owner accepts a proposal.
+Changing `defaultOpen` remounts the preview to demonstrate its initial value. The native demo link
+opens the corresponding example screen.
+
+On React Native, wrap the app in `PopoverProvider` and supply safe-area insets when available.
+`trigger` is content inside the built-in accessible button, not another button. Pass
+`usePopoverHost().onScroll` to scroll containers that can move a trigger, composing it with any
+existing scroll handler. Native `onOpenChange` receives the detail directly; use a ref to call
+`requestClose()` from a panel action.
+
+## Variants
+
+Popover has one neutral surface, sized to its content. Theme tokens and panel styling hooks allow
+customization; its trigger and content are supplied by the consumer.
+
+<Preview>
+  <cosm-popover>
+    <button slot="trigger" type="button">Details</button>
+    <p>Additional information.</p>
+  </cosm-popover>
+</Preview>
+
+## States
+
+Omit `open` for autonomous state and use `defaultOpen` for its initial value. Bind `open`,
+including `false`, to control it. An open-change event proposes a value; assigning the accepted
+value commits it. Close requests are cancelable. Panel actions can request closure through
+`requestClose()`; this does not override a controlled owner.
+
+The requested side and alignment can adapt when there is insufficient space. Outside press, and
+Escape on web and React Native Web, close by default and can be disabled. Outside interaction is
+not consumed. On Android, Back requests closure while the panel is open. Hardware Escape is not
+supported on native Android or iOS.
+
+On browsers with the Popover API, the panel uses the top layer. The fixed-position fallback in
+older browsers can be clipped or displaced by ancestor overflow, transforms or containment.
+
+## Accessibility
+
+- Supply a keyboard-operable, named trigger and semantics and a label appropriate to the content.
+  Popover does not impose a role or modal behavior.
+- Focus is not trapped. Initial focus stays on the trigger unless `initialFocus` is enabled.
+  Focus restoration depends on the close reason and does not steal focus from an outside target.
+- The consumer is responsible for making the trigger and panel controls accessible and for
+  providing appropriate touch target sizes on native.
+
+## API
+
+<ApiTable name="popover" />
+
+## Events by platform
+
+<EventsTable name="popover" />

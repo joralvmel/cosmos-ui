@@ -1,0 +1,78 @@
+---
+title: Popover
+description: Contenido no modal anclado a un activador proporcionado por la aplicación.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="popover" />
+
+Popover muestra contenido junto a un activador sin bloquear el resto de la interfaz. Es útil para
+información o acciones complementarias; no implementa un menú, tooltip ni diálogo modal.
+
+## Playground
+
+<Playground name="popover" content="Información adicional." />
+
+Prueba los controles de posición, alineación, colisión y cierre. Elige entre estado autónomo o
+controlado: un valor controlado solo cambia cuando su propietario acepta la propuesta. El enlace
+de la demostración nativa abre la pantalla correspondiente. Al cambiar `defaultOpen`, la vista
+previa se vuelve a montar para mostrar el valor inicial.
+
+En React Native, envuelve la aplicación con `PopoverProvider` y proporciona los márgenes de área
+segura cuando estén disponibles. `trigger` es contenido dentro del botón accesible integrado, no
+otro botón. Pasa `usePopoverHost().onScroll` a los contenedores cuyo desplazamiento pueda mover el
+activador, combinándolo con cualquier manejador existente. `onOpenChange` recibe el detalle
+directamente; usa una referencia para llamar a `requestClose()` desde una acción del panel.
+
+## Variantes
+
+Popover ofrece una superficie neutra cuyo tamaño depende del contenido. Los tokens del tema y
+los puntos de personalización del panel permiten adaptarla; la aplicación proporciona el activador
+y el contenido.
+
+<Preview>
+  <cosm-popover>
+    <button slot="trigger" type="button">Detalles</button>
+    <p>Información adicional.</p>
+  </cosm-popover>
+</Preview>
+
+## Estados
+
+Omite `open` para usar estado autónomo y utiliza `defaultOpen` para el valor inicial. Vincula
+`open`, incluso con `false`, para controlarlo. El evento de cambio propone un valor; al asignar
+el valor aceptado se confirma el cambio. Las solicitudes de cierre se pueden cancelar. Una acción
+del panel puede solicitar el cierre mediante `requestClose()`, sin reemplazar la decisión del
+propietario en modo controlado.
+
+La posición y la alineación solicitadas pueden adaptarse al espacio disponible. La pulsación
+exterior y Escape en web y React Native Web cierran por defecto y pueden desactivarse. La
+interacción exterior no se consume. En Android, el botón Atrás solicita el cierre mientras el panel
+está abierto. Escape de un teclado físico no está disponible en Android ni iOS nativos.
+
+En navegadores compatibles con Popover API, el panel usa la capa superior. La alternativa de
+posición fija en navegadores antiguos puede quedar recortada o desplazada por desbordamiento,
+transformaciones o contención de sus ancestros.
+
+## Accesibilidad
+
+- Proporciona un activador con nombre y operable por teclado, y una semántica y etiqueta adecuadas
+  para el contenido. Popover no impone un rol ni comportamiento modal.
+- El foco no queda atrapado. Al abrir permanece en el activador salvo que se habilite
+  `initialFocus`. La restauración depende del motivo de cierre y no roba el foco de un destino
+  exterior.
+- La aplicación debe garantizar la accesibilidad de los controles y un tamaño de área táctil
+  adecuado en plataformas nativas.
+
+## API
+
+<ApiTable name="popover" />
+
+## Eventos por plataforma
+
+<EventsTable name="popover" />
