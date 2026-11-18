@@ -1,0 +1,118 @@
+---
+title: Checkbox
+description: An accessible independent boolean choice with form support on the web.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="checkbox" />
+
+Use Checkbox for an independent yes/no choice in a form. It supports controlled and autonomous
+state, a presentation-only mixed state, and native form submission and required validation on the
+web.
+
+## Playground
+
+<Playground name="checkbox" content="Checkbox" />
+
+## Variants
+
+Checkbox has one visual treatment. Use semantic sizes for the standard scale or a positive numeric
+size to change only the visual box.
+
+<Preview>
+  <cosm-checkbox label="Small" size="sm">Small</cosm-checkbox>
+  <cosm-checkbox label="Medium" size="md">Medium</cosm-checkbox>
+  <cosm-checkbox label="Large" size="lg">Large</cosm-checkbox>
+  <cosm-checkbox label="Custom box" size="28">Custom box</cosm-checkbox>
+</Preview>
+
+The default label is visible. Set `hideLabel` only when nearby content already explains the choice.
+The label property remains the accessible name; the default slot can add noninteractive inline
+content, but must not contain links or buttons.
+
+## States
+
+<Preview>
+  <cosm-checkbox label="Checked" default-checked>Checked</cosm-checkbox>
+  <cosm-checkbox label="Mixed" indeterminate>Mixed</cosm-checkbox>
+  <cosm-checkbox label="Disabled" disabled>Disabled</cosm-checkbox>
+  <cosm-checkbox label="Invalid" invalid error-text="Choose this option to continue." help-text="This setting is required.">
+    Invalid
+  </cosm-checkbox>
+</Preview>
+
+`indeterminate` presents a mixed state; it is not a third checked value. An autonomous activation
+commits the proposed checked value and clears mixed presentation. A controlled checkbox waits for
+its owner to update `checked` and, when appropriate, clear `indeterminate`.
+
+## Usage by platform
+
+### React
+
+```tsx
+import { Checkbox } from '@joralvmel/cosmos-react';
+
+<Checkbox
+  label="Accept terms"
+  checked={accepted}
+  onCheckedChange={event => setAccepted(event.detail.checked)}
+  name="terms"
+  value="accepted"
+/>
+```
+
+### Angular
+
+```html
+<cosm-checkbox
+  label="Accept terms"
+  formControlName="accepted"
+  required
+  (checkedChange)="onCheckedChange($event.detail.checked)"
+/>
+```
+
+Angular Forms uses a boolean `ControlValueAccessor`; `name` and `value` are for web form
+submission, not the Angular control value.
+
+### React Native
+
+```tsx
+import { Checkbox } from '@joralvmel/cosmos-native';
+
+<Checkbox
+  label="Accept terms"
+  defaultChecked={false}
+  onCheckedChange={({ checked }) => setAccepted(checked)}
+  helpText="You can change this choice later."
+/>
+```
+
+React Native has no HTML form association or automatic required/invalid validation. Include
+consumer-localized required and validation information in the label or help/error text as needed.
+The native touch target is at least 44pt even when the visual box is smaller.
+
+## Accessibility
+
+- Supply a nonempty `label`; `hideLabel` hides it visually without removing its accessible name.
+- The web component uses a native checkbox input. Tab moves focus and Space toggles it; `required`
+  participates in browser form validation.
+- `indeterminate` is exposed as mixed state. Help and error text are associated with the control,
+  and invalid/error state is exposed on the web.
+- React Native exposes checkbox role, checked/mixed/disabled state and the supplied help/error as
+  an accessibility hint. React Native does not expose equivalent required/invalid accessibility
+  states or perform form validation.
+- Localize `helpText` and `errorText` in the consumer. Do not place interactive content in the label.
+
+## API
+
+<ApiTable name="checkbox" />
+
+## Events by platform
+
+<EventsTable name="checkbox" />

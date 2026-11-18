@@ -357,6 +357,69 @@ Selects one or more values from a named vertical collection, with groups, descri
 | `Enter`, `Space` | Selects the focused option; multiple mode toggles it. Read-only never changes selection. |
 | `Printable characters` | Moves focus to a matching option using locale-aware typeahead without filtering. |
 
+### `checkbox` (`<cosm-checkbox>`)
+
+Selects an independent boolean value with accessible labeling and native form behavior on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required accessible name, visible unless hideLabel is true. |
+| `hideLabel` | boolean | `false` | Visually hides the label while keeping it available to assistive technology. |
+| `checked` | boolean | `false` | Controlled checked value when supplied, including false; activation proposes changes without self-committing. |
+| `defaultChecked` | boolean | `false` | Initial autonomous checked value; later changes do not reset it. |
+| `indeterminate` | boolean | `false` | Presentation-only mixed state. Autonomous activation clears it; controlled use leaves it to the owner. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic visual-box size or positive finite number in CSS pixels on web and logical units on native. |
+| `disabled` | boolean | `false` | Prevents user interaction and excludes the value from web form submission. |
+| `required` | boolean | `false` | Exposes required semantics and participates in native web form validation. Native has no automatic validation. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state; web form validity remains based on required. |
+| `helpText` | string | — | Optional consumer-localized supporting text associated with the checkbox. |
+| `errorText` | string | — | Optional consumer-localized error description; a nonempty value also exposes invalid state. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+| `value` | string | `on` | Web form value submitted when checked and enabled; defaults to on. Angular Forms uses checked as its boolean value. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-checked-change` | `onCheckedChange` | `(checkedChange)` | `onCheckedChange` | `CheckboxCheckedChangeDetail` | Proposes the next checked value after enabled user activation; controlled state waits for the owner. |
+
+**Slots**
+
+| Name | Description |
+| --- | --- |
+| `(default)` | Optional noninteractive inline label content; links and buttons are not allowed. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | The label and visual checkbox control. |
+| `input` | The native checkbox input and web focus target. |
+| `box` | The visible checkbox box and indicator. |
+| `label` | Visible or visually hidden label text. |
+| `help-text` | Supporting text associated with the checkbox. |
+| `error-text` | Error description associated with the checkbox. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-checkbox-size` | Visual box width and height. |
+| `--cosm-checkbox-background` | Unchecked box background. |
+| `--cosm-checkbox-checked-background` | Checked and mixed box background. |
+| `--cosm-checkbox-color` | Checked indicator foreground. |
+| `--cosm-checkbox-border` | Box boundary color. |
+| `--cosm-checkbox-radius` | Box corner radius. |
+| `--cosm-checkbox-focus` | Visible keyboard focus indicator color. |
+| `--cosm-checkbox-gap` | Space between the box and label. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Moves focus to or from the enabled checkbox. |
+| `Space` | Toggles checked state and emits a checkedChange proposal. |
+
 
 ## Rules for AI assistants
 

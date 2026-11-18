@@ -1,4 +1,5 @@
 import type { ListboxItem, ListboxOption, ListboxSelectionMode } from '../specs/listbox.js';
+import { validateSize } from './size.js';
 
 export function getListboxOptions<Icon>(
   items: readonly ListboxItem<Icon>[]
@@ -65,14 +66,7 @@ export function validateListboxValues(
 }
 
 export function validateListboxSize(size: string | number): void {
-  if (
-    size !== 'sm' &&
-    size !== 'md' &&
-    size !== 'lg' &&
-    !(typeof size === 'number' && Number.isFinite(size) && size > 0)
-  ) {
-    throw new TypeError('Listbox size must be sm, md, lg or a positive finite number.');
-  }
+  validateSize(size, 'Listbox');
 }
 
 export function getListboxInitialActive(
