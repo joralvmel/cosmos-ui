@@ -43,7 +43,7 @@ const styles = css`
   }
   .base {
     display: inline-flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--cosm-checkbox-gap, var(--cosm-space-sm, 0.5rem));
     color: var(--cosm-fg, oklch(0.24 0.01 268));
     cursor: pointer;

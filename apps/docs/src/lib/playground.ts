@@ -58,6 +58,7 @@ export interface PlaygroundLabels {
   iconButtonInvalid?: string;
   popoverCloseLabel?: string;
   popoverInvalid?: string;
+  checkboxLabel?: string;
   listboxLabel?: string;
   listboxInvalid?: string;
   listboxSelected?: string;
@@ -187,6 +188,9 @@ export function initPlayground(
   }
   if (contract.name === 'popover') {
     values.closeLabel = labels.popoverCloseLabel ?? 'Close';
+  }
+  if (contract.name === 'checkbox') {
+    values.label = labels.checkboxLabel ?? 'Accept terms';
   }
   if (contract.name === 'listbox') {
     values.label = labels.listboxLabel ?? 'Choose produce';

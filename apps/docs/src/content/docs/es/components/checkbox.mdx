@@ -17,7 +17,7 @@ nativos en la web.
 
 ## Playground
 
-<Playground name="checkbox" content="Checkbox" />
+<Playground name="checkbox" />
 
 ## Variantes
 
@@ -25,10 +25,10 @@ Checkbox tiene un solo tratamiento visual. Usa los tamaños semánticos para la 
 un tamaño numérico positivo para cambiar únicamente la casilla.
 
 <Preview>
-  <cosm-checkbox label="Pequeña" size="sm">Pequeña</cosm-checkbox>
-  <cosm-checkbox label="Mediana" size="md">Mediana</cosm-checkbox>
-  <cosm-checkbox label="Grande" size="lg">Grande</cosm-checkbox>
-  <cosm-checkbox label="Casilla personalizada" size="28">Personalizada</cosm-checkbox>
+  <cosm-checkbox label="Pequeña" size="sm"></cosm-checkbox>
+  <cosm-checkbox label="Mediana" size="md"></cosm-checkbox>
+  <cosm-checkbox label="Grande" size="lg"></cosm-checkbox>
+  <cosm-checkbox label="Casilla personalizada" size="28"></cosm-checkbox>
 </Preview>
 
 La etiqueta es visible de forma predeterminada. Usa `hideLabel` solo si el contenido cercano ya
@@ -38,12 +38,15 @@ puede agregar contenido en línea no interactivo, pero no debe incluir enlaces n
 ## Estados
 
 <Preview>
-  <cosm-checkbox label="Marcada" default-checked>Marcada</cosm-checkbox>
-  <cosm-checkbox label="Mixta" indeterminate>Mixta</cosm-checkbox>
-  <cosm-checkbox label="Deshabilitada" disabled>Deshabilitada</cosm-checkbox>
-  <cosm-checkbox label="No válida" invalid error-text="Selecciona esta opción para continuar." help-text="Esta opción es obligatoria.">
-    No válida
-  </cosm-checkbox>
+  <cosm-checkbox label="Marcada" default-checked></cosm-checkbox>
+  <cosm-checkbox label="Mixta" indeterminate></cosm-checkbox>
+  <cosm-checkbox label="Deshabilitada" disabled></cosm-checkbox>
+  <cosm-checkbox
+    label="No válida"
+    invalid
+    error-text="Selecciona esta opción para continuar."
+    help-text="Esta opción es obligatoria."
+  ></cosm-checkbox>
 </Preview>
 
 `indeterminate` presenta un estado mixto; no es un tercer valor de selección. Una activación

@@ -17,7 +17,7 @@ web.
 
 ## Playground
 
-<Playground name="checkbox" content="Checkbox" />
+<Playground name="checkbox" />
 
 ## Variants
 
@@ -25,10 +25,10 @@ Checkbox has one visual treatment. Use semantic sizes for the standard scale or 
 size to change only the visual box.
 
 <Preview>
-  <cosm-checkbox label="Small" size="sm">Small</cosm-checkbox>
-  <cosm-checkbox label="Medium" size="md">Medium</cosm-checkbox>
-  <cosm-checkbox label="Large" size="lg">Large</cosm-checkbox>
-  <cosm-checkbox label="Custom box" size="28">Custom box</cosm-checkbox>
+  <cosm-checkbox label="Small" size="sm"></cosm-checkbox>
+  <cosm-checkbox label="Medium" size="md"></cosm-checkbox>
+  <cosm-checkbox label="Large" size="lg"></cosm-checkbox>
+  <cosm-checkbox label="Custom box" size="28"></cosm-checkbox>
 </Preview>
 
 The default label is visible. Set `hideLabel` only when nearby content already explains the choice.
@@ -38,12 +38,15 @@ content, but must not contain links or buttons.
 ## States
 
 <Preview>
-  <cosm-checkbox label="Checked" default-checked>Checked</cosm-checkbox>
-  <cosm-checkbox label="Mixed" indeterminate>Mixed</cosm-checkbox>
-  <cosm-checkbox label="Disabled" disabled>Disabled</cosm-checkbox>
-  <cosm-checkbox label="Invalid" invalid error-text="Choose this option to continue." help-text="This setting is required.">
-    Invalid
-  </cosm-checkbox>
+  <cosm-checkbox label="Checked" default-checked></cosm-checkbox>
+  <cosm-checkbox label="Mixed" indeterminate></cosm-checkbox>
+  <cosm-checkbox label="Disabled" disabled></cosm-checkbox>
+  <cosm-checkbox
+    label="Invalid"
+    invalid
+    error-text="Choose this option to continue."
+    help-text="This setting is required."
+  ></cosm-checkbox>
 </Preview>
 
 `indeterminate` presents a mixed state; it is not a third checked value. An autonomous activation
