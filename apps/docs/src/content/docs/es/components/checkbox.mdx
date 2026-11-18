@@ -1,0 +1,127 @@
+---
+title: Checkbox
+description: Una elección booleana independiente y accesible con soporte de formularios web.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="checkbox" />
+
+Usa Checkbox para una opción independiente de sí o no en un formulario. Admite estado controlado
+y autónomo, un estado mixto solo visual y envío de formularios y validación de obligatoriedad
+nativos en la web.
+
+## Playground
+
+<Playground name="checkbox" />
+
+## Variantes
+
+Checkbox tiene un solo tratamiento visual. Usa los tamaños semánticos para la escala estándar o
+un tamaño numérico positivo para cambiar únicamente la casilla.
+
+<Preview>
+  <cosm-checkbox label="Pequeña" size="sm"></cosm-checkbox>
+  <cosm-checkbox label="Mediana" size="md"></cosm-checkbox>
+  <cosm-checkbox label="Grande" size="lg"></cosm-checkbox>
+  <cosm-checkbox label="Casilla personalizada" size="28"></cosm-checkbox>
+</Preview>
+
+La etiqueta es visible de forma predeterminada. Usa `hideLabel` solo si el contenido cercano ya
+explica la opción. La propiedad `label` sigue siendo el nombre accesible; el slot predeterminado
+puede agregar contenido en línea no interactivo, pero no debe incluir enlaces ni botones.
+
+## Estados
+
+<Preview>
+  <cosm-checkbox label="Marcada" default-checked></cosm-checkbox>
+  <cosm-checkbox label="Mixta" indeterminate></cosm-checkbox>
+  <cosm-checkbox label="Deshabilitada" disabled></cosm-checkbox>
+  <cosm-checkbox
+    label="No válida"
+    invalid
+    error-text="Selecciona esta opción para continuar."
+    help-text="Esta opción es obligatoria."
+  ></cosm-checkbox>
+</Preview>
+
+`indeterminate` presenta un estado mixto; no es un tercer valor de selección. Una activación
+autónoma confirma el valor propuesto y elimina la presentación mixta. Una casilla controlada espera
+a que su propietario actualice `checked` y, cuando corresponda, elimine `indeterminate`.
+
+Cuando una casilla no válida está marcada o mixta, el fondo permanece transparente y el indicador
+usa el mismo color que el borde de error. Los mensajes de ayuda y error conservan su posición al
+cambiar el estado.
+
+## Uso por plataforma
+
+### React
+
+```tsx
+import { Checkbox } from '@joralvmel/cosmos-react';
+
+<Checkbox
+  label="Acepto los términos"
+  checked={accepted}
+  onCheckedChange={event => setAccepted(event.detail.checked)}
+  name="terms"
+  value="accepted"
+/>
+```
+
+### Angular
+
+```html
+<cosm-checkbox
+  label="Acepto los términos"
+  formControlName="accepted"
+  required
+  (checkedChange)="onCheckedChange($event.detail.checked)"
+/>
+```
+
+Angular Forms usa un `ControlValueAccessor` booleano; `name` y `value` sirven para el envío de
+formularios web, no como valor del control Angular.
+
+### React Native
+
+```tsx
+import { Checkbox } from '@joralvmel/cosmos-native';
+
+<Checkbox
+  label="Acepto los términos"
+  defaultChecked={false}
+  onCheckedChange={({ checked }) => setAccepted(checked)}
+  helpText="Puedes cambiar esta opción más adelante."
+/>
+```
+
+React Native no tiene asociación con formularios HTML ni validación automática de obligatoriedad o
+estado inválido. Incluye la información localizada de obligatoriedad y validación en la etiqueta o
+en el texto de ayuda/error cuando sea necesario. El área táctil nativa mide al menos 44pt, aunque
+la casilla visual sea menor.
+
+## Accesibilidad
+
+- Proporciona un `label` no vacío; `hideLabel` lo oculta visualmente sin quitar el nombre accesible.
+- El componente web usa un input de casilla nativo. Tab mueve el foco y Espacio cambia el estado;
+  `required` participa en la validación del formulario del navegador.
+- `indeterminate` se expone como estado mixto. La ayuda y el error se asocian al control, y el
+  estado inválido/error se expone en la web.
+- React Native expone el rol de casilla y los estados marcado/mixto/deshabilitado; la ayuda y el
+  error suministrados se exponen como indicación accesible. React Native no expone estados
+  equivalentes de obligatoriedad/invalidez ni realiza validación de formularios.
+- Localiza `helpText` y `errorText` en la aplicación consumidora. No incluyas contenido interactivo
+  en la etiqueta.
+
+## API
+
+<ApiTable name="checkbox" />
+
+## Eventos por plataforma
+
+<EventsTable name="checkbox" />

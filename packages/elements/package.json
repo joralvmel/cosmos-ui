@@ -60,6 +60,10 @@
       "types": "./dist/components/listbox/cosm-listbox.d.ts",
       "default": "./dist/components/listbox/cosm-listbox.js"
     },
+    "./checkbox": {
+      "types": "./dist/components/checkbox/cosm-checkbox.d.ts",
+      "default": "./dist/components/checkbox/cosm-checkbox.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

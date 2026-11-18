@@ -59,6 +59,13 @@ const flatten = (style: unknown, state = { pressed: false }): Record<string, unk
   return (value as Record<string, unknown>) ?? {};
 };
 
+const ariaChecked = (value: unknown): 'mixed' | 'true' | 'false' | undefined => {
+  if (value === 'mixed') return 'mixed';
+  if (value === true) return 'true';
+  if (value === false) return 'false';
+  return undefined;
+};
+
 let pressableRect = { x: 0, y: 0, width: 100, height: 44 };
 export const __setPressableRect = (rect?: typeof pressableRect) => {
   pressableRect = rect ?? { x: 0, y: 0, width: 100, height: 44 };
@@ -95,6 +102,12 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
         data-testid={props.testID as string}
         data-role={props.accessibilityRole as string}
         aria-label={props.accessibilityLabel as string}
+        aria-checked={ariaChecked(
+          props['aria-checked'] ?? (accessibilityState as { checked?: boolean | 'mixed' })?.checked
+        )}
+        aria-required={props['aria-required'] ? 'true' : undefined}
+        aria-invalid={props['aria-invalid'] ? 'true' : undefined}
+        aria-description={props.accessibilityHint as string}
         aria-expanded={(accessibilityState as { expanded?: boolean })?.expanded ? 'true' : 'false'}
         aria-busy={(accessibilityState as { busy?: boolean })?.busy ? 'true' : undefined}
         aria-disabled={

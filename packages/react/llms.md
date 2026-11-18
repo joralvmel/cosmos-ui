@@ -303,6 +303,42 @@ export function Example() {
   );
 }
 ```
+### `Checkbox`
+
+Selects an independent boolean value with accessible labeling and native form behavior on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required accessible name, visible unless hideLabel is true. |
+| `hideLabel` | boolean | `false` | Visually hides the label while keeping it available to assistive technology. |
+| `checked` | boolean | `false` | Controlled checked value when supplied, including false; activation proposes changes without self-committing. |
+| `defaultChecked` | boolean | `false` | Initial autonomous checked value; later changes do not reset it. |
+| `indeterminate` | boolean | `false` | Presentation-only mixed state. Autonomous activation clears it; controlled use leaves it to the owner. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Semantic visual-box size or positive finite number in CSS pixels on web and logical units on native. |
+| `disabled` | boolean | `false` | Prevents user interaction and excludes the value from web form submission. |
+| `required` | boolean | `false` | Exposes required semantics and participates in native web form validation. Native has no automatic validation. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state; web form validity remains based on required. |
+| `helpText` | string | — | Optional consumer-localized supporting text associated with the checkbox. |
+| `errorText` | string | — | Optional consumer-localized error description; a nonempty value also exposes invalid state. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+| `value` | string | `on` | Web form value submitted when checked and enabled; defaults to on. Angular Forms uses checked as its boolean value. |
+
+Events: `onCheckedChange` → `CheckboxCheckedChangeDetail`.
+
+```tsx
+import { Checkbox } from '@joralvmel/cosmos-react';
+
+export function Example() {
+  return (
+    <Checkbox
+      label="Checkbox"
+      onCheckedChange={event => console.log(event.detail)}
+    >
+      Checkbox
+    </Checkbox>
+  );
+}
+```
 
 ## Themes
 

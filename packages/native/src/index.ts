@@ -1,5 +1,6 @@
 export type {
   ButtonPressDetail,
+  CheckboxCheckedChangeDetail,
   ListboxGroup,
   ListboxItem,
   ListboxOption,
@@ -13,6 +14,7 @@ export type {
 } from '@joralvmel/cosmos-core';
 export type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
 export { Button, type ButtonProps, buttonPropNames } from './components/button.js';
+export { Checkbox, type CheckboxProps, checkboxPropNames } from './components/checkbox.js';
 export { Icon, type IconProps, iconPropNames } from './components/icon.js';
 export { IconButton, type IconButtonProps, iconButtonPropNames } from './components/icon-button.js';
 export {

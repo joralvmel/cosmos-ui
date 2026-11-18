@@ -18,4 +18,9 @@ export const screens = [
     title: 'Listbox',
     description: 'Grouped, keyboard-navigable single or multiple selection.',
   },
+  {
+    route: '/checkbox',
+    title: 'Checkbox',
+    description: 'Controlled, mixed, required and custom-size choices.',
+  },
 ] as const;

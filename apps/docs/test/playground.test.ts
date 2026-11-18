@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import {
   buttonContract,
+  checkboxContract,
   iconButtonContract,
   iconContract,
   listboxContract,
@@ -16,6 +17,7 @@ import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
 import { search } from '@joralvmel/cosmos-icons/search';
 import '@joralvmel/cosmos-elements/button';
+import '@joralvmel/cosmos-elements/checkbox';
 import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
@@ -97,6 +99,35 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('initializes the checkbox with a localized accessible label in the preview and snippets', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-checkbox');
+    target.dataset.playgroundTarget = '';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: checkboxContract,
+      content: '',
+      labels: { ...labels, checkboxLabel: 'Acepto los términos' },
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+
+    await target.updateComplete;
+    expect(target.label).toBe('Acepto los términos');
+    expect(root.querySelector<HTMLInputElement>('[data-prop="label"]')?.value).toBe(
+      'Acepto los términos'
+    );
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).toContain('Acepto los términos');
+    }
+
+    controller.set('checked', true);
+    await target.updateComplete;
+    expect(target.checked).toBe(true);
+    expect(controller.code('html')).toContain('label="Acepto los términos"');
+  });
+
   it('resolves collection controls, ownership and numeric sizes in the listbox preview', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-listbox');

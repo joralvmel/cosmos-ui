@@ -1,3 +1,4 @@
+import { CosmCheckboxComponent } from './components/checkbox.component.js';
 import { CosmIconButtonComponent } from './components/icon-button.component.js';
 import { CosmListboxComponent } from './components/listbox.component.js';
 import { CosmPopoverComponent } from './components/popover.component.js';
@@ -5,6 +6,7 @@ import { CosmTextFieldComponent } from './components/text-field.component.js';
 
 export type {
   ButtonPressDetail,
+  CheckboxCheckedChangeDetail,
   ListboxSelectionChangeDetail,
   PressSource,
   TextFieldChangeDetail,
@@ -24,7 +26,9 @@ export const COSMOS_COMPONENTS = [
   CosmIconButtonComponent,
   CosmPopoverComponent,
   CosmListboxComponent,
+  CosmCheckboxComponent,
 ] as const;
+export { CosmCheckboxComponent } from './components/checkbox.component.js';
 export { CosmIconButtonComponent } from './components/icon-button.component.js';
 export { CosmListboxComponent } from './components/listbox.component.js';
 export { CosmPopoverComponent } from './components/popover.component.js';

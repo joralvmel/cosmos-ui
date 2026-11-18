@@ -107,6 +107,7 @@ Frontmatter (`title`, `description`), imports, then:
 7. `## Events by platform` (`## Eventos por plataforma`) — `<EventsTable name="chip" />`.
 
 The Spanish page has the same structure under `apps/docs/src/content/docs/es/components/`.
+Keep component names in English across locales; translate prose and example labels.
 
 The shared Playground provides one framed preview, labeled controls, theme/mode selectors and
 syntax-highlighted, keyboard-accessible HTML/React/Angular/React Native tabs with copy feedback.

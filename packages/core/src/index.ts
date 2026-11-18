@@ -1,3 +1,4 @@
+import { checkboxContract } from './specs/checkbox.js';
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
 import { listboxContract } from './specs/listbox.js';
@@ -57,6 +58,7 @@ export {
   type PressableInput,
   type PressableState,
 } from './headless/pressable.js';
+export { validateSize } from './headless/size.js';
 export {
   getTextFieldState,
   type TextFieldState,
@@ -100,7 +102,18 @@ export const contracts = {
   'icon-button': iconButtonContract,
   popover: popoverContract,
   listbox: listboxContract,
+  checkbox: checkboxContract,
 } as const;
+export {
+  type CheckboxCheckedChangeDetail,
+  checkboxContract,
+} from './specs/checkbox.js';
+export {
+  type CheckboxAction,
+  type CheckboxScenario,
+  checkboxScenarios,
+  checkboxScenariosFor,
+} from './specs/checkbox.scenarios.js';
 export { iconContract } from './specs/icon.js';
 export {
   type IconScenario,

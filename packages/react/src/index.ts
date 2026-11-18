@@ -1,11 +1,13 @@
 export type {
   ButtonPressDetail,
+  CheckboxCheckedChangeDetail,
   ListboxSelectionChangeDetail,
   PressSource,
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
 export { Button, type ButtonProps, buttonEvents } from './components/button.js';
+export { Checkbox, type CheckboxProps, checkboxEvents } from './components/checkbox.js';
 export { Icon, type IconProps, iconEvents } from './components/icon.js';
 export { IconButton, type IconButtonProps, iconButtonEvents } from './components/icon-button.js';
 export { Listbox, type ListboxProps, listboxEvents } from './components/listbox.js';
