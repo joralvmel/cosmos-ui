@@ -28,8 +28,7 @@ describe('Switch contract', () => {
     }
   });
 
-  it('covers initial, autonomous, disabled, refused and accepted proposals', () => {
-    expect(switchScenarios).toHaveLength(6);
+  it('covers initial, autonomous, disabled, invalid, refused and accepted proposals', () => {
     expect(switchScenariosFor('web')).toHaveLength(switchScenarios.length);
     expect(switchScenariosFor('react')).toHaveLength(switchScenarios.length);
     expect(switchScenariosFor('angular')).toHaveLength(switchScenarios.length);

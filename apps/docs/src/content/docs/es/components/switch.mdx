@@ -48,6 +48,17 @@ El tamaño numérico indica la altura de la pista en píxeles CSS. React Native 
   <cosm-switch label="Activado inicialmente" default-checked></cosm-switch>
   <cosm-switch label="No disponible" disabled></cosm-switch>
   <cosm-switch
+    label="Inválido, desactivado"
+    invalid
+    help-text="Esta preferencia no está disponible para tu cuenta."
+  ></cosm-switch>
+  <cosm-switch
+    label="Inválido, activado"
+    invalid
+    default-checked
+    help-text="Elige otra preferencia de notificaciones."
+  ></cosm-switch>
+  <cosm-switch
     label="Etiqueta visual oculta"
     hide-label
     help-text="El nombre accesible sigue disponible."
@@ -58,6 +69,11 @@ Un `checked` sin enlace es autónomo y comienza con `defaultChecked`. Un `checke
 `false`, está controlado: la activación propone `{ checked }` y el componente espera a que el
 propietario actualice la propiedad. Mantén estable el nombre accesible durante los cambios. Los
 controles desactivados no emiten propuestas.
+
+`invalid` es un estado visual proporcionado externamente: la pista usa colores de peligro en ambas
+posiciones y web expone `aria-invalid`. No cambia `checked`, la validez ni el envío del formulario.
+Explica el problema con un `helpText` localizado. React Native conserva el Switch del sistema y
+colorea la pista; no existe un estado de accesibilidad invalid equivalente en el control nativo.
 
 El formulario web incluye `name=value` solo cuando el control está activado y habilitado. Al
 reiniciar, se restaura el valor autónomo inicial; los grupos de campos desactivados también lo

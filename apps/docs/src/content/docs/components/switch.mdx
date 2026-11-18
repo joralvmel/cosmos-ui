@@ -46,6 +46,17 @@ prop and keeps the built-in system-sized switch.
   <cosm-switch label="On by default" default-checked></cosm-switch>
   <cosm-switch label="Unavailable" disabled></cosm-switch>
   <cosm-switch
+    label="Invalid, off"
+    invalid
+    help-text="This preference is not available for your account."
+  ></cosm-switch>
+  <cosm-switch
+    label="Invalid, on"
+    invalid
+    default-checked
+    help-text="Choose another notification preference."
+  ></cosm-switch>
+  <cosm-switch
     label="Hidden visual label"
     hide-label
     help-text="The accessible name is still available."
@@ -56,6 +67,11 @@ Unbound `checked` is autonomous and starts from `defaultChecked`. A bound `check
 is controlled: activation proposes `{ checked }` and the component waits for its owner to update
 the prop. Keep the accessible name unchanged while toggling. Disabled switches do not propose
 changes.
+
+`invalid` is an externally supplied presentation state: the track uses danger colors in both
+positions and web exposes `aria-invalid`. It does not change `checked`, form validity or submission.
+Explain the problem with localized `helpText`. React Native keeps its built-in Switch and uses
+danger track colors; there is no equivalent system invalid accessibility trait.
 
 Web form submission includes `name=value` only when checked and enabled. Reset restores the
 autonomous default, and disabled fieldsets disable the switch. Angular Forms uses a boolean through

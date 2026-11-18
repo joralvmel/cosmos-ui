@@ -57,6 +57,13 @@ export const switchContract = defineContract({
       reflect: true,
       description: 'Prevents user interaction and excludes the value from web form submission.',
     },
+    invalid: {
+      type: 'boolean',
+      default: false,
+      reflect: true,
+      description:
+        'Externally supplied invalid presentation. Does not change checked state or form validity; native uses danger colors without an equivalent system invalid trait.',
+    },
     helpText: {
       type: 'string',
       description: 'Optional consumer-localized supporting text associated with the switch.',

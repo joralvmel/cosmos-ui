@@ -32,6 +32,7 @@ export const switchPropNames = [
   'checked',
   'defaultChecked',
   'disabled',
+  'invalid',
   'helpText',
 ] as const satisfies readonly (keyof ContractSwitchProps)[];
 
@@ -44,6 +45,7 @@ export function Switch({
   checked,
   defaultChecked = switchContract.props.defaultChecked.default,
   disabled = switchContract.props.disabled.default,
+  invalid = switchContract.props.invalid.default,
   helpText,
   onCheckedChange,
   style,
@@ -101,11 +103,11 @@ export function Switch({
           value={currentChecked}
           disabled={disabled}
           trackColor={{
-            false: theme.colors['border-strong'],
-            true: theme.colors.primary,
+            false: invalid ? theme.colors.danger : theme.colors['border-strong'],
+            true: invalid ? theme.colors.danger : theme.colors.primary,
           }}
           thumbColor={currentChecked ? theme.colors['primary-fg'] : theme.colors.bg}
-          ios_backgroundColor={theme.colors['border-strong']}
+          ios_backgroundColor={invalid ? theme.colors.danger : theme.colors['border-strong']}
           onValueChange={handleValueChange}
           style={{ minHeight: MIN_TOUCH_TARGET, minWidth: MIN_TOUCH_TARGET }}
         />

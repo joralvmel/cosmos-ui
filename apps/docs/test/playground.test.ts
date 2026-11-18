@@ -133,6 +133,15 @@ describe('Playground', () => {
     expect(controller.code('angular')).toContain('[size]="27"');
     expect(controller.code('native')).not.toMatch(/\b(?:size|name|value)=/);
     expect(controller.code('native')).toContain('checked={false}');
+    const invalid = root.querySelector<HTMLInputElement>('[data-prop="invalid"]');
+    if (!invalid) throw new Error('Missing Switch invalid control');
+    invalid.checked = true;
+    invalid.dispatchEvent(new Event('input'));
+    await target.updateComplete;
+    expect(target.invalid).toBe(true);
+    expect(target.shadowRoot?.querySelector('input')?.getAttribute('aria-invalid')).toBe('true');
+    expect(controller.code('html')).toContain(' invalid');
+    expect(controller.code('native')).toContain('invalid');
     for (const invalid of [0, -1, Number.POSITIVE_INFINITY, 'wide']) {
       controller.set('size', invalid);
       expect(target.size).toBe(27);

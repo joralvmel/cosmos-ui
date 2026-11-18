@@ -47,6 +47,7 @@ export default function SwitchScreen() {
   const [controlled, setControlled] = useState(true);
   const [acceptProposals, setAcceptProposals] = useState(true);
   const [disabled, setDisabled] = useState(false);
+  const [invalid, setInvalid] = useState(false);
   const [hideLabel, setHideLabel] = useState(false);
   const [showHelp, setShowHelp] = useState(true);
   const [revision, setRevision] = useState(0);
@@ -89,6 +90,13 @@ export default function SwitchScreen() {
           onPress={() => setAcceptProposals(value => !value)}
         />
         <Control
+          id="invalid"
+          label="Invalid"
+          value={invalid ? 'on' : 'off'}
+          selected={invalid}
+          onPress={() => setInvalid(value => !value)}
+        />
+        <Control
           id="disabled"
           label="Disabled"
           value={disabled ? 'on' : 'off'}
@@ -125,7 +133,14 @@ export default function SwitchScreen() {
         checked={controlled ? checked : undefined}
         defaultChecked={false}
         disabled={disabled}
-        helpText={showHelp ? 'You can change this preference at any time.' : undefined}
+        invalid={invalid}
+        helpText={
+          showHelp
+            ? invalid
+              ? 'This preference is not available for your account.'
+              : 'You can change this preference at any time.'
+            : undefined
+        }
         onCheckedChange={onCheckedChange}
       />
       <Text

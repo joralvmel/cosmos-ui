@@ -77,6 +77,25 @@ describe('cosm-switch: contract drift', () => {
 });
 
 describe('cosm-switch', () => {
+  it('exposes external invalid presentation without changing checked state or form validity', async () => {
+    const element = await createSwitch({
+      invalid: true,
+      defaultChecked: true,
+      name: 'notifications',
+    });
+    const listener = vi.fn();
+    element.addEventListener('cosm-checked-change', listener);
+    expect(element.hasAttribute('invalid')).toBe(true);
+    expect(inputOf(element).getAttribute('aria-invalid')).toBe('true');
+    expect(element.form?.checkValidity()).toBe(true);
+    element.invalid = false;
+    await element.updateComplete;
+    expect(inputOf(element).hasAttribute('aria-invalid')).toBe(false);
+    expect(element.hasAttribute('invalid')).toBe(false);
+    expect(element.checked).toBe(true);
+    expect(listener).not.toHaveBeenCalled();
+  });
+
   it('renders checkbox input switch semantics with stable label and described help', async () => {
     const element = await createSwitch({
       hideLabel: true,

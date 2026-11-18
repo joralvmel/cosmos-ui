@@ -72,6 +72,17 @@ describe('Switch: shared scenarios', () => {
 });
 
 describe('Switch: contract drift', () => {
+  it('forwards invalid updates without changing the autonomous checked value', async () => {
+    const onCheckedChange = vi.fn();
+    const element = await render({ invalid: true, defaultChecked: true, onCheckedChange });
+    expect(element.invalid).toBe(true);
+    expect(inputOf(element).getAttribute('aria-invalid')).toBe('true');
+    await rerender({ invalid: false, defaultChecked: true, onCheckedChange });
+    expect(inputOf(element).hasAttribute('aria-invalid')).toBe(false);
+    expect(element.checked).toBe(true);
+    expect(onCheckedChange).not.toHaveBeenCalled();
+  });
+
   it('maps every contract event to its React name', () => {
     expect(Object.keys(switchEvents)).toEqual(eventNames(switchContract, 'react'));
   });

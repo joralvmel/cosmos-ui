@@ -43,12 +43,13 @@ class ControlledHostComponent {
 @Component({
   imports: [CosmSwitchComponent],
   template:
-    '<cosm-switch label="Enable notifications" [checked]="checked()" [defaultChecked]="defaultChecked()" [disabled]="disabled()" (checkedChange)="handleChange($event)"></cosm-switch>',
+    '<cosm-switch label="Enable notifications" [checked]="checked()" [defaultChecked]="defaultChecked()" [disabled]="disabled()" [invalid]="invalid()" (checkedChange)="handleChange($event)"></cosm-switch>',
 })
 class ScenarioHostComponent {
   checked = signal<boolean | undefined>(undefined);
   defaultChecked = signal(false);
   disabled = signal(false);
+  invalid = signal(false);
   changes: boolean[] = [];
 
   handleChange(event: CustomEvent<SwitchCheckedChangeDetail>) {
@@ -76,10 +77,12 @@ describe('CosmSwitchComponent', () => {
     const component = componentOf(fixture);
     component.hideLabel = true;
     component.disabled = true;
+    component.invalid = true;
     component.helpText = 'You can change this preference at any time.';
     await component.element.updateComplete;
     expect(component.element.hideLabel).toBe(true);
     expect(component.element.disabled).toBe(true);
+    expect(innerInput(component.element).getAttribute('aria-invalid')).toBe('true');
     expect(component.element.helpText).toBe('You can change this preference at any time.');
     expect(COSMOS_COMPONENTS).toContain(CosmSwitchComponent);
   });
@@ -130,6 +133,7 @@ describe('CosmSwitchComponent: shared scenarios', () => {
       fixture.componentInstance.checked.set(scenario.props.checked);
       fixture.componentInstance.defaultChecked.set(scenario.props.defaultChecked ?? false);
       fixture.componentInstance.disabled.set(scenario.props.disabled ?? false);
+      fixture.componentInstance.invalid.set(scenario.props.invalid ?? false);
       fixture.detectChanges();
       await fixture.whenStable();
       const element = fixture.nativeElement.querySelector('cosm-switch') as CosmSwitch;

@@ -9,6 +9,7 @@ export interface SwitchScenario {
     checked?: boolean;
     defaultChecked?: boolean;
     disabled?: boolean;
+    invalid?: boolean;
   };
   actions: readonly SwitchAction[];
   expected: {
@@ -51,6 +52,18 @@ export const switchScenarios: readonly SwitchScenario[] = [
     props: { ...fixture, checked: false },
     actions: [{ type: 'activate' }, { type: 'activate' }],
     expected: { checked: false, changes: [true, true] },
+  },
+  {
+    name: 'invalid presentation does not block autonomous activation',
+    props: { ...fixture, invalid: true },
+    actions: [{ type: 'activate' }],
+    expected: { checked: true, changes: [true] },
+  },
+  {
+    name: 'invalid presentation preserves controlled proposal ownership',
+    props: { ...fixture, invalid: true, checked: false },
+    actions: [{ type: 'activate' }],
+    expected: { checked: false, changes: [true] },
   },
   {
     name: 'controlled state follows the value accepted by the owner',

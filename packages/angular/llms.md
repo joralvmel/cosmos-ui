@@ -343,6 +343,7 @@ Toggles a binary setting immediately with a stable accessible name and form beha
 | `defaultChecked` | boolean | `false` | Initial autonomous checked value; later changes do not reset it. |
 | `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Web visual size preset or positive finite CSS-pixel size. Native uses system Switch sizing; numeric sizes do not scale it. |
 | `disabled` | boolean | `false` | Prevents user interaction and excludes the value from web form submission. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation. Does not change checked state or form validity; native uses danger colors without an equivalent system invalid trait. |
 | `helpText` | string | — | Optional consumer-localized supporting text associated with the switch. |
 | `name` | string | — | Web form field name; React Native has no HTML form association. |
 | `value` | string | `on` | Web form value submitted when checked and enabled; defaults to on. Angular Forms uses checked as its boolean value. |

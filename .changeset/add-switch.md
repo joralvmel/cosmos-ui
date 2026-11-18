@@ -6,4 +6,4 @@
 '@joralvmel/cosmos-native': minor
 ---
 
-Add the Switch component (`<cosm-switch>`) with its contract, React, Angular and React Native implementations.
+Add the Switch component (`<cosm-switch>`) with its contract, React, Angular and React Native implementations, including an external invalid presentation state.

@@ -23,11 +23,12 @@ touch target is at least 44pt.
 | `defaultChecked` | `false`, all | Initial value for autonomous state; subsequent changes do not reset it. |
 | `size` | `md`, web/React/Angular | `sm`, `md`, `lg` or positive finite CSS-pixel size. Not exposed on native. |
 | `disabled` | `false`, all | Blocks user interaction. Web excludes disabled switch from form submission and honors disabled fieldsets. |
+| `invalid` | `false`, all | External invalid presentation with danger track colors; web exposes `aria-invalid`, without changing form validity or submission. |
 | `helpText` | Optional, all | Supporting text adjacent to the label and associated with the control. |
 | `name` | Optional, web/React/Angular | Form field name. Not part of the native API. |
 | `value` | `on`, web/React/Angular | Submitted only when checked and enabled. Not part of the native API. |
 
-No required, invalid, error, read-only, mixed, loading, variant, icon or on/off-text states are
+No required, error, read-only, mixed, loading, variant, icon or on/off-text states are
 included. The track and thumb are the only visual control content. No label slot or interactive
 children are supported. Native also omits `name` and `value` because it has no HTML form API.
 
@@ -41,6 +42,11 @@ DOM dispatches bubbling, composed `cosm-checked-change` as a typed `CustomEvent`
 `onCheckedChange` and forwards the original event. Angular exposes `checkedChange` and re-emits the
 original event. React Native calls `onCheckedChange(detail)`. Native framework `Switch` changes are
 requests; controlled rejection or delay must restore/preserve the owner-provided position.
+
+`invalid` is always supplied by the consumer and has no proposal event. It adds danger track colors
+in both positions and `aria-invalid` on the web input, but never changes checked state, form validity
+or submission. Consumers explain the problem through localized `helpText`. The built-in native
+Switch has no equivalent invalid accessibility trait; use its supported track colors and help hint.
 
 The web input is a checkbox with `role="switch"`, native Space/keyboard behavior, visible
 `:focus-visible` indication, and a label associated with it. Switch has two states only. Form
@@ -68,6 +74,8 @@ Motion is tokenized and reduced when `prefers-reduced-motion` is requested.
 - Bound `checked={false}` emits repeated `true` proposals without self-committing; accepting or
   rejecting/delaying proposals follows the owner's next value.
 - Disabled controls do not toggle or emit. Native UI rejection preserves the controlled position.
+- Invalid controls retain their checked behavior and form participation. Playground and native demo
+  include an invalid control; the docs States section shows both invalid positions.
 - Web switch has checkbox input semantics with `role="switch"`, stable accessible name, help text,
   Space operation and visible focus.
 - Web form includes only checked, enabled `name=value`; reset restores autonomous default and
@@ -82,7 +90,7 @@ Motion is tokenized and reduced when `prefers-reduced-motion` is requested.
 
 ## Deferred
 
-No label content slots, decorative or semantic icons, track text, tri-state, validation, read-only,
+No label content slots, decorative or semantic icons, track text, tri-state, automatic validation, read-only,
 loading, variants or additional dependencies. Android runtime validation is explicitly deferred by
 the user and will be reported as unavailable/not verified. iOS and manual screen-reader checks are
 optional and will be reported as not verified.
@@ -103,6 +111,11 @@ optional and will be reported as not verified.
   forced-colors thumb visibility and reduced-motion transitions passed.
 - Playground: localized invalid-size feedback preserves the last valid preview; native snippets
   omit web-only size/name/value.
+- Invalid revision: Playground controls and both docs states passed. Web forms retained validity
+  and checked-only submission; real React/Angular bindings forwarded and cleared invalid without
+  changing checked ownership. Cosmos/Nebula light/dark invalid tracks and thumbs exceeded 3:1;
+  labels/help stayed fixed, and forced-colors thumbs remained visible. The native Web demo's invalid
+  control applied danger tracks in both positions and restored normal colors without resetting checked.
 - Native unit tests use mocks. Expo's Web export is not an Android/iOS device test. Android runtime
   is unavailable (`adb devices -l` listed no devices), deferred as approved; iOS and manual screen
   readers remain not verified (optional).

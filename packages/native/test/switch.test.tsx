@@ -81,6 +81,34 @@ describe('Switch (native): contract drift', () => {
 });
 
 describe('Switch (native)', () => {
+  it.each([false, true])('uses danger track colors for invalid checked=%s', async checked => {
+    const theme = getNativeTheme('cosmos', 'light');
+    const onCheckedChange = vi.fn();
+    const sample = (invalid: boolean) => (
+      <CosmosThemeProvider theme="cosmos" mode="light">
+        <Switch
+          label="Enable notifications"
+          checked={checked}
+          invalid={invalid}
+          onCheckedChange={onCheckedChange}
+          testID="subject"
+        />
+      </CosmosThemeProvider>
+    );
+    await render(sample(true));
+    expect(JSON.parse(nativeControl()?.getAttribute('data-track-color') ?? '{}')).toEqual({
+      false: theme.colors.danger,
+      true: theme.colors.danger,
+    });
+    await rerender(sample(false));
+    expect(JSON.parse(nativeControl()?.getAttribute('data-track-color') ?? '{}')).toEqual({
+      false: theme.colors['border-strong'],
+      true: theme.colors.primary,
+    });
+    expect(nativeControl()?.checked).toBe(checked);
+    expect(onCheckedChange).not.toHaveBeenCalled();
+  });
+
   it('uses the built-in switch role, stable accessible name and help hint', async () => {
     await render(
       <Switch

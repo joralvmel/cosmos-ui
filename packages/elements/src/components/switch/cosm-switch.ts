@@ -141,6 +141,10 @@ const styles = css`
     cursor: not-allowed;
     opacity: 0.56;
   }
+  :host([invalid]) .track {
+    border-color: var(--cosm-danger, oklch(0.55 0.16 19));
+    background: var(--cosm-danger, oklch(0.55 0.16 19));
+  }
   @media (forced-colors: active) {
     .track {
       forced-color-adjust: none;
@@ -160,6 +164,13 @@ const styles = css`
     }
     .input:focus-visible + .track {
       outline-color: Highlight;
+    }
+    :host([invalid]) .track {
+      border-color: Highlight;
+      background: Canvas;
+    }
+    :host([invalid]) .track .thumb {
+      background: CanvasText;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -208,6 +219,7 @@ export class CosmSwitch extends CosmElement {
     defaultChecked: { type: Boolean, attribute: 'default-checked' },
     size: { reflect: true, converter: sizeConverter },
     disabled: { type: Boolean, reflect: true },
+    invalid: { type: Boolean, reflect: true },
     helpText: { attribute: 'help-text' },
     name: { reflect: true },
     value: {},
@@ -220,6 +232,7 @@ export class CosmSwitch extends CosmElement {
   declare defaultChecked: NonNullable<Props['defaultChecked']>;
   declare size: SwitchSize;
   declare disabled: NonNullable<Props['disabled']>;
+  declare invalid: NonNullable<Props['invalid']>;
   declare helpText: NonNullable<Props['helpText']>;
   declare name: Props['name'];
   declare value: NonNullable<Props['value']>;
@@ -242,6 +255,7 @@ export class CosmSwitch extends CosmElement {
     this.defaultChecked = props.defaultChecked.default;
     this.size = props.size.default as SwitchSize;
     this.disabled = props.disabled.default;
+    this.invalid = props.invalid.default;
     this.helpText = '';
     this.name = undefined;
     this.value = props.value.default;
@@ -307,6 +321,7 @@ export class CosmSwitch extends CosmElement {
     for (const [name, value] of [
       ['hideLabel', this.hideLabel],
       ['disabled', this.disabled],
+      ['invalid', this.invalid],
       ['defaultChecked', this.defaultChecked],
     ] as const) {
       if (typeof value !== 'boolean') throw new TypeError(`Switch ${name} must be a boolean.`);
@@ -375,6 +390,7 @@ export class CosmSwitch extends CosmElement {
           role="switch"
           .checked=${this.#checked}
           ?disabled=${this.disabled || this.#formDisabled}
+          aria-invalid=${this.invalid ? 'true' : nothing}
           aria-describedby=${describedBy}
           @change=${this.#onChange}
         />

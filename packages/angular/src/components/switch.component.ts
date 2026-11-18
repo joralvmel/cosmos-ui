@@ -67,6 +67,9 @@ export class CosmSwitchComponent implements ControlValueAccessor {
   @Input({ transform: booleanAttribute }) set disabled(value: boolean) {
     this.element.disabled = value;
   }
+  @Input({ transform: booleanAttribute }) set invalid(value: boolean) {
+    this.element.invalid = value;
+  }
   @Input() set helpText(value: Props['helpText']) {
     this.element.helpText = value ?? '';
   }

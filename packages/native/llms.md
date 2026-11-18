@@ -315,6 +315,7 @@ Toggles a binary setting immediately with a stable accessible name and form beha
 | `checked` | boolean | `false` | Controlled checked value when supplied, including false; activation proposes changes without self-committing. |
 | `defaultChecked` | boolean | `false` | Initial autonomous checked value; later changes do not reset it. |
 | `disabled` | boolean | `false` | Prevents user interaction and excludes the value from web form submission. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation. Does not change checked state or form validity; native uses danger colors without an equivalent system invalid trait. |
 | `helpText` | string | — | Optional consumer-localized supporting text associated with the switch. |
 
 Events: `onCheckedChange` → `SwitchCheckedChangeDetail`.
