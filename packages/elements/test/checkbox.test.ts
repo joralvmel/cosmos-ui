@@ -77,6 +77,34 @@ describe('cosm-checkbox: contract drift', () => {
 });
 
 describe('cosm-checkbox', () => {
+  it('keeps invalid checked styling and validation messages in a stable layout', async () => {
+    const element = await createCheckbox({
+      defaultChecked: true,
+      invalid: true,
+      helpText: 'Required for enrollment.',
+      errorText: 'Choose this option to continue.',
+    });
+    const box = element.shadowRoot?.querySelector<HTMLElement>('[part="box"]');
+    const base = element.shadowRoot?.querySelector<HTMLElement>('[part="base"]');
+    if (!box || !base) throw new Error('Missing checkbox parts.');
+
+    const boxStyle = getComputedStyle(box);
+    expect(boxStyle.backgroundColor).toBe('transparent');
+    expect(boxStyle.color).toBe(boxStyle.borderTopColor);
+    expect(getComputedStyle(element).display).toBe('inline-flex');
+    expect(getComputedStyle(element).flexDirection).toBe('column');
+    expect(getComputedStyle(base).alignItems).toBe('center');
+
+    inputOf(element).click();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector('[part="help-text"]')?.textContent).toBe(
+      'Required for enrollment.'
+    );
+    expect(element.shadowRoot?.querySelector('[part="error-text"]')?.textContent).toBe(
+      'Choose this option to continue.'
+    );
+  });
+
   it('renders a named native checkbox with hidden-label, required and described error semantics', async () => {
     const element = await createCheckbox({
       hideLabel: true,

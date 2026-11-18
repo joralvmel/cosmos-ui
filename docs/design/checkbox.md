@@ -57,6 +57,9 @@ input provides web keyboard, checked, required and label semantics. The visible 
 
 The web input remains the focus target and exposes a visible `:focus-visible` indicator. Help and
 error text are referenced with `aria-describedby`; invalid state is exposed with `aria-invalid`.
+An invalid checked or mixed box stays transparent, with its indicator and border using the danger
+color. The host stacks its control and supporting messages vertically to prevent state changes from
+moving the help or error text.
 Native exposes `accessibilityRole="checkbox"`, checked/mixed/disabled state, and associated
 localized help/error as an accessibility hint. React Native does not expose equivalent required or
 invalid states; consumers include required information in localized label/help text as needed.

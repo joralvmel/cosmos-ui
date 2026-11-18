@@ -31,7 +31,8 @@ let instance = 0;
 const styles = css`
   :host {
     --_checkbox-size: var(--cosm-icon-size-md, 20px);
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: column;
     color: var(--cosm-fg, oklch(0.24 0.01 268));
     font-family: var(--cosm-font-sans, system-ui, sans-serif);
   }
@@ -125,6 +126,12 @@ const styles = css`
   .base[data-invalid='true'] .box {
     border-color: var(--cosm-danger, oklch(0.55 0.16 19));
   }
+  .base[data-invalid='true'] .input:checked + .box,
+  .base[data-invalid='true'] .box[data-indeterminate='true'] {
+    border-color: var(--cosm-danger, oklch(0.55 0.16 19));
+    background: transparent;
+    color: var(--cosm-danger, oklch(0.55 0.16 19));
+  }
   @media (forced-colors: active) {
     .input:focus-visible + .box {
       outline-color: Highlight;
@@ -134,6 +141,12 @@ const styles = css`
       border-color: Highlight;
       background: Highlight;
       color: HighlightText;
+    }
+    .base[data-invalid='true'] .input:checked + .box,
+    .base[data-invalid='true'] .box[data-indeterminate='true'] {
+      border-color: Highlight;
+      background: Canvas;
+      color: Highlight;
     }
   }
   @media (prefers-reduced-motion: reduce) {
