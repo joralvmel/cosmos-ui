@@ -1,0 +1,99 @@
+---
+title: Switch
+description: Una preferencia binaria inmediata con nombre accesible estable y comportamiento de formulario.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="switch" />
+
+`<cosm-switch>` activa o desactiva inmediatamente una preferencia binaria, como las notificaciones.
+No es una acción para enviar un formulario ni una casilla para confirmar una decisión aparte. Su
+`label` obligatorio de texto simple mantiene el mismo nombre accesible en ambos estados. El
+`helpText` opcional permanece junto a la etiqueta cuando cambia el estado.
+
+## Playground
+
+<Playground name="switch" content="Switch" />
+
+Usa Playground para probar el estado autónomo, las propuestas del `checked` controlado (incluido
+`false`) y los propietarios que aceptan o rechazan cambios. Proporciona la etiqueta obligatoria y
+mantiene el elemento sin contenido hijo en la vista previa renderizada en el servidor y en los
+fragmentos de código.
+
+## Variantes
+
+Switch tiene un único aspecto estándar de pista y control deslizante, sin iconos ni texto de
+encendido/apagado. Web, React y Angular admiten tamaños semánticos y un tamaño personalizado finito
+y positivo:
+
+<Preview>
+  <cosm-switch label="Pequeño" size="sm"></cosm-switch>
+  <cosm-switch label="Mediano" size="md"></cosm-switch>
+  <cosm-switch label="Grande" size="lg"></cosm-switch>
+  <cosm-switch label="Personalizado" size="28"></cosm-switch>
+</Preview>
+
+El tamaño numérico indica la altura de la pista en píxeles CSS. React Native no expone la propiedad
+`size` y conserva el tamaño del control integrado del sistema.
+
+## Estados
+
+<Preview>
+  <cosm-switch label="Desactivado inicialmente"></cosm-switch>
+  <cosm-switch label="Activado inicialmente" default-checked></cosm-switch>
+  <cosm-switch label="No disponible" disabled></cosm-switch>
+  <cosm-switch
+    label="Etiqueta visual oculta"
+    hide-label
+    help-text="El nombre accesible sigue disponible."
+  ></cosm-switch>
+</Preview>
+
+Un `checked` sin enlace es autónomo y comienza con `defaultChecked`. Un `checked` enlazado, incluso
+`false`, está controlado: la activación propone `{ checked }` y el componente espera a que el
+propietario actualice la propiedad. Mantén estable el nombre accesible durante los cambios. Los
+controles desactivados no emiten propuestas.
+
+El formulario web incluye `name=value` solo cuando el control está activado y habilitado. Al
+reiniciar, se restaura el valor autónomo inicial; los grupos de campos desactivados también lo
+desactivan. Angular Forms utiliza un booleano mediante `ControlValueAccessor`; React Native no
+tiene el ciclo de vida de formularios HTML.
+
+Para personalizar la versión web, las propiedades `--cosm-switch-*` ajustan la pista, el control,
+el radio, el espaciado y el foco:
+
+<Preview>
+  <cosm-switch
+    label="Pista personalizada"
+    default-checked
+    style="--cosm-switch-checked-track-background: var(--cosm-success); --cosm-switch-thumb-background: var(--cosm-bg);"
+  ></cosm-switch>
+</Preview>
+
+## Accesibilidad
+
+- Proporciona un `label` no vacío de texto simple; `hideLabel` lo oculta visualmente, pero conserva
+  el nombre accesible.
+- El control web usa una entrada nativa de casilla con `role="switch"`. `Tab` mueve el foco y
+  `Space` cambia el estado. El foco de teclado tiene un indicador visible.
+- `helpText` se asocia al control y permanece presente cuando cambia el estado.
+- Los estados activado y desactivado usan la semántica nativa de cada plataforma. Native usa el
+  `Switch` integrado de React Native, con el tamaño del sistema y un área circundante de al menos
+  44pt.
+- No añadas un slot de etiqueta ni contenido interactivo. Switch solo tiene estados activado y
+  desactivado.
+- Se elimina el movimiento cuando se solicita movimiento reducido; los colores usan tokens Cosmos
+  y puntos de personalización.
+
+## API
+
+<ApiTable name="switch" />
+
+## Eventos por plataforma
+
+<EventsTable name="switch" />

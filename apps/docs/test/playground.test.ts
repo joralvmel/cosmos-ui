@@ -8,6 +8,7 @@ import {
   listboxItemExamples,
   listboxValueExamples,
   popoverContract,
+  switchContract,
   textFieldContract,
 } from '@joralvmel/cosmos-core';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
@@ -22,6 +23,7 @@ import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
 import '@joralvmel/cosmos-elements/text-field';
+import '@joralvmel/cosmos-elements/switch';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   initPlayground,
@@ -43,6 +45,7 @@ const labels: PlaygroundLabels = {
   light: 'Light',
   dark: 'Dark',
   nativeDemo: 'Native demo',
+  switchLabel: 'Enable notifications',
   tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
   textFieldDefaults: {
     label: 'Email address',
@@ -99,6 +102,50 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('initializes Switch with a required label and no child content on every platform', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-switch');
+    target.dataset.playgroundTarget = '';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: switchContract,
+      content: 'must not become child content',
+      labels: { ...labels, switchLabel: 'Activar notificaciones' },
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+
+    await target.updateComplete;
+    expect(target.label).toBe('Activar notificaciones');
+    expect(target.childNodes).toHaveLength(0);
+    expect(root.querySelector<HTMLInputElement>('[data-prop="label"]')?.value).toBe(
+      'Activar notificaciones'
+    );
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).toContain('Activar notificaciones');
+    }
+
+    controller.set('size', 27);
+    controller.set('checked', false);
+    expect(controller.code('html')).toContain('size="27"');
+    expect(controller.code('react')).toContain('size={27}');
+    expect(controller.code('angular')).toContain('[size]="27"');
+    expect(controller.code('native')).not.toMatch(/\b(?:size|name|value)=/);
+    expect(controller.code('native')).toContain('checked={false}');
+    for (const invalid of [0, -1, Number.POSITIVE_INFINITY, 'wide']) {
+      controller.set('size', invalid);
+      expect(target.size).toBe(27);
+      expect(root.textContent).toContain('non-empty label and a positive size');
+    }
+    controller.set('label', '');
+    expect(target.label).toBe('Activar notificaciones');
+    controller.set('size', 'sm');
+    await target.updateComplete;
+    expect(target.size).toBe('sm');
+    expect(root.textContent).not.toContain('non-empty label and a positive size');
+  });
+
   it('initializes the checkbox with a localized accessible label in the preview and snippets', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-checkbox');

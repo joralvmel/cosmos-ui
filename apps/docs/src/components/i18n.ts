@@ -67,6 +67,8 @@ const strings = {
       popoverCloseLabel: 'Close',
       popoverInvalid: 'Use a non-negative distance and a non-empty close label.',
       checkboxLabel: 'Accept terms',
+      switchLabel: 'Enable notifications',
+      switchInvalid: 'Use a non-empty label and a positive size.',
       listboxLabel: 'Choose produce',
       listboxInvalid:
         'Use a non-empty label, positive height and values matching the selection mode.',
@@ -217,6 +219,8 @@ const strings = {
       popoverCloseLabel: 'Cerrar',
       popoverInvalid: 'Usa una distancia no negativa y una etiqueta de cierre que no esté vacía.',
       checkboxLabel: 'Acepto los términos',
+      switchLabel: 'Activar notificaciones',
+      switchInvalid: 'Usa una etiqueta no vacía y un tamaño positivo.',
       listboxLabel: 'Elige productos',
       listboxInvalid:
         'Usa una etiqueta no vacía, altura positiva y valores adecuados al modo de selección.',

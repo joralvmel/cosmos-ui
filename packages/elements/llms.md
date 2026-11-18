@@ -278,6 +278,34 @@ Events: `cosm-checked-change` → `CheckboxCheckedChangeDetail`.
   element.addEventListener('cosm-checked-change', event => console.log(event.detail));
 </script>
 ```
+### `<cosm-switch>`
+
+Toggles a binary setting immediately with a stable accessible name and form behavior on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required nonempty accessible name; remains stable in both states. |
+| `hideLabel` (`hide-label`) | boolean | `false` | Visually hides the label while retaining its accessible name. |
+| `checked` | boolean | `false` | Controlled checked value when supplied, including false; activation proposes changes without self-committing. |
+| `defaultChecked` (`default-checked`) | boolean | `false` | Initial autonomous checked value; later changes do not reset it. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Web visual size preset or positive finite CSS-pixel size. Native uses system Switch sizing; numeric sizes do not scale it. |
+| `disabled` | boolean | `false` | Prevents user interaction and excludes the value from web form submission. |
+| `helpText` (`help-text`) | string | — | Optional consumer-localized supporting text associated with the switch. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+| `value` | string | `on` | Web form value submitted when checked and enabled; defaults to on. Angular Forms uses checked as its boolean value. |
+
+Events: `cosm-checked-change` → `SwitchCheckedChangeDetail`.
+
+```html
+<cosm-switch label="Switch"></cosm-switch>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/switch';
+
+  const element = document.querySelector('cosm-switch');
+  element.addEventListener('cosm-checked-change', event => console.log(event.detail));
+</script>
+```
 
 ## Themes
 

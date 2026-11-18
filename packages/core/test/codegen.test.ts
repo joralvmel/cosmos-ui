@@ -9,6 +9,7 @@ import {
   listboxContract,
   popoverContract,
   supportsTarget,
+  switchContract,
   textFieldContract,
   toAttribute,
 } from '../src/index.js';
@@ -71,6 +72,39 @@ describe('codegen', () => {
     expect(snippets.angular).toContain('onPress(detail: ButtonPressDetail) {');
     expect(snippets.native).toContain("import { Button } from '@joralvmel/cosmos-native';");
     expect(snippets.native).toContain('onPress={detail => console.log(detail)}');
+  });
+
+  it('generates Switch snippets with required labels and web-only form and size props', () => {
+    const snippets = generateSnippets(
+      switchContract,
+      {
+        label: 'Enable notifications',
+        size: 28,
+        checked: false,
+        name: 'notifications',
+        value: 'yes',
+      },
+      'ignored child content'
+    );
+    expect(snippets.html).toContain(
+      '<cosm-switch label="Enable notifications" size="28" name="notifications" value="yes"></cosm-switch>'
+    );
+    expect(snippets.html).toContain('element.checked = false;');
+    expect(snippets.react).toContain('label="Enable notifications"');
+    expect(snippets.react).toContain('checked={false}');
+    expect(snippets.react).toContain('size={28}');
+    expect(snippets.angular).toContain('[checked]="false"');
+    expect(snippets.angular).toContain('[size]="28"');
+    expect(snippets.native).toContain('label="Enable notifications"');
+    expect(snippets.native).toContain('checked={false}');
+    expect(snippets.native).not.toMatch(/\b(?:size|name|value)=/);
+    for (const source of Object.values(snippets)) {
+      expect(source).not.toContain('ignored child content');
+    }
+    expect(snippets.html).toContain("addEventListener('cosm-checked-change'");
+    expect(snippets.react).toContain('onCheckedChange={event => console.log(event.detail)}');
+    expect(snippets.angular).toContain('(checkedChange)="onCheckedChange($event.detail)"');
+    expect(snippets.native).toContain('onCheckedChange={detail => console.log(detail)}');
   });
 
   it('only emits props available on each platform', () => {

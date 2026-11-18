@@ -64,6 +64,10 @@
       "types": "./dist/components/checkbox/cosm-checkbox.d.ts",
       "default": "./dist/components/checkbox/cosm-checkbox.js"
     },
+    "./switch": {
+      "types": "./dist/components/switch/cosm-switch.d.ts",
+      "default": "./dist/components/switch/cosm-switch.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"
