@@ -21,13 +21,19 @@ setMode('system');
 
 Without `data-mode` the light mode applies; without `data-theme` the default theme (`cosmos`) applies.
 
+Built-in themes: `cosmos` (blue), `nebula` (purple), `terra` (green), `supernova` (coral red),
+`aurora` (cyan/turquoise) and `solstice` (amber/gold). Every theme includes light and dark modes
+with the same semantic roles across CSS, Tailwind, React Native and JSON.
+Use `builtInThemes` for web theme pickers or `themeNames` from the native entry point.
+Status colors keep their meaning independently of the primary brand color; use text or icons as well.
+
 ## Custom themes
 
 ```ts
 import { defineTheme, resolveTheme, toCss, validateTheme } from '@joralvmel/cosmos-tokens';
 
 const theme = resolveTheme(
-  defineTheme({ name: 'aurora', seeds: { primary: 'oklch(0.56 0.15 165)' } })
+  defineTheme({ name: 'studio', seeds: { primary: 'oklch(0.56 0.15 165)' } })
 );
 if (!validateTheme(theme).pass) throw new Error('Theme fails accessibility checks');
 const css = toCss([theme]);

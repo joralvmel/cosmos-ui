@@ -10,6 +10,40 @@ escalas OKLCH de 12 pasos, un modo dark con su propia curva de luminosidad, colo
 conservan su significado y una paleta de 8 colores para gráficas. Cada tema se valida con WCAG 2.2 AA
 (normativo), APCA (informativo) y simulaciones de protanopia, deuteranopia y tritanopia.
 
+## Elegir un tema incluido
+
+| Tema | Color principal | Carácter |
+| --- | --- | --- |
+| Cosmos | Azul | La base equilibrada y predeterminada |
+| Nebula | Morado | Expresivo y frío |
+| Terra | Verde | Natural y fresco |
+| Supernova | Rojo coral | Cálido y enérgico |
+| Aurora | Cian/turquesa | Claro y luminoso |
+| Solstice | Ámbar/dorado | Cálido y equilibrado |
+
+Cada paleta incluye modos claro y oscuro en web y React Native. Las nuevas paletas usan el radio
+estándar; la tipografía, el espaciado y el movimiento no cambian. Cosmos sigue siendo el predeterminado.
+Success, warning, danger e info conservan su significado semántico: un color principal verde o rojo
+es una elección de marca, no un resultado de validación. Acompaña siempre los colores de estado
+con texto o iconos que comuniquen su significado.
+
+Elige un tema en la cabecera del sitio para aplicarlo a las vistas previas y los controles compartidos
+del Playground. El Playground permite fijar su propio tema y modo; selecciona las opciones del sitio
+para volver a seguir la cabecera. La galería muestra cada paleta en ambos modos de forma independiente.
+
+En una aplicación, usa el runtime existente:
+
+```ts
+import { setMode, setTheme } from '@joralvmel/cosmos-tokens/runtime';
+
+setTheme('terra');
+setMode('system');
+```
+
+En React Native, usa `<CosmosThemeProvider theme="terra" mode="system">`; la pantalla principal
+de la demo nativa incluye los mismos temas. Tailwind ofrece una variante `theme-<name>:` para cada
+paleta, como `theme-terra:bg-primary-subtle`.
+
 <ThemeGallery />
 
 ## Crear un tema
@@ -17,14 +51,14 @@ conservan su significado y una paleta de 8 colores para gráficas. Cada tema se 
 ```ts
 import { defineTheme, resolveTheme, toCss, validateTheme } from '@joralvmel/cosmos-tokens';
 
-const aurora = defineTheme({
-  name: 'aurora',
+const studio = defineTheme({
+  name: 'studio',
   seeds: { primary: 'oklch(0.56 0.15 165)' },
   harmony: 'triadic',
   radius: 'pill',
 });
 
-const resolved = resolveTheme(aurora);
+const resolved = resolveTheme(studio);
 console.log(validateTheme(resolved).pass);
 const css = toCss([resolved]);
 ```

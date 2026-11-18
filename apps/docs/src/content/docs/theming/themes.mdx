@@ -10,6 +10,39 @@ Each theme is generated from seed colors and a color harmony with `defineTheme`.
 an 8-color chart palette. Every theme is validated against WCAG 2.2 AA (normative), APCA (informative)
 and simulated protanopia, deuteranopia and tritanopia.
 
+## Choose a built-in theme
+
+| Theme | Primary color | Character |
+| --- | --- | --- |
+| Cosmos | Blue | The default, balanced foundation |
+| Nebula | Purple | Expressive and cool |
+| Terra | Green | Grounded and fresh |
+| Supernova | Coral red | Warm and energetic |
+| Aurora | Cyan/turquoise | Clear and luminous |
+| Solstice | Amber/gold | Warm and balanced |
+
+Every palette includes light and dark modes on web and React Native. New palettes use the standard
+radius preset; typography, spacing and motion stay unchanged. Cosmos remains the default.
+Success, warning, danger and info keep their semantic meaning: a green or red primary is a brand
+choice, not a validation result. Always pair status color with meaningful text or icons.
+
+Choose a theme in the site header to apply it to the previews and shared Playground controls.
+The Playground can override theme and mode independently; choose the site options to follow the
+header again. The gallery below deliberately shows each palette in both modes.
+
+For an application, use the existing runtime:
+
+```ts
+import { setMode, setTheme } from '@joralvmel/cosmos-tokens/runtime';
+
+setTheme('terra');
+setMode('system');
+```
+
+In React Native, set `<CosmosThemeProvider theme="terra" mode="system">`; the native demo
+lists the same themes on its home screen. Tailwind includes a `theme-<name>:` variant for each
+palette, such as `theme-terra:bg-primary-subtle`.
+
 <ThemeGallery />
 
 ## Create a theme
@@ -17,14 +50,14 @@ and simulated protanopia, deuteranopia and tritanopia.
 ```ts
 import { defineTheme, resolveTheme, toCss, validateTheme } from '@joralvmel/cosmos-tokens';
 
-const aurora = defineTheme({
-  name: 'aurora',
+const studio = defineTheme({
+  name: 'studio',
   seeds: { primary: 'oklch(0.56 0.15 165)' },
   harmony: 'triadic',
   radius: 'pill',
 });
 
-const resolved = resolveTheme(aurora);
+const resolved = resolveTheme(studio);
 console.log(validateTheme(resolved).pass);
 const css = toCss([resolved]);
 ```

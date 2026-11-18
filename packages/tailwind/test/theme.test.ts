@@ -34,6 +34,10 @@ describe('Cosmos Tailwind theme', () => {
       'gap-sm',
       'dark:bg-surface',
       'theme-nebula:text-accent',
+      'theme-terra:text-primary',
+      'theme-supernova:text-primary',
+      'theme-aurora:text-primary',
+      'theme-solstice:text-primary',
       'bg-blue-500',
     ]);
   });
@@ -50,6 +54,10 @@ describe('Cosmos Tailwind theme', () => {
     expect(css).toContain('[data-mode="dark"]');
     expect(css).toContain('[data-mode="system"]');
     expect(css).toContain('[data-theme="nebula"]');
+    for (const name of ['terra', 'supernova', 'aurora', 'solstice']) {
+      expect(css).toContain(`:where([data-theme="${name}"], [data-theme="${name}"] *)`);
+      expect(css).toContain('color: var(--cosm-primary)');
+    }
   });
 
   it('removes default palette colors so only tokens are used', () => {

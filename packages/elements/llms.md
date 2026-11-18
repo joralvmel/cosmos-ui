@@ -315,7 +315,7 @@ Events: `cosm-checked-change` → `SwitchCheckedChangeDetail`.
 
 ## Themes
 
-Built-in themes: `cosmos`, `nebula` (default `cosmos`), each with `light` and `dark` modes; `system` follows the OS.
+Built-in themes: `cosmos`, `nebula`, `terra`, `supernova`, `aurora`, `solstice` (default `cosmos`), each with `light` and `dark` modes; `system` follows the OS.
 
 ```html
 <html data-theme="nebula" data-mode="system">
