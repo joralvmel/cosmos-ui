@@ -16,12 +16,12 @@
 
 .cosm-playground-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
   gap: 0.75rem;
   margin: 0;
   padding: 1rem;
   border: 0;
-  border-block-start: 1px solid var(--sl-color-gray-5);
+  border-block-start: 1px solid var(--cosm-border);
   min-inline-size: 0;
   background: var(--cosm-bg);
   color: var(--cosm-fg);
@@ -34,15 +34,15 @@
   font-weight: 600;
 }
 
-.cosm-playground :is(input:not([type="checkbox"]), select) {
+.cosm-playground :is(input, select) {
   min-inline-size: 0;
   max-inline-size: 100%;
   min-block-size: 2.5rem;
   padding: 0.375rem 0.625rem;
-  border: 1px solid var(--sl-color-gray-4);
+  border: 1px solid var(--cosm-border-strong);
   border-radius: 0.375rem;
-  background: var(--sl-color-bg);
-  color: var(--sl-color-text);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
   font: inherit;
 }
 
@@ -88,26 +88,14 @@
   font-size: var(--sl-text-sm);
 }
 
-.cosm-playground-controls label:has(input[type="checkbox"]) {
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-  align-items: center;
-  align-self: start;
-  box-sizing: border-box;
-  padding-block-start: calc(1lh + 0.25rem);
-  min-block-size: calc(1lh + 0.25rem + 2.5rem);
+.cosm-playground-boolean-control {
+  min-inline-size: 0;
+  align-self: end;
+  min-block-size: 2.5rem;
 }
 
 .cosm-playground-controls [hidden] {
   display: none;
-}
-
-.cosm-playground-controls input[type="checkbox"] {
-  appearance: auto;
-  width: 1.125rem;
-  height: 1.125rem;
-  flex: none;
-  accent-color: var(--cosm-primary);
 }
 
 .cosm-playground-advanced {
@@ -121,7 +109,7 @@
 
 .cosm-playground-advanced-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
   gap: 0.75rem;
   padding-block-start: 0.75rem;
 }
@@ -136,7 +124,7 @@
   color: var(--cosm-fg);
   max-block-size: 26rem;
   overflow: auto;
-  border: 1px solid var(--sl-color-gray-5);
+  border: 1px solid var(--cosm-border);
   border-radius: 0.5rem;
 }
 
@@ -208,8 +196,9 @@
   gap: 0.75rem;
   font-size: var(--sl-text-sm);
   padding: 0.75rem 1rem;
-  border-block-end: 1px solid var(--sl-color-gray-5);
-  background: var(--sl-color-gray-6);
+  border-block-end: 1px solid var(--cosm-border);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
 }
 
 .cosm-playground-toolbar label {
@@ -229,8 +218,9 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.5rem;
-  border-bottom: 1px solid var(--sl-color-gray-5);
-  background: var(--sl-color-gray-6);
+  border-bottom: 1px solid var(--cosm-border);
+  background: var(--cosm-bg);
+  color: var(--cosm-fg);
 }
 
 .cosm-playground-code [role="tablist"] {
@@ -246,20 +236,24 @@
   border: 1px solid transparent;
   border-radius: 0.375rem;
   background: transparent;
-  color: var(--sl-color-gray-2);
+  color: var(--cosm-fg);
   font: inherit;
   font-size: var(--sl-text-sm);
   cursor: pointer;
 }
 
 .cosm-playground-code [role="tab"][aria-selected="true"] {
-  border-color: var(--sl-color-gray-4);
-  background: var(--sl-color-black);
-  color: var(--sl-color-white);
+  border-color: var(--cosm-primary);
+  background: var(--cosm-primary);
+  color: var(--cosm-primary-fg);
   font-weight: 600;
 }
 
-.cosm-playground-code [role="tab"]:focus-visible,
+.cosm-playground-code [role="tab"]:focus-visible {
+  outline: 2px solid var(--cosm-focus-ring);
+  outline-offset: 2px;
+}
+
 .cosm-playground-code [role="tabpanel"]:focus-visible {
   outline: 2px solid var(--sl-color-accent);
   outline-offset: 2px;
@@ -267,7 +261,7 @@
 
 .cosm-playground-status {
   font-size: var(--sl-text-xs);
-  color: var(--sl-color-gray-3);
+  color: var(--cosm-fg-muted);
 }
 
 .cosm-playground-code pre {
@@ -303,7 +297,7 @@
 }
 
 .cosm-playground :is(input, select, button, summary):focus-visible {
-  outline: 2px solid var(--cosm-focus-ring, var(--sl-color-text-accent));
+  outline: 2px solid var(--cosm-focus-ring);
   outline-offset: 2px;
 }
 
