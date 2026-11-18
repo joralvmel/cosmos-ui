@@ -36,6 +36,11 @@ affixes and action icons are unaffected.
 Text fields default to `20ch` wide, capped at the container width. Set CSS `width` to fit your
 layout. Clear/reveal actions and decorations take space inside the field without changing its width.
 
+Enabled Checkbox and Text Field borders use the theme color on pointer hover; checked/mixed
+Checkbox borders use the theme's hover color. Invalid borders retain their danger color and disabled
+controls do not react. Text Field uses a subtle themed background while its input or actions have
+focus. Existing background/border/focus hooks still take precedence over their theme defaults.
+
 ## License
 
 MIT

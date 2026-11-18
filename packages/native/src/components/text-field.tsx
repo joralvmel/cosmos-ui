@@ -239,6 +239,7 @@ export function TextField({
   const [ownedValue, setOwnedValue] = useState(defaultValue);
   const [, forceRender] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [focusedAction, setFocusedAction] = useState<'clear' | 'reveal' | null>(null);
   const [revealed, setRevealed] = useState(false);
   const descriptionId = useId();
@@ -302,8 +303,10 @@ export function TextField({
     if (disabled) {
       setFocused(false);
       setFocusedAction(null);
+      setHovered(false);
     }
   }, [disabled]);
+  const controlFocused = !disabled && (focused || actionFocused);
   const iconsFocused = !disabled && (focused || (iconFocusScope === 'control' && actionFocused));
   const startIconColor =
     (iconsFocused ? appearance?.startIconFocusColor : undefined) ?? appearance?.startIconColor;
@@ -355,6 +358,10 @@ export function TextField({
         </Text>
       )}
       <View
+        onPointerEnter={event => {
+          if (event.nativeEvent.pointerType === 'mouse') setHovered(true);
+        }}
+        onPointerLeave={() => setHovered(false)}
         style={[
           {
             minHeight: height,
@@ -363,15 +370,16 @@ export function TextField({
             gap: theme.space.xs,
             paddingHorizontal: theme.space.sm,
             borderWidth: 1,
-            borderColor: focused
+            borderColor: controlFocused
               ? (appearance?.focus ?? theme.colors.primary)
               : state.invalid
                 ? theme.colors.danger
-                : (appearance?.border ?? theme.colors['border-strong']),
+                : (appearance?.border ??
+                  theme.colors[hovered && !disabled ? 'primary' : 'border-strong']),
             borderRadius: appearance?.radius ?? theme.radius.md,
             ...(Platform.OS === 'web'
               ? {
-                  outlineWidth: focused ? 2 : 0,
+                  outlineWidth: controlFocused ? 2 : 0,
                   outlineOffset: -2,
                   outlineStyle: 'solid',
                   outlineColor: appearance?.focus ?? theme.colors.primary,
@@ -379,7 +387,11 @@ export function TextField({
               : {}),
             backgroundColor:
               appearance?.background ??
-              (variant === 'filled' ? theme.colors['surface-raised'] : theme.colors.bg),
+              (controlFocused
+                ? theme.colors['primary-subtle']
+                : variant === 'filled'
+                  ? theme.colors['surface-raised']
+                  : theme.colors.bg),
             opacity: disabled ? 0.5 : 1,
           },
           controlStyle,

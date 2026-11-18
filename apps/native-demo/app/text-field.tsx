@@ -71,6 +71,10 @@ export default function TextFieldScreen() {
     >
       <Stack.Screen options={{ title: 'Text Field' }} />
       <Text style={textStyle}>Interactive text field</Text>
+      <Text style={{ color: theme.colors['fg-muted'] }}>
+        Hover with a mouse to highlight the border. Focus the field or a clear/reveal action to see
+        its subtle themed background; touch does not simulate hover.
+      </Text>
       <TextField
         testID="interactive-text-field"
         label={longContent ? 'LongAccountReference'.repeat(8) : 'Interactive field'}

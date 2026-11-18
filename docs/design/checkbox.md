@@ -60,6 +60,11 @@ error text are referenced with `aria-describedby`; invalid state is exposed with
 An invalid checked or mixed box stays transparent, with its indicator and border using the danger
 color. The host stacks its control and supporting messages vertically to prevent state changes from
 moving the help or error text.
+Enabled valid pointer hover uses `primary` for an unchecked border and `primary-hover` for a
+checked/mixed border, leaving the surface and value unchanged. Web gates hover with
+[`@media (hover: hover)`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/hover);
+native uses Pressable hover events where a pointer is available. Invalid/disabled treatment,
+keyboard focus and existing CSS/style overrides retain priority. Touch does not simulate hover.
 Native exposes `accessibilityRole="checkbox"`, checked/mixed/disabled state, and associated
 localized help/error as an accessibility hint. React Native does not expose equivalent required or
 invalid states; consumers include required information in localized label/help text as needed.
@@ -89,3 +94,15 @@ reported as not verified unless requested.
   touch targets remain at least 44pt.
 - Docs and native demo exercise controlled acceptance/refusal, sizes, mixed, disabled, required,
   invalid and help/error states in the supported themes.
+
+## Hover refinement verification
+
+Chromium checks on docs and the Expo web demo cover Cosmos/Nebula, light/dark and 375/1280px:
+unchecked/checked/mixed hover, unchanged label position, keyboard focus/Space, disabled and invalid
+priority. Measured enabled borders against their actual backgrounds exceed 4.8:1; labels exceed
+15:1. Native unit regressions cover hover exit, disabled/re-enabled state and caller style priority.
+On the Pixel 9 API 35 emulator in Expo Go, eight Cosmos/Nebula light/dark cases at physical widths
+1080/1800px verified autonomous touch toggling without simulated hover, exact selected/invalid
+border pixels, stable control/help bounds and disabled touch suppression. The display-size override
+was reset afterward. iOS and manual screen readers were not reverified; browser/mocked evidence
+remains separate from these Android checks.

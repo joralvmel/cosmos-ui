@@ -11,6 +11,11 @@ Its `appearance` accepts `startIconColor`, `startIconFocusColor`, `endIconColor`
 `iconFocusScope` is `control` (input and action buttons, default) or `input`; action icons,
 affixes and editable text retain their own colors.
 
+Checkbox and TextField highlight enabled valid borders on pointer hover without simulating touch
+hover. Checked/mixed Checkbox uses `primary-hover`; invalid borders keep danger. TextField input
+or action focus adds `primary-subtle`, unless overridden through `appearance.background` or caller
+styles. Disabled controls do not react, and existing appearance/style customization keeps priority.
+
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 
 ## Setup: React Native (Expo)

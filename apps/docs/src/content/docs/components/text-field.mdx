@@ -52,6 +52,11 @@ The example below lets you accept or reject a controlled value proposal:
 and `lg`. A positive finite numeric `size` sets a minimum editable-control height in CSS pixels.
 Label and supporting text remain outside that height.
 
+Hover changes the enabled field's border to the theme color without changing its surface. Focusing
+the input or a clear/reveal action adds a subtle themed background and the existing focus boundary.
+Invalid borders remain danger-colored on hover; disabled fields do not react. Read-only fields
+remain focusable on web. An explicit background customization still takes precedence.
+
 On web the field defaults to `20ch`, capped at its container width. Override CSS `width` (for example
 `width: 100%`) for your layout. Clear/reveal actions and decorations consume space inside that width
 instead of expanding it.
