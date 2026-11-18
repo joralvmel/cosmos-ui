@@ -7,6 +7,10 @@ applyTo: 'apps/docs/**'
 - Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - Every English page in `src/content/docs/` has a Spanish twin in `src/content/docs/es/` (a test checks
   it). Write natural text for each language; do not machine-translate code.
+- Never translate component names: keep the English name in page titles, navigation and references
+  (Checkbox, Text Field, Icon). Translate descriptions, explanations and example labels, not names.
+  Localized component page titles must match the English page; `test/content.test.ts` enforces this
+  against the component catalog.
 - Component pages (anatomy order): `<StatusBadge>` + introduction, `## Playground` (`<Playground>`),
   variants, states, accessibility, `## API` (`<ApiTable>`), events by platform (`<EventsTable>`).
 - `Playground`, `ApiTable`, `EventsTable` and `StatusBadge` read the contract and the inventory: never

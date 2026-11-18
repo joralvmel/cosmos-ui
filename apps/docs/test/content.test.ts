@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { contracts, setupGuide, stacks, supports } from '@joralvmel/cosmos-core';
+import { catalog, contracts, setupGuide, stacks, supports } from '@joralvmel/cosmos-core';
 import { describe, expect, it } from 'vitest';
 import { t } from '../src/components/i18n';
 
@@ -37,6 +37,19 @@ describe('framework guides', () => {
 });
 
 describe('docs content', () => {
+  it('preserves canonical component names in English and Spanish page titles', () => {
+    for (const component of catalog) {
+      const englishFile = join(docs, `components/${component.name}.mdx`);
+      if (!existsSync(englishFile)) continue;
+      const englishTitle = /^title:\s*(.+)$/m.exec(readFileSync(englishFile, 'utf8'))?.[1];
+      expect(englishTitle?.toLowerCase(), englishFile).toBe(component.title.toLowerCase());
+
+      const spanishFile = join(docs, `es/components/${component.name}.mdx`);
+      const spanishTitle = /^title:\s*(.+)$/m.exec(readFileSync(spanishFile, 'utf8'))?.[1];
+      expect(spanishTitle, spanishFile).toBe(englishTitle);
+    }
+  });
+
   it('has a Spanish page for every English page', () => {
     const missing = pages(docs).filter(page => !existsSync(join(docs, 'es', page)));
     expect(missing).toEqual([]);
