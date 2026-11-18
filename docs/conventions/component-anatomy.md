@@ -107,10 +107,7 @@ Frontmatter (`title`, `description`), imports, then:
 7. `## Events by platform` (`## Eventos por plataforma`) — `<EventsTable name="chip" />`.
 
 The Spanish page has the same structure under `apps/docs/src/content/docs/es/components/`.
-Component names are not translated: titles, navigation labels and references keep the English name
-(for example Checkbox, Text Field and Icon) in every locale. Translate descriptive prose and example
-labels instead. Localized component page titles must match their English counterpart and the catalog
-name (capitalization may differ from the catalog); the docs content tests enforce this.
+Keep component names in English across locales; translate prose and example labels.
 
 The shared Playground provides one framed preview, labeled controls, theme/mode selectors and
 syntax-highlighted, keyboard-accessible HTML/React/Angular/React Native tabs with copy feedback.
