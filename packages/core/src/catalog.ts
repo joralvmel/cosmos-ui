@@ -100,8 +100,13 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'data-display',
     batch: 'A',
     priority: 1,
-    dependsOn: [],
+    dependsOn: ['icon'],
     pattern: html('text-level-semantics.html'),
+    status: 'in-progress',
+    notes: [
+      'Badge platform acceptance checks pass; repository-wide validation is blocked by the pre-existing generator theme test documented in docs/design/badge.md.',
+      'Uses the stable icon component for its optional decorative leading icon.',
+    ],
   }),
   entry({
     name: 'spinner',

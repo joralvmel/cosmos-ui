@@ -366,6 +366,33 @@ export class ExampleComponent {
   }
 }
 ```
+### `CosmBadgeComponent` (`<cosm-badge>`)
+
+Displays a noninteractive status or category label, or caller-formatted count, with an optional decorative leading icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | 'soft' \| 'solid' \| 'outline' | `soft` | Visual treatment of the static label. |
+| `tone` | 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' | `neutral` | Semantic color intent of the static label. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Semantic label size. |
+| `startIcon` | IconDefinition | — | Optional structured decorative icon before the label. |
+
+Events: none.
+
+```ts
+import { Component } from '@angular/core';
+import { CosmBadgeComponent } from '@joralvmel/cosmos-angular';
+import { heart } from '@joralvmel/cosmos-icons/heart';
+
+@Component({
+  selector: 'app-example',
+  imports: [CosmBadgeComponent],
+  template: `<cosm-badge [startIcon]="heart">Badge</cosm-badge>`,
+})
+export class ExampleComponent {
+  readonly heart = heart;
+}
+```
 
 ## Themes
 

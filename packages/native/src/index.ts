@@ -14,6 +14,7 @@ export type {
   SwitchCheckedChangeDetail,
 } from '@joralvmel/cosmos-core';
 export type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
+export { Badge, type BadgeProps, badgePropNames } from './components/badge.js';
 export { Button, type ButtonProps, buttonPropNames } from './components/button.js';
 export { Checkbox, type CheckboxProps, checkboxPropNames } from './components/checkbox.js';
 export { Icon, type IconProps, iconPropNames } from './components/icon.js';

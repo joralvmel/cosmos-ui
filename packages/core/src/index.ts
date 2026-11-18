@@ -1,3 +1,4 @@
+import { badgeContract } from './specs/badge.js';
 import { checkboxContract } from './specs/checkbox.js';
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
@@ -105,7 +106,14 @@ export const contracts = {
   listbox: listboxContract,
   checkbox: checkboxContract,
   switch: switchContract,
+  badge: badgeContract,
 } as const;
+export { badgeContract } from './specs/badge.js';
+export {
+  type BadgeScenario,
+  badgeScenarios,
+  badgeScenariosFor,
+} from './specs/badge.scenarios.js';
 export {
   type CheckboxCheckedChangeDetail,
   checkboxContract,

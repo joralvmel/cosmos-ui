@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   activeProps,
+  badgeContract,
   buttonContract,
   type ComponentContract,
   defineContract,
@@ -217,6 +218,35 @@ describe('codegen', () => {
       expect(snippet).not.toContain('cosmos-icons/');
       expect(snippet).not.toContain('startIcon');
       expect(snippet).not.toContain('endIcon');
+    }
+  });
+
+  it('generates Badge default-slot text and optional icon references for every platform', () => {
+    const plain = generateSnippets(
+      badgeContract,
+      { variant: 'outline', tone: 'warning', startIcon: undefined },
+      '0'
+    );
+    expect(plain.html).toContain('<cosm-badge variant="outline" tone="warning">0</cosm-badge>');
+    expect(plain.react).toContain('<Badge variant="outline" tone="warning">0</Badge>');
+    expect(plain.angular).toContain('<cosm-badge variant="outline" tone="warning">0</cosm-badge>');
+    expect(plain.native).toContain('<Badge variant="outline" tone="warning">0</Badge>');
+    for (const source of Object.values(plain)) {
+      expect(source).not.toContain('cosmos-icons/');
+      expect(source).not.toContain('startIcon');
+      expect(source).toContain('>0</');
+    }
+
+    const withIcon = generateSnippets(badgeContract, { startIcon: 'heart' }, 'Ready');
+    expect(withIcon.html).toContain("import { heart } from '@joralvmel/cosmos-icons/heart';");
+    expect(withIcon.html).toContain('element.startIcon = heart;');
+    expect(withIcon.react).toContain('startIcon={heart}');
+    expect(withIcon.angular).toContain('[startIcon]="heart"');
+    expect(withIcon.native).toContain('startIcon={heart}');
+    expect(withIcon.native).not.toContain('<Text>Ready</Text>');
+    for (const source of Object.values(withIcon)) {
+      expect(source).toContain('>Ready</');
+      expect(source).toContain('@joralvmel/cosmos-icons/heart');
     }
   });
 });

@@ -312,6 +312,30 @@ Events: `cosm-checked-change` → `SwitchCheckedChangeDetail`.
   element.addEventListener('cosm-checked-change', event => console.log(event.detail));
 </script>
 ```
+### `<cosm-badge>`
+
+Displays a noninteractive status or category label, or caller-formatted count, with an optional decorative leading icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | 'soft' \| 'solid' \| 'outline' | `soft` | Visual treatment of the static label. |
+| `tone` | 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' | `neutral` | Semantic color intent of the static label. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Semantic label size. |
+| `startIcon` (`start-icon`) | IconDefinition | — | Optional structured decorative icon before the label. |
+
+Events: none.
+
+```html
+<cosm-badge>Badge</cosm-badge>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/badge';
+  import { heart } from '@joralvmel/cosmos-icons/heart';
+
+  const element = document.querySelector('cosm-badge');
+  element.startIcon = heart;
+</script>
+```
 
 ## Themes
 

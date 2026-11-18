@@ -108,7 +108,7 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
           message.textContent = options.labels.iconCatalogError;
           root.append(message);
         });
-    } else if (contract.name === 'text-field') {
+    } else if (contract.name === 'text-field' || contract.name === 'badge') {
       initPlayground(root, {
         ...options,
         referenceValues: { IconDefinition: { heart, house, search, star } },

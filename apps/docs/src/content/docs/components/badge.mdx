@@ -1,0 +1,66 @@
+---
+title: Badge
+description: Static status and category labels with optional decorative icons.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="badge" />
+
+`<cosm-badge>` presents a short, noninteractive status or category label. It can also show a
+caller-formatted count as ordinary text and an optional decorative leading icon. Use it for static
+information, not as a button or a control.
+
+## Playground
+
+<Playground name="badge" content="Ready" />
+
+## Variants
+
+Choose a soft, solid, or outlined treatment independently from the semantic tone.
+
+<Preview>
+  <cosm-badge>Ready</cosm-badge>
+  <cosm-badge variant="solid" tone="success">Complete</cosm-badge>
+  <cosm-badge variant="outline" tone="warning">Review</cosm-badge>
+  <cosm-badge tone="info" size="sm">New</cosm-badge>
+</Preview>
+
+Counts are caller-formatted text; zero is rendered like any other label. Longer labels wrap rather
+than being silently truncated.
+
+<Preview>
+  <cosm-badge>0</cosm-badge>
+  <cosm-badge>This deliberately long status label wraps when space is constrained</cosm-badge>
+</Preview>
+
+Customize spacing, typography, colors and corner radius through the CSS properties below or the
+`base`, `label` and `icon` parts. For example, `--cosm-badge-radius: var(--cosm-radius-full)` gives a
+pill shape. On React Native, use `style` for the container and `textStyle` for the label; the icon
+follows the text color. Native text keeps font scaling enabled. Custom colors must preserve contrast.
+
+## States
+
+Badge has no interactive, disabled, loading, or selection states. Its appearance is selected with
+`variant`, `tone`, and `size`.
+
+## Accessibility
+
+Badge is static content with no added role, tab stop, or live region. Give labels enough context in
+the surrounding content. The application is responsible for contextual labeling and for announcing
+changing counts or statuses when needed. The optional icon is decorative and does not replace text.
+Use theme tokens and verify contrast for the chosen tone and variant.
+
+## API
+
+<ApiTable name="badge" />
+
+## Events by platform
+
+Badge emits no events on any platform.
+
+<EventsTable name="badge" />

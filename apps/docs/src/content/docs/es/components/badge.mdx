@@ -1,0 +1,69 @@
+---
+title: Badge
+description: Etiquetas estáticas de estado y categoría con iconos decorativos opcionales.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="badge" />
+
+`<cosm-badge>` presenta una etiqueta estática y no interactiva de estado o categoría. También puede
+mostrar un recuento formateado por quien lo usa como texto normal y un icono decorativo opcional al
+principio. Úsalo para información estática, no como botón ni como control.
+
+## Playground
+
+<Playground name="badge" content="Listo" />
+
+## Variantes
+
+Elige un estilo suave, sólido o delineado, independientemente del tono semántico.
+
+<Preview>
+  <cosm-badge>Listo</cosm-badge>
+  <cosm-badge variant="solid" tone="success">Completado</cosm-badge>
+  <cosm-badge variant="outline" tone="warning">Revisar</cosm-badge>
+  <cosm-badge tone="info" size="sm">Nuevo</cosm-badge>
+</Preview>
+
+Los recuentos se proporcionan como texto formateado por quien usa el componente; el cero se muestra
+igual que cualquier otra etiqueta. Las etiquetas largas se ajustan a varias líneas en vez de
+truncarse silenciosamente.
+
+<Preview>
+  <cosm-badge>0</cosm-badge>
+  <cosm-badge>Esta etiqueta de estado es intencionalmente larga y se ajusta al espacio disponible</cosm-badge>
+</Preview>
+
+Personaliza el espaciado, la tipografía, los colores y el radio con las propiedades CSS que aparecen
+más abajo o con las partes `base`, `label` e `icon`. Por ejemplo,
+`--cosm-badge-radius: var(--cosm-radius-full)` le da forma de píldora. En React Native, usa `style`
+para el contenedor y `textStyle` para el texto; el icono sigue el color del texto. El escalado de
+fuente nativo permanece activo. Los colores personalizados deben conservar el contraste.
+
+## Estados
+
+Badge no tiene estados interactivos, deshabilitados, de carga ni de selección. Su apariencia se
+elige mediante `variant`, `tone` y `size`.
+
+## Accesibilidad
+
+Badge es contenido estático sin rol añadido, parada de tabulación ni región viva. Proporciona
+suficiente contexto en el contenido que lo rodea. La aplicación es responsable de contextualizar la
+etiqueta y de anunciar los cambios de recuento o estado cuando sea necesario. El icono opcional es
+decorativo y no sustituye al texto. Usa los tokens del tema y comprueba el contraste del tono y la
+variante elegidos.
+
+## API
+
+<ApiTable name="badge" />
+
+## Eventos por plataforma
+
+Badge no emite eventos en ninguna plataforma.
+
+<EventsTable name="badge" />

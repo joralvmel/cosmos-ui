@@ -476,6 +476,51 @@ Toggles a binary setting immediately with a stable accessible name and form beha
 | `Tab`, `Shift+Tab` | Moves focus to or from the enabled switch. |
 | `Space` | Toggles checked state and emits a checkedChange proposal. |
 
+### `badge` (`<cosm-badge>`)
+
+Displays a noninteractive status or category label, or caller-formatted count, with an optional decorative leading icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | 'soft' \| 'solid' \| 'outline' | `soft` | Visual treatment of the static label. |
+| `tone` | 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' | `neutral` | Semantic color intent of the static label. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Semantic label size. |
+| `startIcon` | IconDefinition | — | Optional structured decorative icon before the label. |
+
+**Events**
+
+No events.
+
+**Slots**
+
+| Name | Description |
+| --- | --- |
+| `(default)` | Label or caller-formatted count text. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Rounded label container. |
+| `label` | Label or caller-formatted count text. |
+| `icon` | Optional decorative leading icon wrapper. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-badge-background` | Badge background color. |
+| `--cosm-badge-color` | Badge text and icon color. |
+| `--cosm-badge-border` | Badge border color. |
+| `--cosm-badge-padding-inline` | Badge inline padding. |
+| `--cosm-badge-padding-block` | Badge block padding. |
+| `--cosm-badge-gap` | Space between the icon and label. |
+| `--cosm-badge-font-family` | Badge label font family. |
+| `--cosm-badge-font-size` | Badge label font size. |
+| `--cosm-badge-font-weight` | Badge label font weight. |
+| `--cosm-badge-line-height` | Badge label line height. |
+| `--cosm-badge-radius` | Badge corner radius. |
+
 
 ## Rules for AI assistants
 

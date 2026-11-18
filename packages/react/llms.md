@@ -371,6 +371,29 @@ export function Example() {
   );
 }
 ```
+### `Badge`
+
+Displays a noninteractive status or category label, or caller-formatted count, with an optional decorative leading icon.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | 'soft' \| 'solid' \| 'outline' | `soft` | Visual treatment of the static label. |
+| `tone` | 'neutral' \| 'info' \| 'success' \| 'warning' \| 'danger' | `neutral` | Semantic color intent of the static label. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Semantic label size. |
+| `startIcon` | IconDefinition | — | Optional structured decorative icon before the label. |
+
+Events: none.
+
+```tsx
+import { Badge } from '@joralvmel/cosmos-react';
+import { heart } from '@joralvmel/cosmos-icons/heart';
+
+export function Example() {
+  return (
+    <Badge startIcon={heart}>Badge</Badge>
+  );
+}
+```
 
 ## Themes
 
