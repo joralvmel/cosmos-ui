@@ -103,6 +103,56 @@ describe('Checkbox (native): contract drift', () => {
 });
 
 describe('Checkbox (native)', () => {
+  it('updates only enabled valid hover borders and preserves checked state and caller styles', async () => {
+    const colors = getNativeTheme('cosmos', 'light').colors;
+    const onCheckedChange = vi.fn();
+    const props: CheckboxProps = { label: 'Option', onCheckedChange };
+    const subject = await render(node(props));
+    const box = subject?.querySelector('[aria-hidden="true"]') as Element;
+    const enter = () =>
+      subject?.dispatchEvent(
+        new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })
+      );
+    const leave = () =>
+      subject?.dispatchEvent(
+        new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })
+      );
+    const background = styleOf(box).backgroundColor;
+    await act(async () => {
+      enter();
+    });
+    expect(styleOf(box).borderColor).toBe(colors.primary);
+    expect(styleOf(box).backgroundColor).toBe(background);
+    expect(checkedState()).toBe('false');
+    expect(onCheckedChange).not.toHaveBeenCalled();
+    await act(async () => {
+      leave();
+    });
+    expect(styleOf(box).borderColor).toBe(colors['border-strong']);
+
+    await rerender(node({ ...props, checked: true }));
+    await act(async () => {
+      enter();
+    });
+    expect(styleOf(box).borderColor).toBe(colors['primary-hover']);
+    await rerender(node({ ...props, indeterminate: true }));
+    expect(styleOf(box).borderColor).toBe(colors['primary-hover']);
+    await rerender(node({ ...props, invalid: true }));
+    expect(styleOf(box).borderColor).toBe(colors.danger);
+    await rerender(node({ ...props, disabled: true }));
+    expect(styleOf(box).borderColor).toBe(colors['border-strong']);
+    await act(async () => {
+      leave();
+    });
+    await rerender(node(props));
+    expect(styleOf(box).borderColor).toBe(colors['border-strong']);
+    await rerender(node({ ...props, boxStyle: { borderColor: 'orange' } }));
+    await act(async () => {
+      enter();
+    });
+    expect(styleOf(box).borderColor).toBe('orange');
+  });
+
   it('exposes checkbox role, accessible label, mixed state and descriptive text', async () => {
     Object.assign(Platform, { OS: 'android' });
     const subject = await render(

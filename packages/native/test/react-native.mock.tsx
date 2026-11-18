@@ -5,6 +5,7 @@ import {
   forwardRef,
   type HTMLAttributes,
   type KeyboardEventHandler,
+  type PointerEventHandler,
   type ReactNode,
   useEffect,
   useImperativeHandle,
@@ -90,6 +91,11 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
         onClick={onPress as () => void}
         onFocus={props.onFocus as FocusEventHandler<HTMLButtonElement>}
         onBlur={props.onBlur as FocusEventHandler<HTMLButtonElement>}
+        onPointerEnter={event => {
+          if (!disabled && event.pointerType === 'mouse')
+            (props.onHoverIn as PointerEventHandler<HTMLButtonElement> | undefined)?.(event);
+        }}
+        onPointerLeave={props.onHoverOut as PointerEventHandler<HTMLButtonElement>}
         id={props.id as string}
         role={(props.role as string) ?? (props.accessibilityRole as string)}
         tabIndex={props.tabIndex as number}
@@ -190,6 +196,8 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
         (props.onKeyDownCapture as ((event: unknown) => void) | undefined)?.(event),
       onFocus: props.onFocus,
       onBlur: props.onBlur,
+      onPointerEnter: props.onPointerEnter,
+      onPointerLeave: props.onPointerLeave,
     } as unknown as HTMLAttributes<HTMLDivElement>,
     props.children as ReactNode
   );

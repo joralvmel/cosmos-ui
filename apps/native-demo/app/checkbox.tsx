@@ -68,7 +68,8 @@ export default function CheckboxScreen() {
       <Stack.Screen options={{ title: 'Checkbox' }} />
       <Text style={{ color: theme.colors['fg-muted'], fontSize: theme.text.sm }}>
         Toggle the checkbox by touch. It keeps a 44pt target at every visual size; on the web, Space
-        toggles the focused checkbox.
+        toggles the focused checkbox. With a mouse, hover changes the themed border without changing
+        the checked value; disabled and invalid borders keep their current treatment.
       </Text>
 
       <Text style={{ color: theme.colors.fg, fontSize: theme.text.md, fontWeight: '600' }}>

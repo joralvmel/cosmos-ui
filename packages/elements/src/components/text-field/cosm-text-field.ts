@@ -89,8 +89,17 @@ const styles = css`
   .control[data-invalid='true'] {
     border-color: var(--cosm-danger, oklch(0.55 0.16 19));
   }
+  @media (hover: hover) {
+    :host .control:hover:where(:has(input:not(:disabled))):where(:not([data-invalid='true'])) {
+      border-color: var(--cosm-text-field-border, var(--cosm-primary, oklch(0.55 0.2 268)));
+    }
+  }
   :host .control:focus-within {
     border-color: var(--cosm-text-field-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)));
+    background: var(
+      --cosm-text-field-background,
+      var(--cosm-primary-subtle, oklch(0.94 0.024 268))
+    );
     box-shadow: inset 0 0 0 1px
       var(--cosm-text-field-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)));
   }

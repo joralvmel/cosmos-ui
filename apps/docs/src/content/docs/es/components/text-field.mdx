@@ -54,6 +54,12 @@ tamaños semánticos son `sm`, `md` y `lg`. Un valor numérico positivo y finito
 altura mínima del control editable en píxeles CSS. La etiqueta y el texto de ayuda quedan fuera de
 esa altura.
 
+Al pasar el ratón, el borde del campo habilitado adopta el color del tema sin cambiar el fondo.
+El foco en el campo o en sus acciones de borrar/mostrar añade un fondo tenue del tema y mantiene
+el borde de foco existente. El hover respeta el borde de error y no afecta a los deshabilitados.
+Los campos de solo lectura conservan el foco en web. Un fondo personalizado explícito sigue
+teniendo prioridad.
+
 En web el ancho predeterminado es `20ch`, limitado al ancho del contenedor. Puedes personalizarlo
 con CSS `width` (por ejemplo, `width: 100%`). Las acciones de borrar/mostrar contraseña y las
 decoraciones ocupan espacio dentro de ese ancho, sin ensanchar el campo.

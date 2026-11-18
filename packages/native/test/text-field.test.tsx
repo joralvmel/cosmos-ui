@@ -176,10 +176,72 @@ describe('TextField (native)', () => {
           expect(contrast(control.borderColor, control.backgroundColor)).toBeGreaterThanOrEqual(3);
           expect(contrast(field.color, control.backgroundColor)).toBeGreaterThanOrEqual(4.5);
           expect(contrast(placeholder, control.backgroundColor)).toBeGreaterThanOrEqual(4.5);
+          const element = input().parentElement as HTMLElement;
+          await act(async () => {
+            element.dispatchEvent(
+              new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })
+            );
+          });
+          expect(styleOf(element).borderColor).toBe(colors.primary);
+          expect(styleOf(element).backgroundColor).toBe(control.backgroundColor);
+          await act(async () => input().focus());
+          const focused = styleOf(element);
+          expect(focused.backgroundColor).toBe(colors['primary-subtle']);
+          expect(contrast(focused.borderColor, focused.backgroundColor)).toBeGreaterThanOrEqual(3);
+          expect(contrast(field.color, focused.backgroundColor)).toBeGreaterThanOrEqual(4.5);
+          expect(contrast(placeholder, focused.backgroundColor)).toBeGreaterThanOrEqual(4.5);
+          await act(async () => {
+            input().blur();
+            element.dispatchEvent(
+              new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })
+            );
+          });
+          expect(styleOf(element).backgroundColor).toBe(control.backgroundColor);
+          expect(styleOf(element).borderColor).toBe(control.borderColor);
         });
       }
     }
   }
+  it('does not simulate touch hover or replace invalid and disabled borders', async () => {
+    const colors = getNativeTheme('cosmos', 'light').colors;
+    await render(<TextField label="Field" />);
+    const control = input().parentElement as HTMLElement;
+    await act(async () => {
+      control.dispatchEvent(
+        new PointerEvent('pointerover', { bubbles: true, pointerType: 'touch' })
+      );
+    });
+    expect(styleOf(control).borderColor).toBe(colors['border-strong']);
+    await update(<TextField label="Field" invalid />);
+    await act(async () => {
+      control.dispatchEvent(
+        new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })
+      );
+    });
+    expect(styleOf(control).borderColor).toBe(colors.danger);
+    await update(<TextField label="Field" disabled />);
+    expect(styleOf(control).borderColor).toBe(colors['border-strong']);
+    expect(styleOf(control).backgroundColor).toBe(colors.bg);
+    await update(<TextField label="Field" />);
+    expect(styleOf(control).borderColor).toBe(colors['border-strong']);
+  });
+
+  it.each(['web', 'android', 'ios'])(
+    'retains the focused surface across input and clear action on %s',
+    async platform => {
+      Platform.OS = platform;
+      const colors = getNativeTheme('cosmos', 'light').colors;
+      await render(<TextField label="Field" defaultValue="Text" clearable clearLabel="Clear" />);
+      const control = input().parentElement as HTMLElement;
+      await act(async () => input().focus());
+      expect(styleOf(control).backgroundColor).toBe(colors['primary-subtle']);
+      await act(async () => button('Clear')?.focus());
+      expect(styleOf(control).backgroundColor).toBe(colors['primary-subtle']);
+      expect(styleOf(control).borderColor).toBe(colors.primary);
+      await act(async () => button('Clear')?.blur());
+      expect(styleOf(control).backgroundColor).toBe(colors.bg);
+    }
+  );
   it('omits false web required and readonly attributes and permits editing', async () => {
     await render(<TextField label="Editable" />);
     expect(input().readOnly).toBe(false);
@@ -273,6 +335,7 @@ describe('TextField (native)', () => {
     expect(control.textContent).toContain('kg');
     await act(async () => input().focus());
     expect(styleOf(control).borderColor).toBe('orange');
+    expect(styleOf(control).backgroundColor).toBe('red');
   });
   it('uses the selected theme and follows system mode', async () => {
     __setColorScheme('dark');

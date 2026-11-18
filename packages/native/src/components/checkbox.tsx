@@ -6,7 +6,7 @@ import {
 } from '@joralvmel/cosmos-core';
 import { check } from '@joralvmel/cosmos-icons/check';
 import { minus } from '@joralvmel/cosmos-icons/minus';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import {
   Platform,
   Pressable,
@@ -95,6 +95,10 @@ export function Checkbox({
   const [ownedChecked, setOwnedChecked] = useState(defaultChecked);
   const [mixedState, setMixedState] = useState({ indeterminate, dismissed: false });
   const [focused, setFocused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  useEffect(() => {
+    if (disabled) setHovered(false);
+  }, [disabled]);
   if (mixedState.indeterminate !== indeterminate) {
     setMixedState({ indeterminate, dismissed: false });
   }
@@ -164,6 +168,8 @@ export function Checkbox({
         hitSlop={4}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        onHoverIn={() => setHovered(true)}
+        onHoverOut={() => setHovered(false)}
         onPress={activate}
         onKeyDown={handleWebKeyDown}
         style={[
@@ -193,12 +199,12 @@ export function Checkbox({
               borderColor: currentInvalid
                 ? theme.colors.danger
                 : currentChecked || currentIndeterminate
-                  ? theme.colors.primary
-                  : theme.colors['border-strong'],
+                  ? theme.colors[hovered && !disabled ? 'primary-hover' : 'primary']
+                  : theme.colors[hovered && !disabled ? 'primary' : 'border-strong'],
               borderRadius: theme.radius.sm,
               backgroundColor:
                 currentChecked || currentIndeterminate ? theme.colors.primary : theme.colors.bg,
-              ...(Platform.OS === 'web' && focused
+              ...(Platform.OS === 'web' && focused && !disabled
                 ? {
                     outlineWidth: 2,
                     outlineStyle: 'solid' as const,

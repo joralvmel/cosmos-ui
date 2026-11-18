@@ -132,6 +132,18 @@ const styles = css`
     background: transparent;
     color: var(--cosm-danger, oklch(0.55 0.16 19));
   }
+  @media (hover: hover) {
+    .base:where([data-disabled='false'][data-invalid='false']):hover .box {
+      border-color: var(--cosm-checkbox-border, var(--cosm-primary, oklch(0.55 0.2 268)));
+    }
+    .base:where([data-disabled='false'][data-invalid='false']):hover .input:checked + .box,
+    .base:where([data-disabled='false'][data-invalid='false']):hover .box[data-indeterminate='true'] {
+      border-color: var(
+        --cosm-checkbox-checked-background,
+        var(--cosm-primary-hover, oklch(0.49 0.2 268))
+      );
+    }
+  }
   @media (forced-colors: active) {
     .input:focus-visible + .box {
       outline-color: Highlight;
