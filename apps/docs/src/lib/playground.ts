@@ -59,6 +59,8 @@ export interface PlaygroundLabels {
   popoverCloseLabel?: string;
   popoverInvalid?: string;
   checkboxLabel?: string;
+  switchLabel?: string;
+  switchInvalid?: string;
   listboxLabel?: string;
   listboxInvalid?: string;
   listboxSelected?: string;
@@ -191,6 +193,9 @@ export function initPlayground(
   }
   if (contract.name === 'checkbox') {
     values.label = labels.checkboxLabel ?? 'Accept terms';
+  }
+  if (contract.name === 'switch') {
+    values.label = labels.switchLabel ?? 'Enable notifications';
   }
   if (contract.name === 'listbox') {
     values.label = labels.listboxLabel ?? 'Choose produce';
@@ -864,7 +869,7 @@ export function initPlayground(
           return;
         }
       }
-      if (contract.name === 'text-field') {
+      if (contract.name === 'text-field' || contract.name === 'switch') {
         const invalidSize =
           name === 'size' &&
           value !== 'sm' &&
@@ -881,7 +886,10 @@ export function initPlayground(
           !(typeof value === 'number' && Number.isInteger(value) && value >= 0);
         if (invalidSize || invalidLabel || invalidLength) {
           referenceStatus.textContent =
-            labels.textFieldInvalid ?? 'Enter a non-empty label or a valid positive size/length.';
+            contract.name === 'switch'
+              ? (labels.switchInvalid ?? 'Use a non-empty label and a positive size.')
+              : (labels.textFieldInvalid ??
+                'Enter a non-empty label or a valid positive size/length.');
           return;
         }
         referenceStatus.textContent = '';

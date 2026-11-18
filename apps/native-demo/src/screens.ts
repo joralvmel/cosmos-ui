@@ -23,4 +23,5 @@ export const screens = [
     title: 'Checkbox',
     description: 'Controlled, mixed, required and custom-size choices.',
   },
+  { route: '/switch', title: 'Switch', description: 'Controlled and autonomous binary settings.' },
 ] as const;

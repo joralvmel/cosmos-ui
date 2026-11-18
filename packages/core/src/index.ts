@@ -3,6 +3,7 @@ import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
 import { listboxContract } from './specs/listbox.js';
 import { popoverContract } from './specs/popover.js';
+import { switchContract } from './specs/switch.js';
 import { textFieldContract } from './specs/text-field.js';
 
 export {
@@ -103,6 +104,7 @@ export const contracts = {
   popover: popoverContract,
   listbox: listboxContract,
   checkbox: checkboxContract,
+  switch: switchContract,
 } as const;
 export {
   type CheckboxCheckedChangeDetail,
@@ -161,6 +163,16 @@ export {
   popoverScenarios,
   popoverScenariosFor,
 } from './specs/popover.scenarios.js';
+export {
+  type SwitchCheckedChangeDetail,
+  switchContract,
+} from './specs/switch.js';
+export {
+  type SwitchAction,
+  type SwitchScenario,
+  switchScenarios,
+  switchScenariosFor,
+} from './specs/switch.scenarios.js';
 export {
   type TextFieldChangeDetail,
   type TextFieldSubmitDetail,

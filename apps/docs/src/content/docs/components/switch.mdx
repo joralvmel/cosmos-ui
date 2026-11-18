@@ -1,0 +1,108 @@
+---
+title: Switch
+description: An immediate binary setting with an accessible stable name and form behavior.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="switch" />
+
+`<cosm-switch>` immediately turns a binary preference on or off, for example enabling notifications.
+It is not a submit action or a checkbox for confirming a separate decision. Its required plain-text
+`label` remains the accessible name in either state. Optional `helpText` stays alongside the label
+when the switch changes.
+
+## Playground
+
+<Playground name="switch" content="Switch" />
+
+Use the Playground to exercise autonomous state, controlled `checked` proposals (including `false`),
+and owners that accept or refuse updates. It supplies the required label and keeps the element
+child-free in the server-rendered preview and generated snippets.
+
+## Variants
+
+Switch has one standard track-and-thumb appearance, without icons or on/off text. Web, React and
+Angular support semantic sizes and a positive finite custom size:
+
+<Preview>
+  <cosm-switch label="Small" size="sm"></cosm-switch>
+  <cosm-switch label="Medium" size="md"></cosm-switch>
+  <cosm-switch label="Large" size="lg"></cosm-switch>
+  <cosm-switch label="Custom" size="28"></cosm-switch>
+</Preview>
+
+The numeric size is the track height in CSS pixels. React Native intentionally exposes no `size`
+prop and keeps the built-in system-sized switch.
+
+## States
+
+<Preview>
+  <cosm-switch label="Off by default"></cosm-switch>
+  <cosm-switch label="On by default" default-checked></cosm-switch>
+  <cosm-switch label="Unavailable" disabled></cosm-switch>
+  <cosm-switch
+    label="Invalid, off"
+    invalid
+    help-text="This preference is not available for your account."
+  ></cosm-switch>
+  <cosm-switch
+    label="Invalid, on"
+    invalid
+    default-checked
+    help-text="Choose another notification preference."
+  ></cosm-switch>
+  <cosm-switch
+    label="Hidden visual label"
+    hide-label
+    help-text="The accessible name is still available."
+  ></cosm-switch>
+</Preview>
+
+Unbound `checked` is autonomous and starts from `defaultChecked`. A bound `checked`, even `false`,
+is controlled: activation proposes `{ checked }` and the component waits for its owner to update
+the prop. Keep the accessible name unchanged while toggling. Disabled switches do not propose
+changes.
+
+`invalid` is an externally supplied presentation state: the track uses danger colors in both
+positions and web exposes `aria-invalid`. It does not change `checked`, form validity or submission.
+Explain the problem with localized `helpText`. React Native keeps its built-in Switch and uses
+danger track colors; there is no equivalent system invalid accessibility trait.
+
+Web form submission includes `name=value` only when checked and enabled. Reset restores the
+autonomous default, and disabled fieldsets disable the switch. Angular Forms uses a boolean through
+`ControlValueAccessor`; React Native has no HTML form lifecycle.
+
+For web customization, the `--cosm-switch-*` properties tune track, thumb, radius, spacing and focus:
+
+<Preview>
+  <cosm-switch
+    label="Customized track"
+    default-checked
+    style="--cosm-switch-checked-track-background: var(--cosm-success); --cosm-switch-thumb-background: var(--cosm-bg);"
+  ></cosm-switch>
+</Preview>
+
+## Accessibility
+
+- Supply a nonempty plain-text `label`; `hideLabel` hides it visually but preserves the name.
+- The web control uses a native checkbox input with `role="switch"`. `Tab` moves focus and `Space`
+  toggles it. A visible focus ring is shown for keyboard focus.
+- `helpText` is associated with the control and remains present as checked state changes.
+- Checked and disabled states use native platform semantics. Native uses React Native's built-in
+  `Switch` with its system size and a surrounding target of at least 44pt.
+- Do not add a label slot or interactive children. Switch exposes only on/off states.
+- Motion is removed when reduced motion is requested; colors use Cosmos tokens and customization
+  hooks.
+
+## API
+
+<ApiTable name="switch" />
+
+## Events by platform
+
+<EventsTable name="switch" />

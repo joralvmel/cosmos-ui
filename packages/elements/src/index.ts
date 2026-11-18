@@ -2,6 +2,7 @@ export type {
   ButtonPressDetail,
   ListboxSelectionChangeDetail,
   PressSource,
+  SwitchCheckedChangeDetail,
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
@@ -21,6 +22,7 @@ export {
   type ListboxVariant,
 } from './components/listbox/cosm-listbox.js';
 export { CosmPopover } from './components/popover/cosm-popover.js';
+export { CosmSwitch, type SwitchSize } from './components/switch/cosm-switch.js';
 export {
   CosmTextField,
   type TextFieldSize,

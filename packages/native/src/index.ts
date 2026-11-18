@@ -11,6 +11,7 @@ export type {
   PopoverOpenChangeDetail,
   PopoverSide,
   PressSource,
+  SwitchCheckedChangeDetail,
 } from '@joralvmel/cosmos-core';
 export type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
 export { Button, type ButtonProps, buttonPropNames } from './components/button.js';
@@ -34,6 +35,7 @@ export {
   popoverPropNames,
   usePopoverHost,
 } from './components/popover.js';
+export { Switch, type SwitchProps, switchPropNames } from './components/switch.js';
 export { TextField, type TextFieldProps, textFieldPropNames } from './components/text-field.js';
 export {
   CosmosThemeProvider,

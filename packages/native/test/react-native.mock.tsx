@@ -229,6 +229,34 @@ export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => 
   });
 });
 
+export function Switch({ ...props }: AnyProps) {
+  const accessibilityState = props.accessibilityState as
+    | { checked?: boolean; disabled?: boolean }
+    | undefined;
+  const disabled = Boolean(props.disabled ?? accessibilityState?.disabled);
+  const checked = Boolean(props.value ?? accessibilityState?.checked);
+  return createElement('input', {
+    type: 'checkbox',
+    role: 'switch',
+    checked,
+    disabled,
+    'data-testid': props.testID,
+    'data-role': props.accessibilityRole,
+    'data-style': JSON.stringify(flatten(props.style)),
+    'data-track-color': JSON.stringify(props.trackColor),
+    'data-thumb-color': props.thumbColor,
+    'data-active-thumb-color': props.activeThumbColor,
+    'aria-label': props.accessibilityLabel,
+    'aria-description': props.accessibilityHint,
+    'aria-checked': String(checked),
+    'aria-disabled': disabled ? 'true' : undefined,
+    onChange: (event: { currentTarget: HTMLInputElement }) =>
+      (props.onValueChange as ((value: boolean) => void) | undefined)?.(
+        event.currentTarget.checked
+      ),
+  });
+}
+
 export function ActivityIndicator() {
   return createElement('span', { 'data-testid': 'activity-indicator' });
 }

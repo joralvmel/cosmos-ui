@@ -420,6 +420,62 @@ Selects an independent boolean value with accessible labeling and native form be
 | `Tab`, `Shift+Tab` | Moves focus to or from the enabled checkbox. |
 | `Space` | Toggles checked state and emits a checkedChange proposal. |
 
+### `switch` (`<cosm-switch>`)
+
+Toggles a binary setting immediately with a stable accessible name and form behavior on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required nonempty accessible name; remains stable in both states. |
+| `hideLabel` | boolean | `false` | Visually hides the label while retaining its accessible name. |
+| `checked` | boolean | `false` | Controlled checked value when supplied, including false; activation proposes changes without self-committing. |
+| `defaultChecked` | boolean | `false` | Initial autonomous checked value; later changes do not reset it. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Web visual size preset or positive finite CSS-pixel size. Native uses system Switch sizing; numeric sizes do not scale it. |
+| `disabled` | boolean | `false` | Prevents user interaction and excludes the value from web form submission. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation. Does not change checked state or form validity; native uses danger colors without an equivalent system invalid trait. |
+| `helpText` | string | — | Optional consumer-localized supporting text associated with the switch. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+| `value` | string | `on` | Web form value submitted when checked and enabled; defaults to on. Angular Forms uses checked as its boolean value. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-checked-change` | `onCheckedChange` | `(checkedChange)` | `onCheckedChange` | `SwitchCheckedChangeDetail` | Proposes the next checked value after enabled user activation; controlled state waits for the owner. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Label, control and supporting text layout. |
+| `input` | Native checkbox input and web focus target. |
+| `track` | Visible switch track. |
+| `thumb` | Visible switch thumb. |
+| `label` | Visible or visually hidden label text. |
+| `help-text` | Supporting text associated with the switch. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-switch-width` | Track width. |
+| `--cosm-switch-height` | Track height. |
+| `--cosm-switch-thumb-size` | Thumb diameter. |
+| `--cosm-switch-track-background` | Unchecked track background. |
+| `--cosm-switch-checked-track-background` | Checked track background. |
+| `--cosm-switch-thumb-background` | Thumb background. |
+| `--cosm-switch-border` | Unchecked track boundary color. |
+| `--cosm-switch-radius` | Track corner radius. |
+| `--cosm-switch-gap` | Space between the switch and label. |
+| `--cosm-switch-focus` | Visible keyboard focus indicator color. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Moves focus to or from the enabled switch. |
+| `Space` | Toggles checked state and emits a checkedChange proposal. |
+
 
 ## Rules for AI assistants
 
