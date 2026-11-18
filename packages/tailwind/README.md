@@ -15,6 +15,10 @@ Default Tailwind colors are removed: use `bg-primary`, `text-fg-muted`, `border-
 `bg-danger-subtle`, `text-danger-text`… Radius, shadows, spacing (`p-4` = 4 × `--cosm-space-unit`),
 typography and breakpoints also come from Cosmos. `dark:` follows `data-mode` (including `system`).
 
+Built-in variants: `theme-cosmos:`, `theme-nebula:`, `theme-terra:`, `theme-supernova:`,
+`theme-aurora:` and `theme-solstice:`. Select the palette with `data-theme`; its light/dark mode
+uses the same utilities and semantic roles, without a separate color vocabulary.
+
 ## License
 
 MIT
