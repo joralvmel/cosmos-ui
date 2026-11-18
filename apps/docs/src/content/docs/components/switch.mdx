@@ -23,6 +23,9 @@ when the switch changes.
 Use the Playground to exercise autonomous state, controlled `checked` proposals (including `false`),
 and owners that accept or refuse updates. It supplies the required label and keeps the element
 child-free in the server-rendered preview and generated snippets.
+Binary configuration controls use independent Switch instances; changing `disabled` or `invalid`
+affects the preview, not its editor. The `checked` dropdown retains Autonomous / false / true:
+a binary switch cannot represent all three ownership choices.
 
 ## Variants
 

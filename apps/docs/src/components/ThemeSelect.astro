@@ -17,30 +17,20 @@ const s = t(Astro.currentLocale);
 </div>
 
 <script>
-  // Previews use the Cosmos theme picked here and follow the site's light/dark mode.
-  const KEY = 'cosmos-docs:theme';
+  import { applySiteTheme, SITE_THEME_KEY } from '../lib/theme';
+
   const html = document.documentElement;
-
-  const apply = () => {
-    const theme = localStorage.getItem(KEY) ?? 'cosmos';
-    const mode = html.dataset.theme === 'dark' ? 'dark' : 'light';
-    for (const preview of document.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
-      if (!preview.hasAttribute('data-fixed')) preview.dataset.theme = theme;
-      if (!preview.hasAttribute('data-fixed-mode')) preview.dataset.mode = mode;
-    }
-    for (const select of document.querySelectorAll<HTMLSelectElement>('[data-cosm-theme-select]')) {
-      select.value = theme;
-    }
-  };
-
   for (const select of document.querySelectorAll<HTMLSelectElement>('[data-cosm-theme-select]')) {
     select.addEventListener('change', () => {
-      localStorage.setItem(KEY, select.value);
-      apply();
+      localStorage.setItem(SITE_THEME_KEY, select.value);
+      applySiteTheme();
     });
   }
-  new MutationObserver(apply).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
-  apply();
+  new MutationObserver(() => applySiteTheme()).observe(html, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+  applySiteTheme();
 </script>
 
 <style>

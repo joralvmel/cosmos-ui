@@ -19,13 +19,15 @@ separate number field or textarea for numeric or multiline editing.
 
 ## Playground
 
-Use the dropdowns for type, variant, size, keyboard hint and a few sample icons, and the checkboxes
+Use the dropdowns for type, variant, size, keyboard hint and a few sample icons, and Switch controls
 for boolean features. Less common form, content and action-label settings are under **Advanced
 options**; the complete API remains below. The icon catalog is available on the Icon page rather
 than loaded into this playground.
 
 Text-valued properties use an independent text editor: edits update the preview and generated
 snippets while keeping the editor separate from the preview.
+Controls follow the Playground theme and mode, or the site settings when **Site** is selected.
+Numeric inputs and dropdowns remain native until stable equivalents cover their behavior.
 
 For digit entry, choose `text` and `inputMode="numeric"`; this requests a numeric keyboard, not
 numeric validation or filtering. Use web `pattern` or consumer-owned validation when appropriate.
