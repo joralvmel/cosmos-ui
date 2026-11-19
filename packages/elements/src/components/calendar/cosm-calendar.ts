@@ -60,6 +60,62 @@ const styles = css`
     font-size: var(--cosm-text-md, 1rem);
     font-weight: var(--cosm-weight-semibold, 600);
   }
+  .heading-trigger {
+    border: 0;
+    border-radius: var(--cosm-radius-sm, 0.25rem);
+    padding: 0.125rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .heading-trigger:hover,
+  .picker-option:hover:not(:disabled) {
+    background: var(--cosm-neutral-3, color-mix(in oklab, currentColor 10%, transparent));
+  }
+  .heading-trigger:disabled {
+    color: var(--cosm-calendar-muted-color, var(--cosm-fg-muted, currentColor));
+    cursor: not-allowed;
+  }
+  .heading-trigger:focus-visible,
+  .picker-option:focus-visible {
+    outline: 2px solid var(--cosm-calendar-focus);
+    outline-offset: 2px;
+  }
+  .picker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--cosm-calendar-gap, var(--cosm-space-2xs, 0.125rem));
+  }
+  .month-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .picker-option {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    border: 1px solid transparent;
+    border-radius: var(--cosm-calendar-radius, var(--cosm-radius-md, 0.5rem));
+    background: transparent;
+    color: var(--cosm-calendar-color, var(--cosm-fg, currentColor));
+    font: inherit;
+    cursor: pointer;
+  }
+  .picker-option[aria-pressed='true'] {
+    border-color: var(--cosm-calendar-focus);
+    font-weight: var(--cosm-weight-semibold, 600);
+  }
+  .picker-option:disabled {
+    color: var(--cosm-calendar-muted-color, var(--cosm-fg-muted, currentColor));
+    cursor: not-allowed;
+  }
+  .picker-range {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--cosm-space-xs, 0.25rem);
+    margin-block-end: var(--cosm-space-xs, 0.25rem);
+    text-align: center;
+  }
   .weekdays,
   .week {
     display: grid;
@@ -156,7 +212,7 @@ const styles = css`
 let instance = 0;
 
 /**
- * An inline, localized Gregorian calendar for selecting one date.
+ * An inline, localized Gregorian calendar for selecting one date with direct month and year navigation.
  *
  * @tag cosm-calendar
  * @csspart base - Calendar root.
@@ -164,6 +220,10 @@ let instance = 0;
  * @csspart previous - Previous-month navigation button.
  * @csspart heading - Localized month and year heading.
  * @csspart next - Next-month navigation button.
+ * @csspart month-trigger - Button that opens direct month selection.
+ * @csspart year-trigger - Button that opens direct year selection.
+ * @csspart month-option - Month choice in the month selection view.
+ * @csspart year-option - Year choice in the year selection view.
  * @csspart weekday - Localized weekday heading.
  * @csspart grid - Seven-column date grid.
  * @csspart day - Date button, including adjacent-month dates.
@@ -207,6 +267,8 @@ export class CosmCalendar extends CosmElement {
   #activeDate: string;
   #visibleMonth: string;
   #pendingFocusDate: string | undefined;
+  #navigationView: 'days' | 'months' | 'years' = 'days';
+  #yearPageStart = 1;
   readonly #headingId = `cosm-calendar-heading-${++instance}`;
 
   constructor() {
@@ -264,6 +326,14 @@ export class CosmCalendar extends CosmElement {
   }
 
   #canNavigate(months: -1 | 1, localeInfo: CalendarLocaleInfo): boolean {
+    if (this.#navigationView === 'years') {
+      const start = this.#yearPageStart + months * 12;
+      return start >= 1 && start <= 9999 && this.#hasSelectableYearInRange(start, start + 11);
+    }
+    if (this.#navigationView === 'months') {
+      const year = parseCalendarDate(this.#visibleMonth).year + months;
+      return year >= 1 && year <= 9999 && this.#hasSelectableYear(year);
+    }
     return canNavigateCalendarMonth(
       this.#visibleMonth,
       months,
@@ -276,10 +346,120 @@ export class CosmCalendar extends CosmElement {
 
   #navigate(months: -1 | 1, localeInfo: CalendarLocaleInfo) {
     if (!this.#canNavigate(months, localeInfo)) return;
+    if (this.#navigationView === 'years') {
+      this.#yearPageStart += months * 12;
+      this.requestUpdate();
+      return;
+    }
+    if (this.#navigationView === 'months') {
+      const { year, month } = parseCalendarDate(this.#visibleMonth);
+      const targetYear = year + months;
+      const targetMonth = this.#monthForYear(targetYear, month);
+      if (targetMonth !== undefined) this.#setVisibleMonth(targetMonth, localeInfo);
+      return;
+    }
     this.#activeDate = addCalendarMonths(this.#activeDate, months);
     this.#visibleMonth = addCalendarMonths(this.#visibleMonth, months);
     this.requestUpdate();
   }
+
+  #hasSelectableMonth(month: string): boolean {
+    const dates = getCalendarMonthDates(month, 0).filter(
+      (date): date is string => date !== undefined && date.slice(0, 7) === month.slice(0, 7)
+    );
+    const first = dates[0];
+    const last = dates.at(-1);
+    return (
+      !this.disabled &&
+      first !== undefined &&
+      last !== undefined &&
+      (this.min === undefined || last >= this.min) &&
+      (this.max === undefined || first <= this.max)
+    );
+  }
+
+  #hasSelectableYear(year: number): boolean {
+    const first = `${String(year).padStart(4, '0')}-01-01`;
+    const last = `${String(year).padStart(4, '0')}-12-31`;
+    return (
+      !this.disabled &&
+      year >= 1 &&
+      year <= 9999 &&
+      (this.min === undefined || last >= this.min) &&
+      (this.max === undefined || first <= this.max)
+    );
+  }
+
+  #hasSelectableYearInRange(start: number, end: number): boolean {
+    for (let year = start; year <= Math.min(end, 9999); year++) {
+      if (this.#hasSelectableYear(year)) return true;
+    }
+    return false;
+  }
+
+  #monthForYear(year: number, preferredMonth: number): string | undefined {
+    const month = Array.from({ length: 12 }, (_, index) => index + 1)
+      .filter(value =>
+        this.#hasSelectableMonth(
+          `${String(year).padStart(4, '0')}-${String(value).padStart(2, '0')}-01`
+        )
+      )
+      .sort((left, right) => Math.abs(left - preferredMonth) - Math.abs(right - preferredMonth))[0];
+    return month === undefined
+      ? undefined
+      : `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-01`;
+  }
+
+  #setVisibleMonth(month: string, localeInfo: CalendarLocaleInfo) {
+    if (!this.#hasSelectableMonth(month)) return;
+    const current = parseCalendarDate(this.#visibleMonth);
+    const target = parseCalendarDate(month);
+    const monthDelta = (target.year - current.year) * 12 + target.month - current.month;
+    const candidate = tryAddCalendarMonths(this.#activeDate, monthDelta);
+    const selectableDates = getCalendarMonthDates(month, localeInfo.firstDay).filter(
+      (date): date is string =>
+        date !== undefined &&
+        date.slice(0, 7) === month.slice(0, 7) &&
+        isCalendarDateSelectable(date, this.min, this.max)
+    );
+    this.#visibleMonth = month;
+    this.#activeDate =
+      candidate && selectableDates.includes(candidate) ? candidate : (selectableDates[0] ?? month);
+    this.#pendingFocusDate = this.#activeDate;
+    this.requestUpdate();
+  }
+
+  #onMonthTrigger = () => {
+    this.#navigationView = 'months';
+    this.requestUpdate();
+  };
+
+  #onYearTrigger = () => {
+    const { year } = parseCalendarDate(this.#visibleMonth);
+    this.#yearPageStart = Math.max(1, Math.floor((year - 1) / 10) * 10);
+    this.#navigationView = 'years';
+    this.requestUpdate();
+  };
+
+  #onMonthSelect = (event: MouseEvent, localeInfo: CalendarLocaleInfo) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    const month = button.dataset.month;
+    if (!month) return;
+    const year = parseCalendarDate(this.#visibleMonth).year;
+    this.#setVisibleMonth(`${String(year).padStart(4, '0')}-${month}-01`, localeInfo);
+    this.#navigationView = 'days';
+    this.requestUpdate();
+  };
+
+  #onYearSelect = (event: MouseEvent, localeInfo: CalendarLocaleInfo) => {
+    const button = event.currentTarget as HTMLButtonElement;
+    const year = Number(button.dataset.year);
+    if (!Number.isInteger(year) || !this.#hasSelectableYear(year)) return;
+    const month = this.#monthForYear(year, parseCalendarDate(this.#visibleMonth).month);
+    if (month) this.#setVisibleMonth(month, localeInfo);
+    this.#navigationView = 'days';
+    this.requestUpdate();
+  };
 
   #moveActiveDate(value: string) {
     this.#activeDate = value;
@@ -353,14 +533,56 @@ export class CosmCalendar extends CosmElement {
     const weekdayNames = getCalendarWeekdayNames(localeInfo.locale, localeInfo.firstDay);
     const today = getCalendarToday();
     const dates = getCalendarMonthDates(this.#visibleMonth, localeInfo.firstDay);
+    const currentDate = parseCalendarDate(this.#visibleMonth);
+    const monthName = new Intl.DateTimeFormat(localeInfo.locale, {
+      calendar: 'gregory',
+      month: 'long',
+      timeZone: 'UTC',
+    }).format(new Date(Date.UTC(currentDate.year, currentDate.month - 1, 1, 12)));
+    const yearName = new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(
+      currentDate.year
+    );
     const monthLabel = formatCalendarMonth(this.#visibleMonth, localeInfo.locale);
-    const previousLabel = new Intl.RelativeTimeFormat(localeInfo.locale, {
-      numeric: 'auto',
-    }).format(-1, 'month');
-    const nextLabel = new Intl.RelativeTimeFormat(localeInfo.locale, {
-      numeric: 'auto',
-    }).format(1, 'month');
+    const relative = new Intl.RelativeTimeFormat(localeInfo.locale, { numeric: 'auto' });
+    const relativeUnit = this.#navigationView === 'days' ? 'month' : 'year';
+    const relativeStep = this.#navigationView === 'years' ? 12 : 1;
+    const previousLabel = relative.format(-relativeStep, relativeUnit);
+    const nextLabel = relative.format(relativeStep, relativeUnit);
     const formatDay = new Intl.NumberFormat(localeInfo.locale, { useGrouping: false });
+    const yearPageEnd = Math.min(9999, this.#yearPageStart + 11);
+    const yearPageLabel = `${new Intl.NumberFormat(localeInfo.locale, {
+      useGrouping: false,
+    }).format(
+      this.#yearPageStart
+    )}–${new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(yearPageEnd)}`;
+    const monthOptions = Array.from({ length: 12 }, (_, index) => {
+      const month = String(index + 1).padStart(2, '0');
+      const monthStart = `${String(currentDate.year).padStart(4, '0')}-${month}-01`;
+      return {
+        month,
+        label: new Intl.DateTimeFormat(localeInfo.locale, {
+          calendar: 'gregory',
+          month: 'long',
+          timeZone: 'UTC',
+        }).format(new Date(Date.UTC(currentDate.year, index, 1, 12))),
+        selected: currentDate.month === index + 1,
+        disabled: !this.#hasSelectableMonth(monthStart),
+      };
+    });
+    const yearOptions = Array.from(
+      { length: yearPageEnd - this.#yearPageStart + 1 },
+      (_, index) => {
+        const year = this.#yearPageStart + index;
+        return {
+          year,
+          label: new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(year),
+          selected: currentDate.year === year,
+          disabled: !this.#hasSelectableYear(year),
+        };
+      }
+    );
+    const monthPickerId = `${this.#headingId}-month-picker`;
+    const yearPickerId = `${this.#headingId}-year-picker`;
 
     return html`<div
       part="base"
@@ -385,7 +607,28 @@ export class CosmCalendar extends CosmElement {
           ></cosm-icon>
         </cosm-button>
         <h2 part="heading" class="heading" id=${this.#headingId} aria-live="polite" aria-atomic="true">
-          ${monthLabel}
+          <button
+            class="heading-trigger"
+            type="button"
+            part="month-trigger"
+            aria-expanded=${this.#navigationView === 'months' ? 'true' : 'false'}
+            aria-controls=${monthPickerId}
+            ?disabled=${this.disabled}
+            @click=${this.#onMonthTrigger}
+          >
+            ${monthName}
+          </button>
+          <button
+            class="heading-trigger"
+            type="button"
+            part="year-trigger"
+            aria-expanded=${this.#navigationView === 'years' ? 'true' : 'false'}
+            aria-controls=${yearPickerId}
+            ?disabled=${this.disabled}
+            @click=${this.#onYearTrigger}
+          >
+            ${yearName}
+          </button>
         </h2>
         <cosm-button
           part="next"
@@ -403,7 +646,82 @@ export class CosmCalendar extends CosmElement {
           ></cosm-icon>
         </cosm-button>
       </div>
-      <div class="calendar-scroll">
+      ${
+        this.#navigationView === 'months'
+          ? html`<div
+            id=${monthPickerId}
+            class="picker-grid month-grid"
+            role="group"
+            aria-label=${monthLabel}
+          >
+            ${monthOptions.map(
+              option => html`<button
+                class="picker-option"
+                part="month-option"
+                type="button"
+                data-month=${option.month}
+                aria-pressed=${option.selected ? 'true' : 'false'}
+                ?disabled=${option.disabled}
+                @click=${(event: MouseEvent) => this.#onMonthSelect(event, localeInfo)}
+              >
+                ${option.label}
+              </button>`
+            )}
+          </div>`
+          : this.#navigationView === 'years'
+            ? html`<div
+              id=${yearPickerId}
+              role="group"
+              aria-label=${yearPageLabel}
+            >
+              <div class="picker-range">
+                <cosm-button
+                  size="sm"
+                  variant="ghost"
+                  tone="neutral"
+                  .label=${previousLabel}
+                  .disabled=${!this.#canNavigate(-1, localeInfo)}
+                  @cosm-press=${() => this.#navigate(-1, localeInfo)}
+                >
+                  <cosm-icon
+                    .icon=${localeInfo.direction === 'rtl' ? chevronRight : chevronLeft}
+                    size="sm"
+                    decorative
+                  ></cosm-icon>
+                </cosm-button>
+                <span aria-live="polite">${yearPageLabel}</span>
+                <cosm-button
+                  size="sm"
+                  variant="ghost"
+                  tone="neutral"
+                  .label=${nextLabel}
+                  .disabled=${!this.#canNavigate(1, localeInfo)}
+                  @cosm-press=${() => this.#navigate(1, localeInfo)}
+                >
+                  <cosm-icon
+                    .icon=${localeInfo.direction === 'rtl' ? chevronLeft : chevronRight}
+                    size="sm"
+                    decorative
+                  ></cosm-icon>
+                </cosm-button>
+              </div>
+              <div class="picker-grid">
+                ${yearOptions.map(
+                  option => html`<button
+                    class="picker-option"
+                    part="year-option"
+                    type="button"
+                    data-year=${option.year}
+                    aria-pressed=${option.selected ? 'true' : 'false'}
+                    ?disabled=${option.disabled}
+                    @click=${(event: MouseEvent) => this.#onYearSelect(event, localeInfo)}
+                  >
+                    ${option.label}
+                  </button>`
+                )}
+              </div>
+            </div>`
+            : html`<div class="calendar-scroll">
         <div class="weekdays" role="row">
           ${weekdayNames.map(
             weekday =>
@@ -461,7 +779,8 @@ export class CosmCalendar extends CosmElement {
             </div>`;
           })}
         </div>
-      </div>
+      </div>`
+      }
     </div>`;
   }
 }

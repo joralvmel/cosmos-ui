@@ -70,6 +70,8 @@ interface WebDocument {
   getElementById(id: string): WebFocusTarget | null;
 }
 
+type CalendarNavigationView = 'days' | 'months' | 'years';
+
 const minimumDaySize = 44;
 const webKeys: readonly CalendarKey[] = [
   'ArrowLeft',
@@ -98,7 +100,7 @@ function getCalendarWeekCells(week: readonly (string | undefined)[]) {
   }));
 }
 
-/** Inline, localized Gregorian calendar for native platforms. */
+/** Inline, localized Gregorian calendar with direct month and year navigation. */
 export function Calendar({
   value,
   defaultValue,
@@ -123,6 +125,8 @@ export function Calendar({
   const currentValue = value === undefined ? ownedValue : value;
   const [activeDate, setActiveDate] = useState(initialDate);
   const [visibleMonth, setVisibleMonth] = useState(getCalendarMonth(initialDate));
+  const [navigationView, setNavigationView] = useState<CalendarNavigationView>('days');
+  const [yearPageStart, setYearPageStart] = useState(1);
   const valueEdited = useRef(false);
   const focusAfterUpdate = useRef(false);
   const weekdays = useMemo(
@@ -139,12 +143,6 @@ export function Calendar({
     [dates]
   );
   const monthLabel = formatCalendarMonth(visibleMonth, localeInfo.locale);
-  const previousLabel = new Intl.RelativeTimeFormat(localeInfo.locale, {
-    numeric: 'auto',
-  }).format(-1, 'month');
-  const nextLabel = new Intl.RelativeTimeFormat(localeInfo.locale, {
-    numeric: 'auto',
-  }).format(1, 'month');
   const formatDay = new Intl.NumberFormat(localeInfo.locale, { useGrouping: false });
 
   useEffect(() => {
@@ -164,19 +162,138 @@ export function Calendar({
   }, [defaultValue, value]);
 
   useEffect(() => {
-    if (!focusAfterUpdate.current) return;
+    if (!focusAfterUpdate.current || navigationView !== 'days') return;
     focusAfterUpdate.current = false;
     focusWebDate(`${id}-day-${activeDate}`);
-  }, [activeDate, id]);
+  }, [activeDate, id, navigationView]);
 
   const announceMonth = (nextMonth: string) => {
     if (Platform.OS !== 'web') {
       AccessibilityInfo.announceForAccessibility(formatCalendarMonth(nextMonth, localeInfo.locale));
     }
   };
-
+  const currentDate = parseCalendarDate(visibleMonth);
+  const monthName = new Intl.DateTimeFormat(localeInfo.locale, {
+    calendar: 'gregory',
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(currentDate.year, currentDate.month - 1, 1, 12)));
+  const yearName = new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(
+    currentDate.year
+  );
+  const relative = new Intl.RelativeTimeFormat(localeInfo.locale, { numeric: 'auto' });
+  const relativeUnit = navigationView === 'days' ? 'month' : 'year';
+  const relativeStep = navigationView === 'years' ? 12 : 1;
+  const previousLabel = relative.format(-relativeStep, relativeUnit);
+  const nextLabel = relative.format(relativeStep, relativeUnit);
+  const yearPageEnd = Math.min(9999, yearPageStart + 11);
+  const yearPageLabel = `${new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(
+    yearPageStart
+  )}–${new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(yearPageEnd)}`;
+  const hasSelectableMonth = (month: string) => {
+    const monthDates = getCalendarMonthDates(month, 0).filter(
+      (date): date is string => date !== undefined && date.slice(0, 7) === month.slice(0, 7)
+    );
+    const first = monthDates[0];
+    const last = monthDates.at(-1);
+    return (
+      !disabled &&
+      first !== undefined &&
+      last !== undefined &&
+      (min === undefined || last >= min) &&
+      (max === undefined || first <= max)
+    );
+  };
+  const hasSelectableYear = (year: number) => {
+    const first = `${String(year).padStart(4, '0')}-01-01`;
+    const last = `${String(year).padStart(4, '0')}-12-31`;
+    return (
+      !disabled &&
+      year >= 1 &&
+      year <= 9999 &&
+      (min === undefined || last >= min) &&
+      (max === undefined || first <= max)
+    );
+  };
+  const monthForYear = (year: number, preferredMonth: number) => {
+    const month = Array.from({ length: 12 }, (_, index) => index + 1)
+      .filter(value =>
+        hasSelectableMonth(`${String(year).padStart(4, '0')}-${String(value).padStart(2, '0')}-01`)
+      )
+      .sort((left, right) => Math.abs(left - preferredMonth) - Math.abs(right - preferredMonth))[0];
+    return month === undefined
+      ? undefined
+      : `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-01`;
+  };
+  const monthOptions = Array.from({ length: 12 }, (_, index) => {
+    const month = String(index + 1).padStart(2, '0');
+    const monthStart = `${String(currentDate.year).padStart(4, '0')}-${month}-01`;
+    return {
+      month,
+      label: new Intl.DateTimeFormat(localeInfo.locale, {
+        calendar: 'gregory',
+        month: 'long',
+        timeZone: 'UTC',
+      }).format(new Date(Date.UTC(currentDate.year, index, 1, 12))),
+      selected: currentDate.month === index + 1,
+      disabled: !hasSelectableMonth(monthStart),
+    };
+  });
+  const yearOptions = Array.from({ length: yearPageEnd - yearPageStart + 1 }, (_, index) => {
+    const year = yearPageStart + index;
+    return {
+      year,
+      label: new Intl.NumberFormat(localeInfo.locale, { useGrouping: false }).format(year),
+      selected: currentDate.year === year,
+      disabled: !hasSelectableYear(year),
+    };
+  });
+  const hasSelectableYearInRange = (start: number, end: number) => {
+    for (let year = start; year <= Math.min(end, 9999); year++) {
+      if (hasSelectableYear(year)) return true;
+    }
+    return false;
+  };
+  const setMonthView = (month: string) => {
+    if (!hasSelectableMonth(month)) return;
+    const current = parseCalendarDate(visibleMonth);
+    const target = parseCalendarDate(month);
+    const monthDelta = (target.year - current.year) * 12 + target.month - current.month;
+    const candidate = tryAddCalendarMonths(activeDate, monthDelta);
+    const selectableDates = getCalendarMonthDates(month, localeInfo.firstDay).filter(
+      (date): date is string =>
+        date !== undefined &&
+        date.slice(0, 7) === month.slice(0, 7) &&
+        isCalendarDateSelectable(date, min, max)
+    );
+    setVisibleMonth(month);
+    setActiveDate(
+      candidate && selectableDates.includes(candidate) ? candidate : (selectableDates[0] ?? month)
+    );
+    focusAfterUpdate.current = true;
+    announceMonth(month);
+  };
+  const canNavigate = (months: -1 | 1) => {
+    if (navigationView === 'years') {
+      const start = yearPageStart + months * 12;
+      return start >= 1 && start <= 9999 && hasSelectableYearInRange(start, start + 11);
+    }
+    if (navigationView === 'months') {
+      const year = parseCalendarDate(visibleMonth).year + months;
+      return year >= 1 && year <= 9999 && hasSelectableYear(year);
+    }
+    return canNavigateCalendarMonth(visibleMonth, months, localeInfo.firstDay, min, max, disabled);
+  };
   const navigate = (months: -1 | 1) => {
-    if (!canNavigateCalendarMonth(visibleMonth, months, localeInfo.firstDay, min, max, disabled)) {
+    if (!canNavigate(months)) return;
+    if (navigationView === 'years') {
+      setYearPageStart(current => current + months * 12);
+      return;
+    }
+    if (navigationView === 'months') {
+      const { year, month } = parseCalendarDate(visibleMonth);
+      const target = monthForYear(year + months, month);
+      if (target) setMonthView(target);
       return;
     }
     const nextMonth = addCalendarMonths(visibleMonth, months);
@@ -198,7 +315,7 @@ export function Calendar({
   };
 
   const handleKeyDown = (event: unknown) => {
-    if (Platform.OS !== 'web' || disabled) return;
+    if (Platform.OS !== 'web' || disabled || navigationView !== 'days') return;
     const keyEvent = event as CalendarKeyEvent;
     const key = keyEvent.nativeEvent?.key ?? keyEvent.key;
     if (!key || !webKeys.includes(key as CalendarKey)) return;
@@ -259,184 +376,296 @@ export function Calendar({
           variant="ghost"
           tone="neutral"
           label={previousLabel}
-          disabled={
-            !canNavigateCalendarMonth(visibleMonth, -1, localeInfo.firstDay, min, max, disabled)
-          }
+          disabled={!canNavigate(-1)}
           onPress={() => navigate(-1)}
         >
           <Icon icon={localeInfo.direction === 'rtl' ? chevronRight : chevronLeft} size="sm" />
         </Button>
-        <Text
+        <View
           accessibilityRole="header"
-          accessibilityLabel={monthLabel}
-          style={{
-            color: theme.colors.fg,
-            flex: 1,
-            fontSize: theme.text.md,
-            fontWeight: theme.weight.semibold,
-            textAlign: 'center',
-          }}
+          style={{ alignItems: 'center', flex: 1, flexDirection: 'row', justifyContent: 'center' }}
         >
-          {monthLabel}
-        </Text>
+          <Button
+            testID={testID ? `${testID}-choose-month` : undefined}
+            size="sm"
+            variant="ghost"
+            tone="neutral"
+            label={monthName}
+            disabled={disabled}
+            onPress={() => setNavigationView('months')}
+          >
+            {monthName}
+          </Button>
+          <Button
+            testID={testID ? `${testID}-choose-year` : undefined}
+            size="sm"
+            variant="ghost"
+            tone="neutral"
+            label={yearName}
+            disabled={disabled}
+            onPress={() => {
+              setYearPageStart(Math.max(1, Math.floor((currentDate.year - 1) / 10) * 10));
+              setNavigationView('years');
+            }}
+          >
+            {yearName}
+          </Button>
+        </View>
         <Button
           testID={testID ? `${testID}-next` : undefined}
           size="sm"
           variant="ghost"
           tone="neutral"
           label={nextLabel}
-          disabled={
-            !canNavigateCalendarMonth(visibleMonth, 1, localeInfo.firstDay, min, max, disabled)
-          }
+          disabled={!canNavigate(1)}
           onPress={() => navigate(1)}
         >
           <Icon icon={localeInfo.direction === 'rtl' ? chevronLeft : chevronRight} size="sm" />
         </Button>
       </View>
-      <ScrollView horizontal style={{ width: '100%' }} contentContainerStyle={{ minWidth: '100%' }}>
+      {navigationView === 'months' ? (
         <View
-          style={{ ...gridStyle, minWidth: minimumGridWidth }}
-          onKeyDown={handleKeyDown}
-          {...(Platform.OS === 'web'
-            ? ({
-                role: 'grid',
-                'aria-label': monthLabel,
-                'aria-disabled': disabled || undefined,
-              } as Record<string, unknown>)
-            : {})}
+          style={{
+            direction: localeInfo.direction,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: theme.space['2xs'],
+          }}
         >
+          {monthOptions.map(option => (
+            <Button
+              key={option.month}
+              testID={testID ? `${testID}-month-${option.month}` : undefined}
+              size="sm"
+              variant={option.selected ? 'soft' : 'ghost'}
+              tone={option.selected ? 'primary' : 'neutral'}
+              label={option.label}
+              disabled={option.disabled}
+              style={{ flexBasis: '31%', flexGrow: 1, minHeight: minimumDaySize }}
+              onPress={() => {
+                const year = parseCalendarDate(visibleMonth).year;
+                setMonthView(`${String(year).padStart(4, '0')}-${option.month}-01`);
+                setNavigationView('days');
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </View>
+      ) : navigationView === 'years' ? (
+        <View style={{ gap: theme.space.xs }}>
           <View
-            style={dayRowStyle}
-            {...(Platform.OS === 'web' ? ({ role: 'row' } as Record<string, unknown>) : {})}
+            style={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}
           >
-            {weekdays.map(weekday => (
-              <Text
-                key={weekday.long}
-                accessibilityLabel={weekday.long}
-                accessibilityRole="text"
-                style={{
-                  color: theme.colors['fg-muted'],
-                  flex: 1,
-                  fontSize: theme.text.sm,
-                  minHeight: minimumDaySize,
-                  minWidth: minimumDaySize,
-                  textAlign: 'center',
-                  textAlignVertical: 'center',
+            <Button
+              size="sm"
+              variant="ghost"
+              tone="neutral"
+              label={previousLabel}
+              disabled={!canNavigate(-1)}
+              onPress={() => navigate(-1)}
+            >
+              <Icon icon={localeInfo.direction === 'rtl' ? chevronRight : chevronLeft} size="sm" />
+            </Button>
+            <Text accessibilityRole="header" style={{ color: theme.colors.fg }}>
+              {yearPageLabel}
+            </Text>
+            <Button
+              size="sm"
+              variant="ghost"
+              tone="neutral"
+              label={nextLabel}
+              disabled={!canNavigate(1)}
+              onPress={() => navigate(1)}
+            >
+              <Icon icon={localeInfo.direction === 'rtl' ? chevronLeft : chevronRight} size="sm" />
+            </Button>
+          </View>
+          <View
+            style={{
+              direction: localeInfo.direction,
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: theme.space['2xs'],
+            }}
+          >
+            {yearOptions.map(option => (
+              <Button
+                key={option.year}
+                testID={testID ? `${testID}-year-${option.year}` : undefined}
+                size="sm"
+                variant={option.selected ? 'soft' : 'ghost'}
+                tone={option.selected ? 'primary' : 'neutral'}
+                label={option.label}
+                disabled={option.disabled}
+                style={{ flexBasis: '23%', flexGrow: 1, minHeight: minimumDaySize }}
+                onPress={() => {
+                  const month = monthForYear(option.year, parseCalendarDate(visibleMonth).month);
+                  if (month) {
+                    setMonthView(month);
+                    setNavigationView('days');
+                  }
                 }}
-                {...(Platform.OS === 'web'
-                  ? ({
-                      role: 'columnheader',
-                      'aria-label': weekday.long,
-                    } as Record<string, unknown>)
-                  : {})}
               >
-                {weekday.short}
-              </Text>
+                {option.label}
+              </Button>
             ))}
           </View>
-          {weeks.map(week => {
-            const cells = getCalendarWeekCells(week);
-            const firstDate = cells.find(cell => cell.date !== undefined)?.date ?? 'edge';
-            return (
-              <View
-                key={`week-${firstDate}`}
-                style={dayRowStyle}
-                {...(Platform.OS === 'web' ? ({ role: 'row' } as Record<string, unknown>) : {})}
-              >
-                {cells.map(({ date, key }) => {
-                  if (!date) {
+        </View>
+      ) : (
+        <ScrollView
+          horizontal
+          style={{ width: '100%' }}
+          contentContainerStyle={{ minWidth: '100%' }}
+        >
+          <View
+            style={{ ...gridStyle, minWidth: minimumGridWidth }}
+            onKeyDown={handleKeyDown}
+            {...(Platform.OS === 'web'
+              ? ({
+                  role: 'grid',
+                  'aria-label': monthLabel,
+                  'aria-disabled': disabled || undefined,
+                } as Record<string, unknown>)
+              : {})}
+          >
+            <View
+              style={dayRowStyle}
+              {...(Platform.OS === 'web' ? ({ role: 'row' } as Record<string, unknown>) : {})}
+            >
+              {weekdays.map(weekday => (
+                <Text
+                  key={weekday.long}
+                  accessibilityLabel={weekday.long}
+                  accessibilityRole="text"
+                  style={{
+                    color: theme.colors['fg-muted'],
+                    flex: 1,
+                    fontSize: theme.text.sm,
+                    minHeight: minimumDaySize,
+                    minWidth: minimumDaySize,
+                    textAlign: 'center',
+                    textAlignVertical: 'center',
+                  }}
+                  {...(Platform.OS === 'web'
+                    ? ({
+                        role: 'columnheader',
+                        'aria-label': weekday.long,
+                      } as Record<string, unknown>)
+                    : {})}
+                >
+                  {weekday.short}
+                </Text>
+              ))}
+            </View>
+            {weeks.map(week => {
+              const cells = getCalendarWeekCells(week);
+              const firstDate = cells.find(cell => cell.date !== undefined)?.date ?? 'edge';
+              return (
+                <View
+                  key={`week-${firstDate}`}
+                  style={dayRowStyle}
+                  {...(Platform.OS === 'web' ? ({ role: 'row' } as Record<string, unknown>) : {})}
+                >
+                  {cells.map(({ date, key }) => {
+                    if (!date) {
+                      return (
+                        <View
+                          key={key}
+                          style={{
+                            flex: 1,
+                            minHeight: minimumDaySize,
+                            minWidth: minimumDaySize,
+                          }}
+                          {...(Platform.OS === 'web'
+                            ? ({ role: 'gridcell', 'aria-hidden': true } as Record<string, unknown>)
+                            : {})}
+                        />
+                      );
+                    }
+                    const dateParts = parseCalendarDate(date);
+                    const selected = currentValue === date;
+                    const isToday = date === today;
+                    const selectable = isCalendarDateSelectable(date, min, max);
+                    const inMonth = date.slice(0, 7) === visibleMonth.slice(0, 7);
+                    const dayColor = selected
+                      ? theme.colors['primary-fg']
+                      : selectable && inMonth
+                        ? theme.colors.fg
+                        : theme.colors['fg-muted'];
+                    const webProps =
+                      Platform.OS === 'web'
+                        ? ({
+                            id: `${id}-day-${date}`,
+                            tabIndex: !disabled && activeDate === date ? 0 : -1,
+                            'aria-disabled': disabled || !selectable,
+                            'aria-current': isToday ? 'date' : undefined,
+                            'data-date': date,
+                            onFocus: () => setActiveDate(date),
+                          } as Record<string, unknown>)
+                        : {};
                     return (
                       <View
                         key={key}
-                        style={{
-                          flex: 1,
-                          minHeight: minimumDaySize,
-                          minWidth: minimumDaySize,
-                        }}
                         {...(Platform.OS === 'web'
-                          ? ({ role: 'gridcell', 'aria-hidden': true } as Record<string, unknown>)
+                          ? ({
+                              role: 'gridcell',
+                              'aria-selected': selected,
+                              'aria-disabled': disabled || !selectable,
+                            } as Record<string, unknown>)
                           : {})}
-                      />
-                    );
-                  }
-                  const dateParts = parseCalendarDate(date);
-                  const selected = currentValue === date;
-                  const isToday = date === today;
-                  const selectable = isCalendarDateSelectable(date, min, max);
-                  const inMonth = date.slice(0, 7) === visibleMonth.slice(0, 7);
-                  const dayColor = selected
-                    ? theme.colors['primary-fg']
-                    : selectable && inMonth
-                      ? theme.colors.fg
-                      : theme.colors['fg-muted'];
-                  const webProps =
-                    Platform.OS === 'web'
-                      ? ({
-                          id: `${id}-day-${date}`,
-                          tabIndex: !disabled && activeDate === date ? 0 : -1,
-                          'aria-disabled': disabled || !selectable,
-                          'aria-current': isToday ? 'date' : undefined,
-                          'data-date': date,
-                          onFocus: () => setActiveDate(date),
-                        } as Record<string, unknown>)
-                      : {};
-                  return (
-                    <View
-                      key={key}
-                      {...(Platform.OS === 'web'
-                        ? ({
-                            role: 'gridcell',
-                            'aria-selected': selected,
-                            'aria-disabled': disabled || !selectable,
-                          } as Record<string, unknown>)
-                        : {})}
-                      style={{ flex: 1, minWidth: minimumDaySize }}
-                    >
-                      <Pressable
-                        {...webProps}
-                        accessibilityRole="button"
-                        accessibilityLabel={`${formatCalendarDate(date, localeInfo.locale)}${
-                          isToday ? `, ${getCalendarTodayLabel(localeInfo.locale)}` : ''
-                        }`}
-                        accessibilityState={{
-                          disabled: disabled || !selectable,
-                          selected,
-                        }}
-                        disabled={disabled || (Platform.OS !== 'web' && !selectable)}
-                        hitSlop={{ left: 4, right: 4 }}
-                        onPress={() => selectDate(date)}
-                        style={{
-                          aspectRatio: 1,
-                          alignItems: 'center',
-                          backgroundColor: selected ? theme.colors.primary : 'transparent',
-                          borderColor: isToday ? theme.colors.primary : 'transparent',
-                          borderRadius: theme.radius.md,
-                          borderWidth: 1,
-                          flex: 1,
-                          justifyContent: 'center',
-                          minHeight: minimumDaySize,
-                          minWidth: minimumDaySize,
-                        }}
-                        testID={testID ? `${testID}-day-${date}` : undefined}
+                        style={{ flex: 1, minWidth: minimumDaySize }}
                       >
-                        <Text
-                          style={{
-                            color: dayColor,
-                            fontSize: theme.text.sm,
-                            fontWeight: selected ? theme.weight.semibold : theme.weight.regular,
+                        <Pressable
+                          {...webProps}
+                          accessibilityRole="button"
+                          accessibilityLabel={`${formatCalendarDate(date, localeInfo.locale)}${
+                            isToday ? `, ${getCalendarTodayLabel(localeInfo.locale)}` : ''
+                          }`}
+                          accessibilityState={{
+                            disabled: disabled || !selectable,
+                            selected,
                           }}
+                          disabled={disabled || (Platform.OS !== 'web' && !selectable)}
+                          hitSlop={{ left: 4, right: 4 }}
+                          onPress={() => selectDate(date)}
+                          style={{
+                            aspectRatio: 1,
+                            alignItems: 'center',
+                            backgroundColor: selected ? theme.colors.primary : 'transparent',
+                            borderColor: isToday ? theme.colors.primary : 'transparent',
+                            borderRadius: theme.radius.md,
+                            borderWidth: 1,
+                            flex: 1,
+                            justifyContent: 'center',
+                            minHeight: minimumDaySize,
+                            minWidth: minimumDaySize,
+                          }}
+                          testID={testID ? `${testID}-day-${date}` : undefined}
                         >
-                          {formatDay.format(dateParts.day)}
-                        </Text>
-                      </Pressable>
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })}
-        </View>
-      </ScrollView>
+                          <Text
+                            style={{
+                              color: dayColor,
+                              fontSize: theme.text.sm,
+                              fontWeight: selected ? theme.weight.semibold : theme.weight.regular,
+                            }}
+                          >
+                            {formatDay.format(dateParts.day)}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    );
+                  })}
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 }

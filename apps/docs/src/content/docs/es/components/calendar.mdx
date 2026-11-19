@@ -22,9 +22,10 @@ formato de solo fecha `YYYY-MM-DD`.
 
 ## Variantes
 
-Calendar tiene una presentación adaptable con siete columnas de días. No tiene propiedades de
-tamaño, tono ni variante. Si hay una fecha seleccionada, se muestra inicialmente su mes; de lo
-contrario, se muestra el mes actual.
+Calendar tiene una cuadrícula adaptable de siete columnas y no tiene propiedades de tamaño, tono ni
+variante. Si hay una fecha seleccionada, se muestra inicialmente su mes; de lo contrario, se
+muestra el mes actual. Use los botones de mes y año del encabezado para saltar directamente sin
+presionar las flechas repetidamente.
 
 <Preview>
   <cosm-calendar default-value="2024-06-15"></cosm-calendar>
@@ -94,6 +95,8 @@ El estado `disabled` impide seleccionar fechas y navegar entre meses.
   una fecha disponible.
 - La fecha enfocada permanece visible al navegar. Se anuncian los cambios de mes y cada fecha
   expone un nombre localizado y sus estados de selección, fecha actual y disponibilidad.
+- Las opciones de mes y año son botones accesibles; los límites `min` y `max` deshabilitan las
+  opciones sin fechas disponibles.
 - En plataformas nativas, las fechas usan botones accesibles, nombres localizados y áreas táctiles
   de al menos 44 puntos. En pantallas estrechas, la cuadrícula se desplaza horizontalmente para
   conservar ese tamaño. React Native Web usa los eventos de teclado del navegador; Android e iOS

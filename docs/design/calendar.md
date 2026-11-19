@@ -35,19 +35,28 @@ dates and reversed bounds are rejected explicitly.
 | `header` | `header` | Month heading and navigation row. |
 | `previous` | `previous` | Previous-month button. |
 | `heading` | `heading` | Localized month and year. |
+| `month-trigger` | `month-trigger` | Opens the in-place month choices. |
+| `year-trigger` | `year-trigger` | Opens the in-place year choices. |
 | `next` | `next` | Next-month button. |
 | `grid` | `grid` | Seven-column calendar grid. |
 | `weekday` | `weekday` | Localized weekday abbreviation. |
 | `day` | `day` | Date cell, including adjacent-month dates. |
+| `month-option` | `month-option` | Month choice in the month selection view. |
+| `year-option` | `year-option` | Year choice in the year selection view. |
 
 Web customization is through Cosmos theme tokens, the documented parts, and `--cosm-calendar-*`
 hooks. No custom day renderer or arbitrary per-day content is provided. Native styling follows
 `useTheme()` and the equivalent component props; it does not expose DOM parts.
 
-The header contains only the month/year and previous/next controls. The visible month initially
-contains the selected date, or today when no date is selected. Today is visibly distinguished but
-is not selected implicitly. Adjacent-month dates complete the week rows and can be selected; doing
-so moves the displayed month. There is one month at a time.
+The header contains previous/next controls and separate month and year buttons. Activating either
+replaces the date grid with an in-place set of month or year buttons; years are paged in groups of
+12. Choosing a month or year changes only the displayed month, not the selected date. Choices with
+no dates inside `min`/`max` are unavailable. This avoids a dependency on Select or Dialog and works
+with native buttons on every platform.
+
+The visible month initially contains the selected date, or today when no date is selected. Today is
+visibly distinguished but is not selected implicitly. Adjacent-month dates complete the week rows
+and can be selected; doing so moves the displayed month. There is one month at a time.
 
 ## Visual and platform contract
 
@@ -71,9 +80,10 @@ and `icon` as direct dependencies. No runtime dependency is added.
 
 On web, arrow keys move one day or one week, Home/End move to the first/last day of the localized
 week, PageUp/PageDown move by month, and Shift+PageUp/Shift+PageDown move by year. Enter/Space
-selects the focused enabled date. Focus remains on the active date as the month changes. Month
-changes are announced, and each date has a localized accessible name with selected, today, and
-disabled state conveyed without color alone.
+selects the focused enabled date. Month and year choices are native buttons and remain keyboard
+reachable with Tab. Focus returns to the active date after a choice. Focus remains on the active
+date as the month changes. Month changes are announced, and each date has a localized accessible
+name with selected, today, and disabled state conveyed without color alone.
 
 On React Native, dates have native button semantics and localized labels/states. Touch selection is
 the primary interaction. React Native Web uses browser keyboard events; Android and iOS follow
@@ -91,6 +101,8 @@ in RTL while previous/next actions retain their chronological meaning.
   not change its selected state until `value` changes.
 - The selected date's month is initially visible; otherwise the current date's month is visible,
   while no date is selected by default.
+- Month and year buttons open in-place choices; selecting one changes the visible month without
+  proposing a date change, and unavailable choices respect inclusive bounds.
 - Previous/next navigation, adjacent-month selection, and keyboard month/day movement preserve the
   date-only value and update the internal view/focus.
 - `min` and `max` are inclusive; out-of-range dates cannot be selected, and month navigation cannot
@@ -103,9 +115,10 @@ in RTL while previous/next actions retain their chronological meaning.
 
 ## Exclusions
 
-Date text entry, popover/dialog, time, ranges, month/year selection views, multiple months, week
-numbers, arbitrary disabled dates, custom day contents, non-Gregorian calendars, size/variant props,
-and animations are deferred.
+Date text entry, popover/dialog, time, ranges, multiple month grids, week numbers, arbitrary
+disabled dates, custom day contents, non-Gregorian calendars, size/variant props, event scheduling
+views, and animations are deferred. Event scheduling is a distinct agenda concern; it needs a
+separate event/time-zone contract rather than expanding this single-date selector.
 
 ## Research and accepted scope
 
@@ -136,4 +149,8 @@ References:
 
 ## Validation evidence
 
-Implementation and platform validation evidence will be added after the approved scope is built.
+- `npx turbo run typecheck test build --filter=...@joralvmel/cosmos-core --filter=...@joralvmel/cosmos-elements --filter=...@joralvmel/cosmos-native --filter=...@joralvmel/cosmos-native-demo --filter=...@joralvmel/cosmos-docs`: passed; 30 tasks, including core, Web, React, Angular, native, native demo, and docs.
+- Browser interaction passed on the docs site and React Native Web demo: opened the month/year choices, selected April 2030, and confirmed the selected date remained unchanged.
+- Android Expo export passed; no Android device interaction was run.
+- `npx biome ci .`, `npm run check-terms`, `npm run status`, and `npx changeset status` passed. Biome reports the existing informational schema mismatch (config 2.6.6, CLI 2.6.7).
+- iOS and manual screen-reader checks are not verified (optional).

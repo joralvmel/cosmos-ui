@@ -21,9 +21,10 @@ Dates use the Gregorian calendar and the date-only `YYYY-MM-DD` format.
 
 ## Variants
 
-Calendar has one responsive presentation, with seven equal weekday columns. It has no size, tone or
-variant props. The selected date's month is shown initially; without a selection, the current month
-is shown.
+Calendar has one responsive date-grid presentation, with seven equal weekday columns. It has no
+size, tone or variant props. The selected date's month is shown initially; without a selection, the
+current month is shown. Use the month and year buttons in the heading to jump directly to a month
+or year without repeated arrow presses.
 
 <Preview>
   <cosm-calendar default-value="2024-06-15"></cosm-calendar>
@@ -91,6 +92,7 @@ The `disabled` state prevents selection and month navigation.
   move by month, and Shift + Page Up/Down move by year. Enter or Space selects an enabled date.
 - The focused date stays in view as you navigate. Month changes are announced, and dates expose
   localized names and selected, today and unavailable states.
+- Month and year choices are accessible buttons; unavailable choices respect `min` and `max`.
 - Native dates use accessible button semantics and localized labels, with touch targets of at
   least 44 points. On narrow screens, the date grid scrolls horizontally to preserve those target
   sizes. React Native Web uses browser keyboard events; Android and iOS follow native focus and

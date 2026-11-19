@@ -16,7 +16,7 @@ export const calendarContract = defineContract({
   name: 'calendar',
   tag: 'cosm-calendar',
   description:
-    'Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional date bounds.',
+    'Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional bounds. Month and year can be selected directly.',
   role: 'grid',
   pattern: 'https://www.w3.org/WAI/ARIA/apg/patterns/grid/',
   props: {
@@ -47,7 +47,7 @@ export const calendarContract = defineContract({
       type: 'boolean',
       default: false,
       reflect: true,
-      description: 'Disables date selection and month navigation.',
+      description: 'Disables date selection and calendar navigation.',
     },
   },
   events: {
@@ -74,6 +74,10 @@ export const calendarContract = defineContract({
     weekday: 'Localized weekday heading.',
     grid: 'Seven-column date grid.',
     day: 'Date button, including adjacent-month dates.',
+    'month-trigger': 'Button that opens direct month selection.',
+    'year-trigger': 'Button that opens direct year selection.',
+    'month-option': 'Month choice in the month selection view.',
+    'year-option': 'Year choice in the year selection view.',
   },
   cssProperties: {
     '--cosm-calendar-background': 'Calendar surface background.',

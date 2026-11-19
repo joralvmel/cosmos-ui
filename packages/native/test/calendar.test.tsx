@@ -3,7 +3,6 @@ import {
   calendarContract,
   calendarScenariosFor,
   formatCalendarDate,
-  formatCalendarMonth,
   getCalendarToday,
   propNames,
 } from '@joralvmel/cosmos-core';
@@ -77,9 +76,22 @@ describe('Calendar (native): shared scenarios', () => {
       await act(async () => Promise.resolve());
       const active = subject?.querySelector<HTMLButtonElement>('button[tabindex="0"]');
       expect(active?.id.split('-day-').at(-1)).toBe(scenario.expected.activeDate);
-      expect(subject?.textContent).toContain(
-        formatCalendarMonth(scenario.expected.month, scenario.props.locale ?? 'en-US')
+      const monthParts = scenario.expected.month.split('-');
+      const year = Number(monthParts[0]);
+      const month = Number(monthParts[1]);
+      const locale = scenario.props.locale ?? 'en-US';
+      expect(
+        subject?.querySelector('[data-testid="subject-choose-month"]')?.textContent?.trim()
+      ).toBe(
+        new Intl.DateTimeFormat(locale, {
+          calendar: 'gregory',
+          month: 'long',
+          timeZone: 'UTC',
+        }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
       );
+      expect(
+        subject?.querySelector('[data-testid="subject-choose-year"]')?.textContent?.trim()
+      ).toBe(new Intl.NumberFormat(locale, { useGrouping: false }).format(year));
       expect(onValueChange.mock.calls.map(([detail]) => detail.value)).toEqual(
         scenario.expected.changes
       );
@@ -125,6 +137,66 @@ describe('Calendar (native)', () => {
     if (!next) throw new Error('Missing next-month button.');
     await act(async () => next.click());
     expect(__accessibilityAnnouncements).toContain('June 2024');
+  });
+
+  it('jumps to a month or year without changing the selected date', async () => {
+    const onValueChange = vi.fn<(detail: CalendarChangeDetail) => void>();
+    const subject = await render(
+      <Calendar
+        defaultValue="2024-05-15"
+        locale="en-US"
+        onValueChange={onValueChange}
+        testID="subject"
+      />
+    );
+    const chooseMonth = container?.querySelector<HTMLButtonElement>(
+      '[data-testid="subject-choose-month"]'
+    );
+    if (!chooseMonth) throw new Error('Missing month picker button.');
+    await act(async () => chooseMonth.click());
+
+    const august = container?.querySelector<HTMLButtonElement>('[data-testid="subject-month-08"]');
+    if (!august) throw new Error('Missing August option.');
+    await act(async () => august.click());
+    expect(subject?.textContent).toContain('August');
+
+    const chooseYear = container?.querySelector<HTMLButtonElement>(
+      '[data-testid="subject-choose-year"]'
+    );
+    if (!chooseYear) throw new Error('Missing year picker button.');
+    await act(async () => chooseYear.click());
+    const year = container?.querySelector<HTMLButtonElement>('[data-testid="subject-year-2030"]');
+    if (!year) throw new Error('Missing 2030 option.');
+    await act(async () => year.click());
+
+    expect(subject?.textContent).toContain('2030');
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('keeps native month and year choices inside the selectable bounds', async () => {
+    const subject = await render(
+      <Calendar
+        defaultValue="2024-06-15"
+        min="2024-06-10"
+        max="2025-02-02"
+        locale="en-US"
+        testID="subject"
+      />
+    );
+    const chooseYear = container?.querySelector<HTMLButtonElement>(
+      '[data-testid="subject-choose-year"]'
+    );
+    if (!chooseYear) throw new Error('Missing year picker button.');
+    await act(async () => chooseYear.click());
+
+    expect(
+      container?.querySelector<HTMLButtonElement>('[data-testid="subject-year-2023"]')?.disabled
+    ).toBe(true);
+    const year = container?.querySelector<HTMLButtonElement>('[data-testid="subject-year-2025"]');
+    if (!year) throw new Error('Missing 2025 option.');
+    await act(async () => year.click());
+
+    expect(subject?.textContent).toContain('February');
   });
 
   it('marks bounded native dates as disabled buttons', async () => {

@@ -5,7 +5,6 @@ import {
   calendarContract,
   calendarScenariosFor,
   eventNames,
-  formatCalendarMonth,
   propNames,
 } from '@joralvmel/cosmos-core';
 import type { CosmCalendar } from '@joralvmel/cosmos-elements/calendar';
@@ -83,9 +82,26 @@ describe('CosmCalendarComponent', () => {
 
       expect(element.value).toBe(scenario.expected.value);
       expect(changes).toEqual(scenario.expected.changes);
-      expect(element.shadowRoot?.querySelector('[part="heading"]')?.textContent?.trim()).toBe(
-        formatCalendarMonth(scenario.expected.month, scenario.props.locale ?? 'en-US')
+      const monthParts = scenario.expected.month.split('-');
+      const year = Number(monthParts[0]);
+      const month = Number(monthParts[1]);
+      const locale = scenario.props.locale ?? 'en-US';
+      expect(
+        element.shadowRoot
+          ?.querySelector('[part="heading"] [part="month-trigger"]')
+          ?.textContent?.trim()
+      ).toBe(
+        new Intl.DateTimeFormat(locale, {
+          calendar: 'gregory',
+          month: 'long',
+          timeZone: 'UTC',
+        }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
       );
+      expect(
+        element.shadowRoot
+          ?.querySelector('[part="heading"] [part="year-trigger"]')
+          ?.textContent?.trim()
+      ).toBe(new Intl.NumberFormat(locale, { useGrouping: false }).format(year));
       expect(
         element.shadowRoot?.querySelector<HTMLButtonElement>('.day[tabindex="0"]')?.dataset.date
       ).toBe(scenario.expected.activeDate);

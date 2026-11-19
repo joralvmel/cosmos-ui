@@ -3,7 +3,6 @@ import {
   calendarContract,
   calendarScenariosFor,
   eventNames,
-  formatCalendarMonth,
   getCalendarToday,
   propNames,
 } from '@joralvmel/cosmos-core';
@@ -68,9 +67,26 @@ describe('cosm-calendar: shared scenarios', () => {
 
       expect(element.value).toBe(scenario.expected.value);
       expect(changes).toEqual(scenario.expected.changes);
-      expect(element.shadowRoot?.querySelector('[part="heading"]')?.textContent?.trim()).toBe(
-        formatCalendarMonth(scenario.expected.month, scenario.props.locale ?? 'en-US')
+      const monthParts = scenario.expected.month.split('-');
+      const year = Number(monthParts[0]);
+      const month = Number(monthParts[1]);
+      const locale = scenario.props.locale ?? 'en-US';
+      expect(
+        element.shadowRoot
+          ?.querySelector('[part="heading"] [part="month-trigger"]')
+          ?.textContent?.trim()
+      ).toBe(
+        new Intl.DateTimeFormat(locale, {
+          calendar: 'gregory',
+          month: 'long',
+          timeZone: 'UTC',
+        }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
       );
+      expect(
+        element.shadowRoot
+          ?.querySelector('[part="heading"] [part="year-trigger"]')
+          ?.textContent?.trim()
+      ).toBe(new Intl.NumberFormat(locale, { useGrouping: false }).format(year));
       expect(
         element.shadowRoot?.querySelector<HTMLButtonElement>('.day[tabindex="0"]')?.dataset.date
       ).toBe(scenario.expected.activeDate);
@@ -153,6 +169,78 @@ describe('cosm-calendar', () => {
     expect(
       element.shadowRoot?.querySelector<HTMLButtonElement>('.day[tabindex="0"]')?.dataset.date
     ).toBe('2025-04-25');
+  });
+
+  it('jumps to a month or year without changing the selected date', async () => {
+    const element = await createCalendar({ defaultValue: '2024-05-15', locale: 'en-US' });
+    const change = vi.fn();
+    element.addEventListener('cosm-change', change);
+
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[part="month-trigger"]')?.click();
+    await element.updateComplete;
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[data-month="08"]')?.click();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector('[part="heading"]')?.textContent).toContain('August');
+    expect(element.value).toBe('2024-05-15');
+
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[part="year-trigger"]')?.click();
+    await element.updateComplete;
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[data-year="2030"]')?.click();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector('[part="heading"]')?.textContent).toContain('2030');
+    expect(element.value).toBe('2024-05-15');
+    expect(change).not.toHaveBeenCalled();
+  });
+
+  it('keeps month and year choices inside the selectable bounds', async () => {
+    const element = await createCalendar({
+      defaultValue: '2024-06-15',
+      min: '2024-06-10',
+      max: '2025-02-02',
+      locale: 'en-US',
+    });
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[part="year-trigger"]')?.click();
+    await element.updateComplete;
+    expect(
+      element.shadowRoot?.querySelector<HTMLButtonElement>('[data-year="2023"]')?.disabled
+    ).toBe(true);
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[data-year="2025"]')?.click();
+    await element.updateComplete;
+    expect(element.shadowRoot?.querySelector('[part="heading"]')?.textContent).toContain(
+      'February'
+    );
+    expect(
+      element.shadowRoot?.querySelector<HTMLButtonElement>('[data-date="2025-02-02"]')
+    ).not.toBeNull();
+  });
+
+  it('associates each heading button with its own picker panel', async () => {
+    const first = await createCalendar({ defaultValue: '2024-05-15' });
+    const second = await createCalendar({ defaultValue: '2024-06-15' });
+    const firstTrigger =
+      first.shadowRoot?.querySelector<HTMLButtonElement>('[part="month-trigger"]');
+    const secondTrigger =
+      second.shadowRoot?.querySelector<HTMLButtonElement>('[part="month-trigger"]');
+    const firstPanelId = firstTrigger?.getAttribute('aria-controls');
+    const secondPanelId = secondTrigger?.getAttribute('aria-controls');
+
+    expect(firstPanelId).not.toBe(secondPanelId);
+    firstTrigger?.click();
+    secondTrigger?.click();
+    await Promise.all([first.updateComplete, second.updateComplete]);
+    expect(first.shadowRoot?.getElementById(firstPanelId ?? '')).not.toBeNull();
+    expect(second.shadowRoot?.getElementById(secondPanelId ?? '')).not.toBeNull();
+  });
+
+  it('disables direct month and year navigation when disabled', async () => {
+    const element = await createCalendar({ disabled: true });
+
+    expect(
+      element.shadowRoot?.querySelector<HTMLButtonElement>('[part="month-trigger"]')?.disabled
+    ).toBe(true);
+    expect(
+      element.shadowRoot?.querySelector<HTMLButtonElement>('[part="year-trigger"]')?.disabled
+    ).toBe(true);
   });
 
   it('marks today and selected state without relying on color alone', async () => {

@@ -523,7 +523,7 @@ No events.
 
 ### `calendar` (`<cosm-calendar>`)
 
-Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional date bounds.
+Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional bounds. Month and year can be selected directly.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -532,7 +532,7 @@ Selects one Gregorian date from an inline, localized calendar with keyboard navi
 | `min` | string | — | Earliest selectable date in YYYY-MM-DD format, inclusive. |
 | `max` | string | — | Latest selectable date in YYYY-MM-DD format, inclusive. |
 | `locale` | string | — | BCP 47 locale for month and weekday names, week start, and text direction; defaults to the environment locale. Invalid locale identifiers are rejected. |
-| `disabled` | boolean | `false` | Disables date selection and month navigation. |
+| `disabled` | boolean | `false` | Disables date selection and calendar navigation. |
 
 **Events**
 
@@ -552,6 +552,10 @@ Selects one Gregorian date from an inline, localized calendar with keyboard navi
 | `weekday` | Localized weekday heading. |
 | `grid` | Seven-column date grid. |
 | `day` | Date button, including adjacent-month dates. |
+| `month-trigger` | Button that opens direct month selection. |
+| `year-trigger` | Button that opens direct year selection. |
+| `month-option` | Month choice in the month selection view. |
+| `year-option` | Year choice in the year selection view. |
 
 **CSS custom properties**
 
