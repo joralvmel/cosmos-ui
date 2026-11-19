@@ -93,14 +93,15 @@ References reviewed:
 
 ## Validation evidence
 
-Verified on Windows on 2026-11-18. File presence and native DOM mocks are not device evidence.
+Platform acceptance verified on Windows on 2026-11-18; repository checks rerun on 2026-11-19.
+File presence and native DOM mocks are not device evidence.
 
 | Area | Result | Evidence |
 | --- | --- | --- |
 | Contract and platform tests | Passed | Shared scenarios and drift tests in the Badge test files in `packages/elements`, `packages/react`, `packages/angular` and `packages/native`; Playground optional-reference coverage and core snippet-generation tests. |
 | Formatting | Passed | `npx biome ci .`; existing schema 2.6.6 / CLI 2.6.7 informational notice remains. |
 | Affected package checks | Passed | `npx turbo run typecheck test build --filter=@joralvmel/cosmos-core --filter=@joralvmel/cosmos-elements --filter=@joralvmel/cosmos-react --filter=@joralvmel/cosmos-angular --filter=@joralvmel/cosmos-native --filter=@joralvmel/cosmos-docs --filter=@joralvmel/cosmos-native-demo`. |
-| Repository-wide checks | Failed, pre-existing | Full `npx turbo run typecheck test build` fails only the generator's `other targets > adds a theme after the existing ones` assertion, which expects exactly `[cosmos, nebula, aurora]` after the baseline added more themes. Neither the test nor theme definitions changed in this task. All 48 tasks pass with `--filter='!@joralvmel/cosmos-generator'`; the generator failure is not hidden or fixed here. |
+| Repository-wide checks | Passed (2026-11-19) | Full `npx turbo run typecheck test build`: all 49 tasks pass, including the generator, without exclusions. `npx biome ci .` and `npm run check-terms` also pass. |
 | Terms and structure | Passed | `npm run check-terms`; structure coverage in the tools suite; `git diff --check`. |
 | Web component | Passed | Chromium docs Playground: all 180 combinations of six built-in themes, two modes, three variants and five tones render; small/medium/large controls, icon add/remove, generated snippets and static semantics verified. |
 | React | Passed | Actual compiled wrapper mounted in a temporary Vite browser harness; keyboard activation updates text, tone, variant, size and icon, then resets and clears the icon. |
@@ -118,5 +119,15 @@ development server had stale optimized-dependency 504 responses during rebuilds;
 against the production build. Its missing favicon and build-time i18n/sitemap notices are existing
 site diagnostics, not Badge failures.
 
-Badge remains `in-progress` solely to disclose the unresolved repository-wide generator check.
-Its catalog note must be revisited after that baseline issue is fixed and full validation is green.
+### Readiness follow-up
+
+The initial review kept Badge `in-progress` because the repository-wide generator theme test
+failed. On 2026-11-19, the generator's registry insertion was corrected to preserve trailing commas
+without inserting an empty array entry. Its regression tests now add a new, non-colliding theme
+and assert that every existing theme remains in order, followed by exactly one new entry. They
+cover the actual multiline registry with a trailing comma, an inline registry and a multiline
+registry without a trailing comma; they no longer assume a fixed list of built-in themes.
+
+All 20 generator tests and all 49 repository tasks pass. Badge is now `stable`: its accepted
+platform implementation and runtime evidence above remain unchanged, and the repository-wide
+blocker is resolved. Optional iOS and manual screen-reader checks remain unverified, not passed.

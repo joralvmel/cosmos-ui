@@ -190,7 +190,7 @@ export function plan(target, n, options = {}) {
         {
           type: 'insert',
           path: 'packages/tokens/src/themes.ts',
-          before: /\];\nexport const defaultThemeName/,
+          before: /(?<=\w)(?=,?\s*\];\nexport const defaultThemeName)/,
           content: `, ${n.camel}`,
         },
         { type: 'create', path: `.changeset/add-${n.kebab}-theme.md`, content: theme.changeset(n) },
