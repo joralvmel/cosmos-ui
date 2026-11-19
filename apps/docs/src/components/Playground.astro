@@ -25,13 +25,15 @@ const fieldActionLabels =
       }
     : name === 'icon-button'
       ? { label: s.playground.iconButtonLabel }
-      : name === 'listbox'
-        ? { label: s.playground.listboxLabel }
-        : name === 'checkbox'
-          ? { label: s.playground.checkboxLabel }
-          : name === 'switch'
-            ? { label: s.playground.switchLabel }
-            : {};
+      : name === 'textarea'
+        ? { label: s.playground.textareaLabel }
+        : name === 'listbox'
+          ? { label: s.playground.listboxLabel }
+          : name === 'checkbox'
+            ? { label: s.playground.checkboxLabel }
+            : name === 'switch'
+              ? { label: s.playground.switchLabel }
+              : {};
 const web = supports(contract, 'web');
 const hasDemo = getStatusReport().components.find(item => item.name === name)?.pieces.nativeDemo;
 const nativeDemoUrl = hasDemo

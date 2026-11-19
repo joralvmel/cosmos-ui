@@ -10,12 +10,14 @@ import {
   listboxValueExamples,
   popoverContract,
   switchContract,
+  textareaContract,
   textFieldContract,
 } from '@joralvmel/cosmos-core';
 import type { CosmBadge } from '@joralvmel/cosmos-elements/badge';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
 import type { CosmSwitch } from '@joralvmel/cosmos-elements/switch';
 import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
+import type { CosmTextarea } from '@joralvmel/cosmos-elements/textarea';
 import { iconCatalog, searchIconCatalog } from '@joralvmel/cosmos-icons';
 import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
@@ -28,6 +30,7 @@ import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
 import '@joralvmel/cosmos-elements/text-field';
+import '@joralvmel/cosmos-elements/textarea';
 import '@joralvmel/cosmos-elements/switch';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -52,6 +55,9 @@ const labels: PlaygroundLabels = {
   dark: 'Dark',
   nativeDemo: 'Native demo',
   switchLabel: 'Enable notifications',
+  textareaLabel: 'Message',
+  textareaInvalid:
+    'Use a non-empty label, positive row count and nonnegative whole maximum length.',
   tabs: { html: 'HTML', react: 'React', angular: 'Angular', native: 'React Native' },
   textFieldDefaults: {
     label: 'Email address',
@@ -116,6 +122,45 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('initializes Textarea with a required localized label and validates rows and lengths', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-textarea') as CosmTextarea;
+    target.dataset.playgroundTarget = '';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: textareaContract,
+      content: 'must not become child content',
+      labels: {
+        ...labels,
+        textareaLabel: 'Mensaje',
+        textareaInvalid: 'Etiqueta o filas no válidas.',
+      },
+      themes: [],
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+
+    await target.updateComplete;
+    expect(target.label).toBe('Mensaje');
+    expect(target.childNodes).toHaveLength(0);
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).toContain('Mensaje');
+    }
+
+    const label = root.querySelector<CosmTextField>('[data-prop="label"]');
+    if (!label) throw new Error('Missing Textarea label control');
+    await editTextField(label, '');
+    expect(target.label).toBe('Mensaje');
+    expect(root.querySelector('[role="status"]')?.textContent).toContain(
+      'Etiqueta o filas no válidas.'
+    );
+
+    controller.set('rows', 0);
+    expect(target.rows).toBe(4);
+    controller.set('maxLength', -1);
+    expect(target.maxLength).toBeUndefined();
+  });
+
   it('starts optional icon references empty, supports selection and clears them across four snippets', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-badge') as CosmBadge;

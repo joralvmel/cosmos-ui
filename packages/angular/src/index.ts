@@ -6,6 +6,7 @@ import { CosmListboxComponent } from './components/listbox.component.js';
 import { CosmPopoverComponent } from './components/popover.component.js';
 import { CosmSwitchComponent } from './components/switch.component.js';
 import { CosmTextFieldComponent } from './components/text-field.component.js';
+import { CosmTextareaComponent } from './components/textarea.component.js';
 
 export type {
   ButtonPressDetail,
@@ -13,6 +14,7 @@ export type {
   ListboxSelectionChangeDetail,
   PressSource,
   SwitchCheckedChangeDetail,
+  TextareaChangeDetail,
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
@@ -34,6 +36,7 @@ export const COSMOS_COMPONENTS = [
   CosmSwitchComponent,
   CosmBadgeComponent,
   CosmCalendarComponent,
+  CosmTextareaComponent,
 ] as const;
 export { CosmBadgeComponent } from './components/badge.component.js';
 export { CosmCalendarComponent } from './components/calendar.component.js';
@@ -43,3 +46,4 @@ export { CosmListboxComponent } from './components/listbox.component.js';
 export { CosmPopoverComponent } from './components/popover.component.js';
 export { CosmSwitchComponent } from './components/switch.component.js';
 export { CosmTextFieldComponent } from './components/text-field.component.js';
+export { CosmTextareaComponent } from './components/textarea.component.js';

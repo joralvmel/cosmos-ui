@@ -76,6 +76,10 @@
       "types": "./dist/components/calendar/cosm-calendar.d.ts",
       "default": "./dist/components/calendar/cosm-calendar.js"
     },
+    "./textarea": {
+      "types": "./dist/components/textarea/cosm-textarea.d.ts",
+      "default": "./dist/components/textarea/cosm-textarea.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

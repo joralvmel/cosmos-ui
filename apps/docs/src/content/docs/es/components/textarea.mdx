@@ -1,0 +1,97 @@
+---
+title: Textarea
+description: Un control multilínea etiquetado para texto sin formato con comportamiento de formulario nativo en la web.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="textarea" />
+
+`<cosm-textarea>` acepta texto sin formato en varias líneas. Úsalo para mensajes largos o notas;
+para una sola línea, usa [Text field](/es/components/text-field/). Es obligatorio proporcionar una
+etiqueta `label` no vacía. Enter inserta una línea nueva; el control no agrega un comportamiento de
+envío personalizado al pulsar Enter.
+
+En la web utiliza un `<textarea>` nativo dentro de un elemento personalizado asociado a formularios.
+`name` y el valor actual participan en el envío del formulario; las restricciones nativas de
+`required` y longitud máxima se conservan. Al restablecer el formulario, el uso autónomo recupera
+`defaultValue`. En el uso controlado, el restablecimiento propone un valor y espera a que la
+aplicación actualice `value`.
+
+## Playground
+
+<Playground name="textarea" content="Escribe tu mensaje aquí." />
+
+## Variantes
+
+`variant` cambia la superficie del control; `size` cambia la tipografía y el relleno visuales.
+`rows` determina las líneas visibles independientemente del tamaño visual.
+
+<Preview>
+  <cosm-textarea label="Contorno" default-value="Un mensaje de varias líneas." rows="4" />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Relleno" variant="filled" size="lg" default-value="Un control relleno más grande." rows="3" />
+</Preview>
+
+## Estados
+
+El texto de ayuda y de error permanece asociado al editor. Usa `invalid` para indicar una
+validación externa; `error` muestra el mensaje y marca el control como no válido.
+
+En la web, al pasar el puntero sobre un control habilitado y válido cambia el color del borde.
+Al enfocarlo también se aplica un fondo tenue del tema y un indicador de foco visible; los
+controles deshabilitados o no válidos no reciben el estilo de hover.
+
+<Preview>
+  <cosm-textarea label="Notas del proyecto" help-text="Escribe un mensaje conciso." rows="3" />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Mensaje obligatorio" required error="Añade un mensaje para continuar." invalid />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Mensaje de solo lectura" read-only default-value="Este texto se puede seleccionar, pero no editar." />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="No disponible" disabled default-value="Este control está deshabilitado." />
+</Preview>
+
+## Accesibilidad
+
+- Proporciona un `label` no vacío. `labelHidden` lo oculta visualmente sin quitar el nombre
+  accesible. El texto de marcador de posición nunca sustituye a la etiqueta.
+- `helpText` y `error` se asocian al editor nativo mediante `aria-describedby`. El estado no válido
+  se comunica con `aria-invalid`.
+- El editor conserva el comportamiento de teclado nativo de textarea, incluida la inserción de
+  líneas con Enter, el foco nativo y la semántica de obligatoriedad, deshabilitación y solo lectura.
+- Los tokens de Cosmos admiten los modos claro y oscuro y los temas incluidos. Se respeta la
+  preferencia de movimiento reducido; el control no necesita animaciones.
+
+## API
+
+<ApiTable name="textarea" />
+
+El componente web expone las partes CSS `label`, `control`, `textarea`, `help` y `error`. Sus
+propiedades personalizadas son `--cosm-textarea-background`, `--cosm-textarea-color`,
+`--cosm-textarea-placeholder`, `--cosm-textarea-border`, `--cosm-textarea-focus` y
+`--cosm-textarea-radius`.
+
+React Native sigue el tema activo de Cosmos y acepta `style`, `inputStyle`, `labelStyle`,
+`helpStyle`, `errorStyle` y un objeto `appearance` (`background`, `text`, `placeholder`, `border`,
+`focus` y `radius`) para adaptar los estilos a la plataforma.
+
+## Eventos por plataforma
+
+<EventsTable name="textarea" />
+
+En React, `onChange`; y en Angular, `valueChange` reciben el `CustomEvent` original del DOM. El
+texto propuesto está en `event.detail.value`. La función `onValueChange` de React Native recibe el
+detalle `{ value }`.

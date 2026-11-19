@@ -1,0 +1,95 @@
+---
+title: Textarea
+description: A labeled multiline plain-text control with native web form behavior.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="textarea" />
+
+`<cosm-textarea>` accepts plain text across multiple lines. Use it for longer messages or notes;
+use [Text field](/components/text-field/) for single-line input. A non-empty `label` is required.
+Enter inserts a newline, and the control does not add submit-on-enter behavior.
+
+On the web it uses a native `<textarea>` inside a form-associated custom element. The `name` and
+current value participate in form submission, required and maximum-length constraints remain
+native, and reset restores `defaultValue` for autonomous use. Controlled reset dispatches a value
+proposal and waits for the owner to update `value`.
+
+## Playground
+
+<Playground name="textarea" content="Your message goes here." />
+
+## Variants
+
+`variant` changes the control surface; `size` changes its visual typography and padding. `rows`
+sets the number of visible lines independently of visual size.
+
+<Preview>
+  <cosm-textarea label="Outlined" default-value="A message with multiple lines." rows="4" />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Filled" variant="filled" size="lg" default-value="A larger filled control." rows="3" />
+</Preview>
+
+## States
+
+Help and error text stay associated with the editor. Set `invalid` for external validation state;
+`error` both presents the message and marks the control invalid.
+
+On Web, hovering an enabled valid control changes its border color. Focusing it also applies a
+subtle themed background and visible focus ring; disabled and invalid controls do not receive the
+hover treatment.
+
+<Preview>
+  <cosm-textarea label="Project notes" help-text="Keep the message concise." rows="3" />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Required message" required error="Add a message before continuing." invalid />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Read-only message" read-only default-value="This text can be selected but not edited." />
+</Preview>
+
+<Preview>
+  <cosm-textarea label="Unavailable" disabled default-value="This control is disabled." />
+</Preview>
+
+## Accessibility
+
+- Supply a non-empty `label`; `labelHidden` hides it visually without removing its accessible
+  name. A placeholder is never a substitute for the label.
+- `helpText` and `error` are connected to the native editor with `aria-describedby`. Invalid state
+  is exposed with `aria-invalid`.
+- The editor retains native textarea keyboard behavior, including newline insertion with Enter,
+  native focus, required validation and disabled/read-only semantics.
+- Cosmos tokens support light and dark modes and the built-in themes. Reduced-motion preferences
+  are respected; the control has no required animation.
+
+## API
+
+<ApiTable name="textarea" />
+
+The web component exposes `label`, `control`, `textarea`, `help`, and `error` CSS parts. Its custom
+properties are `--cosm-textarea-background`, `--cosm-textarea-color`,
+`--cosm-textarea-placeholder`, `--cosm-textarea-border`, `--cosm-textarea-focus`, and
+`--cosm-textarea-radius`.
+
+React Native follows the active Cosmos theme and accepts `style`, `inputStyle`, `labelStyle`,
+`helpStyle`, `errorStyle`, and an `appearance` object (`background`, `text`, `placeholder`,
+`border`, `focus`, and `radius`) for platform-appropriate customization.
+
+## Events by platform
+
+<EventsTable name="textarea" />
+
+`onChange` in React and `valueChange` in Angular receive the original DOM `CustomEvent`; read the
+proposed string from `event.detail.value`. The React Native `onValueChange` callback receives the
+detail object `{ value }`.

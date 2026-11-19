@@ -50,6 +50,10 @@ export class EmailComponent {
 Reactive Forms handles programmatic writes, touched/disabled state, reset and the configured
 `updateOn` strategy.
 
+`cosm-textarea` provides the same `ControlValueAccessor` integration for multiline messages. Its
+`(valueChange)` output re-emits the original `CustomEvent`; use `$event.detail.value` when handling
+the proposal directly.
+
 Text fields also forward `iconFocusScope` (`control` by default, or `input`) for optional decorative
 icon focus colors. Use CSS classes or Angular style bindings with
 `--cosm-text-field-start-icon-color`, `--cosm-text-field-start-icon-focus-color`, and the matching

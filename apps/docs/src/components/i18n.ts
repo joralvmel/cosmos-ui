@@ -67,6 +67,9 @@ const strings = {
       popoverCloseLabel: 'Close',
       popoverInvalid: 'Use a non-negative distance and a non-empty close label.',
       checkboxLabel: 'Accept terms',
+      textareaLabel: 'Message',
+      textareaInvalid:
+        'Use a non-empty label, positive row count and nonnegative whole maximum length.',
       switchLabel: 'Enable notifications',
       switchInvalid: 'Use a non-empty label and a positive size.',
       listboxLabel: 'Choose produce',
@@ -219,6 +222,9 @@ const strings = {
       popoverCloseLabel: 'Cerrar',
       popoverInvalid: 'Usa una distancia no negativa y una etiqueta de cierre que no esté vacía.',
       checkboxLabel: 'Acepto los términos',
+      textareaLabel: 'Mensaje',
+      textareaInvalid:
+        'Usa una etiqueta no vacía, un número positivo de filas y una longitud máxima entera no negativa.',
       switchLabel: 'Activar notificaciones',
       switchInvalid: 'Usa una etiqueta no vacía y un tamaño positivo.',
       listboxLabel: 'Elige productos',

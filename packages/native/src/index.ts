@@ -12,6 +12,7 @@ export type {
   PopoverSide,
   PressSource,
   SwitchCheckedChangeDetail,
+  TextareaChangeDetail,
 } from '@joralvmel/cosmos-core';
 export type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
 export { Badge, type BadgeProps, badgePropNames } from './components/badge.js';
@@ -39,6 +40,12 @@ export {
 } from './components/popover.js';
 export { Switch, type SwitchProps, switchPropNames } from './components/switch.js';
 export { TextField, type TextFieldProps, textFieldPropNames } from './components/text-field.js';
+export {
+  Textarea,
+  type TextareaAppearance,
+  type TextareaProps,
+  textareaPropNames,
+} from './components/textarea.js';
 export {
   CosmosThemeProvider,
   type CosmosThemeProviderProps,

@@ -63,6 +63,8 @@ export interface PlaygroundLabels {
   popoverCloseLabel?: string;
   popoverInvalid?: string;
   checkboxLabel?: string;
+  textareaLabel?: string;
+  textareaInvalid?: string;
   switchLabel?: string;
   switchInvalid?: string;
   listboxLabel?: string;
@@ -196,6 +198,9 @@ export function initPlayground(
   }
   if (contract.name === 'checkbox') {
     values.label = labels.checkboxLabel ?? 'Accept terms';
+  }
+  if (contract.name === 'textarea') {
+    values.label = labels.textareaLabel ?? 'Message';
   }
   if (contract.name === 'switch') {
     values.label = labels.switchLabel ?? 'Enable notifications';
@@ -939,6 +944,26 @@ export function initPlayground(
               ? (labels.switchInvalid ?? 'Use a non-empty label and a positive size.')
               : (labels.textFieldInvalid ??
                 'Enter a non-empty label or a valid positive size/length.');
+          return;
+        }
+        referenceStatus.textContent = '';
+      }
+      if (contract.name === 'textarea') {
+        const nextRows = name === 'rows' ? value : values.rows;
+        const nextMaxLength = name === 'maxLength' ? value : values.maxLength;
+        const nextLabel = name === 'label' ? value : values.label;
+        const invalidLabel = typeof nextLabel !== 'string' || !nextLabel.trim();
+        const invalidRows =
+          typeof nextRows !== 'number' || !Number.isInteger(nextRows) || nextRows < 1;
+        const invalidLength =
+          nextMaxLength !== undefined &&
+          (typeof nextMaxLength !== 'number' ||
+            !Number.isInteger(nextMaxLength) ||
+            nextMaxLength < 0);
+        if (invalidLabel || invalidRows || invalidLength) {
+          referenceStatus.textContent =
+            labels.textareaInvalid ??
+            'Use a non-empty label, positive row count and nonnegative whole maximum length.';
           return;
         }
         referenceStatus.textContent = '';
