@@ -6,6 +6,7 @@ export type {
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
+export { CosmBadge } from './components/badge/cosm-badge.js';
 export {
   type ButtonSize,
   type ButtonTone,

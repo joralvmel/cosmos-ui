@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import {
+  badgeContract,
   buttonContract,
   checkboxContract,
   iconButtonContract,
@@ -11,6 +12,7 @@ import {
   switchContract,
   textFieldContract,
 } from '@joralvmel/cosmos-core';
+import type { CosmBadge } from '@joralvmel/cosmos-elements/badge';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
 import type { CosmSwitch } from '@joralvmel/cosmos-elements/switch';
 import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
@@ -18,7 +20,9 @@ import { iconCatalog, searchIconCatalog } from '@joralvmel/cosmos-icons';
 import { heart } from '@joralvmel/cosmos-icons/heart';
 import { house } from '@joralvmel/cosmos-icons/house';
 import { search } from '@joralvmel/cosmos-icons/search';
+import { star } from '@joralvmel/cosmos-icons/star';
 import '@joralvmel/cosmos-elements/button';
+import '@joralvmel/cosmos-elements/badge';
 import '@joralvmel/cosmos-elements/checkbox';
 import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
@@ -112,6 +116,61 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('starts optional icon references empty, supports selection and clears them across four snippets', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-badge') as CosmBadge;
+    target.dataset.playgroundTarget = '';
+    target.textContent = 'Badge';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: badgeContract,
+      content: 'Badge',
+      labels,
+      themes: [],
+      referenceValues: { IconDefinition: { heart, house, search, star } },
+      storage: { getItem: () => null, setItem: () => {} },
+    });
+
+    await target.updateComplete;
+    const control = root.querySelector<HTMLSelectElement>('[data-prop="startIcon"]');
+    if (!control) throw new Error('Missing Badge startIcon control');
+    expect(control.options[0]?.textContent).toBe('None');
+    expect(control.value).toBe('');
+    expect(target.startIcon).toBeUndefined();
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).not.toContain('cosmos-icons/');
+      expect(controller.code(platform)).not.toContain('startIcon');
+      expect(controller.code(platform)).toContain('>Badge</');
+    }
+
+    control.value = 'heart';
+    control.dispatchEvent(new Event('input'));
+    await target.updateComplete;
+    expect(target.startIcon).toBe(heart);
+    for (const [platform, expected] of [
+      ['html', 'element.startIcon = heart;'],
+      ['react', 'startIcon={heart}'],
+      ['angular', '[startIcon]="heart"'],
+      ['native', 'startIcon={heart}'],
+    ] as const) {
+      controller.select(platform);
+      expect(controller.code()).toContain(expected);
+      expect(controller.code()).toContain('@joralvmel/cosmos-icons/heart');
+    }
+    expect(controller.code('native')).not.toContain('<Text>Badge</Text>');
+
+    control.value = '';
+    control.dispatchEvent(new Event('input'));
+    await target.updateComplete;
+    expect(controller.values.startIcon).toBeUndefined();
+    expect(target.startIcon).toBeUndefined();
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).not.toContain('startIcon');
+      expect(controller.code(platform)).not.toContain('cosmos-icons/');
+    }
+  });
+
   it('initializes Switch with a required label and no child content on every platform', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-switch');

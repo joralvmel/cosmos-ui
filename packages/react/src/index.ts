@@ -7,6 +7,7 @@ export type {
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
+export { Badge, type BadgeProps, badgeEvents } from './components/badge.js';
 export { Button, type ButtonProps, buttonEvents } from './components/button.js';
 export { Checkbox, type CheckboxProps, checkboxEvents } from './components/checkbox.js';
 export { Icon, type IconProps, iconEvents } from './components/icon.js';

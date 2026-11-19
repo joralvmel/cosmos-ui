@@ -68,6 +68,10 @@
       "types": "./dist/components/switch/cosm-switch.d.ts",
       "default": "./dist/components/switch/cosm-switch.js"
     },
+    "./badge": {
+      "types": "./dist/components/badge/cosm-badge.d.ts",
+      "default": "./dist/components/badge/cosm-badge.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

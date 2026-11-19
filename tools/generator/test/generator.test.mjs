@@ -161,13 +161,35 @@ describe('component target', () => {
 });
 
 describe('other targets', () => {
-  it('adds a theme after the existing ones', () => {
-    const root = copyRepoFiles();
-    apply(root, plan('theme', names('aurora'), { seed: 'oklch(0.6 0.14 160)' }));
-    const themes = readFileSync(join(root, 'packages/tokens/src/themes.ts'), 'utf8');
-    expect(themes).toContain("name: 'aurora'");
-    expect(themes).toMatch(/\[cosmos, nebula, aurora\]/);
-  });
+  it.each(['existing', 'inline', 'multiline without trailing comma'])(
+    'adds a theme after the existing ones (%s registry)',
+    format => {
+      const root = copyRepoFiles();
+      const path = join(root, 'packages/tokens/src/themes.ts');
+      const registry = /builtInThemes[^=]*=\s*\[([\s\S]*?)\];/;
+      const registeredThemes = source =>
+        source
+          .match(registry)[1]
+          .trim()
+          .replace(/,$/, '')
+          .split(',')
+          .map(name => name.trim());
+      const original = readFileSync(path, 'utf8');
+      const existing = registeredThemes(original);
+      if (format !== 'existing') {
+        const entries =
+          format === 'inline' ? existing.join(', ') : `\n  ${existing.join(',\n  ')}\n`;
+        writeFileSync(path, original.replace(registry, `builtInThemes = [${entries}];`));
+      }
+
+      apply(root, plan('theme', names('test-palette'), { seed: 'oklch(0.6 0.14 160)' }));
+      const themes = readFileSync(path, 'utf8');
+      expect(themes).toContain("name: 'test-palette'");
+      expect(themes).toContain("primary: 'oklch(0.6 0.14 160)'");
+      expect(themes.match(/export const testPalette:/g)).toHaveLength(1);
+      expect(registeredThemes(themes)).toEqual([...existing, 'testPalette']);
+    }
+  );
 
   it('adds a chart layout', () => {
     const root = copyRepoFiles();

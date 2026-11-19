@@ -177,9 +177,9 @@ export function initPlayground(
   for (const [name, spec] of Object.entries(contract.props)) {
     values[name] =
       spec.type === 'reference'
-        ? contract.name === 'text-field'
-          ? undefined
-          : spec.example
+        ? spec.required && !contract.states.some(state => state.prop === name)
+          ? spec.example
+          : undefined
         : spec.default;
   }
   for (const state of contract.states) {
@@ -417,10 +417,15 @@ export function initPlayground(
           : spec.type === 'reference'
             ? (spec.options ?? [])
             : unionChoices;
-      if (contract.name === 'text-field' && (spec.type === 'reference' || enumUnion)) {
+      const stateReference =
+        spec.type === 'reference' && contract.states.some(state => state.prop === name);
+      if (
+        (spec.type === 'reference' && !spec.required && !stateReference) ||
+        (contract.name === 'text-field' && enumUnion)
+      ) {
         control.append(element('option', { value: '' }, labels.none ?? 'None'));
       }
-      if (spec.type === 'reference' && contract.states.some(state => state.prop === name)) {
+      if (stateReference) {
         control.append(element('option', { value: '' }, labels.autonomous ?? 'Autonomous'));
       }
       for (const value of choices) {
@@ -431,6 +436,7 @@ export function initPlayground(
       if (fieldSize) {
         control.append(element('option', { value: 'custom' }, labels.customSize ?? 'Custom'));
       }
+      control.value = values[name] === undefined ? '' : String(values[name]);
       if (catalog) {
         const catalogControls = element('div', { class: 'cosm-icon-toolbar' });
         if (contract.name === 'icon') iconToolbar = catalogControls;
@@ -676,9 +682,9 @@ export function initPlayground(
                 control.value.trim() !== '' &&
                 Number.isFinite(Number(control.value))
               ? Number(control.value)
-              : ((contract.name === 'text-field' && (spec.type === 'reference' || enumUnion)) ||
-                    (spec.type === 'reference' &&
-                      contract.states.some(state => state.prop === name))) &&
+              : ((spec.type === 'reference' &&
+                    (!spec.required || contract.states.some(state => state.prop === name))) ||
+                    (contract.name === 'text-field' && enumUnion)) &&
                   control.value === ''
                 ? undefined
                 : control.value;

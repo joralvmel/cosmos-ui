@@ -100,8 +100,10 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'data-display',
     batch: 'A',
     priority: 1,
-    dependsOn: [],
+    dependsOn: ['icon'],
     pattern: html('text-level-semantics.html'),
+    status: 'stable',
+    notes: ['Uses the stable icon component for its optional decorative leading icon.'],
   }),
   entry({
     name: 'spinner',

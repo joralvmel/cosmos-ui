@@ -18,6 +18,21 @@ export default function App() {
 
 `useTheme()` returns the active theme (colors, spacing, radius, typography as numbers).
 
+## Badge
+
+`Badge` displays a static status/category label or caller-formatted count. Native content is a
+required string child; it wraps without truncation and keeps the platform's default font scaling.
+Use `style` and `textStyle` for container and label overrides. Badge is not interactive and does
+not announce changing values.
+
+```tsx
+import { Badge } from '@joralvmel/cosmos-native';
+
+export function Status() {
+  return <Badge variant="soft" tone="success">Ready</Badge>;
+}
+```
+
 ## Text field
 
 `TextField` supports single-line text, email, password, telephone, URL and search input, semantic or
