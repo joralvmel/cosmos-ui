@@ -7,6 +7,7 @@ import { listboxContract } from './specs/listbox.js';
 import { popoverContract } from './specs/popover.js';
 import { switchContract } from './specs/switch.js';
 import { textFieldContract } from './specs/text-field.js';
+import { textareaContract } from './specs/textarea.js';
 
 export {
   buildOrder,
@@ -130,6 +131,7 @@ export const contracts = {
   switch: switchContract,
   badge: badgeContract,
   calendar: calendarContract,
+  textarea: textareaContract,
 } as const;
 export { badgeContract } from './specs/badge.js';
 export {
@@ -223,3 +225,10 @@ export {
   textFieldScenarios,
   textFieldScenariosFor,
 } from './specs/text-field.scenarios.js';
+export { type TextareaChangeDetail, textareaContract } from './specs/textarea.js';
+export {
+  type TextareaAction,
+  type TextareaScenario,
+  textareaScenarios,
+  textareaScenariosFor,
+} from './specs/textarea.scenarios.js';

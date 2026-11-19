@@ -45,6 +45,20 @@ value, so ordinary synchronous `setState` handlers do not lose rapid keystrokes.
 need to call `flushSync`; deferred updates still leave the previous controlled value in place
 until the owner accepts the proposal.
 
+For multiline plain text, use `Textarea`. It uses the same controlled-value event contract and
+preserves native newline behavior:
+
+```tsx
+import { Textarea } from '@joralvmel/cosmos-react';
+
+<Textarea
+  label="Message"
+  value={message}
+  onChange={event => setMessage(event.detail.value)}
+  rows={4}
+/>;
+```
+
 For independent icon colors, put the text-field CSS hooks on a `className` or `style`:
 `--cosm-text-field-start-icon-color`, `--cosm-text-field-start-icon-focus-color`, and the corresponding
 `end-icon` hooks. `iconFocusScope="control"` (default) includes input/action focus; `"input"` limits

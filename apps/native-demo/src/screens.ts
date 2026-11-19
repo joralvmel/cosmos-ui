@@ -12,7 +12,7 @@ export const screens = [
     title: 'Icon Button',
     description: 'Labeled icon actions, variants and toggle states.',
   },
-  { route: '/popover', title: 'Popover', description: 'TODO(generator): short description.' },
+  { route: '/popover', title: 'Popover', description: 'Anchored floating content and placement.' },
   {
     route: '/listbox',
     title: 'Listbox',
@@ -34,4 +34,5 @@ export const screens = [
     title: 'Calendar',
     description: 'Date selection, locale, bounds and states.',
   },
+  { route: '/textarea', title: 'Textarea', description: 'Labeled multiline text and states.' },
 ] as const;

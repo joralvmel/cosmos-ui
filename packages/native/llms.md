@@ -385,6 +385,43 @@ export function Example() {
   );
 }
 ```
+### `Textarea`
+
+Accepts multiline plain text with an accessible label, optional help and error text, and native form behavior on the web.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Accessible name for the editable control. It is rendered above the control unless visually hidden. |
+| `labelHidden` | boolean | `false` | Visually hides the label while keeping it available to assistive technology. |
+| `value` | string | — | Current text. When bound, edits are proposals and the component waits for the owner to supply the accepted value. |
+| `defaultValue` | string | `` | Initial value for autonomous use. Web form reset restores this value; it does not control subsequent edits. |
+| `rows` | number | `4` | Visible line count of the multiline editor. It is independent of the visual size. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Visual treatment of the editable control. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Visual size of the editable control, independent of rows. |
+| `placeholder` | string | — | Short input hint; it never replaces the accessible label. |
+| `helpText` | string | — | Optional supporting text associated with the editable control. |
+| `error` | string | — | Optional externally supplied error text associated with the editable control. |
+| `invalid` | boolean | `false` | External invalid state, independent of browser constraints or consumer business validation. |
+| `required` | boolean | `false` | Exposes required semantics. On web, participates in native HTML constraint validation. |
+| `disabled` | boolean | `false` | Disables editing and interaction. On web, follows disabled fieldsets and excludes the value from form submission. |
+| `readOnly` | boolean | `false` | Prevents editing while remaining focusable and form-submittable on web; distinct from disabled. |
+| `maxLength` | number | — | Maximum number of characters. Web uses native HTML length constraints and native applies supported input limits. |
+
+Events: `onValueChange` → `TextareaChangeDetail`.
+
+```tsx
+import { Textarea } from '@joralvmel/cosmos-native';
+
+export function Example() {
+  return (
+    <Textarea
+      label="Textarea"
+      onValueChange={detail => console.log(detail)}
+    >
+    </Textarea>
+  );
+}
+```
 
 ## Themes
 

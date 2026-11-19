@@ -3,6 +3,7 @@ export type {
   ListboxSelectionChangeDetail,
   PressSource,
   SwitchCheckedChangeDetail,
+  TextareaChangeDetail,
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
@@ -31,5 +32,10 @@ export {
   type TextFieldType,
   type TextFieldVariant,
 } from './components/text-field/cosm-text-field.js';
+export {
+  CosmTextarea,
+  type TextareaSize,
+  type TextareaVariant,
+} from './components/textarea/cosm-textarea.js';
 export { CosmElement, type EmitOptions } from './internal/cosm-element.js';
 export { define } from './internal/define.js';

@@ -77,6 +77,23 @@ action icons, and require no consumer focus handlers. Use native color values, n
 The implementation is stable with explicitly deferred platform and accessibility checks;
 see the [design evidence](../../docs/design/text-field.md) for what is verified and what is not.
 
+## Textarea
+
+`Textarea` uses a native multiline `TextInput`. Bind `value` and update it from `onValueChange`,
+or use `defaultValue` for autonomous editing. `rows` maps to the native visible-line setting;
+Enter inserts a newline. Native style props and the `appearance` colors/radius customize its
+theme-derived presentation. React Native does not emulate HTML form submission or required
+validation.
+
+```tsx
+<Textarea
+  label="Message"
+  value={message}
+  onValueChange={({ value }) => setMessage(value)}
+  rows={4}
+/>
+```
+
 ## License
 
 MIT

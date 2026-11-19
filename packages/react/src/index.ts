@@ -4,6 +4,7 @@ export type {
   ListboxSelectionChangeDetail,
   PressSource,
   SwitchCheckedChangeDetail,
+  TextareaChangeDetail,
   TextFieldChangeDetail,
   TextFieldSubmitDetail,
 } from '@joralvmel/cosmos-core';
@@ -17,3 +18,4 @@ export { Listbox, type ListboxProps, listboxEvents } from './components/listbox.
 export { Popover, type PopoverProps, popoverEvents } from './components/popover.js';
 export { Switch, type SwitchProps, switchEvents } from './components/switch.js';
 export { TextField, type TextFieldProps, textFieldEvents } from './components/text-field.js';
+export { Textarea, type TextareaProps, textareaEvents } from './components/textarea.js';

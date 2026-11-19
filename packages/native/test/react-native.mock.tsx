@@ -211,7 +211,7 @@ export const ScrollView = View;
 
 export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => {
   const state = props.accessibilityState as { disabled?: boolean } | undefined;
-  return createElement('input', {
+  const commonProps = {
     ref,
     value: props.value,
     readOnly: !props.editable,
@@ -231,6 +231,7 @@ export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => 
     'data-autocomplete': props.autoComplete,
     'data-placeholder-color': props.placeholderTextColor,
     'data-style': JSON.stringify(flatten(props.style)),
+    'data-testid': props.testID,
     onFocus: props.onFocus,
     onBlur: props.onBlur,
     onInput: (event: { currentTarget: HTMLInputElement }) =>
@@ -238,7 +239,15 @@ export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => 
     onKeyDown: (event: { key: string }) => {
       if (event.key === 'Enter') (props.onSubmitEditing as (() => void) | undefined)?.();
     },
-  });
+  };
+  if (props.multiline) {
+    return createElement('textarea', {
+      ...commonProps,
+      rows: props.numberOfLines,
+      'data-submit-behavior': props.submitBehavior,
+    } as unknown as HTMLAttributes<HTMLTextAreaElement>);
+  }
+  return createElement('input', commonProps);
 });
 
 export function Switch({ ...props }: AnyProps) {

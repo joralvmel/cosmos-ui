@@ -24,6 +24,7 @@ import '@joralvmel/cosmos-elements/button';
 | --------------- | ----------------------------------- | ---------------------------------- |
 | `<cosm-button>` | `@joralvmel/cosmos-elements/button` | Action or form submit/reset button |
 | `<cosm-text-field>` | `@joralvmel/cosmos-elements/text-field` | Labeled single-line entry with browser form validation |
+| `<cosm-textarea>` | `@joralvmel/cosmos-elements/textarea` | Labeled multiline entry with native form association |
 | `<cosm-badge>` | `@joralvmel/cosmos-elements/badge` | Static status/category label or caller-formatted count |
 
 The Custom Elements Manifest is published as `@joralvmel/cosmos-elements/custom-elements.json`.
