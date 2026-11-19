@@ -148,7 +148,7 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'primitive',
     batch: 'internal',
     priority: 1,
-    dependsOn: ['button'],
+    dependsOn: ['button', 'icon'],
     pattern: apg('dialog-modal/examples/datepicker-dialog'),
   }),
   // Batch B: forms

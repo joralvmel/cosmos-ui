@@ -1,4 +1,5 @@
 import { badgeContract } from './specs/badge.js';
+import { calendarContract } from './specs/calendar.js';
 import { checkboxContract } from './specs/checkbox.js';
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
@@ -46,6 +47,27 @@ export {
   type StateSpec,
   supports,
 } from './contract.js';
+export {
+  addCalendarDays,
+  addCalendarMonths,
+  type CalendarLocaleInfo,
+  type CalendarWeekdayName,
+  canNavigateCalendarMonth,
+  compareCalendarDates,
+  formatCalendarDate,
+  formatCalendarMonth,
+  getCalendarLocaleInfo,
+  getCalendarMonth,
+  getCalendarMonthDates,
+  getCalendarToday,
+  getCalendarTodayLabel,
+  getCalendarWeekdayNames,
+  isCalendarDateSelectable,
+  parseCalendarDate,
+  tryAddCalendarDays,
+  tryAddCalendarMonths,
+  validateCalendarBounds,
+} from './headless/calendar.js';
 export {
   findListboxMatch,
   getListboxInitialActive,
@@ -107,6 +129,7 @@ export const contracts = {
   checkbox: checkboxContract,
   switch: switchContract,
   badge: badgeContract,
+  calendar: calendarContract,
 } as const;
 export { badgeContract } from './specs/badge.js';
 export {
@@ -114,6 +137,14 @@ export {
   badgeScenarios,
   badgeScenariosFor,
 } from './specs/badge.scenarios.js';
+export { type CalendarChangeDetail, calendarContract } from './specs/calendar.js';
+export {
+  type CalendarAction,
+  type CalendarKey,
+  type CalendarScenario,
+  calendarScenarios,
+  calendarScenariosFor,
+} from './specs/calendar.scenarios.js';
 export {
   type CheckboxCheckedChangeDetail,
   checkboxContract,

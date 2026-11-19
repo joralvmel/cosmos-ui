@@ -336,6 +336,31 @@ Events: none.
   element.startIcon = heart;
 </script>
 ```
+### `<cosm-calendar>`
+
+Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional date bounds.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | string | — | Controlled selected date in YYYY-MM-DD format; when supplied, selection proposals wait for the owner to update this value. |
+| `defaultValue` (`default-value`) | string | — | Initial autonomous selected date in YYYY-MM-DD format; later changes do not reset selection. |
+| `min` | string | — | Earliest selectable date in YYYY-MM-DD format, inclusive. |
+| `max` | string | — | Latest selectable date in YYYY-MM-DD format, inclusive. |
+| `locale` | string | — | BCP 47 locale for month and weekday names, week start, and text direction; defaults to the environment locale. Invalid locale identifiers are rejected. |
+| `disabled` | boolean | `false` | Disables date selection and month navigation. |
+
+Events: `cosm-change` → `CalendarChangeDetail`.
+
+```html
+<cosm-calendar></cosm-calendar>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/calendar';
+
+  const element = document.querySelector('cosm-calendar');
+  element.addEventListener('cosm-change', event => console.log(event.detail));
+</script>
+```
 
 ## Themes
 

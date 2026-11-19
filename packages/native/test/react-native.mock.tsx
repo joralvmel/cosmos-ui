@@ -43,6 +43,7 @@ export const BackHandler = {
   __reset: () => backPressListeners.clear(),
 };
 export const __accessibilityFocusCalls: number[] = [];
+export const __accessibilityAnnouncements: string[] = [];
 export const AccessibilityInfo = {
   setAccessibilityFocus: (tag: number) => {
     __accessibilityFocusCalls.push(tag);
@@ -51,6 +52,9 @@ export const AccessibilityInfo = {
       (node.querySelector<HTMLElement>('button, input, [tabindex]') ?? node).focus();
     }
     return Promise.resolve();
+  },
+  announceForAccessibility: (announcement: string) => {
+    __accessibilityAnnouncements.push(announcement);
   },
 };
 

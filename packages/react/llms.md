@@ -394,6 +394,30 @@ export function Example() {
   );
 }
 ```
+### `Calendar`
+
+Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional date bounds.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | string | — | Controlled selected date in YYYY-MM-DD format; when supplied, selection proposals wait for the owner to update this value. |
+| `defaultValue` | string | — | Initial autonomous selected date in YYYY-MM-DD format; later changes do not reset selection. |
+| `min` | string | — | Earliest selectable date in YYYY-MM-DD format, inclusive. |
+| `max` | string | — | Latest selectable date in YYYY-MM-DD format, inclusive. |
+| `locale` | string | — | BCP 47 locale for month and weekday names, week start, and text direction; defaults to the environment locale. Invalid locale identifiers are rejected. |
+| `disabled` | boolean | `false` | Disables date selection and month navigation. |
+
+Events: `onChange` → `CalendarChangeDetail`.
+
+```tsx
+import { Calendar } from '@joralvmel/cosmos-react';
+
+export function Example() {
+  return (
+    <Calendar onChange={event => console.log(event.detail)}></Calendar>
+  );
+}
+```
 
 ## Themes
 

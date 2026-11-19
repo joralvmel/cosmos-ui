@@ -1,0 +1,109 @@
+---
+title: Calendar
+description: An inline, localized Gregorian calendar for selecting one date.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="calendar" />
+
+`<cosm-calendar>` is an inline, single-date calendar. Use it when people need to choose a date
+directly in a page; use a date picker when the calendar should open from a text field or dialog.
+Dates use the Gregorian calendar and the date-only `YYYY-MM-DD` format.
+
+## Playground
+
+<Playground name="calendar" content="Calendar" />
+
+## Variants
+
+Calendar has one responsive presentation, with seven equal weekday columns. It has no size, tone or
+variant props. The selected date's month is shown initially; without a selection, the current month
+is shown.
+
+<Preview>
+  <cosm-calendar default-value="2024-06-15"></cosm-calendar>
+</Preview>
+
+Set `locale` to choose localized month and weekday names, the first day of the week and text
+direction. `min` and `max` are inclusive; dates outside them are unavailable.
+
+<Preview>
+  <cosm-calendar
+    default-value="2024-06-15"
+    min="2024-06-10"
+    max="2024-06-22"
+    locale="es-ES"
+  ></cosm-calendar>
+</Preview>
+
+## States
+
+`value` controls the selected date. Listen for the date proposal and update `value` to accept it.
+Use `defaultValue` for an autonomous selection. Selecting an adjacent-month date also changes the
+displayed month.
+
+```html
+<cosm-calendar default-value="2024-06-15"></cosm-calendar>
+```
+
+```tsx
+import { useState } from 'react';
+import { Calendar } from '@joralvmel/cosmos-react';
+
+function Schedule() {
+  const [value, setValue] = useState('2024-06-15');
+  return <Calendar value={value} onChange={event => setValue(event.detail.value)} />;
+}
+```
+
+```html
+<cosm-calendar
+  [value]="value"
+  (valueChange)="value = $event.detail.value"
+></cosm-calendar>
+```
+
+```tsx
+import { useState } from 'react';
+import { Calendar } from '@joralvmel/cosmos-native';
+
+function Schedule() {
+  const [value, setValue] = useState('2024-06-15');
+  return <Calendar value={value} onValueChange={({ value }) => setValue(value)} />;
+}
+```
+
+The `disabled` state prevents selection and month navigation.
+
+<Preview>
+  <cosm-calendar default-value="2024-06-15" disabled></cosm-calendar>
+</Preview>
+
+## Accessibility
+
+- On the web, the calendar is an ARIA grid with one day in the Tab sequence. Arrow keys move by
+  day or week; Home and End move to the localized week's first and last day. Page Up and Page Down
+  move by month, and Shift + Page Up/Down move by year. Enter or Space selects an enabled date.
+- The focused date stays in view as you navigate. Month changes are announced, and dates expose
+  localized names and selected, today and unavailable states.
+- Native dates use accessible button semantics and localized labels, with touch targets of at
+  least 44 points. On narrow screens, the date grid scrolls horizontally to preserve those target
+  sizes. React Native Web uses browser keyboard events; Android and iOS follow native focus and
+  screen-reader behavior instead of imitating the web-only ARIA grid keyboard model.
+- Today is indicated separately from the selected date. Selection, focus and unavailable states
+  are not conveyed by color alone.
+- The web component follows the selected Cosmos theme and supports customization through its
+  documented parts and `--cosm-calendar-*` properties. React Native styling follows `useTheme()`.
+
+## API
+
+<ApiTable name="calendar" />
+
+## Events by platform
+
+<EventsTable name="calendar" />

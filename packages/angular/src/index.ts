@@ -1,4 +1,5 @@
 import { CosmBadgeComponent } from './components/badge.component.js';
+import { CosmCalendarComponent } from './components/calendar.component.js';
 import { CosmCheckboxComponent } from './components/checkbox.component.js';
 import { CosmIconButtonComponent } from './components/icon-button.component.js';
 import { CosmListboxComponent } from './components/listbox.component.js';
@@ -32,8 +33,10 @@ export const COSMOS_COMPONENTS = [
   CosmCheckboxComponent,
   CosmSwitchComponent,
   CosmBadgeComponent,
+  CosmCalendarComponent,
 ] as const;
 export { CosmBadgeComponent } from './components/badge.component.js';
+export { CosmCalendarComponent } from './components/calendar.component.js';
 export { CosmCheckboxComponent } from './components/checkbox.component.js';
 export { CosmIconButtonComponent } from './components/icon-button.component.js';
 export { CosmListboxComponent } from './components/listbox.component.js';
