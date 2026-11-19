@@ -29,4 +29,9 @@ export const screens = [
     title: 'Badge',
     description: 'Static labels, count text and appearance controls.',
   },
+  {
+    route: '/calendar',
+    title: 'Calendar',
+    description: 'Date selection, locale, bounds and states.',
+  },
 ] as const;

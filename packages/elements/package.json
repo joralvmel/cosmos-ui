@@ -72,6 +72,10 @@
       "types": "./dist/components/badge/cosm-badge.d.ts",
       "default": "./dist/components/badge/cosm-badge.js"
     },
+    "./calendar": {
+      "types": "./dist/components/calendar/cosm-calendar.d.ts",
+      "default": "./dist/components/calendar/cosm-calendar.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

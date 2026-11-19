@@ -1,0 +1,117 @@
+---
+title: Calendar
+description: Calendario gregoriano localizado para seleccionar una fecha en línea.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="calendar" />
+
+`<cosm-calendar>` es un calendario en línea para seleccionar una sola fecha. Úselo cuando las
+personas deban elegir una fecha directamente en una página; para abrir el calendario desde un campo
+de texto o un diálogo, use un selector de fecha. Las fechas usan el calendario gregoriano y el
+formato de solo fecha `YYYY-MM-DD`.
+
+## Playground
+
+<Playground name="calendar" content="Calendar" />
+
+## Variantes
+
+Calendar tiene una cuadrícula adaptable de siete columnas y no tiene propiedades de tamaño, tono ni
+variante. Si hay una fecha seleccionada, se muestra inicialmente su mes; de lo contrario, se
+muestra el mes actual. Use los botones de mes y año del encabezado para saltar directamente sin
+presionar las flechas repetidamente.
+
+<Preview>
+  <cosm-calendar default-value="2024-06-15"></cosm-calendar>
+</Preview>
+
+Use `locale` para elegir los nombres localizados del mes y los días, el primer día de la semana y
+la dirección del texto. Los límites `min` y `max` son inclusivos; las fechas fuera de ellos no se
+pueden seleccionar.
+
+<Preview>
+  <cosm-calendar
+    default-value="2024-06-15"
+    min="2024-06-10"
+    max="2024-06-22"
+    locale="es-ES"
+  ></cosm-calendar>
+</Preview>
+
+## Estados
+
+`value` controla la fecha seleccionada. Escuche la propuesta de fecha y actualice `value` para
+aceptarla. Use `defaultValue` para una selección autónoma. Al seleccionar un día de un mes
+adyacente, también cambia el mes mostrado.
+
+```html
+<cosm-calendar default-value="2024-06-15"></cosm-calendar>
+```
+
+```tsx
+import { useState } from 'react';
+import { Calendar } from '@joralvmel/cosmos-react';
+
+function Schedule() {
+  const [value, setValue] = useState('2024-06-15');
+  return <Calendar value={value} onChange={event => setValue(event.detail.value)} />;
+}
+```
+
+```html
+<cosm-calendar
+  [value]="value"
+  (valueChange)="value = $event.detail.value"
+></cosm-calendar>
+```
+
+```tsx
+import { useState } from 'react';
+import { Calendar } from '@joralvmel/cosmos-native';
+
+function Schedule() {
+  const [value, setValue] = useState('2024-06-15');
+  return <Calendar value={value} onValueChange={({ value }) => setValue(value)} />;
+}
+```
+
+El estado `disabled` impide seleccionar fechas y navegar entre meses.
+
+<Preview>
+  <cosm-calendar default-value="2024-06-15" disabled></cosm-calendar>
+</Preview>
+
+## Accesibilidad
+
+- En la web, el calendario es una cuadrícula ARIA con un solo día en la secuencia de Tab. Las
+  flechas avanzan por día o semana; Inicio y Fin llevan al primer y último día de la semana
+  localizada. Re Pág y Av Pág cambian el mes; con Mayús cambian el año. Enter o Espacio selecciona
+  una fecha disponible.
+- La fecha enfocada permanece visible al navegar. Se anuncian los cambios de mes y cada fecha
+  expone un nombre localizado y sus estados de selección, fecha actual y disponibilidad.
+- Las opciones de mes y año son botones accesibles; los límites `min` y `max` deshabilitan las
+  opciones sin fechas disponibles.
+- En plataformas nativas, las fechas usan botones accesibles, nombres localizados y áreas táctiles
+  de al menos 44 puntos. En pantallas estrechas, la cuadrícula se desplaza horizontalmente para
+  conservar ese tamaño. React Native Web usa los eventos de teclado del navegador; Android e iOS
+  siguen el foco y el comportamiento del lector de pantalla nativos, sin imitar el modelo de
+  teclado de la cuadrícula ARIA exclusiva de la web.
+- La fecha actual se distingue de la fecha seleccionada. La selección, el foco y la indisponibilidad
+  no se comunican solo mediante el color.
+- El componente web sigue el tema seleccionado de Cosmos y admite personalización mediante las
+  partes documentadas y las propiedades `--cosm-calendar-*`. En React Native, los estilos siguen
+  `useTheme()`.
+
+## API
+
+<ApiTable name="calendar" />
+
+## Eventos por plataforma
+
+<EventsTable name="calendar" />

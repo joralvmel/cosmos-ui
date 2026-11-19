@@ -521,6 +521,69 @@ No events.
 | `--cosm-badge-line-height` | Badge label line height. |
 | `--cosm-badge-radius` | Badge corner radius. |
 
+### `calendar` (`<cosm-calendar>`)
+
+Selects one Gregorian date from an inline, localized calendar with keyboard navigation and optional bounds. Month and year can be selected directly.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | string | — | Controlled selected date in YYYY-MM-DD format; when supplied, selection proposals wait for the owner to update this value. |
+| `defaultValue` | string | — | Initial autonomous selected date in YYYY-MM-DD format; later changes do not reset selection. |
+| `min` | string | — | Earliest selectable date in YYYY-MM-DD format, inclusive. |
+| `max` | string | — | Latest selectable date in YYYY-MM-DD format, inclusive. |
+| `locale` | string | — | BCP 47 locale for month and weekday names, week start, and text direction; defaults to the environment locale. Invalid locale identifiers are rejected. |
+| `disabled` | boolean | `false` | Disables date selection and calendar navigation. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-change` | `onChange` | `(valueChange)` | `onValueChange` | `CalendarChangeDetail` | Proposes an enabled selected date as a YYYY-MM-DD value; autonomous selection commits and controlled selection waits for the owner. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Calendar root. |
+| `header` | Month heading and navigation controls. |
+| `previous` | Previous-month navigation button. |
+| `heading` | Localized month and year heading. |
+| `next` | Next-month navigation button. |
+| `weekday` | Localized weekday heading. |
+| `grid` | Seven-column date grid. |
+| `day` | Date button, including adjacent-month dates. |
+| `month-trigger` | Button that opens direct month selection. |
+| `year-trigger` | Button that opens direct year selection. |
+| `month-option` | Month choice in the month selection view. |
+| `year-option` | Year choice in the year selection view. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-calendar-background` | Calendar surface background. |
+| `--cosm-calendar-color` | Primary calendar text color. |
+| `--cosm-calendar-muted-color` | Adjacent-month and weekday text color. |
+| `--cosm-calendar-selected-background` | Selected-date background. |
+| `--cosm-calendar-selected-color` | Selected-date text color. |
+| `--cosm-calendar-day-size` | Minimum date target dimensions. |
+| `--cosm-calendar-gap` | Space between date targets. |
+| `--cosm-calendar-radius` | Date target corner radius. |
+| `--cosm-calendar-focus` | Visible keyboard focus indicator color. |
+| `--cosm-calendar-today-border` | Non-color-only today marker. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Moves between the navigation controls and one active date. |
+| `ArrowLeft`, `ArrowRight` | Moves the active date by one day; direction follows the visual RTL/LTR order. |
+| `ArrowUp`, `ArrowDown` | Moves the active date by one week. |
+| `Home`, `End` | Moves to the first or last day of the localized week. |
+| `PageUp`, `PageDown` | Moves the active date by one month. |
+| `Shift+PageUp`, `Shift+PageDown` | Moves the active date by one year. |
+| `Enter`, `Space` | Proposes selection of the active enabled date. |
+
 
 ## Rules for AI assistants
 
