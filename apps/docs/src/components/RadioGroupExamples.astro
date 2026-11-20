@@ -1,0 +1,176 @@
+---
+import Preview from './Preview.astro';
+
+const es = Astro.props.locale === 'es';
+const states = Astro.props.kind === 'states';
+---
+
+<Preview>
+  <div class="radio-group-examples" data-radio-group-examples data-locale={es ? 'es' : 'en'}>
+    <template>
+    {states ? (
+      <>
+        <cosm-radio-group
+          data-radio-group-example
+          data-initial="phone"
+          label={es ? 'Selección inicial' : 'Initial selection'}
+        />
+        <cosm-radio-group
+          data-radio-group-example
+          data-initial="email"
+          disabled
+          label={es ? 'Grupo deshabilitado' : 'Disabled group'}
+        />
+        <cosm-radio-group
+          data-radio-group-example
+          required
+          invalid
+          help-text={es ? 'Elige una opción para continuar.' : 'Choose an option to continue.'}
+          error-text={es ? 'Este campo es obligatorio.' : 'This field is required.'}
+          label={es ? 'Grupo obligatorio no seleccionado' : 'Required group with no selection'}
+        />
+        <section>
+          <cosm-radio-group
+            data-radio-group-controlled
+            label={es ? 'Selección controlada' : 'Controlled selection'}
+          />
+          <div class="actions">
+            <cosm-button data-radio-group-owner variant="soft">
+              {es ? 'Aceptar propuestas' : 'Accept proposals'}
+            </cosm-button>
+            <cosm-button data-radio-group-reset variant="ghost">
+              {es ? 'Restablecer' : 'Reset'}
+            </cosm-button>
+          </div>
+          <output data-radio-group-output aria-live="polite" />
+        </section>
+      </>
+    ) : (
+      <>
+        <cosm-radio-group
+          data-radio-group-example
+          data-initial="email"
+          label={es ? 'Orientación vertical' : 'Vertical orientation'}
+        />
+        <cosm-radio-group
+          data-radio-group-example
+          data-initial="phone"
+          orientation="horizontal"
+          class="custom-radio-group"
+          label={es ? 'Orientación horizontal' : 'Horizontal orientation'}
+        />
+      </>
+    )}
+    </template>
+  </div>
+</Preview>
+
+<style>
+  .radio-group-examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    width: 100%;
+    gap: var(--cosm-space-lg);
+    align-items: start;
+  }
+  section,
+  .actions {
+    display: grid;
+    gap: var(--cosm-space-sm);
+  }
+  .actions {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), max-content));
+  }
+  output {
+    overflow-wrap: anywhere;
+    font-size: var(--cosm-text-sm);
+  }
+  .custom-radio-group {
+    --cosm-radio-group-gap: var(--cosm-space-md);
+    --cosm-radio-group-control-size: 1.375rem;
+  }
+</style>
+
+<script>
+  import type {
+    RadioGroupChangeDetail,
+    RadioGroupOption,
+  } from '@joralvmel/cosmos-core';
+  import '@joralvmel/cosmos-elements/button';
+  import '@joralvmel/cosmos-elements/radio-group';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-radio-group-examples]')) {
+    const template = root.querySelector('template');
+    if (!template) continue;
+    const examples = document.importNode(template.content, true);
+    customElements.upgrade(examples);
+    const es = root.dataset.locale === 'es';
+    const options: readonly RadioGroupOption[] = [
+      { value: 'email', label: es ? 'Correo electrónico' : 'Email' },
+      {
+        value: 'phone',
+        label: es ? 'Teléfono' : 'Phone',
+        description: es ? 'Llamada o mensaje de texto' : 'Call or text message',
+      },
+      {
+        value: 'in-person',
+        label: es ? 'En persona' : 'In person',
+        disabled: true,
+      },
+    ];
+
+    for (const group of examples.querySelectorAll<HTMLElementTagNameMap['cosm-radio-group']>(
+      '[data-radio-group-example]'
+    )) {
+      group.options = options;
+      if (group.dataset.initial) group.defaultValue = group.dataset.initial;
+    }
+
+    const controlled = examples.querySelector<HTMLElementTagNameMap['cosm-radio-group']>(
+      '[data-radio-group-controlled]'
+    );
+    const owner = examples.querySelector('[data-radio-group-owner]');
+    const reset = examples.querySelector('[data-radio-group-reset]');
+    const output = examples.querySelector('output');
+    template.replaceWith(examples);
+    if (!controlled || !owner || !reset || !output) continue;
+
+    controlled.options = options;
+    let accept = true;
+    let selected: string | null = 'email';
+    let proposal: string | null = null;
+    controlled.value = selected;
+
+    const render = () => {
+      owner.textContent = accept
+        ? es
+          ? 'Aceptar propuestas'
+          : 'Accept proposals'
+        : es
+          ? 'Rechazar propuestas'
+          : 'Refuse proposals';
+      output.textContent = `${es ? 'Selección' : 'Selected'}: ${selected ?? (es ? 'ninguna' : 'none')}; ${es ? 'Propuesta' : 'Proposal'}: ${proposal ?? (es ? 'ninguna' : 'none')}`;
+    };
+
+    controlled.addEventListener('cosm-change', event => {
+      const { detail } = event as CustomEvent<RadioGroupChangeDetail>;
+      proposal = detail.value;
+      if (accept) {
+        selected = detail.value;
+        controlled.value = selected;
+      }
+      render();
+    });
+    owner.addEventListener('cosm-press', () => {
+      accept = !accept;
+      render();
+    });
+    reset.addEventListener('cosm-press', () => {
+      selected = null;
+      proposal = null;
+      controlled.value = selected;
+      render();
+    });
+    render();
+  }
+</script>

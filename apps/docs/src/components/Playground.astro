@@ -29,11 +29,13 @@ const fieldActionLabels =
         ? { label: s.playground.textareaLabel }
         : name === 'listbox'
           ? { label: s.playground.listboxLabel }
-          : name === 'checkbox'
-            ? { label: s.playground.checkboxLabel }
-            : name === 'switch'
-              ? { label: s.playground.switchLabel }
-              : {};
+          : name === 'radio-group'
+            ? { label: s.playground.radioGroupLabel }
+            : name === 'checkbox'
+              ? { label: s.playground.checkboxLabel }
+              : name === 'switch'
+                ? { label: s.playground.switchLabel }
+                : {};
 const web = supports(contract, 'web');
 const hasDemo = getStatusReport().components.find(item => item.name === name)?.pieces.nativeDemo;
 const nativeDemoUrl = hasDemo
@@ -73,7 +75,13 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
 
 <script>
   import '@joralvmel/cosmos-elements';
-  import { contracts, listboxItemExamples, listboxValueExamples } from '@joralvmel/cosmos-core';
+  import {
+    contracts,
+    listboxItemExamples,
+    listboxValueExamples,
+    radioGroupOptionsExamples,
+    radioGroupValueExamples,
+  } from '@joralvmel/cosmos-core';
   import { heart } from '@joralvmel/cosmos-icons/heart';
   import { house } from '@joralvmel/cosmos-icons/house';
   import { info } from '@joralvmel/cosmos-icons/info';
@@ -121,6 +129,14 @@ const themes = builtInThemes.map(theme => ({ name: theme.name, label: theme.labe
         referenceValues: {
           ListboxItems: listboxItemExamples,
           ListboxValues: listboxValueExamples,
+        },
+      });
+    } else if (contract.name === 'radio-group') {
+      initPlayground(root, {
+        ...options,
+        referenceValues: {
+          RadioGroupOptions: radioGroupOptionsExamples,
+          RadioGroupValue: radioGroupValueExamples,
         },
       });
     } else if (contract.name === 'icon-button') {

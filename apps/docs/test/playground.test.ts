@@ -9,6 +9,9 @@ import {
   listboxItemExamples,
   listboxValueExamples,
   popoverContract,
+  radioGroupContract,
+  radioGroupOptionsExamples,
+  radioGroupValueExamples,
   switchContract,
   textareaContract,
   textFieldContract,
@@ -29,6 +32,7 @@ import '@joralvmel/cosmos-elements/checkbox';
 import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
+import '@joralvmel/cosmos-elements/radio-group';
 import '@joralvmel/cosmos-elements/text-field';
 import '@joralvmel/cosmos-elements/textarea';
 import '@joralvmel/cosmos-elements/switch';
@@ -316,6 +320,56 @@ describe('Playground', () => {
     await target.updateComplete;
     expect(target.checked).toBe(true);
     expect(controller.code('html')).toContain('label="Acepto los términos"');
+  });
+
+  it('switches radio presets without stale selections and keeps the preview size', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-radio-group');
+    target.dataset.playgroundTarget = '';
+    target.label = 'Choose an option';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: radioGroupContract,
+      content: '',
+      labels,
+      themes: [],
+      referenceValues: {
+        RadioGroupOptions: radioGroupOptionsExamples,
+        RadioGroupValue: radioGroupValueExamples,
+      },
+    });
+    const size = root.querySelector<HTMLSelectElement>('[data-prop="size"]');
+    if (!size) throw new Error('Missing indicator size control');
+    size.value = 'custom';
+    size.dispatchEvent(new Event('input'));
+    const custom = root.querySelector<HTMLInputElement>('[data-radio-group-custom-size]');
+    if (!custom) throw new Error('Missing custom size control');
+    custom.value = '27.5';
+    custom.dispatchEvent(new Event('input'));
+    custom.value = '0';
+    custom.dispatchEvent(new Event('input'));
+    expect(controller.values.size).toBe(27.5);
+    controller.set('options', 'plans');
+    controller.set('defaultValue', 'plus');
+    controller.set('value', 'premium');
+    const plans = root.querySelector('cosm-radio-group');
+    await plans?.updateComplete;
+    expect(plans?.value).toBe('premium');
+    expect(controller.code('react')).toContain('options={plans}');
+    controller.set('options', 'frequency');
+    const frequency = root.querySelector('cosm-radio-group');
+    await frequency?.updateComplete;
+    expect(frequency?.value).toBeNull();
+    expect(frequency?.defaultValue).toBeUndefined();
+    expect(frequency?.size).toBe(27.5);
+    expect(frequency?.getAttribute('size')).toBe('27.5');
+    expect(root.querySelector('[data-prop="value"] option[value="premium"]')).toHaveProperty(
+      'disabled',
+      true
+    );
+    expect(controller.code('native')).toContain('options={frequency}');
+    expect(controller.code('native')).toContain('size={27.5}');
   });
 
   it('resolves collection controls, ownership and numeric sizes in the listbox preview', async () => {

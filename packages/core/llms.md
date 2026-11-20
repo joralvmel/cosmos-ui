@@ -641,6 +641,67 @@ Accepts multiline plain text with an accessible label, optional help and error t
 | `Tab`, `Shift+Tab` | Moves focus to or from the enabled editable control. |
 | `Enter` | Inserts a newline in the editable text. |
 
+### `radio-group` (`<cosm-radio-group>`)
+
+Selects one option from a labeled collection, with optional selection and native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the group. |
+| `options` | RadioGroupOptions | Required | Readonly flat options with unique nonempty values and labels, optional descriptions and disabled states. |
+| `value` | RadioGroupValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | RadioGroupValue | — | Initial autonomous selection; null by default. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Indicator size token or positive finite number in CSS pixels on web and logical units on native. |
+| `orientation` | 'vertical' \| 'horizontal' | `vertical` | Vertical list or wrapping horizontal options. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the group. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-change` | `onChange` | `(valueChange)` | `onValueChange` | `RadioGroupChangeDetail` | Proposes a selection after enabled user activation; autonomous state commits and controlled state waits for the owner. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Group wrapper and accessible fieldset. |
+| `label` | Visible group label. |
+| `options` | Option collection. |
+| `option` | Selectable option row. |
+| `input` | Native radio input and Web focus target. |
+| `control` | Visible circular radio boundary. |
+| `indicator` | Selected radio dot. |
+| `option-label` | Primary option text. |
+| `description` | Optional option description. |
+| `help-text` | Supporting text associated with the group. |
+| `error-text` | Error description associated with the group. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-radio-group-gap` | Space between option rows. |
+| `--cosm-radio-group-option-gap` | Space between the radio control and option content. |
+| `--cosm-radio-group-control-size` | Diameter of the visible radio control. |
+| `--cosm-radio-group-border` | Unchecked radio boundary color. |
+| `--cosm-radio-group-selected-border` | Selected radio boundary color. |
+| `--cosm-radio-group-indicator` | Selected radio dot color. |
+| `--cosm-radio-group-focus` | Visible keyboard focus indicator color. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Enters or leaves the group as one tab stop. |
+| `Space` | Selects the focused enabled option. |
+| `ArrowRight`, `ArrowDown`, `ArrowLeft`, `ArrowUp` | Moves focus and selection through enabled options with wrapping. |
+
 
 ## Rules for AI assistants
 

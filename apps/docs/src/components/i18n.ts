@@ -73,6 +73,15 @@ const strings = {
       switchLabel: 'Enable notifications',
       switchInvalid: 'Use a non-empty label and a positive size.',
       listboxLabel: 'Choose produce',
+      radioGroupLabel: 'Contact method',
+      radioGroupExamples: {
+        'contact-methods': 'Contact methods',
+        plans: 'Plans',
+        frequency: 'Frequency',
+      },
+      radioGroupCustomSize: 'Custom indicator size (px)',
+      radioGroupSizeInvalid: 'Enter a finite indicator size greater than zero.',
+      radioGroupInvalid: 'Enter a non-empty group label.',
       listboxInvalid:
         'Use a non-empty label, positive height and values matching the selection mode.',
       listboxSelected: 'Selected',
@@ -228,6 +237,15 @@ const strings = {
       switchLabel: 'Activar notificaciones',
       switchInvalid: 'Usa una etiqueta no vacía y un tamaño positivo.',
       listboxLabel: 'Elige productos',
+      radioGroupLabel: 'Método de contacto',
+      radioGroupExamples: {
+        'contact-methods': 'Métodos de contacto',
+        plans: 'Planes',
+        frequency: 'Frecuencia',
+      },
+      radioGroupCustomSize: 'Tamaño personalizado del indicador (px)',
+      radioGroupSizeInvalid: 'Introduce un tamaño finito mayor que cero.',
+      radioGroupInvalid: 'Introduce una etiqueta de grupo que no esté vacía.',
       listboxInvalid:
         'Usa una etiqueta no vacía, altura positiva y valores adecuados al modo de selección.',
       listboxSelected: 'Seleccionados',

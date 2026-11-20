@@ -1,0 +1,115 @@
+---
+title: Radio Group
+description: Selección única accesible con navegación por teclado y soporte de formularios web.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import RadioGroupExamples from '../../../../components/RadioGroupExamples.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="radio-group" />
+
+Radio Group permite elegir una opción de un conjunto con nombre. Úsalo cuando las alternativas
+deban permanecer visibles; elige otro control si el espacio es limitado.
+
+## Playground
+
+<Playground name="radio-group" />
+
+Prueba **Métodos de contacto**, **Planes** o **Frecuencia**. Al cambiar de ejemplo se restablece la
+selección. Usa `size` para cambiar el círculo y el punto: `sm`, `md` (por defecto), `lg` o un número
+positivo y finito (píxeles CSS en Web, React y Angular; unidades lógicas en React Native). El área
+interactiva mínima no cambia. Elige **Personalizado** para probar un número y verlo en el código generado.
+
+El control de opciones incluye colecciones de ejemplo con nombre. El Playground genera ejemplos
+autónomos y controlados para Web, React, Angular y React Native.
+
+## Variantes
+
+Radio Group tiene una apariencia circular estándar y un tamaño visual mediano. Elige orientación
+vertical u horizontal con ajuste de línea y usa las propiedades CSS documentadas para personalizar
+el espaciado y los colores.
+
+<RadioGroupExamples locale="es" />
+
+## Estados
+
+`defaultValue` inicializa un grupo autónomo; no lo restablece después de su inicialización. Al
+proporcionar `value`, incluso `null`, el grupo pasa a ser controlado. En este modo, el propietario
+decide si acepta una selección propuesta.
+
+<RadioGroupExamples kind="states" locale="es" />
+
+## Uso por plataforma
+
+### React
+
+```tsx
+import { RadioGroup } from '@joralvmel/cosmos-react';
+
+<RadioGroup
+  label="Método de contacto"
+  options={contactMethods}
+  value={contactMethod}
+  onChange={event => setContactMethod(event.detail.value)}
+/>;
+```
+
+### Angular
+
+```html
+<cosm-radio-group
+  label="Método de contacto"
+  [options]="contactMethods"
+  formControlName="contactMethod"
+  name="contact-method"
+/>
+```
+
+Angular Forms se integra mediante `ControlValueAccessor`. Si no se usa un control de formulario,
+escucha `valueChange` y asigna explícitamente el valor aceptado.
+
+### React Native
+
+```tsx
+import { RadioGroup } from '@joralvmel/cosmos-native';
+
+<RadioGroup
+  label="Método de contacto"
+  options={contactMethods}
+  value={contactMethod}
+  onValueChange={({ value }) => setContactMethod(value)}
+/>;
+```
+
+React Native no ofrece asociación HTML con formularios ni validación de restricciones del navegador.
+Proporciona mensajes localizados de obligatoriedad y validación mediante la etiqueta, el texto de
+ayuda y el texto de error según corresponda.
+
+## Accesibilidad
+
+- Proporciona una etiqueta de grupo visible y no vacía, además de etiquetas concisas para cada
+  opción. Las descripciones son contexto adicional, no reemplazan las etiquetas.
+- Tab entra en la opción seleccionada o, si no hay ninguna, en la primera habilitada. Espacio
+  selecciona la opción enfocada. Las flechas mueven el foco y la selección, recorren el conjunto y
+  omiten las opciones deshabilitadas.
+- Web usa controles de radio nativos dentro de un `fieldset` con nombre y admite envío de
+  formularios, validación de obligatoriedad, grupos deshabilitados y restablecimiento. React y
+  Angular usan la misma implementación web.
+- React Native expone semántica `radiogroup` y `radio`, estados de selección y deshabilitado, y
+  objetivos táctiles de al menos 44 puntos. React Native Web también admite el teclado documentado;
+  el comportamiento de formularios HTML no aplica en plataformas nativas.
+- Mantén el foco de teclado distinguible de la selección al personalizar colores. Los estados de
+  error y deshabilitado conservan su tratamiento semántico.
+- No se incluyen modo toolbar, limpieza de selección, selección múltiple, renderizadores de opciones
+  personalizados ni navegación con teclado físico nativo.
+
+## API
+
+<ApiTable name="radio-group" />
+
+## Eventos por plataforma
+
+<EventsTable name="radio-group" />

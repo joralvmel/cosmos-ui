@@ -1,5 +1,6 @@
 import type { ComponentContract, Platform, PropSpec } from './contract.js';
 import type { ListboxItem } from './specs/listbox.js';
+import type { RadioGroupOption, RadioGroupValue } from './specs/radio-group.js';
 
 /** Small, dependency-free collections shared by generated examples and documentation controls. */
 export const listboxItemExamples: Readonly<Record<string, readonly ListboxItem<never>[]>> = {
@@ -32,6 +33,34 @@ export const listboxValueExamples: Readonly<Record<string, readonly string[]>> =
   apple: ['apple'],
   cherry: ['cherry'],
   'apple-cherry': ['apple', 'cherry'],
+};
+
+export const radioGroupOptionsExamples: Readonly<Record<string, readonly RadioGroupOption[]>> = {
+  'contact-methods': [
+    { value: 'email', label: 'Email', description: 'Receive updates by email.' },
+    { value: 'phone', label: 'Phone', description: 'Receive updates by text.' },
+    { value: 'mail', label: 'Mail', disabled: true },
+  ],
+  plans: [
+    { value: 'basic', label: 'Basic' },
+    { value: 'plus', label: 'Plus' },
+    { value: 'premium', label: 'Premium' },
+  ],
+  frequency: [
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' },
+  ],
+};
+
+export const radioGroupValueExamples: Readonly<Record<string, RadioGroupValue>> = {
+  none: null,
+  email: 'email',
+  phone: 'phone',
+  basic: 'basic',
+  plus: 'plus',
+  premium: 'premium',
+  weekly: 'weekly',
+  monthly: 'monthly',
 };
 
 /** Code tabs of the Playground. */
@@ -100,6 +129,18 @@ function referenceImports(props: ActiveProp[], indent = '', typescript = true) {
               spec.reference === 'ListboxItems' ? listboxItemExamples : listboxValueExamples;
             const sample = samples[slug];
             if (!sample) throw new Error(`Unknown ${spec.reference} example "${slug}".`);
+            return `${indent}const ${referenceBinding(slug)} = ${JSON.stringify(sample)}${typescript ? ' as const' : ''};`;
+          }
+          if (spec.type === 'reference' && spec.reference === 'RadioGroupOptions') {
+            const sample = radioGroupOptionsExamples[slug];
+            if (!sample) throw new Error(`Unknown ${spec.reference} example "${slug}".`);
+            return `${indent}const ${referenceBinding(slug)} = ${JSON.stringify(sample)}${typescript ? ' as const' : ''};`;
+          }
+          if (spec.type === 'reference' && spec.reference === 'RadioGroupValue') {
+            if (!Object.hasOwn(radioGroupValueExamples, slug)) {
+              throw new Error(`Unknown ${spec.reference} example "${slug}".`);
+            }
+            const sample = radioGroupValueExamples[slug];
             return `${indent}const ${referenceBinding(slug)} = ${JSON.stringify(sample)}${typescript ? ' as const' : ''};`;
           }
           return `${indent}import { ${referenceBinding(slug)} } from '@joralvmel/cosmos-icons/${slug}';`;

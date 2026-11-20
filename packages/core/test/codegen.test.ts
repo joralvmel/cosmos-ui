@@ -9,6 +9,7 @@ import {
   iconButtonContract,
   listboxContract,
   popoverContract,
+  radioGroupContract,
   supportsTarget,
   switchContract,
   textFieldContract,
@@ -42,6 +43,33 @@ describe('codegen', () => {
     expect(snippets.react).toContain('selectedValues={appleCherry}');
     expect(snippets.angular).toContain('[items]="grouped"');
     expect(snippets.native).toContain('size={57}');
+  });
+
+  it('generates typed Radio Group options and nullable values on every platform', () => {
+    const snippets = generateSnippets(
+      radioGroupContract,
+      {
+        label: 'Contact method',
+        options: 'contact-methods',
+        value: 'none',
+        orientation: 'horizontal',
+      },
+      ''
+    );
+    expect(snippets.html).toContain('const contactMethods = [{"value":"email"');
+    expect(snippets.html).toContain('const none = null;');
+    expect(snippets.html).toContain('element.options = contactMethods;');
+    expect(snippets.html).toContain('element.value = none;');
+    expect(snippets.react).toContain('options={contactMethods}');
+    expect(snippets.react).toContain('value={none}');
+    expect(snippets.angular).toContain('[options]="contactMethods"');
+    expect(snippets.angular).toContain('[value]="none"');
+    expect(snippets.native).toContain('options={contactMethods}');
+    expect(snippets.native).toContain('value={none}');
+    for (const source of Object.values(snippets)) {
+      expect(source).not.toContain('cosmos-icons/contact-methods');
+      expect(source).not.toContain('cosmos-icons/none');
+    }
   });
   it('omits props that keep their default value', () => {
     expect(activeProps(buttonContract, defaults, 'web')).toEqual([]);

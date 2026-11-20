@@ -422,6 +422,41 @@ export function Example() {
   );
 }
 ```
+### `RadioGroup`
+
+Selects one option from a labeled collection, with optional selection and native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the group. |
+| `options` | RadioGroupOptions | Required | Readonly flat options with unique nonempty values and labels, optional descriptions and disabled states. |
+| `value` | RadioGroupValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | RadioGroupValue | — | Initial autonomous selection; null by default. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Indicator size token or positive finite number in CSS pixels on web and logical units on native. |
+| `orientation` | 'vertical' \| 'horizontal' | `vertical` | Vertical list or wrapping horizontal options. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the group. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+
+Events: `onValueChange` → `RadioGroupChangeDetail`.
+
+```tsx
+import { RadioGroup } from '@joralvmel/cosmos-native';
+const contactMethods = [{"value":"email","label":"Email","description":"Receive updates by email."},{"value":"phone","label":"Phone","description":"Receive updates by text."},{"value":"mail","label":"Mail","disabled":true}] as const;
+
+export function Example() {
+  return (
+    <RadioGroup
+      label="RadioGroup"
+      options={contactMethods}
+      onValueChange={detail => console.log(detail)}
+    >
+    </RadioGroup>
+  );
+}
+```
 
 ## Themes
 

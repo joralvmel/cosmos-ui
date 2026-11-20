@@ -25,6 +25,7 @@ export {
   type ListboxVariant,
 } from './components/listbox/cosm-listbox.js';
 export { CosmPopover } from './components/popover/cosm-popover.js';
+export { CosmRadioGroup } from './components/radio-group/cosm-radio-group.js';
 export { CosmSwitch, type SwitchSize } from './components/switch/cosm-switch.js';
 export {
   CosmTextField,

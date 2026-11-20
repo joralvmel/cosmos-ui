@@ -9,6 +9,7 @@ import {
   toAttribute,
   validateListboxSize,
   validateListboxValues,
+  validateSize,
 } from '@joralvmel/cosmos-core';
 import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/switch';
@@ -68,6 +69,11 @@ export interface PlaygroundLabels {
   switchLabel?: string;
   switchInvalid?: string;
   listboxLabel?: string;
+  radioGroupLabel?: string;
+  radioGroupExamples?: Record<string, string>;
+  radioGroupCustomSize?: string;
+  radioGroupSizeInvalid?: string;
+  radioGroupInvalid?: string;
   listboxInvalid?: string;
   listboxSelected?: string;
   listboxProposal?: string;
@@ -208,6 +214,9 @@ export function initPlayground(
   if (contract.name === 'listbox') {
     values.label = labels.listboxLabel ?? 'Choose produce';
   }
+  if (contract.name === 'radio-group') {
+    values.label = labels.radioGroupLabel ?? 'Contact method';
+  }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
       if (spec.type === 'reference') {
@@ -311,8 +320,23 @@ export function initPlayground(
     'endIcon',
   ]);
   const customHeightLabel = element('label');
-  customHeightLabel.append(element('span', {}, labels.customHeight ?? 'Custom minimum height'));
-  const customHeight = element('input', { type: 'number', min: '1', step: 'any', value: '56' });
+  const radioGroup = contract.name === 'radio-group';
+  customHeightLabel.append(
+    element(
+      'span',
+      {},
+      radioGroup
+        ? (labels.radioGroupCustomSize ?? 'Custom indicator size (px)')
+        : (labels.customHeight ?? 'Custom minimum height')
+    )
+  );
+  const customHeight = element('input', {
+    type: 'number',
+    min: radioGroup ? '0' : '1',
+    step: 'any',
+    value: radioGroup ? '28' : '56',
+  });
+  if (radioGroup) customHeight.dataset.radioGroupCustomSize = '';
   customHeightLabel.append(customHeight);
   customHeightLabel.hidden = true;
   const referenceStatus = element('span', { role: 'status', 'aria-live': 'polite' });
@@ -381,7 +405,8 @@ export function initPlayground(
         ? spec.variants.flatMap(variant => (variant.type === 'enum' ? variant.values : []))
         : [];
     const fieldSize =
-      (contract.name === 'text-field' || contract.name === 'listbox') && name === 'size';
+      (contract.name === 'text-field' || contract.name === 'listbox' || radioGroup) &&
+      name === 'size';
     const enumUnion =
       spec.type === 'union' && spec.variants.every(variant => variant.type === 'enum');
     if (spec.type === 'string' || (spec.type === 'union' && !enumUnion && !fieldSize)) {
@@ -420,7 +445,9 @@ export function initPlayground(
         : spec.type === 'enum'
           ? spec.values
           : spec.type === 'reference'
-            ? (spec.options ?? [])
+            ? contract.name === 'radio-group'
+              ? Object.keys(options.referenceValues?.[spec.reference] ?? {})
+              : (spec.options ?? [])
             : unionChoices;
       const stateReference =
         spec.type === 'reference' && contract.states.some(state => state.prop === name);
@@ -434,7 +461,11 @@ export function initPlayground(
         control.append(element('option', { value: '' }, labels.autonomous ?? 'Autonomous'));
       }
       for (const value of choices) {
-        const option = element('option', { value }, value);
+        const option = element(
+          'option',
+          { value },
+          contract.name === 'radio-group' ? (labels.radioGroupExamples?.[value] ?? value) : value
+        );
         option.selected = value === values[name];
         control.append(option);
       }
@@ -442,6 +473,26 @@ export function initPlayground(
         control.append(element('option', { value: 'custom' }, labels.customSize ?? 'Custom'));
       }
       control.value = values[name] === undefined ? '' : String(values[name]);
+      if (
+        contract.name === 'radio-group' &&
+        spec.type === 'reference' &&
+        spec.reference === 'RadioGroupValue'
+      ) {
+        const valueControl = control;
+        refreshControls.push(() => {
+          const sample = options.referenceValues?.RadioGroupOptions?.[String(values.options)] as
+            | readonly { value: string; label: string; disabled?: boolean }[]
+            | undefined;
+          for (const choice of valueControl.options) {
+            if (!choice.value || choice.value === 'none') continue;
+            const option = sample?.find(entry => entry.value === choice.value && !entry.disabled);
+            choice.hidden = !option;
+            choice.disabled = !option;
+            if (option) choice.textContent = option.label;
+          }
+          valueControl.value = String(values[name] ?? '');
+        });
+      }
       if (catalog) {
         const catalogControls = element('div', { class: 'cosm-icon-toolbar' });
         if (contract.name === 'icon') iconToolbar = catalogControls;
@@ -1002,6 +1053,24 @@ export function initPlayground(
         }
         referenceStatus.textContent = '';
       }
+      if (contract.name === 'radio-group') {
+        const label = name === 'label' ? value : values.label;
+        if (typeof label !== 'string' || !label.trim()) {
+          referenceStatus.textContent =
+            labels.radioGroupInvalid ?? 'Enter a non-empty group label.';
+          return;
+        }
+        if (name === 'size') {
+          try {
+            validateSize(value, 'RadioGroup');
+          } catch (error) {
+            if (!(error instanceof TypeError)) throw error;
+            referenceStatus.textContent = labels.radioGroupSizeInvalid ?? error.message;
+            return;
+          }
+        }
+        referenceStatus.textContent = '';
+      }
       const catalog =
         spec?.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
       if (catalog && typeof value === 'string') {
@@ -1023,11 +1092,16 @@ export function initPlayground(
         return;
       }
       values[name] = value;
+      if (contract.name === 'radio-group' && name === 'options') {
+        values.value = undefined;
+        values.defaultValue = undefined;
+      }
       if (
         target &&
         ((contract.name === 'popover' && name === 'defaultOpen') ||
           (contract.name === 'listbox' &&
-            (name === 'selectionMode' || name === 'defaultSelectedValues')))
+            (name === 'selectionMode' || name === 'defaultSelectedValues')) ||
+          (contract.name === 'radio-group' && (name === 'defaultValue' || name === 'options')))
       ) {
         const replacement = document.createElement(contract.tag);
         for (const attribute of target.attributes) {
@@ -1061,6 +1135,9 @@ export function initPlayground(
         }
         if (contract.name === 'listbox' && name === 'selectedValues') {
           Reflect.set(target, 'selectedValuesControlled', value !== undefined);
+        }
+        if (contract.name === 'radio-group' && name === 'value') {
+          Reflect.set(target, 'valueControlled', value !== undefined);
         }
         const resolved =
           spec?.type === 'reference' && typeof value === 'string'
