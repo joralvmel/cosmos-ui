@@ -702,6 +702,79 @@ Selects one option from a labeled collection, with optional selection and native
 | `Space` | Selects the focused enabled option. |
 | `ArrowRight`, `ArrowDown`, `ArrowLeft`, `ArrowUp` | Moves focus and selection through enabled options with wrapping. |
 
+### `select` (`<cosm-select>`)
+
+Selects one option from an accessible collection, with grouped items and native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the control. |
+| `items` | ListboxItems | Required | Readonly options or named groups. Each option has a unique nonempty value and label, and may include a description, decorative IconDefinition, or disabled state. |
+| `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | SelectValue | — | Initial autonomous selection; null by default. |
+| `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the control. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+| `clearable` | boolean | `false` | Shows a separate clear action when a value is selected. |
+| `clearLabel` | string | — | Consumer-localized accessible name for the clear action; required when clearable. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-change` | `onChange` | `(valueChange)` | `onValueChange` | `SelectChangeDetail` | Proposes a selected or cleared value after user activation; autonomous state commits and controlled state waits for the owner. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Field wrapper. |
+| `label` | Visible accessible label. |
+| `trigger` | Select-only combobox trigger. |
+| `value` | Selected option text. |
+| `placeholder` | Text displayed when no option is selected. |
+| `clear-button` | Optional accessible action that clears the selection. |
+| `popup` | Anchored popup surface. |
+| `listbox` | Single-selection option collection. |
+| `group` | Named option group. |
+| `group-label` | Noninteractive group heading. |
+| `option` | Selectable row with selected, active, and disabled states. |
+| `icon` | Decorative leading option icon. |
+| `content` | Option text wrapper. |
+| `option-label` | Primary option text. |
+| `description` | Optional supporting option text. |
+| `help` | Supporting text associated with the control. |
+| `error` | Error description associated with the control. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-select-background` | Control background. |
+| `--cosm-select-color` | Control and value text color. |
+| `--cosm-select-placeholder` | Placeholder text color. |
+| `--cosm-select-border` | Control boundary color. |
+| `--cosm-select-focus` | Visible keyboard focus indicator color. |
+| `--cosm-select-radius` | Control corner radius. |
+| `--cosm-select-option-selected-background` | Selected option background. |
+| `--cosm-select-option-selected-color` | Selected option text color. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Moves focus to or from the enabled combobox trigger. |
+| `Enter`, `Space`, `ArrowDown`, `ArrowUp` | Opens the popup; arrows move the active option without changing the selection. |
+| `ArrowDown`, `ArrowUp`, `Home`, `End` | Moves active focus among enabled options without changing the selected value. |
+| `Printable characters` | Moves active focus to a matching option using locale-aware typeahead without filtering. |
+| `Enter`, `Space` | Selects the active enabled option. |
+| `Escape` | Closes the popup without changing the selected value. |
+
 
 ## Rules for AI assistants
 

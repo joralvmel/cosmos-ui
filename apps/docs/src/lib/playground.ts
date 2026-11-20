@@ -1,6 +1,8 @@
 import {
   type ComponentContract,
   type ControlValues,
+  getListboxOptions,
+  type ListboxItem,
   type ListboxSelectionChangeDetail,
   listboxValueExamples,
   type SnippetTarget,
@@ -75,6 +77,11 @@ export interface PlaygroundLabels {
   radioGroupSizeInvalid?: string;
   radioGroupInvalid?: string;
   listboxInvalid?: string;
+  selectLabel?: string;
+  selectPlaceholder?: string;
+  selectClearLabel?: string;
+  selectValues?: Readonly<Record<string, string>>;
+  selectInvalid?: string;
   listboxSelected?: string;
   listboxProposal?: string;
   listboxResetNote?: string;
@@ -216,6 +223,11 @@ export function initPlayground(
   }
   if (contract.name === 'radio-group') {
     values.label = labels.radioGroupLabel ?? 'Contact method';
+  }
+  if (contract.name === 'select') {
+    values.label = labels.selectLabel ?? 'Fruit';
+    values.placeholder = labels.selectPlaceholder ?? 'Choose a fruit';
+    values.clearLabel = labels.selectClearLabel ?? 'Clear selection';
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -464,7 +476,13 @@ export function initPlayground(
         const option = element(
           'option',
           { value },
-          contract.name === 'radio-group' ? (labels.radioGroupExamples?.[value] ?? value) : value
+          contract.name === 'radio-group'
+            ? (labels.radioGroupExamples?.[value] ?? value)
+            : contract.name === 'select' &&
+                spec.type === 'reference' &&
+                spec.reference === 'SelectValue'
+              ? (labels.selectValues?.[value] ?? value)
+              : value
         );
         option.selected = value === values[name];
         control.append(option);
@@ -491,6 +509,33 @@ export function initPlayground(
             if (option) choice.textContent = option.label;
           }
           valueControl.value = String(values[name] ?? '');
+        });
+      }
+      if (
+        contract.name === 'select' &&
+        spec.type === 'reference' &&
+        spec.reference === 'SelectValue'
+      ) {
+        const valueControl = control;
+        refreshControls.push(() => {
+          const sample = options.referenceValues?.ListboxItems?.[String(values.items)] as
+            | readonly ListboxItem[]
+            | undefined;
+          const available = sample ? getListboxOptions(sample) : [];
+          for (const choice of valueControl.options) {
+            if (!choice.value || choice.value === 'none') continue;
+            const option = available?.find(
+              entry => entry.value === choice.value && !entry.disabled
+            );
+            choice.hidden = !option;
+            choice.disabled = !option;
+          }
+          const current = String(values[name] ?? '');
+          valueControl.value = [...valueControl.options].some(
+            option => option.value === current && !option.disabled
+          )
+            ? current
+            : '';
         });
       }
       if (catalog) {
@@ -1071,6 +1116,25 @@ export function initPlayground(
         }
         referenceStatus.textContent = '';
       }
+      if (contract.name === 'select') {
+        const next = { ...values, [name]: value };
+        const label = name === 'label' ? value : next.label;
+        const placeholder = name === 'placeholder' ? value : next.placeholder;
+        const clearable = name === 'clearable' ? value : next.clearable;
+        const clearLabel = name === 'clearLabel' ? value : next.clearLabel;
+        if (
+          typeof label !== 'string' ||
+          !label.trim() ||
+          typeof placeholder !== 'string' ||
+          !placeholder.trim() ||
+          (clearable === true && (typeof clearLabel !== 'string' || !clearLabel.trim()))
+        ) {
+          referenceStatus.textContent =
+            labels.selectInvalid ??
+            'Use a non-empty label, placeholder, and clear label when clearable.';
+          return;
+        }
+      }
       const catalog =
         spec?.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
       if (catalog && typeof value === 'string') {
@@ -1092,6 +1156,20 @@ export function initPlayground(
         return;
       }
       values[name] = value;
+      if (contract.name === 'select' && name === 'items') {
+        const sample = options.referenceValues?.ListboxItems?.[String(value)] as
+          | readonly ListboxItem[]
+          | undefined;
+        const available = new Set(
+          (sample ? getListboxOptions(sample) : []).map(option => option.value)
+        );
+        for (const prop of ['value', 'defaultValue']) {
+          const current = values[prop];
+          if (typeof current === 'string' && current !== 'none' && !available.has(current)) {
+            values[prop] = undefined;
+          }
+        }
+      }
       if (contract.name === 'radio-group' && name === 'options') {
         values.value = undefined;
         values.defaultValue = undefined;
@@ -1101,7 +1179,8 @@ export function initPlayground(
         ((contract.name === 'popover' && name === 'defaultOpen') ||
           (contract.name === 'listbox' &&
             (name === 'selectionMode' || name === 'defaultSelectedValues')) ||
-          (contract.name === 'radio-group' && (name === 'defaultValue' || name === 'options')))
+          (contract.name === 'radio-group' && (name === 'defaultValue' || name === 'options')) ||
+          (contract.name === 'select' && name === 'items'))
       ) {
         const replacement = document.createElement(contract.tag);
         for (const attribute of target.attributes) {
@@ -1137,6 +1216,9 @@ export function initPlayground(
           Reflect.set(target, 'selectedValuesControlled', value !== undefined);
         }
         if (contract.name === 'radio-group' && name === 'value') {
+          Reflect.set(target, 'valueControlled', value !== undefined);
+        }
+        if (contract.name === 'select' && name === 'value') {
           Reflect.set(target, 'valueControlled', value !== undefined);
         }
         const resolved =

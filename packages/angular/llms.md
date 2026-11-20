@@ -504,6 +504,49 @@ export class ExampleComponent {
   }
 }
 ```
+### `CosmSelectComponent` (`<cosm-select>`)
+
+Selects one option from an accessible collection, with grouped items and native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the control. |
+| `items` | ListboxItems | Required | Readonly options or named groups. Each option has a unique nonempty value and label, and may include a description, decorative IconDefinition, or disabled state. |
+| `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | SelectValue | — | Initial autonomous selection; null by default. |
+| `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the control. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+| `clearable` | boolean | `false` | Shows a separate clear action when a value is selected. |
+| `clearLabel` | string | — | Consumer-localized accessible name for the clear action; required when clearable. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+
+Events: `(valueChange)` → `SelectChangeDetail`.
+
+```ts
+import { Component } from '@angular/core';
+import { CosmSelectComponent } from '@joralvmel/cosmos-angular';
+const grouped = [{"label":"Fruit","options":[{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry","description":"Seasonal"}]},{"label":"Vegetables","options":[{"value":"carrot","label":"Carrot"},{"value":"broccoli","label":"Broccoli","disabled":true}]}] as const;
+const none = null as const;
+import type { SelectChangeDetail } from '@joralvmel/cosmos-core';
+
+@Component({
+  selector: 'app-example',
+  imports: [CosmSelectComponent],
+  template: `<cosm-select label="Select" [items]="grouped" [defaultValue]="none" placeholder="Select" (valueChange)="onValueChange($event.detail)"></cosm-select>`,
+})
+export class ExampleComponent {
+  readonly grouped = grouped;
+  readonly none = none;
+  onValueChange(detail: SelectChangeDetail) {
+    console.log(detail);
+  }
+}
+```
 
 ## Themes
 

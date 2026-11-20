@@ -1,0 +1,144 @@
+---
+title: Select
+description: Elige una opción de una colección compacta y etiquetada.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import SelectExamples from '../../../../components/SelectExamples.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="select" />
+
+Select permite elegir un valor de una colección compacta sin mantener todas las opciones visibles.
+Usa Listbox cuando las opciones deban permanecer en la página, o espera al futuro Combobox si se
+necesita buscar o filtrar una colección extensa.
+
+## Playground
+
+<Playground name="select" />
+
+El playground muestra opciones planas y agrupadas, valores autónomos y controlados, tamaños y la
+acción para limpiar. Las opciones se proporcionan como datos; cada una tiene un valor estable y una
+etiqueta visible, y puede incluir una descripción, un icono decorativo y el estado deshabilitado.
+
+## Variantes
+
+Select tiene una apariencia estándar con contorno y tres tamaños. Personaliza sus superficies con
+los tokens del tema, los hooks `--cosm-select-*` o las partes CSS documentadas, sin añadir otra
+variante visual.
+
+<SelectExamples kind="variants" />
+
+## Estados
+
+`defaultValue` inicializa una selección autónoma. Al proporcionar `value`, incluso `null`, la
+selección pasa a ser controlada: el componente emite una propuesta y espera a que su propietario
+actualice el valor. `clearable` añade una acción con nombre accesible propio que propone `null`.
+
+Web, React y Angular usan el mismo Web Component asociado a formularios. Admite `name`, validación
+de `required`, fieldsets deshabilitados y reinicio del formulario. React Native no tiene el ciclo
+de vida de formularios HTML; proporciona directamente texto localizado de ayuda o error.
+
+<SelectExamples kind="states" />
+
+### Web
+
+```html
+<cosm-select
+  id="fruit"
+  label="Fruta"
+  placeholder="Elige una fruta"
+  name="fruit"
+  required
+></cosm-select>
+<script type="module">
+  import '@joralvmel/cosmos-elements/select';
+
+  document.querySelector('#fruit').items = [
+    { value: 'apple', label: 'Manzana' },
+    {
+      label: 'De temporada',
+      options: [{ value: 'cherry', label: 'Cereza', description: 'Disponible en verano.' }],
+    },
+  ];
+</script>
+```
+
+### React
+
+```tsx
+import { Select } from '@joralvmel/cosmos-react';
+
+<Select
+  label="Fruta"
+  items={fruitItems}
+  placeholder="Elige una fruta"
+  value={fruit}
+  onChange={event => setFruit(event.detail.value)}
+/>;
+```
+
+### Angular
+
+```html
+<cosm-select
+  label="Fruta"
+  [items]="fruitItems"
+  placeholder="Elige una fruta"
+  [(ngModel)]="fruit"
+  name="fruit"
+></cosm-select>
+```
+
+Angular Forms se integra mediante `ControlValueAccessor`. Sin Forms, escucha `valueChange`; el
+evento DOM `CustomEvent` original se reenvía, así que el valor propuesto está en
+`$event.detail.value`.
+
+### React Native
+
+```tsx
+import { Select } from '@joralvmel/cosmos-native';
+
+<Select
+  label="Fruta"
+  items={fruitItems}
+  placeholder="Elige una fruta"
+  value={fruit}
+  onValueChange={({ value }) => setFruit(value)}
+/>;
+```
+
+La app nativa debe montar Select bajo el `PopoverProvider` de nivel de aplicación. Su popup usa el
+comportamiento Cosmos de Popover y Listbox, con ubicación y cierre adaptados a la plataforma.
+
+## Accesibilidad
+
+- Proporciona una etiqueta visible y no vacía. El marcador indica que aún no hay un valor, pero no
+  da nombre al control. Localiza la etiqueta, el marcador, el texto de las opciones, la ayuda, los
+  errores y `clearLabel`.
+- En Web, Tab llega al activador del combobox; Enter, Espacio o una flecha abre el listbox. Las
+  flechas y Home/End mueven la opción activa sin confirmarla; los caracteres imprimibles usan
+  búsqueda por prefijo, Enter/Espacio selecciona y Escape cierra sin cambiar el valor.
+- El popup Web expone semánticas de combobox, listbox, grupo y opción, además de los estados
+  expandido, seleccionado, deshabilitado, obligatorio e inválido. El foco es distinguible de la
+  selección y no se pueden elegir opciones deshabilitadas.
+- React y Angular reenvían los eventos y la accesibilidad del Web Component. React Native expone
+  las semánticas de combobox/listbox que admite la plataforma, el estado de selección y el estado
+  deshabilitado, y controles táctiles de tamaño adecuado; el teclado físico puede comportarse de
+  otra manera.
+- Al personalizar colores, mantén diferenciados el foco, la selección y los estados de error y
+  deshabilitado. Native no ofrece envío de formularios HTML ni validación de restricciones del
+  navegador.
+- La búsqueda y el filtrado, la selección múltiple, la carga asíncrona, la virtualización, las
+  opciones en árbol, las acciones masivas, el contenido interactivo arbitrario y la interfaz picker
+  nativa quedan para más adelante.
+
+## API
+
+<ApiTable name="select" />
+
+## Eventos por plataforma
+
+<EventsTable name="select" />

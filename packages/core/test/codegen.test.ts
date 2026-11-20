@@ -10,6 +10,7 @@ import {
   listboxContract,
   popoverContract,
   radioGroupContract,
+  selectContract,
   supportsTarget,
   switchContract,
   textFieldContract,
@@ -68,6 +69,33 @@ describe('codegen', () => {
     expect(snippets.native).toContain('value={none}');
     for (const source of Object.values(snippets)) {
       expect(source).not.toContain('cosmos-icons/contact-methods');
+      expect(source).not.toContain('cosmos-icons/none');
+    }
+  });
+
+  it('generates Select item collections and nullable values on every platform', () => {
+    const snippets = generateSnippets(
+      selectContract,
+      {
+        label: 'Fruit',
+        items: 'grouped',
+        value: 'none',
+        placeholder: 'Choose a fruit',
+      },
+      ''
+    );
+    expect(snippets.html).toContain('const grouped =');
+    expect(snippets.html).toContain('const none = null;');
+    expect(snippets.html).toContain('element.items = grouped;');
+    expect(snippets.html).toContain('element.value = none;');
+    expect(snippets.react).toContain('items={grouped}');
+    expect(snippets.react).toContain('value={none}');
+    expect(snippets.angular).toContain('[items]="grouped"');
+    expect(snippets.angular).toContain('[value]="none"');
+    expect(snippets.native).toContain('items={grouped}');
+    expect(snippets.native).toContain('value={none}');
+    for (const source of Object.values(snippets)) {
+      expect(source).not.toContain('cosmos-icons/grouped');
       expect(source).not.toContain('cosmos-icons/none');
     }
   });

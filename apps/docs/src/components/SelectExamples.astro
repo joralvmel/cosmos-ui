@@ -1,0 +1,64 @@
+---
+import Preview from './Preview.astro';
+
+interface Props {
+  kind: 'variants' | 'states';
+}
+
+const { kind } = Astro.props;
+const examples =
+  kind === 'variants'
+    ? [
+        { name: 'small', label: 'Small', size: 'sm', value: 'apple', clearable: true },
+        { name: 'medium', label: 'Medium', size: 'md', value: 'cherry' },
+        { name: 'large', label: 'Large', size: 'lg', disabled: true },
+      ]
+    : [
+        { name: 'help', label: 'With help text', helpText: 'Choose one seasonal fruit.' },
+        {
+          name: 'error',
+          label: 'Invalid',
+          invalid: true,
+          errorText: 'Choose a fruit before continuing.',
+        },
+      ];
+---
+
+<Preview>
+  <div class="select-examples">
+    {examples.map(example => <div data-select-example={example.name} />)}
+  </div>
+</Preview>
+
+<script>
+  import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
+  import { listboxItemExamples } from '@joralvmel/cosmos-core';
+  import '@joralvmel/cosmos-elements/select';
+
+  const items = listboxItemExamples.grouped ?? [];
+  for (const host of document.querySelectorAll<HTMLElement>('[data-select-example]')) {
+    const select = document.createElement('cosm-select') as CosmSelect;
+    Object.assign(select, {
+      label: host.dataset.selectExample ?? 'Fruit',
+      placeholder: 'Choose a fruit',
+      items,
+      clearLabel: 'Clear fruit',
+      ...{
+        ...(host.dataset.selectExample === 'small'
+          ? { size: 'sm', value: 'apple', valueControlled: true, clearable: true }
+          : {}),
+        ...(host.dataset.selectExample === 'medium'
+          ? { size: 'md', value: 'cherry', valueControlled: true }
+          : {}),
+        ...(host.dataset.selectExample === 'large' ? { size: 'lg', disabled: true } : {}),
+        ...(host.dataset.selectExample === 'help'
+          ? { helpText: 'Choose one seasonal fruit.' }
+          : {}),
+        ...(host.dataset.selectExample === 'error'
+          ? { invalid: true, errorText: 'Choose a fruit before continuing.' }
+          : {}),
+      },
+    });
+    host.append(select);
+  }
+</script>

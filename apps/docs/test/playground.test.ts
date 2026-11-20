@@ -12,12 +12,15 @@ import {
   radioGroupContract,
   radioGroupOptionsExamples,
   radioGroupValueExamples,
+  selectContract,
+  selectValueExamples,
   switchContract,
   textareaContract,
   textFieldContract,
 } from '@joralvmel/cosmos-core';
 import type { CosmBadge } from '@joralvmel/cosmos-elements/badge';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
+import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
 import type { CosmSwitch } from '@joralvmel/cosmos-elements/switch';
 import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
 import type { CosmTextarea } from '@joralvmel/cosmos-elements/textarea';
@@ -33,6 +36,7 @@ import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
 import '@joralvmel/cosmos-elements/radio-group';
+import '@joralvmel/cosmos-elements/select';
 import '@joralvmel/cosmos-elements/text-field';
 import '@joralvmel/cosmos-elements/textarea';
 import '@joralvmel/cosmos-elements/switch';
@@ -415,6 +419,64 @@ describe('Playground', () => {
     expect(controller.values.locale).toBeUndefined();
     controller.set('size', 0);
     expect(controller.values.size).toBe(57);
+  });
+
+  it('resolves Select collections, labels and controlled values across platform snippets', async () => {
+    const root = document.createElement('div');
+    const target = document.createElement('cosm-select') as CosmSelect;
+    target.dataset.playgroundTarget = '';
+    root.append(target);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: selectContract,
+      content: '',
+      labels: {
+        ...labels,
+        selectLabel: 'Fruta',
+        selectPlaceholder: 'Elige una fruta',
+        selectClearLabel: 'Quitar fruta',
+        selectValues: { none: 'Sin selección', apple: 'Manzana', cherry: 'Cereza' },
+      },
+      themes: [],
+      referenceValues: {
+        ListboxItems: listboxItemExamples,
+        SelectValue: selectValueExamples,
+      },
+    });
+
+    await target.updateComplete;
+    expect(target.label).toBe('Fruta');
+    expect(target.placeholder).toBe('Elige una fruta');
+    expect(target.items).toEqual(listboxItemExamples.grouped);
+    controller.set('value', 'cherry');
+    controller.set('clearable', true);
+    await target.updateComplete;
+    expect(target.value).toBe('cherry');
+    expect(target.valueControlled).toBe(true);
+    expect(target.clearLabel).toBe('Quitar fruta');
+    expect(
+      root.querySelector<HTMLSelectElement>('[data-prop="value"] option[value="cherry"]')
+        ?.textContent
+    ).toBe('Cereza');
+
+    controller.set('items', 'flat');
+    const replacement = root.querySelector<CosmSelect>('cosm-select');
+    if (!replacement) throw new Error('Missing remounted Select');
+    await replacement.updateComplete;
+    expect(replacement).not.toBe(target);
+    expect(replacement.value).toBe('cherry');
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).toContain('cherry');
+      expect(controller.code(platform)).toContain('clearable');
+    }
+
+    controller.set('value', 'none');
+    await replacement.updateComplete;
+    expect(replacement.value).toBeNull();
+    expect(replacement.valueControlled).toBe(true);
+    controller.set('label', ' ');
+    expect(controller.values.label).toBe('Fruta');
+    expect(root.querySelector('[role="status"]')?.textContent).toContain('non-empty label');
   });
 
   it('validates popover spacing and close labels before updating the preview', async () => {

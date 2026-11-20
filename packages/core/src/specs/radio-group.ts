@@ -51,14 +51,14 @@ export const radioGroupContract = defineContract({
     value: {
       type: 'reference',
       reference: 'RadioGroupValue',
-      options: ['none', 'email', 'phone'],
+      options: ['none', 'email', 'phone', 'basic', 'plus', 'premium', 'weekly', 'monthly'],
       description:
         'Controlled selected value; null means no selection, and a supplied null remains controlled.',
     },
     defaultValue: {
       type: 'reference',
       reference: 'RadioGroupValue',
-      options: ['none', 'email', 'phone'],
+      options: ['none', 'email', 'phone', 'basic', 'plus', 'premium', 'weekly', 'monthly'],
       description: 'Initial autonomous selection; null by default.',
     },
     size: {

@@ -6,6 +6,7 @@ import { iconButtonContract } from './specs/icon-button.js';
 import { listboxContract } from './specs/listbox.js';
 import { popoverContract } from './specs/popover.js';
 import { radioGroupContract } from './specs/radio-group.js';
+import { selectContract } from './specs/select.js';
 import { switchContract } from './specs/switch.js';
 import { textFieldContract } from './specs/text-field.js';
 import { textareaContract } from './specs/textarea.js';
@@ -32,6 +33,7 @@ export {
   radioGroupValueExamples,
   type SnippetChild,
   type SnippetTarget,
+  selectValueExamples,
   snippetTargets,
   supportsTarget,
   toAttribute,
@@ -92,6 +94,7 @@ export {
   validateRadioGroupOptions,
   validateRadioGroupValue,
 } from './headless/radio-group.js';
+export { validateSelectValue } from './headless/select.js';
 export { validateSize } from './headless/size.js';
 export {
   getTextFieldState,
@@ -142,6 +145,7 @@ export const contracts = {
   calendar: calendarContract,
   textarea: textareaContract,
   'radio-group': radioGroupContract,
+  select: selectContract,
 } as const;
 export { badgeContract } from './specs/badge.js';
 export {
@@ -229,6 +233,20 @@ export {
   radioGroupScenarios,
   radioGroupScenariosFor,
 } from './specs/radio-group.scenarios.js';
+export {
+  type SelectChangeDetail,
+  type SelectItems,
+  type SelectReferences,
+  type SelectValue,
+  selectContract,
+} from './specs/select.js';
+export {
+  type SelectAction,
+  type SelectScenario,
+  selectScenarioItems,
+  selectScenarios,
+  selectScenariosFor,
+} from './specs/select.scenarios.js';
 export {
   type SwitchCheckedChangeDetail,
   switchContract,

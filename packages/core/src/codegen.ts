@@ -1,6 +1,7 @@
 import type { ComponentContract, Platform, PropSpec } from './contract.js';
 import type { ListboxItem } from './specs/listbox.js';
 import type { RadioGroupOption, RadioGroupValue } from './specs/radio-group.js';
+import type { SelectValue } from './specs/select.js';
 
 /** Small, dependency-free collections shared by generated examples and documentation controls. */
 export const listboxItemExamples: Readonly<Record<string, readonly ListboxItem<never>[]>> = {
@@ -56,6 +57,17 @@ export const radioGroupValueExamples: Readonly<Record<string, RadioGroupValue>> 
   none: null,
   email: 'email',
   phone: 'phone',
+  basic: 'basic',
+  plus: 'plus',
+  premium: 'premium',
+  weekly: 'weekly',
+  monthly: 'monthly',
+};
+
+export const selectValueExamples: Readonly<Record<string, SelectValue>> = {
+  none: null,
+  apple: 'apple',
+  cherry: 'cherry',
   basic: 'basic',
   plus: 'plus',
   premium: 'premium',
@@ -141,6 +153,13 @@ function referenceImports(props: ActiveProp[], indent = '', typescript = true) {
               throw new Error(`Unknown ${spec.reference} example "${slug}".`);
             }
             const sample = radioGroupValueExamples[slug];
+            return `${indent}const ${referenceBinding(slug)} = ${JSON.stringify(sample)}${typescript ? ' as const' : ''};`;
+          }
+          if (spec.type === 'reference' && spec.reference === 'SelectValue') {
+            if (!Object.hasOwn(selectValueExamples, slug)) {
+              throw new Error(`Unknown ${spec.reference} example "${slug}".`);
+            }
+            const sample = selectValueExamples[slug];
             return `${indent}const ${referenceBinding(slug)} = ${JSON.stringify(sample)}${typescript ? ' as const' : ''};`;
           }
           return `${indent}import { ${referenceBinding(slug)} } from '@joralvmel/cosmos-icons/${slug}';`;

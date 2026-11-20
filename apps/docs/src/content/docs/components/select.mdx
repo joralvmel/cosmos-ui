@@ -1,0 +1,139 @@
+---
+title: Select
+description: Choose one option from a compact, labeled collection.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import SelectExamples from '../../../components/SelectExamples.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="select" />
+
+Select lets a person choose one value from a compact collection without keeping every option
+visible. Use Listbox when choices should remain on the page, or wait for the planned Combobox when
+people need to search or filter a long collection.
+
+## Playground
+
+<Playground name="select" />
+
+The playground demonstrates flat and grouped options, autonomous and controlled values, sizes, and
+clear behavior. Option collections are supplied as data; each option has a stable value and a
+visible label, with optional description, decorative icon, and disabled state.
+
+## Variants
+
+Select has one standard outlined appearance and three sizes. Use the documented theme tokens and
+`--cosm-select-*` hooks or CSS parts to customize its surfaces without introducing another visual
+variant.
+
+<SelectExamples kind="variants" />
+
+## States
+
+`defaultValue` initializes an autonomous selection. Supplying `value`, including `null`, makes the
+selection controlled: the component emits a proposal and waits for its owner to update the value.
+`clearable` adds a separately labeled action that proposes `null`.
+
+Web, React, and Angular use the same form-associated Web Component. It supports `name`, required
+validity, disabled fieldsets, and form reset. React Native has no HTML form lifecycle; provide
+localized help or error text directly.
+
+<SelectExamples kind="states" />
+
+### Web
+
+```html
+<cosm-select
+  id="fruit"
+  label="Fruit"
+  placeholder="Choose a fruit"
+  name="fruit"
+  required
+></cosm-select>
+<script type="module">
+  import '@joralvmel/cosmos-elements/select';
+
+  document.querySelector('#fruit').items = [
+    { value: 'apple', label: 'Apple' },
+    {
+      label: 'Seasonal',
+      options: [{ value: 'cherry', label: 'Cherry', description: 'Available in summer.' }],
+    },
+  ];
+</script>
+```
+
+### React
+
+```tsx
+import { Select } from '@joralvmel/cosmos-react';
+
+<Select
+  label="Fruit"
+  items={fruitItems}
+  placeholder="Choose a fruit"
+  value={fruit}
+  onChange={event => setFruit(event.detail.value)}
+/>;
+```
+
+### Angular
+
+```html
+<cosm-select
+  label="Fruit"
+  [items]="fruitItems"
+  placeholder="Choose a fruit"
+  [(ngModel)]="fruit"
+  name="fruit"
+></cosm-select>
+```
+
+Angular Forms integrates through `ControlValueAccessor`. Without Forms, listen to `valueChange`;
+it forwards the original DOM `CustomEvent`, so read the proposed value from `$event.detail.value`.
+
+### React Native
+
+```tsx
+import { Select } from '@joralvmel/cosmos-native';
+
+<Select
+  label="Fruit"
+  items={fruitItems}
+  placeholder="Choose a fruit"
+  value={fruit}
+  onValueChange={({ value }) => setFruit(value)}
+/>;
+```
+
+The native app must mount Select under the app-level `PopoverProvider`. Its popup uses Cosmos
+Popover and Listbox behavior, with platform-appropriate placement and dismissal.
+
+## Accessibility
+
+- Provide a visible, nonempty label. Placeholder text indicates an empty value; it does not name
+  the control. Localize the label, placeholder, option text, help/error text, and `clearLabel`.
+- On Web, Tab reaches the combobox trigger; Enter, Space, or an arrow key opens the listbox.
+  Arrow keys and Home/End move the active option without committing it, printable characters use
+  typeahead, Enter/Space selects, and Escape closes without changing the value.
+- The Web popup exposes combobox, listbox, group, option, expanded, selected, disabled, required,
+  and invalid semantics. Focus remains distinct from selection, and disabled options cannot be
+  selected.
+- React and Angular forward the Web component's events and accessibility behavior. React Native
+  exposes platform-supported combobox/listbox semantics, selection and disabled state, and
+  touch-sized controls; native hardware-keyboard behavior may differ.
+- Keep focus, selected, invalid, and disabled states distinguishable when customizing colors.
+  Native does not provide HTML form submission or browser constraint validation.
+- Search/filtering, multiselect, asynchronous loading, virtualization, tree options, bulk actions,
+  arbitrary interactive option content, and platform-native picker UI are deferred.
+
+## API
+
+<ApiTable name="select" />
+
+## Events by platform
+
+<EventsTable name="select" />

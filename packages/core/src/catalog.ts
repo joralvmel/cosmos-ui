@@ -219,6 +219,10 @@ export const catalog: readonly CatalogEntry[] = [
     priority: 1,
     dependsOn: ['popover', 'listbox', 'icon'],
     pattern: apg('combobox/examples/combobox-select-only'),
+    status: 'in-progress',
+    notes: [
+      'Android emulator/device interaction remains unverified; the Expo Android export and React Native Web demo were validated.',
+    ],
   }),
   entry({
     name: 'combobox',
