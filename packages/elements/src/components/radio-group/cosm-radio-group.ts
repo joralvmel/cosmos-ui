@@ -7,6 +7,7 @@ import {
   radioGroupContract,
   validateRadioGroupOptions,
   validateRadioGroupValue,
+  validateSize,
 } from '@joralvmel/cosmos-core';
 import { css, html, LitElement, nothing } from 'lit';
 import { CosmElement } from '../../internal/cosm-element.js';
@@ -15,15 +16,31 @@ import { boxSizing, focusRing } from '../../internal/styles.js';
 
 type Props = ContractProps<typeof radioGroupContract, 'web', RadioGroupReferences>;
 type Value = Props['value'];
+type Size = NonNullable<Props['size']>;
+
+const sizeConverter = {
+  fromAttribute(value: string | null): Size {
+    if (value === null) return radioGroupContract.props.size.default;
+    const number = Number(value);
+    return value.trim() !== '' && Number.isFinite(number) ? number : (value as Size);
+  },
+};
 
 let instance = 0;
 
 const styles = css`
   :host {
+    --_radio-size: var(--cosm-icon-size-md, 20px);
     display: block;
     min-width: 0;
     color: var(--cosm-fg, oklch(0.24 0.01 268));
     font-family: var(--cosm-font-sans, system-ui, sans-serif);
+  }
+  :host([size='sm']) {
+    --_radio-size: var(--cosm-icon-size-sm, 16px);
+  }
+  :host([size='lg']) {
+    --_radio-size: var(--cosm-icon-size-lg, 24px);
   }
   .base {
     min-width: 0;
@@ -72,8 +89,8 @@ const styles = css`
   }
   .control {
     display: grid;
-    width: var(--cosm-radio-group-control-size, var(--cosm-icon-size-md, 1.25rem));
-    height: var(--cosm-radio-group-control-size, var(--cosm-icon-size-md, 1.25rem));
+    width: var(--cosm-radio-group-control-size, var(--_radio-custom-size, var(--_radio-size)));
+    height: var(--cosm-radio-group-control-size, var(--_radio-custom-size, var(--_radio-size)));
     flex: none;
     place-items: center;
     box-sizing: border-box;
@@ -219,6 +236,7 @@ export class CosmRadioGroup extends CosmElement {
     value: { attribute: false, noAccessor: true },
     defaultValue: { attribute: false },
     orientation: { reflect: true },
+    size: { reflect: true, converter: sizeConverter },
     disabled: { type: Boolean, reflect: true },
     required: { type: Boolean, reflect: true },
     invalid: { type: Boolean, reflect: true },
@@ -233,6 +251,7 @@ export class CosmRadioGroup extends CosmElement {
   declare options: NonNullable<Props['options']>;
   declare defaultValue: Props['defaultValue'];
   declare orientation: NonNullable<Props['orientation']>;
+  declare size: Size;
   declare disabled: NonNullable<Props['disabled']>;
   declare required: NonNullable<Props['required']>;
   declare invalid: NonNullable<Props['invalid']>;
@@ -258,6 +277,7 @@ export class CosmRadioGroup extends CosmElement {
     this.options = [];
     this.defaultValue = undefined;
     this.orientation = props.orientation.default;
+    this.size = props.size.default;
     this.disabled = props.disabled.default;
     this.required = props.required.default;
     this.invalid = props.invalid.default;
@@ -337,6 +357,7 @@ export class CosmRadioGroup extends CosmElement {
   }
 
   protected override willUpdate(): void {
+    validateSize(this.size, 'RadioGroup');
     if (typeof this.label !== 'string' || !this.label.trim()) {
       throw new TypeError('RadioGroup requires a non-empty label.');
     }
@@ -368,6 +389,11 @@ export class CosmRadioGroup extends CosmElement {
   }
 
   protected override updated(): void {
+    if (typeof this.size === 'number') {
+      this.style.setProperty('--_radio-custom-size', `${this.size}px`);
+    } else {
+      this.style.removeProperty('--_radio-custom-size');
+    }
     this.#syncFormState();
   }
 

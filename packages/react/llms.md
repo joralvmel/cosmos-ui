@@ -466,6 +466,7 @@ Selects one option from a labeled collection, with optional selection and native
 | `options` | RadioGroupOptions | Required | Readonly flat options with unique nonempty values and labels, optional descriptions and disabled states. |
 | `value` | RadioGroupValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
 | `defaultValue` | RadioGroupValue | — | Initial autonomous selection; null by default. |
+| `size` | 'sm' \| 'md' \| 'lg' \| number | `md` | Indicator size token or positive finite number in CSS pixels on web and logical units on native. |
 | `orientation` | 'vertical' \| 'horizontal' | `vertical` | Vertical list or wrapping horizontal options. |
 | `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
 | `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |

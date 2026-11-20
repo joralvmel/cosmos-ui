@@ -7,12 +7,14 @@ import {
   radioGroupContract,
   validateRadioGroupOptions,
   validateRadioGroupValue,
+  validateSize,
 } from '@joralvmel/cosmos-core';
 import { useEffect, useId, useState } from 'react';
 import {
   Platform,
   Pressable,
   type StyleProp,
+  StyleSheet,
   Text,
   type TextStyle,
   View,
@@ -45,6 +47,7 @@ export const radioGroupPropNames = [
   'value',
   'defaultValue',
   'orientation',
+  'size',
   'disabled',
   'required',
   'invalid',
@@ -53,7 +56,7 @@ export const radioGroupPropNames = [
 ] as const satisfies readonly (keyof ContractRadioGroupProps)[];
 
 const MIN_TOUCH_TARGET = 44;
-const CONTROL_SIZE = 20;
+const sizeDimensions = { sm: 16, md: 20, lg: 24 } as const;
 
 interface WebKeyEvent {
   key: string;
@@ -83,6 +86,7 @@ export function RadioGroup({
   value,
   defaultValue = null,
   orientation = radioGroupContract.props.orientation.default,
+  size = radioGroupContract.props.size.default,
   disabled = radioGroupContract.props.disabled.default,
   required = radioGroupContract.props.required.default,
   invalid = radioGroupContract.props.invalid.default,
@@ -107,7 +111,17 @@ export function RadioGroup({
     getRadioGroupInitialActive(options, currentValue)
   );
   const [focusedValue, setFocusedValue] = useState<string | null>(null);
+  const [focusVisible, setFocusVisible] = useState(false);
   const [hoveredValue, setHoveredValue] = useState<string | null>(null);
+  const controlDimensions = StyleSheet.flatten(controlStyle);
+  validateSize(size, 'RadioGroup');
+  const dimension = typeof size === 'number' ? size : sizeDimensions[size];
+  const controlWidth = controlDimensions?.width ?? dimension;
+  const controlHeight = controlDimensions?.height ?? dimension;
+  const dotSize =
+    typeof controlWidth === 'number' && typeof controlHeight === 'number'
+      ? Math.min(controlWidth, controlHeight) * 0.48
+      : dimension * 0.48;
   const currentInvalid = invalid || Boolean(errorText);
   const describedBy = [helpText ? `${id}-help` : '', errorText ? `${id}-error` : '']
     .filter(Boolean)
@@ -158,6 +172,7 @@ export function RadioGroup({
           ? -1
           : 0;
     if (direction === 0 && keyEvent.key !== ' ') return;
+    setFocusVisible(true);
     keyEvent.preventDefault();
     keyEvent.stopPropagation();
     if (direction === 0) {
@@ -168,6 +183,7 @@ export function RadioGroup({
     if (!nextValue) return;
     setActiveValue(nextValue);
     focusWebOption(`${id}-option-${options.findIndex(option => option.value === nextValue)}`);
+    setFocusVisible(true);
     select(nextValue);
   };
 
@@ -241,12 +257,17 @@ export function RadioGroup({
               disabled={optionDisabled}
               hitSlop={4}
               onPress={() => select(option.value)}
-              onFocus={() => {
+              onFocus={event => {
                 setFocusedValue(option.value);
                 setActiveValue(option.value);
+                if (Platform.OS === 'web') {
+                  const target = event.currentTarget as { matches?(selector: string): boolean };
+                  setFocusVisible(target.matches?.(':focus-visible') === true);
+                }
               }}
               onBlur={() => {
                 setFocusedValue(null);
+                setFocusVisible(false);
                 setActiveValue(initialActive);
               }}
               onHoverIn={() => setHoveredValue(option.value)}
@@ -262,6 +283,18 @@ export function RadioGroup({
                   alignItems: 'center',
                   gap: theme.space.sm,
                   opacity: optionDisabled ? 0.5 : 1,
+                  ...(Platform.OS === 'web' &&
+                  focusVisible &&
+                  focusedValue === option.value &&
+                  !optionDisabled
+                    ? {
+                        outlineWidth: 2,
+                        outlineStyle: 'solid' as const,
+                        outlineColor: theme.colors['focus-ring'],
+                        outlineOffset: 2,
+                        borderRadius: theme.radius.sm,
+                      }
+                    : {}),
                 },
                 optionStyle,
               ]}
@@ -273,8 +306,8 @@ export function RadioGroup({
                 aria-hidden
                 style={[
                   {
-                    width: CONTROL_SIZE,
-                    height: CONTROL_SIZE,
+                    width: dimension,
+                    height: dimension,
                     flexShrink: 0,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -282,14 +315,6 @@ export function RadioGroup({
                     borderColor: boundaryColor,
                     borderRadius: theme.radius.full,
                     backgroundColor: theme.colors.bg,
-                    ...(Platform.OS === 'web' && focusedValue === option.value && !optionDisabled
-                      ? {
-                          outlineWidth: 2,
-                          outlineStyle: 'solid' as const,
-                          outlineColor: theme.colors['focus-ring'],
-                          outlineOffset: 2,
-                        }
-                      : {}),
                   },
                   controlStyle,
                 ]}
@@ -297,8 +322,8 @@ export function RadioGroup({
                 {checked ? (
                   <View
                     style={{
-                      width: CONTROL_SIZE * 0.48,
-                      height: CONTROL_SIZE * 0.48,
+                      width: dotSize,
+                      height: dotSize,
                       borderRadius: theme.radius.full,
                       backgroundColor: currentInvalid ? theme.colors.danger : theme.colors.primary,
                     }}

@@ -186,6 +186,23 @@ describe('RadioGroup (native)', () => {
     expect(onValueChange).toHaveBeenCalledOnce();
   });
 
+  it('resizes the selected dot without shrinking the touch target', async () => {
+    await render(
+      <RadioGroup
+        label="Contact method"
+        options={radioGroupScenarioOptions}
+        defaultValue="email"
+        controlStyle={[{ width: 24 }, { height: 24 }]}
+        testID="subject"
+      />
+    );
+    const option = optionNode('email') as Element;
+    const control = option.querySelector('[aria-hidden="true"]') as Element;
+    expect(styleOf(option).minHeight).toBe(44);
+    expect(styleOf(control)).toMatchObject({ width: 24, height: 24, borderWidth: 1 });
+    expect(styleOf(control.firstElementChild as Element).width).toBeCloseTo(11.52);
+  });
+
   it('supports keyboard selection and a single React Native Web tab stop', async () => {
     runtime.nativeWeb = true;
     const onValueChange = vi.fn();

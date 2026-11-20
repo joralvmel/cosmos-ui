@@ -15,8 +15,9 @@ it. Required validation is separate from the initial selection.
 Options are a typed data collection with unique nonempty `value`, nonempty `label`, optional
 `description`, and optional `disabled`. The group label is required and visible. The group supports
 `orientation="vertical" | "horizontal"` and defaults to vertical; horizontal options wrap when
-space is constrained. There is one standard circular-radio appearance and one medium visual size;
-there is no public size or variant prop.
+space is constrained. There is one standard circular-radio appearance. Like Checkbox, `size`
+accepts `sm`, `md` (default), `lg`, or a positive finite number in CSS pixels on Web and logical
+units on React Native. This affects the indicator, not the minimum interaction target.
 
 ## State and event mapping
 
@@ -56,7 +57,8 @@ validation.
 
 On all platforms, selection is drawn as a colored ring and a centered dot on the same background
 as an unselected control. The dot stays distinct from the ring on hover, and keyboard focus uses
-its own outline.
+its own outline. On React Native Web the outline surrounds the option row and is shown for
+keyboard focus, not pointer focus.
 
 ### Hover refinement
 
@@ -91,7 +93,7 @@ manual screen-reader testing are optional and remain unverified unless explicitl
 
 ## Excluded and deferred
 
-No card or segmented-button variants, additional sizes, icons, arbitrary HTML/JSX or custom option
+No card or segmented-button variants, icons, arbitrary HTML/JSX or custom option
 renderers, nested interactive content, multi-selection, read-only state, clear-on-activation,
 toolbar behavior, Home/End shortcuts, search, loading, virtualization, async validation, TV support,
 native hardware-keyboard navigation, or new dependencies.

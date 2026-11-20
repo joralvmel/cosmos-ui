@@ -72,6 +72,9 @@ export class CosmRadioGroupComponent implements ControlValueAccessor {
   @Input() set orientation(value: Props['orientation']) {
     if (value !== undefined) this.element.orientation = value;
   }
+  @Input() set size(value: Props['size']) {
+    this.element.size = value ?? 'md';
+  }
   @Input({ transform: booleanAttribute }) set disabled(value: boolean) {
     this.element.disabled = value;
   }

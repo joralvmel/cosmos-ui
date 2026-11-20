@@ -61,6 +61,14 @@ export const radioGroupContract = defineContract({
       options: ['none', 'email', 'phone'],
       description: 'Initial autonomous selection; null by default.',
     },
+    size: {
+      type: 'union',
+      variants: [{ type: 'enum', values: ['sm', 'md', 'lg'] }, { type: 'number' }],
+      default: 'md',
+      reflect: true,
+      description:
+        'Indicator size token or positive finite number in CSS pixels on web and logical units on native.',
+    },
     orientation: {
       type: 'enum',
       values: ['vertical', 'horizontal'],

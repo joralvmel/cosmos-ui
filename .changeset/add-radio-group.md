@@ -6,4 +6,4 @@
 '@joralvmel/cosmos-native': minor
 ---
 
-Add the Radio Group component (`<cosm-radio-group>`) with its contract, React, Angular and React Native implementations.
+Add Radio Group (`<cosm-radio-group>`) for Web, React, Angular and React Native with semantic or numeric `size` and a distinct keyboard focus outline.

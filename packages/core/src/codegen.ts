@@ -41,12 +41,26 @@ export const radioGroupOptionsExamples: Readonly<Record<string, readonly RadioGr
     { value: 'phone', label: 'Phone', description: 'Receive updates by text.' },
     { value: 'mail', label: 'Mail', disabled: true },
   ],
+  plans: [
+    { value: 'basic', label: 'Basic' },
+    { value: 'plus', label: 'Plus' },
+    { value: 'premium', label: 'Premium' },
+  ],
+  frequency: [
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' },
+  ],
 };
 
 export const radioGroupValueExamples: Readonly<Record<string, RadioGroupValue>> = {
   none: null,
   email: 'email',
   phone: 'phone',
+  basic: 'basic',
+  plus: 'plus',
+  premium: 'premium',
+  weekly: 'weekly',
+  monthly: 'monthly',
 };
 
 /** Code tabs of the Playground. */

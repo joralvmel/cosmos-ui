@@ -22,7 +22,7 @@ type ElementProps = React.ComponentProps<typeof RadioGroupElement>;
 /** React wrapper; a supplied value, including null, keeps selection controlled. */
 export const RadioGroup = React.forwardRef<CosmRadioGroup, RadioGroupProps>(
   (props, forwardedRef) => {
-    const { value, onChange, ...elementProps } = props;
+    const { value, onChange, size = 'md', ...elementProps } = props;
     const handleChange = React.useCallback(
       (event: CustomEvent<RadioGroupChangeDetail>) => {
         if (onChange) flushSync(() => onChange(event));
@@ -39,6 +39,7 @@ export const RadioGroup = React.forwardRef<CosmRadioGroup, RadioGroupProps>(
     );
     return React.createElement(RadioGroupElement, {
       ...elementProps,
+      size,
       value,
       onChange: handleChange,
       ref: setRef,

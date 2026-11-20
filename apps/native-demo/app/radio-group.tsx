@@ -52,6 +52,7 @@ export default function RadioGroupScreen() {
   const [required, setRequired] = useState(true);
   const [invalid, setInvalid] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [indicatorSize, setIndicatorSize] = useState<'sm' | 'md' | 'lg' | 28>('md');
   const [lastProposal, setLastProposal] = useState('No selection proposal yet');
   const controlRow = { flexDirection: 'row', flexWrap: 'wrap', gap: theme.space.sm } as const;
 
@@ -67,6 +68,15 @@ export default function RadioGroupScreen() {
         Interaction and validation
       </Text>
       <View style={controlRow}>
+        <Control
+          label="Indicator size"
+          value={typeof indicatorSize === 'number' ? `${indicatorSize} pt` : indicatorSize}
+          onPress={() =>
+            setIndicatorSize(current =>
+              current === 'sm' ? 'md' : current === 'md' ? 'lg' : current === 'lg' ? 28 : 'sm'
+            )
+          }
+        />
         <Control
           label="Accept proposals"
           value={acceptProposals ? 'yes' : 'no'}
@@ -103,6 +113,7 @@ export default function RadioGroupScreen() {
       <RadioGroup
         label="Preferred contact method"
         options={options}
+        size={indicatorSize}
         value={value}
         orientation={orientation}
         required={required}
