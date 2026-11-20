@@ -100,7 +100,7 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
             (props.onHoverIn as PointerEventHandler<HTMLButtonElement> | undefined)?.(event);
         }}
         onPointerLeave={props.onHoverOut as PointerEventHandler<HTMLButtonElement>}
-        id={props.id as string}
+        id={(props.id ?? props.nativeID) as string}
         role={(props.role as string) ?? (props.accessibilityRole as string)}
         tabIndex={props.tabIndex as number}
         aria-selected={
@@ -129,6 +129,7 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
         }
         aria-readonly={props['aria-readonly'] ? 'true' : undefined}
         onKeyDownCapture={props.onKeyDownCapture as KeyboardEventHandler<HTMLButtonElement>}
+        onKeyDown={props.onKeyDown as KeyboardEventHandler<HTMLButtonElement>}
         data-style={JSON.stringify(flatten(style))}
         data-hitslop={props.hitSlop as string}
       >
@@ -180,10 +181,14 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
       ref: node,
       tabIndex: props.tabIndex,
       'data-testid': props.testID,
-      role: props.role as string,
+      'data-role': props.accessibilityRole as string,
+      role: (props.role as string) ?? (props.accessibilityRole as string),
       'aria-label': props.accessibilityLabel as string,
       'aria-labelledby': props['aria-labelledby'] as string,
       'aria-readonly': props['aria-readonly'] ? 'true' : undefined,
+      'aria-required': props['aria-required'] ? 'true' : undefined,
+      'aria-invalid': props['aria-invalid'] ? 'true' : undefined,
+      'aria-describedby': props['aria-describedby'] as string,
       'aria-disabled': props['aria-disabled'] ? 'true' : state?.disabled ? 'true' : undefined,
       'data-popover-host': flatten(props.style).flex === 1 ? 'true' : undefined,
       'aria-busy': state?.busy ? 'true' : undefined,

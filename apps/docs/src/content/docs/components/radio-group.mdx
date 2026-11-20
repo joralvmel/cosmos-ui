@@ -1,0 +1,107 @@
+---
+title: Radio Group
+description: Accessible single selection with keyboard navigation and Web form support.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import RadioGroupExamples from '../../../components/RadioGroupExamples.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="radio-group" />
+
+Radio Group lets a person choose one option from a labeled set. Use it when the available choices
+should remain visible; use a different control when the choice is optional but space is limited.
+
+## Playground
+
+<Playground name="radio-group" />
+
+The options control uses named sample collections. The playground shows autonomous and controlled
+snippets for Web, React, Angular, and React Native.
+
+## Variants
+
+Radio Group has one standard circular appearance and a medium visual size. Choose vertical or
+wrapping horizontal orientation, and use the documented CSS custom properties to adapt its spacing
+and colors.
+
+<RadioGroupExamples />
+
+## States
+
+`defaultValue` initializes an autonomous group; it does not reset a group after initialization.
+Supplying `value`, including `null`, makes the group controlled. In controlled mode, the owner
+decides whether to accept a proposed selection.
+
+<RadioGroupExamples kind="states" />
+
+## Usage by platform
+
+### React
+
+```tsx
+import { RadioGroup } from '@joralvmel/cosmos-react';
+
+<RadioGroup
+  label="Contact method"
+  options={contactMethods}
+  value={contactMethod}
+  onChange={event => setContactMethod(event.detail.value)}
+/>;
+```
+
+### Angular
+
+```html
+<cosm-radio-group
+  label="Contact method"
+  [options]="contactMethods"
+  formControlName="contactMethod"
+  name="contact-method"
+/>
+```
+
+Angular Forms integrates through `ControlValueAccessor`. Without a form control, listen to
+`valueChange` and assign an accepted value explicitly.
+
+### React Native
+
+```tsx
+import { RadioGroup } from '@joralvmel/cosmos-native';
+
+<RadioGroup
+  label="Contact method"
+  options={contactMethods}
+  value={contactMethod}
+  onValueChange={({ value }) => setContactMethod(value)}
+/>;
+```
+
+React Native has no HTML form association or browser constraint validation. Provide localized
+required and validation feedback through the label, help text, and error text as appropriate.
+
+## Accessibility
+
+- Provide a visible, nonempty group `label` and concise labels for every option. Optional
+  descriptions add context without replacing the label.
+- Tab enters the selected option, or the first enabled option when none is selected. Space selects
+  the focused option. Arrow keys move focus and selection with wrapping, skipping disabled options.
+- Web uses native radio inputs within a labeled fieldset and supports form submission, required
+  validity, disabled fieldsets, and reset. React and Angular use the same Web implementation.
+- React Native exposes `radiogroup` and `radio` semantics, checked and disabled state, and touch
+  targets of at least 44 points. React Native Web also supports the documented keyboard behavior;
+  HTML form behavior does not apply on native platforms.
+- Keep keyboard focus distinct from selection when customizing colors. Invalid and disabled states
+  retain their semantic treatment.
+- Toolbar behavior, clearing a selection, multiple selection, custom option renderers, and native
+  hardware-keyboard navigation are not part of this component.
+
+## API
+
+<ApiTable name="radio-group" />
+
+## Events by platform
+
+<EventsTable name="radio-group" />

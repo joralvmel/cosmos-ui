@@ -80,6 +80,10 @@
       "types": "./dist/components/textarea/cosm-textarea.d.ts",
       "default": "./dist/components/textarea/cosm-textarea.js"
     },
+    "./radio-group": {
+      "types": "./dist/components/radio-group/cosm-radio-group.d.ts",
+      "default": "./dist/components/radio-group/cosm-radio-group.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

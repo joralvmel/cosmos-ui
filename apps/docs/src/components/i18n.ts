@@ -73,6 +73,8 @@ const strings = {
       switchLabel: 'Enable notifications',
       switchInvalid: 'Use a non-empty label and a positive size.',
       listboxLabel: 'Choose produce',
+      radioGroupLabel: 'Contact method',
+      radioGroupInvalid: 'Enter a non-empty group label.',
       listboxInvalid:
         'Use a non-empty label, positive height and values matching the selection mode.',
       listboxSelected: 'Selected',
@@ -228,6 +230,8 @@ const strings = {
       switchLabel: 'Activar notificaciones',
       switchInvalid: 'Usa una etiqueta no vacía y un tamaño positivo.',
       listboxLabel: 'Elige productos',
+      radioGroupLabel: 'Método de contacto',
+      radioGroupInvalid: 'Introduce una etiqueta de grupo que no esté vacía.',
       listboxInvalid:
         'Usa una etiqueta no vacía, altura positiva y valores adecuados al modo de selección.',
       listboxSelected: 'Seleccionados',

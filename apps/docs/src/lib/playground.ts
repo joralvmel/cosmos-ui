@@ -68,6 +68,8 @@ export interface PlaygroundLabels {
   switchLabel?: string;
   switchInvalid?: string;
   listboxLabel?: string;
+  radioGroupLabel?: string;
+  radioGroupInvalid?: string;
   listboxInvalid?: string;
   listboxSelected?: string;
   listboxProposal?: string;
@@ -207,6 +209,9 @@ export function initPlayground(
   }
   if (contract.name === 'listbox') {
     values.label = labels.listboxLabel ?? 'Choose produce';
+  }
+  if (contract.name === 'radio-group') {
+    values.label = labels.radioGroupLabel ?? 'Contact method';
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -1002,6 +1007,15 @@ export function initPlayground(
         }
         referenceStatus.textContent = '';
       }
+      if (contract.name === 'radio-group') {
+        const label = name === 'label' ? value : values.label;
+        if (typeof label !== 'string' || !label.trim()) {
+          referenceStatus.textContent =
+            labels.radioGroupInvalid ?? 'Enter a non-empty group label.';
+          return;
+        }
+        referenceStatus.textContent = '';
+      }
       const catalog =
         spec?.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
       if (catalog && typeof value === 'string') {
@@ -1027,7 +1041,8 @@ export function initPlayground(
         target &&
         ((contract.name === 'popover' && name === 'defaultOpen') ||
           (contract.name === 'listbox' &&
-            (name === 'selectionMode' || name === 'defaultSelectedValues')))
+            (name === 'selectionMode' || name === 'defaultSelectedValues')) ||
+          (contract.name === 'radio-group' && name === 'defaultValue'))
       ) {
         const replacement = document.createElement(contract.tag);
         for (const attribute of target.attributes) {
@@ -1061,6 +1076,9 @@ export function initPlayground(
         }
         if (contract.name === 'listbox' && name === 'selectedValues') {
           Reflect.set(target, 'selectedValuesControlled', value !== undefined);
+        }
+        if (contract.name === 'radio-group' && name === 'value') {
+          Reflect.set(target, 'valueControlled', value !== undefined);
         }
         const resolved =
           spec?.type === 'reference' && typeof value === 'string'

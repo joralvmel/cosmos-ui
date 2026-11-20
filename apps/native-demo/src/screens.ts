@@ -35,4 +35,9 @@ export const screens = [
     description: 'Date selection, locale, bounds and states.',
   },
   { route: '/textarea', title: 'Textarea', description: 'Labeled multiline text and states.' },
+  {
+    route: '/radio-group',
+    title: 'Radio Group',
+    description: 'Single selection, orientation, validation and controlled state.',
+  },
 ] as const;

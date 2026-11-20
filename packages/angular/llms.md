@@ -465,6 +465,44 @@ export class ExampleComponent {
   }
 }
 ```
+### `CosmRadioGroupComponent` (`<cosm-radio-group>`)
+
+Selects one option from a labeled collection, with optional selection and native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the group. |
+| `options` | RadioGroupOptions | Required | Readonly flat options with unique nonempty values and labels, optional descriptions and disabled states. |
+| `value` | RadioGroupValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | RadioGroupValue | — | Initial autonomous selection; null by default. |
+| `orientation` | 'vertical' \| 'horizontal' | `vertical` | Vertical list or wrapping horizontal options. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the group. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+
+Events: `(valueChange)` → `RadioGroupChangeDetail`.
+
+```ts
+import { Component } from '@angular/core';
+import { CosmRadioGroupComponent } from '@joralvmel/cosmos-angular';
+const contactMethods = [{"value":"email","label":"Email","description":"Receive updates by email."},{"value":"phone","label":"Phone","description":"Receive updates by text."},{"value":"mail","label":"Mail","disabled":true}] as const;
+import type { RadioGroupChangeDetail } from '@joralvmel/cosmos-core';
+
+@Component({
+  selector: 'app-example',
+  imports: [CosmRadioGroupComponent],
+  template: `<cosm-radio-group label="RadioGroup" [options]="contactMethods" (valueChange)="onValueChange($event.detail)"></cosm-radio-group>`,
+})
+export class ExampleComponent {
+  readonly contactMethods = contactMethods;
+  onValueChange(detail: RadioGroupChangeDetail) {
+    console.log(detail);
+  }
+}
+```
 
 ## Themes
 
