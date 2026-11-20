@@ -190,7 +190,6 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'form',
     batch: 'B',
     priority: 1,
-    status: 'in-progress',
     dependsOn: [],
     pattern: apg('radio'),
   }),

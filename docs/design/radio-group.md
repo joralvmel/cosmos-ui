@@ -128,6 +128,19 @@ state/event ownership, and [ADR 0004](../adr/0004-theming.md) for theming.
    React Native demos are validated. Android build/runtime is recorded separately; iOS and manual
    screen-reader results remain not verified (optional).
 
+## Readiness validation
+
+- Chromium: verified selection, keyboard focus, and wrapping at 360 CSS px with forced colors
+  and reduced motion. Axe reported no violations in the component previews. Checked both modes
+  of all six built-in themes; the minimum indicator-boundary contrast against the background
+  was 3.22:1.
+- React and Angular: mounted the built wrappers in Chrome. Verified controlled React changes
+  and size bindings, and Angular form selection, reset, disabled state, and programmatic writes.
+- React Native Web: verified pointer selection and the separate keyboard focus outline.
+- Android: exported the Hermes bundle and tested touch selection, controlled refusal, size,
+  orientation, and checked/disabled accessibility states on Pixel 9 (API 35) with Expo Go 58.
+  A standalone APK was not built. iOS and manual screen-reader testing were not verified (optional).
+
 ## Research references
 
 - [WAI-ARIA APG Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
