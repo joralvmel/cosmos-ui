@@ -139,6 +139,8 @@ No reference implementation code or assets are copied.
   chevron rotation, and popup closure when a Web Select becomes disabled. React Native Web reports
   `aria-expanded`, applies the expanded trigger styles, and rotates the chevron; its disabled state
   remains noninteractive.
+- React and Angular package tests passed, but those wrappers were not separately mounted for browser
+  runtime smoke tests in this pass.
 - The Select states gallery now includes a disabled control. Disabled controls close their popup
   when disabled while open and do not reopen from keyboard activation.
 - Across all six built-in themes in light and dark modes, resolved-token WCAG contrast minima are
@@ -148,5 +150,5 @@ No reference implementation code or assets are copied.
   calculations use the token package's contrast function; they are not device/runtime measurements.
 - `npx expo export --platform android` passed. No Android device was attached and no emulator
   executable was available, so Android interaction remains unverified and the catalog readiness
-  status stays `in-progress`.
+  status stays `in-progress`. The React/Angular browser wrapper smoke tests are also unverified.
 - iOS interaction and manual screen-reader testing are not verified (optional).

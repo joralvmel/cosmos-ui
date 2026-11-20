@@ -221,7 +221,7 @@ export const catalog: readonly CatalogEntry[] = [
     pattern: apg('combobox/examples/combobox-select-only'),
     status: 'in-progress',
     notes: [
-      'Android emulator/device interaction remains unverified; the Expo Android export and React Native Web demo were validated.',
+      'Android emulator/device interaction and dedicated React/Angular browser wrapper smoke tests remain unverified; Expo Android export, React Native Web, and wrapper package tests passed.',
     ],
   }),
   entry({
