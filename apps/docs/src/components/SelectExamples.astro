@@ -21,6 +21,7 @@ const examples =
           invalid: true,
           errorText: 'Choose a fruit before continuing.',
         },
+        { name: 'disabled', label: 'Disabled', disabled: true, value: 'apple' },
       ];
 ---
 
@@ -56,6 +57,9 @@ const examples =
           : {}),
         ...(host.dataset.selectExample === 'error'
           ? { invalid: true, errorText: 'Choose a fruit before continuing.' }
+          : {}),
+        ...(host.dataset.selectExample === 'disabled'
+          ? { disabled: true, value: 'apple', valueControlled: true }
           : {}),
       },
     });

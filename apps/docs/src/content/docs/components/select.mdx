@@ -35,7 +35,10 @@ variant.
 
 `defaultValue` initializes an autonomous selection. Supplying `value`, including `null`, makes the
 selection controlled: the component emits a proposal and waits for its owner to update the value.
-`clearable` adds a separately labeled action that proposes `null`.
+`clearable` adds a separately labeled action that proposes `null`. `disabled` prevents opening,
+selection, and clearing; disabled options remain visible but cannot be selected.
+Enabled triggers highlight on pointer hover and remain visually active while open; the chevron
+rotates to indicate the expanded popup.
 
 Web, React, and Angular use the same form-associated Web Component. It supports `name`, required
 validity, disabled fieldsets, and form reset. React Native has no HTML form lifecycle; provide

@@ -11,7 +11,7 @@ import {
 import type { IconDefinition } from '@joralvmel/cosmos-icons';
 import { chevronDown } from '@joralvmel/cosmos-icons/chevron-down';
 import { x } from '@joralvmel/cosmos-icons/x';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Pressable,
   type StyleProp,
@@ -84,6 +84,7 @@ export function Select({
   const popover = useRef<PopoverHandle>(null);
   const [ownedValue, setOwnedValue] = useState<SelectValue>(defaultValue);
   const [expanded, setExpanded] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const options = useMemo(() => getListboxOptions(items), [items]);
   const currentValue = value === undefined ? ownedValue : value;
   const selected = options.find(option => option.value === currentValue);
@@ -118,6 +119,10 @@ export function Select({
     changeValue(null);
     popover.current?.requestClose();
   };
+
+  useEffect(() => {
+    if (disabled && expanded) popover.current?.requestClose();
+  }, [disabled, expanded]);
 
   const controlHeight = Math.max(44, theme.control[size]);
   const textSize = theme.text[size];
@@ -158,22 +163,34 @@ export function Select({
                 accessibilityHint={description || (required ? 'Required' : undefined)}
                 accessibilityValue={{ text: selected?.label ?? placeholder }}
                 accessibilityState={{ disabled, expanded }}
+                aria-expanded={expanded}
                 aria-invalid={currentInvalid ? 'true' : 'false'}
                 aria-required={required ? 'true' : 'false'}
-                style={({ pressed }) => ({
-                  minHeight: controlHeight,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: theme.space.sm,
-                  paddingHorizontal: theme.space.md,
-                  paddingVertical: theme.space.xs,
-                  borderWidth: 1,
-                  borderColor: currentInvalid ? theme.colors.danger : theme.colors['border-strong'],
-                  borderRadius: theme.radius.md,
-                  backgroundColor: theme.colors.bg,
-                  opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
-                })}
+                onHoverIn={() => setHovered(true)}
+                onHoverOut={() => setHovered(false)}
+                style={({ pressed }) => {
+                  const borderColor = currentInvalid
+                    ? theme.colors.danger
+                    : expanded
+                      ? theme.colors['focus-ring']
+                      : !disabled && hovered
+                        ? theme.colors.primary
+                        : theme.colors['border-strong'];
+                  return {
+                    minHeight: controlHeight,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: theme.space.sm,
+                    paddingHorizontal: theme.space.md,
+                    paddingVertical: theme.space.xs,
+                    borderWidth: 1,
+                    borderColor,
+                    borderRadius: theme.radius.md,
+                    backgroundColor: expanded ? theme.colors['primary-subtle'] : theme.colors.bg,
+                    opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
+                  };
+                }}
               >
                 <Text
                   numberOfLines={1}
@@ -185,7 +202,12 @@ export function Select({
                 >
                   {selected?.label ?? placeholder}
                 </Text>
-                <Icon icon={chevronDown} stroke={theme.colors.fg} size={18} />
+                <View
+                  testID={testID ? `${testID}-chevron` : undefined}
+                  style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }}
+                >
+                  <Icon icon={chevronDown} stroke={theme.colors.fg} size={18} />
+                </View>
               </Pressable>
             )}
           >

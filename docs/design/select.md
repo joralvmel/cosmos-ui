@@ -54,11 +54,11 @@ appropriate; Escape and outside dismissal do not commit a new value.
 
 Sizes map to Cosmos control-height, spacing, and typography tokens (`--cosm-control-*`,
 `--cosm-space-*`, `--cosm-text-*`). Colors, border, radius, focus ring, disabled/invalid
-presentation and selected/active option treatment use semantic `--cosm-*` theme tokens with
-fallbacks. Exposed custom properties use the `--cosm-select-*` prefix. Light/dark and all built-in
-themes must retain at least 3:1 contrast for boundaries and 4.5:1 for text. Focus is visibly
-distinct from selection. No transition is needed for selection; any optional visual transition
-must respect reduced motion.
+presentation, hover and expanded trigger treatment, and selected/active/hovered option states use
+semantic `--cosm-*` theme tokens with fallbacks. The chevron rotates while expanded. Exposed custom
+properties use the `--cosm-select-*` prefix. Light/dark and all built-in themes must retain at least
+3:1 contrast for boundaries and 4.5:1 for text. Focus is visibly distinct from selection. Transitions
+respect reduced motion.
 
 React Native uses `useTheme()`, reports `combobox`/`listbox`/`option` semantics and expanded,
 selected, disabled, required, and invalid states where supported, and keeps touch targets at least
@@ -100,17 +100,19 @@ loading state, and new dependencies.
    change.
 3. Arrow keys, Home/End, typeahead, Enter/Space, Escape, Tab, pointer, and touch work as documented;
    active focus and committed selection remain distinct.
-4. Disabled trigger/options cannot be selected. Clear is visible only when enabled, is separately
-   labeled, and proposes/commits `null` without opening the popup.
+4. Disabled trigger/options cannot be selected. Disabling an open control closes its popup. Clear
+   is visible only when enabled, is separately labeled, and proposes/commits `null` without opening
+   the popup.
 5. Web submission includes exactly one selected enabled `name=value`; required validity, form
    reset, disabled fieldset, and controlled reset proposals work.
 6. React forwards the original bubbling/composed DOM `CustomEvent`; Angular outputs and CVA write,
    change, touch, disable, and reset behavior follow the contract.
 7. React Native preserves the same value ownership/event contract, exposes supported accessibility
    state, supports touch and Android Back, uses minimum 44-point targets, and has no HTML form API.
-8. Light/dark built-in themes, RTL, reduced motion, narrow/wide layouts, visible focus, contrast,
-   and representative demos on all four targets are validated. Android acceptance is recorded
-   separately; iOS and manual screen-reader testing remain not verified (optional).
+8. Light/dark built-in themes, RTL, reduced motion, narrow/wide layouts, visible focus, hover and
+   expanded/chevron feedback, contrast, and representative demos on all four targets are validated.
+   Android acceptance is recorded separately; iOS and manual screen-reader testing remain not
+   verified (optional).
 
 ## Research references
 
@@ -133,9 +135,17 @@ No reference implementation code or assets are copied.
   expected development-mode warning.
 - In the Expo React Native Web demo, clear and option selection updated the controlled value; the
   grouped options and disabled, help-text, and error examples rendered.
-- Across all six built-in themes in light and dark modes, browser-computed OKLCH contrast minima
-  were 15.76:1 for trigger text, 3.22:1 for the trigger/popup boundary, 4.03:1 for the focus ring,
-  and 5.39:1 for the error color.
+- Browser verification confirmed hover borders, active option surfaces, expanded trigger styling,
+  chevron rotation, and popup closure when a Web Select becomes disabled. React Native Web reports
+  `aria-expanded`, applies the expanded trigger styles, and rotates the chevron; its disabled state
+  remains noninteractive.
+- The Select states gallery now includes a disabled control. Disabled controls close their popup
+  when disabled while open and do not reopen from keyboard activation.
+- Across all six built-in themes in light and dark modes, resolved-token WCAG contrast minima are
+  15.76:1 for trigger text, 4.36:1 for hover border against the trigger background, 3.91:1 for the
+  expanded border against its fill, 4.36:1 for the focus ring against the page background (4.54:1
+  against a surface), 15.08:1 for active-option text, and 5.39:1 for the error border. These
+  calculations use the token package's contrast function; they are not device/runtime measurements.
 - `npx expo export --platform android` passed. No Android device was attached and no emulator
   executable was available, so Android interaction remains unverified and the catalog readiness
   status stays `in-progress`.

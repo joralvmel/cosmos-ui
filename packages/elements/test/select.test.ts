@@ -161,6 +161,27 @@ describe('cosm-select', () => {
     expect(trigger?.getAttribute('aria-expanded')).toBe('false');
   });
 
+  it('closes the popup when the control becomes disabled and cannot reopen', async () => {
+    const element = await createSelect();
+    const trigger = element.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]');
+    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    await element.updateComplete;
+    expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+
+    element.disabled = true;
+    await element.updateComplete;
+    await element.updateComplete;
+    expect(trigger?.disabled).toBe(true);
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    expect(element.shadowRoot?.querySelector('[part="popup"]')?.getAttribute('data-open')).toBe(
+      'false'
+    );
+
+    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    await element.updateComplete;
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('resets autonomous values, proposes controlled resets, and honors form-disabled state', async () => {
     const form = document.createElement('form');
     const element = await createSelect({ name: 'fruit', defaultValue: 'apple' });

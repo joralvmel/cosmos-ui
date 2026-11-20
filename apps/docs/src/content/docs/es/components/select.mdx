@@ -36,6 +36,10 @@ variante visual.
 `defaultValue` inicializa una selección autónoma. Al proporcionar `value`, incluso `null`, la
 selección pasa a ser controlada: el componente emite una propuesta y espera a que su propietario
 actualice el valor. `clearable` añade una acción con nombre accesible propio que propone `null`.
+`disabled` impide abrir, seleccionar y limpiar; las opciones deshabilitadas siguen visibles, pero no
+se pueden seleccionar.
+Los controles habilitados resaltan al pasar el puntero y conservan el estado activo mientras están
+abiertos; el chevron gira para indicar que el popup está expandido.
 
 Web, React y Angular usan el mismo Web Component asociado a formularios. Admite `name`, validación
 de `required`, fieldsets deshabilitados y reinicio del formulario. React Native no tiene el ciclo

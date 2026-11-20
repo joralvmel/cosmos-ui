@@ -89,6 +89,7 @@ afterEach(async () => {
 
 const trigger = () =>
   container?.querySelector<HTMLButtonElement>('[data-testid="subject-trigger"]');
+const chevron = () => container?.querySelector('[data-testid="subject-chevron"]');
 const option = (value: string) =>
   container?.querySelector<HTMLButtonElement>(`[data-testid="subject-listbox-option-${value}"]`);
 const clearButton = () =>
@@ -190,5 +191,24 @@ describe('Select (native)', () => {
     await act(async () => clear.click());
     expect(onValueChange.mock.calls.map(([detail]) => detail.value)).toEqual([null]);
     expect(trigger()?.textContent).toContain('Apple');
+  });
+
+  it('shows the expanded state, rotates the chevron and closes when disabled', async () => {
+    runtime.nativeWeb = false;
+    await renderSelect(baseProps);
+    const colors = getNativeTheme('cosmos', 'light').colors;
+
+    expect(styleOf(trigger() as Element).borderColor).toBe(colors['border-strong']);
+    expect(styleOf(chevron() as Element).transform).toEqual([{ rotate: '0deg' }]);
+
+    await openSelect();
+    expect(trigger()?.getAttribute('aria-expanded')).toBe('true');
+    expect(styleOf(trigger() as Element).borderColor).toBe(colors['focus-ring']);
+    expect(styleOf(trigger() as Element).backgroundColor).toBe(colors['primary-subtle']);
+    expect(styleOf(chevron() as Element).transform).toEqual([{ rotate: '180deg' }]);
+
+    await rerenderSelect({ ...baseProps, disabled: true });
+    expect(trigger()?.getAttribute('aria-expanded')).toBe('false');
+    expect(styleOf(chevron() as Element).transform).toEqual([{ rotate: '0deg' }]);
   });
 });

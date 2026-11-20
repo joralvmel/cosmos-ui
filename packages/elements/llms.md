@@ -5,7 +5,9 @@ Framework-agnostic Web Components (Lit) of Cosmos UI. Use them in plain HTML or 
 Checkbox and Text Field use themed hover borders on enabled valid controls; checked/mixed
 Checkbox uses `primary-hover`. Text Field adds `primary-subtle` while its input or actions have
 focus. Existing component background/border/focus hooks retain priority over theme defaults.
-Disabled controls do not react to hover; invalid hover borders retain danger. No new props or tokens.
+Select uses a themed hover border, a persistent expanded appearance, and a rotating chevron while
+open; enabled active options use the Listbox neutral surface. Disabled controls do not react to
+hover; invalid hover borders retain danger. No new props or tokens.
 
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 

@@ -86,13 +86,30 @@ const styles = css`
     font-size: var(--_font-size, var(--cosm-text-md, 1rem));
     text-align: start;
     cursor: pointer;
+    transition:
+      border-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease),
+      background-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
+  }
+  @media (hover: hover) {
+    .trigger:hover:not(:disabled):not([aria-invalid='true']) {
+      border-color: var(--cosm-select-border, var(--cosm-primary, oklch(0.55 0.2 268)));
+    }
   }
   .trigger:focus-visible {
-    outline: 2px solid var(--cosm-select-focus, var(--cosm-focus, oklch(0.56 0.18 265)));
+    outline: 2px solid var(--cosm-select-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)));
     outline-offset: 2px;
   }
   .trigger[aria-invalid='true'] {
     border-color: var(--cosm-danger, oklch(0.55 0.2 25));
+  }
+  .trigger[aria-expanded='true'] {
+    background: var(--cosm-select-background, var(--cosm-primary-subtle, oklch(0.92 0.04 265)));
+  }
+  .trigger[aria-expanded='true']:not([aria-invalid='true']) {
+    border-color: var(
+      --cosm-select-border,
+      var(--cosm-select-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)))
+    );
   }
   .trigger:disabled {
     cursor: not-allowed;
@@ -105,7 +122,11 @@ const styles = css`
     white-space: nowrap;
   }
   .placeholder { color: var(--cosm-select-placeholder, var(--cosm-fg-muted, oklch(0.48 0.01 268))); }
-  .trigger-icon { flex: none; }
+  .trigger-icon {
+    flex: none;
+    transition: transform var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
+  }
+  .trigger[aria-expanded='true'] .trigger-icon { transform: rotate(180deg); }
   .clear-button {
     position: absolute;
     top: 50%;
@@ -168,8 +189,16 @@ const styles = css`
     color: var(--cosm-select-option-selected-color, var(--cosm-primary-text, oklch(0.32 0.12 265)));
     font-weight: 600;
   }
+  .option[data-active='true']:not([data-disabled='true']):not([data-selected='true']) {
+    background: var(--cosm-neutral-2, oklch(0.96 0.008 268));
+  }
+  @media (hover: hover) {
+    .option:hover:not([data-disabled='true']):not([data-selected='true']) {
+      background: var(--cosm-neutral-2, oklch(0.96 0.008 268));
+    }
+  }
   .option[data-active='true']:focus-visible {
-    outline: 2px solid var(--cosm-select-focus, var(--cosm-focus, oklch(0.56 0.18 265)));
+    outline: 2px solid var(--cosm-select-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)));
     outline-offset: -2px;
   }
   .option[data-disabled='true'] {
@@ -194,12 +223,13 @@ const styles = css`
     white-space: nowrap;
   }
   @media (prefers-reduced-motion: reduce) {
-    .trigger, .option { transition: none; }
+    .trigger, .trigger-icon, .option { transition: none; }
   }
   @media (forced-colors: active) {
     .trigger:focus-visible, .option[data-active='true']:focus-visible {
       outline-color: Highlight;
     }
+    .trigger[aria-expanded='true'] { border-color: Highlight; }
     .option[data-selected='true'] { border: 1px solid Highlight; }
   }
 `;
@@ -427,6 +457,9 @@ export class CosmSelect extends CosmElement {
       !options.some(option => option.value === this.#activeValue && !option.disabled)
     ) {
       this.#activeValue = getListboxInitialActive(options, this.value ? [this.value] : []);
+    }
+    if (this.#open && (this.disabled || this.#formDisabled)) {
+      this.#closePopup(false);
     }
   }
 
