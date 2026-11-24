@@ -59,7 +59,7 @@ with `npx vitest run` (Turborepo filters do it for you).
 5. **Tests are mandatory**: shared scenarios, drift tests and platform tests.
 6. **Changesets are mandatory** for every change to `packages/*`.
 7. **Pinned toolchain**: Node 24, npm 11, TypeScript 6.0.x (Angular 22 requires `<6.1`), Lit 3,
-   React 19.3, Angular 22, React Native 0.88 + Expo SDK 58, Tailwind 4, Vitest 5, Biome 2, Astro 7.
+   React 19.3, Angular 22.3.x, React Native 0.88 + Expo SDK 58, Tailwind 4, Vitest 5, Biome 2, Astro 7.
    No upgrades or new dependencies unless the task asks for them; upgrade with `upgrade-stack`.
 8. **Never edit generated files**: `dist/`, `custom-elements.json`, `.astro/`, `CHANGELOG.md`;
    `package-lock.json` only through npm.
@@ -113,7 +113,9 @@ with `npx vitest run` (Turborepo filters do it for you).
   publish and GitHub Releases (`release` skill). Synchronize main back into develop using a
   **merge commit**, including synchronization repair branches; verify main's ancestry afterward.
   Never squash/rebase synchronization or delete either long-lived branch.
-- Dependencies: Dependabot opens weekly minor/patch PRs into `develop`. CI classifies them
+- Dependencies: Dependabot opens weekly minor/patch PRs into `develop`. Angular development
+  dependencies share one minor version; Dependabot groups their patches and ignores minor/major
+  updates, which require a coordinated `upgrade-stack` review. CI classifies updates
   (`tools/deps/dependency-changes.mjs`): development and runtime patch/minor updates pass and get a
   `patch` changeset before the release (`npm run deps:changeset`); majors, peer ranges and the pinned
   stack need `upgrade-stack` and a changeset. `Dependency review` blocks high/critical vulnerabilities
