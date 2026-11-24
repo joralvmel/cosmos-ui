@@ -8,7 +8,7 @@ published as `@joralvmel/cosmos-*`. Read [`AGENTS.md`](../AGENTS.md) first and t
 ## Stack (pinned)
 
 Node.js 24 · npm 11 workspaces · Turborepo 2 · TypeScript 6.0.x (Angular 22 requires `<6.1`) · Lit 3 ·
-React 19.3 · Angular 22 · React Native 0.88 + Expo SDK 58 · Tailwind CSS 4 · Vitest 5 (happy-dom) ·
+React 19.3 · Angular 22.3.x · React Native 0.88 + Expo SDK 58 · Tailwind CSS 4 · Vitest 5 (happy-dom) ·
 Biome 2 · Astro 7 + Starlight · Changesets · culori.
 
 ## Commands (repository root)

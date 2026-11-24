@@ -2,7 +2,7 @@
 applyTo: 'packages/angular/**'
 ---
 
-# Angular wrappers (Angular 22)
+# Angular wrappers (Angular 22.3.x)
 
 - Follow [`docs/conventions/component-anatomy.md`](../../docs/conventions/component-anatomy.md): exact file names and section order. `tools/test/structure.test.mjs` checks every implemented component.
 - One standalone component per element in `src/components/<name>.component.ts`, with the same
@@ -16,3 +16,4 @@ applyTo: 'packages/angular/**'
 - Build with `ngc` (partial compilation); `tsconfig*.json` keep `experimentalDecorators` and
   `useDefineForClassFields: false`.
 - Tests use `TestBed` (setup in `test/setup.ts`) and the drift test reads `ɵcmp.inputs/outputs`.
+- Keep Angular development dependencies on the same minor and patch release; upgrade them together.
