@@ -100,6 +100,23 @@ describe('dependency classification', () => {
     const group = config.split('pinned-stack:')[1]?.split('update-types')[0] ?? '';
     expect([...group.matchAll(/- "([^"]+)"/g)].map(match => match[1])).toEqual(pinnedStack);
   });
+
+  it('groups Angular patches and ignores automatic Angular minor and major updates', () => {
+    const config = readFileSync(join(root, '.github/dependabot.yml'), 'utf8');
+    const group = config.split('pinned-stack:')[1]?.split('tooling:')[0] ?? '';
+    expect(group).toContain('- "@angular/*"');
+    expect(group).toContain('update-types: ["patch"]');
+    expect(config).toMatch(
+      /dependency-name: "@angular\/\*"\s+update-types: \["version-update:semver-minor", "version-update:semver-major"\]/
+    );
+    const angular = JSON.parse(readFileSync(join(root, 'packages/angular/package.json'), 'utf8'));
+    const versions = Object.entries(angular.devDependencies)
+      .filter(([name]) => name.startsWith('@angular/'))
+      .map(([, version]) => version);
+    expect(versions.length).toBeGreaterThan(1);
+    expect(new Set(versions).size).toBe(1);
+    expect(versions[0]).toMatch(/^~\d+\.\d+\.\d+$/);
+  });
 });
 
 describe('maintenance reports', () => {
