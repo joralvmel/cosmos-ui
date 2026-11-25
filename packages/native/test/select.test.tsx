@@ -92,8 +92,6 @@ const trigger = () =>
 const chevron = () => container?.querySelector('[data-testid="subject-chevron"]');
 const option = (value: string) =>
   container?.querySelector<HTMLButtonElement>(`[data-testid="subject-listbox-option-${value}"]`);
-const clearButton = () =>
-  container?.querySelector<HTMLButtonElement>('[data-testid="subject-clear"]');
 const openSelect = async () => {
   const control = trigger();
   if (!control) throw new Error('Missing Select trigger.');
@@ -120,10 +118,6 @@ describe('Select (native): shared scenarios', () => {
           const item = option(action.value);
           if (!item) throw new Error(`Missing option "${action.value}".`);
           await act(async () => item.click());
-        } else if (action.type === 'clear') {
-          const clear = clearButton();
-          if (!clear) throw new Error('Missing clear action.');
-          await act(async () => clear.click());
         } else {
           props = { ...props, value: action.value };
           await rerenderSelect(props);
@@ -176,21 +170,27 @@ describe('Select (native)', () => {
     expect(trigger()?.getAttribute('aria-disabled')).toBe('true');
   });
 
-  it('keeps controlled values with the owner and clears only when enabled', async () => {
-    runtime.nativeWeb = true;
-    const onValueChange = vi.fn<(detail: SelectChangeDetail) => void>();
+  it('applies filled trigger styling and clamps custom height to the touch target', async () => {
+    runtime.nativeWeb = false;
     await renderSelect({
       ...baseProps,
       value: 'apple',
-      clearable: true,
-      clearLabel: 'Clear fruit',
-      onValueChange,
+      variant: 'filled',
+      triggerStyle: { minHeight: 56 },
     });
-    const clear = clearButton();
-    if (!clear) throw new Error('Missing clear action.');
-    await act(async () => clear.click());
-    expect(onValueChange.mock.calls.map(([detail]) => detail.value)).toEqual([null]);
-    expect(trigger()?.textContent).toContain('Apple');
+    const colors = getNativeTheme('cosmos', 'light').colors;
+    expect(styleOf(trigger() as Element).minHeight).toBe(56);
+    expect(styleOf(trigger() as Element).backgroundColor).toBe(colors['surface-raised']);
+
+    await rerenderSelect({ ...baseProps, variant: 'filled', triggerStyle: { minHeight: 20 } });
+    expect(styleOf(trigger() as Element).minHeight).toBe(44);
+  });
+
+  it('requires a numeric custom minimum height to preserve the touch target', async () => {
+    runtime.nativeWeb = false;
+    await expect(
+      renderSelect({ ...baseProps, triggerStyle: { minHeight: '50%' } })
+    ).rejects.toThrow('Select triggerStyle.minHeight must be a number.');
   });
 
   it('shows the expanded state, rotates the chevron and closes when disabled', async () => {

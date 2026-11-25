@@ -13,6 +13,7 @@ import {
   radioGroupOptionsExamples,
   radioGroupValueExamples,
   selectContract,
+  selectItemExamples,
   selectValueExamples,
   switchContract,
   textareaContract,
@@ -434,12 +435,11 @@ describe('Playground', () => {
         ...labels,
         selectLabel: 'Fruta',
         selectPlaceholder: 'Elige una fruta',
-        selectClearLabel: 'Quitar fruta',
         selectValues: { none: 'Sin selección', apple: 'Manzana', cherry: 'Cereza' },
       },
       themes: [],
       referenceValues: {
-        ListboxItems: listboxItemExamples,
+        SelectItems: selectItemExamples,
         SelectValue: selectValueExamples,
       },
     });
@@ -447,33 +447,25 @@ describe('Playground', () => {
     await target.updateComplete;
     expect(target.label).toBe('Fruta');
     expect(target.placeholder).toBe('Elige una fruta');
-    expect(target.items).toEqual(listboxItemExamples.grouped);
+    expect(target.items).toEqual(selectItemExamples.flat);
     controller.set('value', 'cherry');
-    controller.set('clearable', true);
     await target.updateComplete;
     expect(target.value).toBe('cherry');
     expect(target.valueControlled).toBe(true);
-    expect(target.clearLabel).toBe('Quitar fruta');
     expect(
       root.querySelector<HTMLSelectElement>('[data-prop="value"] option[value="cherry"]')
         ?.textContent
     ).toBe('Cereza');
 
-    controller.set('items', 'flat');
-    const replacement = root.querySelector<CosmSelect>('cosm-select');
-    if (!replacement) throw new Error('Missing remounted Select');
-    await replacement.updateComplete;
-    expect(replacement).not.toBe(target);
-    expect(replacement.value).toBe('cherry');
     for (const platform of ['html', 'react', 'angular', 'native'] as const) {
       expect(controller.code(platform)).toContain('cherry');
-      expect(controller.code(platform)).toContain('clearable');
+      expect(controller.code(platform)).not.toContain('clearable');
     }
 
     controller.set('value', 'none');
-    await replacement.updateComplete;
-    expect(replacement.value).toBeNull();
-    expect(replacement.valueControlled).toBe(true);
+    await target.updateComplete;
+    expect(target.value).toBeNull();
+    expect(target.valueControlled).toBe(true);
     controller.set('label', ' ');
     expect(controller.values.label).toBe('Fruta');
     expect(root.querySelector('[role="status"]')?.textContent).toContain('non-empty label');

@@ -19,15 +19,16 @@ people need to search or filter a long collection.
 
 <Playground name="select" />
 
-The playground demonstrates flat and grouped options, autonomous and controlled values, sizes, and
-clear behavior. Option collections are supplied as data; each option has a stable value and a
-visible label, with optional description, decorative icon, and disabled state.
+The playground demonstrates flat options, autonomous and controlled values, variants, sizes, and a
+custom trigger height. Each option has a stable value and visible label; disabled options remain
+visible but cannot be selected.
 
 ## Variants
 
-Select has one standard outlined appearance and three sizes. Use the documented theme tokens and
-`--cosm-select-*` hooks or CSS parts to customize its surfaces without introducing another visual
-variant.
+Select supports outlined (default) and filled variants, plus `sm`, `md` (default), and `lg` sizes.
+Set `--cosm-select-trigger-min-height` to customize the Web trigger's minimum height. Use Cosmos
+theme tokens and the documented `--cosm-select-*` hooks or CSS parts for other Web appearance
+customization.
 
 <SelectExamples kind="variants" />
 
@@ -35,10 +36,8 @@ variant.
 
 `defaultValue` initializes an autonomous selection. Supplying `value`, including `null`, makes the
 selection controlled: the component emits a proposal and waits for its owner to update the value.
-`clearable` adds a separately labeled action that proposes `null`. `disabled` prevents opening,
-selection, and clearing; disabled options remain visible but cannot be selected.
-Enabled triggers highlight on pointer hover and remain visually active while open; the chevron
-rotates to indicate the expanded popup.
+`disabled` prevents opening and selection; disabled options remain visible but cannot be selected.
+Triggers highlight on pointer hover and while expanded; the chevron rotates as the popup opens.
 
 Web, React, and Angular use the same form-associated Web Component. It supports `name`, required
 validity, disabled fieldsets, and form reset. React Native has no HTML form lifecycle; provide
@@ -54,6 +53,7 @@ localized help or error text directly.
   label="Fruit"
   placeholder="Choose a fruit"
   name="fruit"
+  variant="filled"
   required
 ></cosm-select>
 <script type="module">
@@ -61,10 +61,8 @@ localized help or error text directly.
 
   document.querySelector('#fruit').items = [
     { value: 'apple', label: 'Apple' },
-    {
-      label: 'Seasonal',
-      options: [{ value: 'cherry', label: 'Cherry', description: 'Available in summer.' }],
-    },
+    { value: 'cherry', label: 'Cherry' },
+    { value: 'lime', label: 'Lime', disabled: true },
   ];
 </script>
 ```
@@ -78,6 +76,7 @@ import { Select } from '@joralvmel/cosmos-react';
   label="Fruit"
   items={fruitItems}
   placeholder="Choose a fruit"
+  variant="filled"
   value={fruit}
   onChange={event => setFruit(event.detail.value)}
 />;
@@ -90,6 +89,7 @@ import { Select } from '@joralvmel/cosmos-react';
   label="Fruit"
   [items]="fruitItems"
   placeholder="Choose a fruit"
+  variant="filled"
   [(ngModel)]="fruit"
   name="fruit"
 ></cosm-select>
@@ -107,31 +107,41 @@ import { Select } from '@joralvmel/cosmos-native';
   label="Fruit"
   items={fruitItems}
   placeholder="Choose a fruit"
+  variant="filled"
   value={fruit}
   onValueChange={({ value }) => setFruit(value)}
+  triggerStyle={{ minHeight: 56 }}
 />;
 ```
 
 The native app must mount Select under the app-level `PopoverProvider`. Its popup uses Cosmos
-Popover and Listbox behavior, with platform-appropriate placement and dismissal.
+Popover and Listbox behavior, with platform-appropriate placement and dismissal. The `style` prop
+styles the field wrapper, `labelStyle` styles its label, and `triggerStyle` customizes the trigger;
+the trigger's minimum height remains at least 44 logical points.
 
 ## Accessibility
 
 - Provide a visible, nonempty label. Placeholder text indicates an empty value; it does not name
-  the control. Localize the label, placeholder, option text, help/error text, and `clearLabel`.
+  the control. Localize the label, placeholder, option text, and help/error text.
 - On Web, Tab reaches the combobox trigger; Enter, Space, or an arrow key opens the listbox.
-  Arrow keys and Home/End move the active option without committing it, printable characters use
-  typeahead, Enter/Space selects, and Escape closes without changing the value.
-- The Web popup exposes combobox, listbox, group, option, expanded, selected, disabled, required,
-  and invalid semantics. Focus remains distinct from selection, and disabled options cannot be
-  selected.
+  The combobox keeps DOM focus while `aria-activedescendant` identifies the active option. Arrow
+  keys and Home/End move the active option without committing it; printable characters use
+  type-ahead, Enter/Space selects, and Escape closes without changing the value.
+- The Web popup exposes combobox, listbox, option, expanded, selected, disabled, required, and
+  invalid semantics. Focus remains distinct from selection, and disabled options cannot be
+  selected. The keyboard interaction follows the
+  [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/).
 - React and Angular forward the Web component's events and accessibility behavior. React Native
-  exposes platform-supported combobox/listbox semantics, selection and disabled state, and
-  touch-sized controls; native hardware-keyboard behavior may differ.
+  exposes platform-supported combobox/listbox semantics and touch-sized controls. React Native Web
+  supports keyboard type-ahead through Listbox; native iOS/Android use touch and platform
+  accessibility navigation because React Native core does not expose hardware key events on this
+  control. Native `required` is descriptive; validation and error timing belong to the consumer.
 - Keep focus, selected, invalid, and disabled states distinguishable when customizing colors.
+- Web, React, and Angular use native form association and browser constraint validation. React
   Native does not provide HTML form submission or browser constraint validation.
-- Search/filtering, multiselect, asynchronous loading, virtualization, tree options, bulk actions,
-  arbitrary interactive option content, and platform-native picker UI are deferred.
+- Search/filtering, multiselect, asynchronous loading, virtualization, groups, option descriptions
+  and icons, clear action, tree options, arbitrary interactive option content, and platform-native
+  picker UI are deferred.
 
 ## API
 

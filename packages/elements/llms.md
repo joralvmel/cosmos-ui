@@ -433,23 +433,22 @@ Events: `cosm-change` → `RadioGroupChangeDetail`.
 ```
 ### `<cosm-select>`
 
-Selects one option from an accessible collection, with grouped items and native Web form behavior.
+Selects one option from an accessible collection, with native Web form behavior.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `label` | string | Required | Required visible accessible name for the control. |
-| `items` | ListboxItems | Required | Readonly options or named groups. Each option has a unique nonempty value and label, and may include a description, decorative IconDefinition, or disabled state. |
+| `items` | SelectItems | Required | Readonly flat options with unique nonempty values, nonempty labels, and optional disabled state. |
 | `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
 | `defaultValue` (`default-value`) | SelectValue | — | Initial autonomous selection; null by default. |
 | `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Outlined or filled trigger appearance. |
 | `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
 | `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
 | `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
 | `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
 | `helpText` (`help-text`) | string | — | Optional supporting text associated with the control. |
 | `errorText` (`error-text`) | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
-| `clearable` | boolean | `false` | Shows a separate clear action when a value is selected. |
-| `clearLabel` (`clear-label`) | string | — | Consumer-localized accessible name for the clear action; required when clearable. |
 | `name` | string | — | Web form field name; React Native has no HTML form association. |
 
 Events: `cosm-change` → `SelectChangeDetail`.
@@ -459,11 +458,11 @@ Events: `cosm-change` → `SelectChangeDetail`.
 
 <script type="module">
   import '@joralvmel/cosmos-elements/select';
-  const grouped = [{"label":"Fruit","options":[{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry","description":"Seasonal"}]},{"label":"Vegetables","options":[{"value":"carrot","label":"Carrot"},{"value":"broccoli","label":"Broccoli","disabled":true}]}];
+  const flat = [{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry"},{"value":"lime","label":"Lime","disabled":true}];
   const none = null;
 
   const element = document.querySelector('cosm-select');
-  element.items = grouped;
+  element.items = flat;
   element.defaultValue = none;
   element.addEventListener('cosm-change', event => console.log(event.detail));
 </script>

@@ -78,24 +78,24 @@ describe('codegen', () => {
       selectContract,
       {
         label: 'Fruit',
-        items: 'grouped',
+        items: 'flat',
         value: 'none',
         placeholder: 'Choose a fruit',
       },
       ''
     );
-    expect(snippets.html).toContain('const grouped =');
+    expect(snippets.html).toContain('const flat =');
     expect(snippets.html).toContain('const none = null;');
-    expect(snippets.html).toContain('element.items = grouped;');
+    expect(snippets.html).toContain('element.items = flat;');
     expect(snippets.html).toContain('element.value = none;');
-    expect(snippets.react).toContain('items={grouped}');
+    expect(snippets.react).toContain('items={flat}');
     expect(snippets.react).toContain('value={none}');
-    expect(snippets.angular).toContain('[items]="grouped"');
+    expect(snippets.angular).toContain('[items]="flat"');
     expect(snippets.angular).toContain('[value]="none"');
-    expect(snippets.native).toContain('items={grouped}');
+    expect(snippets.native).toContain('items={flat}');
     expect(snippets.native).toContain('value={none}');
     for (const source of Object.values(snippets)) {
-      expect(source).not.toContain('cosmos-icons/grouped');
+      expect(source).not.toContain('cosmos-icons/flat');
       expect(source).not.toContain('cosmos-icons/none');
     }
   });

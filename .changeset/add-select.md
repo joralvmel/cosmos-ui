@@ -4,6 +4,7 @@
 '@joralvmel/cosmos-react': minor
 '@joralvmel/cosmos-angular': minor
 '@joralvmel/cosmos-native': minor
+'@joralvmel/cosmos-mcp': minor
 ---
 
-Add the Select component (`<cosm-select>`) with its contract, React, Angular and React Native implementations.
+Add Select across Web, React, Angular, and React Native.

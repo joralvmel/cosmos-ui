@@ -2,117 +2,64 @@
 
 ## Approved scope
 
-A single-selection control for Web, React, Angular, and React Native. The Web control uses a
-custom select-only popup built with Cosmos Popover/Listbox patterns; React and Angular adapt that
-implementation. React Native uses a Cosmos-styled popup with platform-appropriate placement and
-dismissal. Native has no HTML form association.
+Select provides single selection from a flat collection of options on Web, React, Angular, and
+React Native. Each option has a nonempty string `value` and `label`, and may be disabled.
+Selection is autonomous with `defaultValue` or controlled with `value`; `null` represents no
+selection. A user selection emits `{ value }`, while controlled state waits for the owner to accept
+the proposal.
 
-The control has one standard/outlined visual variant and sizes `sm`, `md` (default), and `lg`.
-Customization uses Cosmos theme tokens and documented component parts/hooks. The selected value
-is a string or `null`; option values and primary labels are nonempty strings. Items may be flat or
-grouped. Options may be disabled and may include a description and a decorative structured
-`IconDefinition`.
+The visible label is required; placeholder text never names the control. Optional `helpText` and
+`errorText` describe the field. The `required`, `invalid`, `errorText`, and `disabled` states remain
+distinct. Web, React, and Angular use the form-associated custom element, including `name`,
+required validity, disabled fieldsets, and reset behavior. Native exposes required/invalid semantics
+but leaves validation timing and enforcement to the consumer.
 
-`defaultValue` initializes autonomous selection. Supplying `value`, including `null`, makes the
-selection controlled. User selection and clear actions propose a change; controlled selection
-waits for the owner to supply the accepted value. Re-activating the selected option does not emit a
-change. A clear action is shown only when `clearable` is enabled and has a consumer-supplied,
-localized accessible name.
+The outlined variant is the default; filled is also supported. Sizes are `sm`, `md` (default), and
+`lg`. Web styling uses Cosmos tokens, CSS parts, and documented `--cosm-select-*` hooks; set
+`--cosm-select-trigger-min-height` for a custom minimum trigger height. Native accepts
+`triggerStyle`; its minimum height cannot be less than 44 logical points.
 
-The required visible label names the trigger; placeholder text never replaces it. Supporting help
-and error text are associated with the trigger and popup. `required`, `invalid`, `error`, and
-`disabled` remain distinct. The component does not infer validation timing from blur or submit.
-On Web, the host is form-associated, submits the selected enabled `name=value`, participates in
-required validity, follows disabled fieldsets, and resets to `defaultValue`. A controlled reset
-proposes the reset value and waits for owner acceptance. React Native has no HTML form lifecycle or
-browser constraint validation.
+## Interaction and accessibility
 
-## State and event mapping
+The Web trigger is a select-only combobox. DOM focus remains on the trigger while
+`aria-activedescendant` identifies the active option. The active option is separate from the
+committed value: ArrowUp/ArrowDown and Home/End move it without selecting; printable characters
+perform typeahead; Enter or Space selects; Escape closes without changing the value. Options are not
+Tab stops. Disabled options are skipped, and selecting the current option emits no change.
+Pointer activation selects an enabled option. The Web popup uses the platform popover behavior and
+Cosmos option styling; React and Angular forward the same implementation and event semantics.
 
-| State | Autonomous | Controlled | Event |
-| --- | --- | --- | --- |
-| `value` | Starts at `defaultValue` (null by default); user selection/clear commits | A supplied value, including null, proposes a change without committing | `valueChange` |
+React Native uses Cosmos Popover and Listbox behavior with platform-appropriate placement and
+dismissal. React Native Web retains the Listbox keyboard behavior; native iOS/Android use touch and
+platform accessibility navigation. Physical-key typeahead is deferred on native iOS/Android because
+React Native core does not provide general keyboard events for this control. Native has no HTML
+form association.
 
-Selection proposals use `{ value: string | null }`. The DOM event is `cosm-change`; React forwards
-the original event as `onChange`; Angular forwards it as `valueChange` and integrates with
-`ControlValueAccessor`; React Native invokes `onValueChange` with the detail. Owner prop updates
-never emit proposals.
-
-## Anatomy and appearance
-
-Parts: `base`, `label`, `trigger`, `value`, `placeholder`, `clear-button`, `popup`, `listbox`,
-`group`, `group-label`, `option`, `icon`, `content`, `option-label`, `description`, `help`, and
-`error`.
-
-The trigger is a keyboard-operable select-only combobox with committed `aria-expanded`,
-`aria-controls`, `aria-haspopup="listbox"`, and the accessible label/help/error state. The popup
-contains a single-selection listbox. The active option (keyboard focus) is independent of the
-committed selection; moving through options never changes the value. Selected, active, disabled,
-required, and invalid states are exposed programmatically and not by color alone. Clear is a
-separately named button and does not open the popup. Popup closure restores focus only when
-appropriate; Escape and outside dismissal do not commit a new value.
-
-Sizes map to Cosmos control-height, spacing, and typography tokens (`--cosm-control-*`,
-`--cosm-space-*`, `--cosm-text-*`). Colors, border, radius, focus ring, disabled/invalid
-presentation, hover and expanded trigger treatment, and selected/active/hovered option states use
-semantic `--cosm-*` theme tokens with fallbacks. The chevron rotates while expanded. Exposed custom
-properties use the `--cosm-select-*` prefix. Light/dark and all built-in themes must retain at least
-3:1 contrast for boundaries and 4.5:1 for text. Focus is visibly distinct from selection. Transitions
-respect reduced motion.
-
-React Native uses `useTheme()`, reports `combobox`/`listbox`/`option` semantics and expanded,
-selected, disabled, required, and invalid states where supported, and keeps touch targets at least
-44 logical points. Android Back closes an open popup. Escape is supported on Web and React Native
-Web; native iOS/Android do not promise hardware Escape. iOS and Android popup geometry/dismissal
-may adapt to platform constraints while retaining the same selection contract.
-
-## Keyboard and platform behavior
-
-- Tab and Shift+Tab move into or out of the trigger normally; options are not separate Tab stops.
-- Enter or Space opens the popup from the trigger and selects the active option while open.
-- ArrowDown/ArrowUp move the active option without changing selection; Home/End move to the first
-  or last enabled option.
-- Printable characters perform locale-aware typeahead without filtering the option collection.
-- Escape closes without changing the value and restores trigger focus when the trigger remains
-  connected.
-- Disabled options are skipped and cannot be selected. Tab does not wrap and selection is not
-  committed by focus movement.
-- Pointer/touch activation selects an enabled option and closes the popup. Selecting the current
-  value does not emit a change.
-- Clear proposes/commits `null` when the selected value is non-null and `clearable` is enabled.
-
-Web, React, and Angular use the same Lit implementation, event, and native form semantics. React
-Native mirrors the public selection contract using Cosmos primitives; it does not add a native
-picker dependency or HTML form API.
+Trigger hover, expanded, invalid, disabled, and focus-visible feedback use theme tokens and remain
+distinct from selection. The chevron rotates while expanded. Native touch targets remain at least
+44 logical points. Motion respects reduced-motion preferences on Web.
 
 ## Excluded and deferred
 
-Combobox search/filtering, multiselect/chips, async options, virtualization, tree options, bulk
-actions, arbitrary interactive option content, platform-native picker UI, custom tones/variants,
-loading state, and new dependencies.
+Grouped options, per-option descriptions or icons, clearable selection, multiselect, search/filter,
+async loading, virtualization, tree options, arbitrary interactive option content, and platform
+native picker UI are out of scope. The field-level help and error text are included. No dependency is
+added.
 
 ## Acceptance scenarios
 
-1. A required labeled Select renders the outlined medium trigger, placeholder, grouped options,
-   optional descriptions/icons, disabled options, help/error text, and accessible state.
-2. Autonomous selection commits and emits one `{ value }` proposal. Controlled selection,
-   including controlled `null`, waits for owner acceptance; reselecting the current option emits no
-   change.
-3. Arrow keys, Home/End, typeahead, Enter/Space, Escape, Tab, pointer, and touch work as documented;
-   active focus and committed selection remain distinct.
-4. Disabled trigger/options cannot be selected. Disabling an open control closes its popup. Clear
-   is visible only when enabled, is separately labeled, and proposes/commits `null` without opening
-   the popup.
-5. Web submission includes exactly one selected enabled `name=value`; required validity, form
-   reset, disabled fieldset, and controlled reset proposals work.
-6. React forwards the original bubbling/composed DOM `CustomEvent`; Angular outputs and CVA write,
-   change, touch, disable, and reset behavior follow the contract.
-7. React Native preserves the same value ownership/event contract, exposes supported accessibility
-   state, supports touch and Android Back, uses minimum 44-point targets, and has no HTML form API.
-8. Light/dark built-in themes, RTL, reduced motion, narrow/wide layouts, visible focus, hover and
-   expanded/chevron feedback, contrast, and representative demos on all four targets are validated.
-   Android acceptance is recorded separately; iOS and manual screen-reader testing remain not
-   verified (optional).
+1. A labeled Select renders flat options, placeholder, optional help/error text, disabled options,
+   and accessible selected/active/required/invalid states.
+2. Autonomous selection commits and emits once; controlled values, including controlled `null`,
+   wait for the owner. Activating the current or a disabled option does not change the value.
+3. Web keyboard navigation follows the select-only combobox pattern, keeping focus on the trigger
+   and exposing the active option through `aria-activedescendant`.
+4. Web, React, and Angular preserve event, controlled-state, and native form behavior. Native
+   preserves selection semantics, a minimum 44-point target, and platform-supported accessibility.
+5. Outlined/filled variants, `sm`/`md`/`lg` sizes, Web minimum-height customization, and Native
+   `triggerStyle` are demonstrated.
+6. Representative examples show autonomous/controlled values, filled styling, help/error,
+   disabled state, and custom minimum height.
 
 ## Research references
 
@@ -127,28 +74,19 @@ No reference implementation code or assets are copied.
 
 ## Validation evidence
 
-- Core, Web, React, Angular, React Native, native-demo, and docs typechecks/tests/builds passed.
-  Vitest totals: core 83, Web 271, React 184, Angular 154, React Native 282, and docs 51.
-- In the browser at 375×812, the docs Playground opened with ArrowDown, moved the active option
-  without committing it, selected with a pointer, and closed with Escape while restoring trigger
-  focus and retaining the selection. Five Web examples rendered; the browser reported only Lit's
-  expected development-mode warning.
-- In the Expo React Native Web demo, clear and option selection updated the controlled value; the
-  grouped options and disabled, help-text, and error examples rendered.
-- Browser verification confirmed hover borders, active option surfaces, expanded trigger styling,
-  chevron rotation, and popup closure when a Web Select becomes disabled. React Native Web reports
-  `aria-expanded`, applies the expanded trigger styles, and rotates the chevron; its disabled state
-  remains noninteractive.
-- React and Angular package tests passed, but those wrappers were not separately mounted for browser
-  runtime smoke tests in this pass.
-- The Select states gallery now includes a disabled control. Disabled controls close their popup
-  when disabled while open and do not reopen from keyboard activation.
-- Across all six built-in themes in light and dark modes, resolved-token WCAG contrast minima are
-  15.76:1 for trigger text, 4.36:1 for hover border against the trigger background, 3.91:1 for the
-  expanded border against its fill, 4.36:1 for the focus ring against the page background (4.54:1
-  against a surface), 15.08:1 for active-option text, and 5.39:1 for the error border. These
-  calculations use the token package's contrast function; they are not device/runtime measurements.
-- `npx expo export --platform android` passed. No Android device was attached and no emulator
-  executable was available, so Android interaction remains unverified and the catalog readiness
-  status stays `in-progress`. The React/Angular browser wrapper smoke tests are also unverified.
-- iOS interaction and manual screen-reader testing are not verified (optional).
+- `npx biome ci .`, `npx turbo run typecheck test build` (49 tasks), the structure test (16 tests),
+  and `npm run check-terms` passed. Relevant suite totals: core 83, Web 272, React 183, Angular 154,
+  React Native 283, docs 51, and MCP 7 tests.
+- Browser verification on the docs Playground opened with ArrowDown, moved the active option from
+  Apple to Cherry without changing the value, confirmed `aria-activedescendant` while focus remained
+  on the combobox, then selected Cherry with Enter and confirmed the popup closed. Hover and expanded
+  trigger styling, chevron rotation, filled appearance, and the 56px custom minimum height were also
+  checked in the browser.
+- A React wrapper was mounted in the browser. Keyboard selection emitted the expected `onChange`
+  proposal while the controlled `null` value remained unchanged.
+- The Android Expo bundle export passed. No Android device/emulator interaction was performed.
+  React and Angular wrapper tests passed. A separate Angular browser mount was unavailable because
+  the docs Vite harness did not provide Angular's JIT compiler. Native device interaction remains
+  unverified; iOS and manual screen-reader checks are optional and unverified.
+- The component inventory remains `in-progress` while the required platform runtime evidence is
+  incomplete.

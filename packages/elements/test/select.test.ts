@@ -1,24 +1,15 @@
 import {
   eventNames,
-  type ListboxItem,
   propNames,
   type SelectChangeDetail,
   selectContract,
   selectScenarioItems,
   selectScenariosFor,
 } from '@joralvmel/cosmos-core';
-import type { IconDefinition } from '@joralvmel/cosmos-icons';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CosmSelect } from '../src/components/select/cosm-select.js';
 
-const typedScenarioItems: readonly ListboxItem<IconDefinition>[] = selectScenarioItems.map(item =>
-  'options' in item
-    ? {
-        label: item.label,
-        options: item.options.map(({ icon: _icon, ...option }) => option),
-      }
-    : (({ icon: _icon, ...option }) => option)(item)
-);
+const typedScenarioItems = selectScenarioItems;
 
 const mounted: HTMLElement[] = [];
 
@@ -60,9 +51,7 @@ describe('cosm-select: shared scenarios', () => {
 
       for (const action of scenario.actions) {
         if (action.type === 'select') optionOf(element, action.value)?.click();
-        else if (action.type === 'clear') {
-          element.shadowRoot?.querySelector<HTMLButtonElement>('[part="clear-button"]')?.click();
-        } else {
+        else {
           element.valueControlled = true;
           element.value = action.value;
         }
@@ -106,15 +95,14 @@ describe('cosm-select: contract drift', () => {
 });
 
 describe('cosm-select', () => {
-  it('renders a labeled combobox, grouped options, descriptions and validation state', async () => {
+  it('renders a labeled combobox, flat options, variant and validation state', async () => {
     const element = await createSelect({
       required: true,
       invalid: true,
       helpText: 'Choose one fruit.',
       errorText: 'A fruit is required.',
-      clearable: true,
-      clearLabel: 'Clear fruit',
       defaultValue: 'apple',
+      variant: 'filled',
     });
     const trigger = element.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]');
     const listbox = element.shadowRoot?.querySelector<HTMLElement>('[part="listbox"]');
@@ -127,38 +115,54 @@ describe('cosm-select', () => {
     expect(trigger?.getAttribute('aria-describedby')).toContain('help');
     expect(trigger?.getAttribute('aria-describedby')).toContain('error');
     expect(listbox?.getAttribute('role')).toBe('listbox');
-    expect(element.shadowRoot?.querySelector('[part="group"]')?.getAttribute('role')).toBe('group');
+    expect(element.getAttribute('variant')).toBe('filled');
+    expect(element.shadowRoot?.querySelector('[part="group"]')).toBeNull();
     expect(option?.getAttribute('aria-selected')).toBe('true');
-    expect(option?.getAttribute('aria-describedby')).toContain('description');
-    expect(
-      element.shadowRoot?.querySelector('[part="clear-button"]')?.getAttribute('aria-label')
-    ).toBe('Clear fruit');
+    expect(option?.hasAttribute('tabindex')).toBe(false);
+    expect(element.shadowRoot?.querySelector('[part="description"]')).toBeNull();
   });
 
-  it('opens with keyboard, navigates options without selection, commits, then restores focus', async () => {
+  it('keeps focus on the combobox and exposes the active option through aria-activedescendant', async () => {
     const element = await createSelect();
     const trigger = element.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]');
+    trigger?.focus();
     trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
     await element.updateComplete;
     await Promise.resolve();
 
     expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+    expect(trigger?.getAttribute('aria-activedescendant')).toBe(optionOf(element, 'apple')?.id);
+    expect(element.shadowRoot?.activeElement).toBe(trigger);
     expect(element.shadowRoot?.querySelector('[part="popup"]')?.getAttribute('data-open')).toBe(
       'true'
     );
     expect(element.value).toBeNull();
-    const first = optionOf(element, 'apple');
-    first?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
     await element.updateComplete;
-    expect(
-      element.shadowRoot?.querySelector('[data-active="true"]')?.getAttribute('data-value')
-    ).toBe('cherry');
-    optionOf(element, 'cherry')?.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
-    );
+    expect(trigger?.getAttribute('aria-activedescendant')).toBe(optionOf(element, 'cherry')?.id);
+    expect(element.value).toBeNull();
+    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     await element.updateComplete;
+    await Promise.resolve();
     expect(element.value).toBe('cherry');
     expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    expect(element.shadowRoot?.activeElement).toBe(trigger);
+  });
+
+  it('opens on closed-trigger typeahead and selects the matching option with Enter', async () => {
+    const element = await createSelect();
+    const trigger = element.shadowRoot?.querySelector<HTMLButtonElement>('[part="trigger"]');
+    trigger?.focus();
+    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'c', bubbles: true }));
+    await element.updateComplete;
+
+    expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+    expect(trigger?.getAttribute('aria-activedescendant')).toBe(optionOf(element, 'cherry')?.id);
+    expect(element.value).toBeNull();
+
+    trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await element.updateComplete;
+    expect(element.value).toBe('cherry');
   });
 
   it('closes the popup when the control becomes disabled and cannot reopen', async () => {

@@ -79,7 +79,6 @@ export interface PlaygroundLabels {
   listboxInvalid?: string;
   selectLabel?: string;
   selectPlaceholder?: string;
-  selectClearLabel?: string;
   selectValues?: Readonly<Record<string, string>>;
   selectInvalid?: string;
   listboxSelected?: string;
@@ -227,7 +226,6 @@ export function initPlayground(
   if (contract.name === 'select') {
     values.label = labels.selectLabel ?? 'Fruit';
     values.placeholder = labels.selectPlaceholder ?? 'Choose a fruit';
-    values.clearLabel = labels.selectClearLabel ?? 'Clear selection';
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -518,7 +516,7 @@ export function initPlayground(
       ) {
         const valueControl = control;
         refreshControls.push(() => {
-          const sample = options.referenceValues?.ListboxItems?.[String(values.items)] as
+          const sample = options.referenceValues?.SelectItems?.[String(values.items)] as
             | readonly ListboxItem[]
             | undefined;
           const available = sample ? getListboxOptions(sample) : [];
@@ -1120,18 +1118,14 @@ export function initPlayground(
         const next = { ...values, [name]: value };
         const label = name === 'label' ? value : next.label;
         const placeholder = name === 'placeholder' ? value : next.placeholder;
-        const clearable = name === 'clearable' ? value : next.clearable;
-        const clearLabel = name === 'clearLabel' ? value : next.clearLabel;
         if (
           typeof label !== 'string' ||
           !label.trim() ||
           typeof placeholder !== 'string' ||
-          !placeholder.trim() ||
-          (clearable === true && (typeof clearLabel !== 'string' || !clearLabel.trim()))
+          !placeholder.trim()
         ) {
           referenceStatus.textContent =
-            labels.selectInvalid ??
-            'Use a non-empty label, placeholder, and clear label when clearable.';
+            labels.selectInvalid ?? 'Use a non-empty label and placeholder.';
           return;
         }
       }
@@ -1157,7 +1151,7 @@ export function initPlayground(
       }
       values[name] = value;
       if (contract.name === 'select' && name === 'items') {
-        const sample = options.referenceValues?.ListboxItems?.[String(value)] as
+        const sample = options.referenceValues?.SelectItems?.[String(value)] as
           | readonly ListboxItem[]
           | undefined;
         const available = new Set(

@@ -66,9 +66,11 @@ describe('CosmSelectComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const component = componentOf(fixture);
+    component.variant = 'filled';
     component.size = 'lg';
     component.required = true;
     await component.element.updateComplete;
+    expect(component.element.variant).toBe('filled');
     expect(component.element.size).toBe('lg');
     expect(component.element.required).toBe(true);
     expect(component.element.items).toEqual(selectScenarioItems);

@@ -23,7 +23,9 @@ describe('MCP tools (data layer)', () => {
     expect(Object.keys(button?.snippets ?? {})).toEqual(['html', 'react', 'angular', 'native']);
     expect(button?.contract?.events.press?.names.react).toBe('onPress');
     expect(button?.api).toContain('| `variant` |');
-    expect(getComponent('select')?.contract).toBeUndefined();
+    const select = getComponent('select');
+    expect(select?.contract?.name).toBe('select');
+    expect(Object.keys(select?.snippets ?? {})).toEqual(['html', 'react', 'angular', 'native']);
     expect(getComponent('constructor')).toBeUndefined();
   });
 

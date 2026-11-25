@@ -3,18 +3,17 @@ import {
   findListboxMatch,
   getListboxInitialActive,
   getListboxOptions,
-  type ListboxItem,
   type ListboxOption,
   moveListboxActive,
   type SelectChangeDetail,
+  type SelectItems,
+  type SelectOption,
   type SelectValue,
   selectContract,
   validateSelectValue,
 } from '@joralvmel/cosmos-core';
-import { type IconDefinition, isIconDefinition } from '@joralvmel/cosmos-icons';
 import { check } from '@joralvmel/cosmos-icons/check';
 import { chevronDown } from '@joralvmel/cosmos-icons/chevron-down';
-import { x } from '@joralvmel/cosmos-icons/x';
 import { css, html, LitElement, nothing } from 'lit';
 import '../icon/cosm-icon.js';
 import { CosmElement } from '../../internal/cosm-element.js';
@@ -25,9 +24,10 @@ type Props = Required<
   ContractProps<
     typeof selectContract,
     'web',
-    { ListboxItems: readonly ListboxItem<IconDefinition>[]; SelectValue: SelectValue }
+    { SelectItems: SelectItems; SelectValue: SelectValue }
   >
 >;
+type Variant = NonNullable<Props['variant']>;
 type Size = NonNullable<Props['size']>;
 
 let instance = 0;
@@ -73,7 +73,10 @@ const styles = css`
     box-sizing: border-box;
     display: inline-flex;
     width: 100%;
-    min-height: var(--_control-height, var(--cosm-control-md, 2.5rem));
+    min-height: max(
+      var(--_control-height, var(--cosm-control-md, 2.5rem)),
+      var(--cosm-select-trigger-min-height, 0px)
+    );
     align-items: center;
     justify-content: space-between;
     gap: var(--cosm-space-sm, 0.5rem);
@@ -90,6 +93,10 @@ const styles = css`
       border-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease),
       background-color var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
   }
+  :host([variant='filled']) .trigger {
+    border-color: var(--cosm-select-border, var(--cosm-border-strong, oklch(0.64 0.01 268)));
+    background: var(--cosm-select-background, var(--cosm-neutral-2, oklch(0.96 0.008 268)));
+  }
   @media (hover: hover) {
     .trigger:hover:not(:disabled):not([aria-invalid='true']) {
       border-color: var(--cosm-select-border, var(--cosm-primary, oklch(0.55 0.2 268)));
@@ -104,12 +111,11 @@ const styles = css`
   }
   .trigger[aria-expanded='true'] {
     background: var(--cosm-select-background, var(--cosm-primary-subtle, oklch(0.92 0.04 265)));
+    box-shadow: inset 0 0 0 1px
+      var(--cosm-select-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)));
   }
   .trigger[aria-expanded='true']:not([aria-invalid='true']) {
-    border-color: var(
-      --cosm-select-border,
-      var(--cosm-select-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)))
-    );
+    border-color: var(--cosm-select-focus, var(--cosm-focus-ring, oklch(0.55 0.2 268)));
   }
   .trigger:disabled {
     cursor: not-allowed;
@@ -127,27 +133,6 @@ const styles = css`
     transition: transform var(--cosm-duration-fast, 120ms) var(--cosm-easing-standard, ease);
   }
   .trigger[aria-expanded='true'] .trigger-icon { transform: rotate(180deg); }
-  .clear-button {
-    position: absolute;
-    top: 50%;
-    right: var(--cosm-space-xl, 2rem);
-    display: grid;
-    width: 1.75rem;
-    height: 1.75rem;
-    place-items: center;
-    padding: 0;
-    transform: translateY(-50%);
-    border: 0;
-    border-radius: var(--cosm-radius-sm, 0.25rem);
-    background: transparent;
-    color: var(--cosm-fg-muted, oklch(0.48 0.01 268));
-    cursor: pointer;
-  }
-  .clear-button:focus-visible {
-    outline: 2px solid var(--cosm-select-focus, var(--cosm-focus, oklch(0.56 0.18 265)));
-    outline-offset: 1px;
-  }
-  .clear-button:disabled { cursor: not-allowed; }
   .popup {
     position: fixed;
     inset: auto;
@@ -168,12 +153,6 @@ const styles = css`
   .popup[data-open='true'],
   .popup:popover-open { display: block; }
   .listbox { display: grid; gap: var(--cosm-space-2xs, 0.125rem); }
-  .group-label {
-    padding: var(--cosm-space-xs, 0.25rem) var(--cosm-space-sm, 0.5rem);
-    color: var(--cosm-fg-muted, oklch(0.48 0.01 268));
-    font-size: var(--cosm-text-xs, 0.75rem);
-    font-weight: 600;
-  }
   .option {
     display: flex;
     min-height: var(--_option-height, 2.5rem);
@@ -206,10 +185,8 @@ const styles = css`
     cursor: not-allowed;
     opacity: 0.55;
   }
-  .option-icon { flex: none; }
   .option-content { display: grid; min-width: 0; }
   .option-label { font-size: var(--_font-size, var(--cosm-text-md, 1rem)); }
-  .description { color: var(--cosm-muted, oklch(0.48 0.01 268)); font-size: var(--cosm-text-sm, 0.875rem); }
   .check { margin-inline-start: auto; flex: none; }
   .help, .error { font-size: var(--cosm-text-sm, 0.875rem); }
   .help { color: var(--cosm-muted, oklch(0.48 0.01 268)); }
@@ -235,7 +212,7 @@ const styles = css`
 `;
 
 /**
- * Labeled, single-selection combobox with a grouped popup and native Web form behavior.
+ * Labeled, single-selection combobox with a flat popup and native Web form behavior.
  *
  * @tag cosm-select
  * @csspart base - Field wrapper.
@@ -243,25 +220,21 @@ const styles = css`
  * @csspart trigger - Select-only combobox trigger.
  * @csspart value - Selected option text.
  * @csspart placeholder - Text displayed when no option is selected.
- * @csspart clear-button - Optional accessible clear action.
  * @csspart popup - Anchored option surface.
  * @csspart listbox - Single-selection option collection.
- * @csspart group - Named option group.
- * @csspart group-label - Noninteractive group heading.
  * @csspart option - Selectable option row.
- * @csspart icon - Decorative option icon.
  * @csspart content - Option text wrapper.
  * @csspart option-label - Primary option text.
- * @csspart description - Supporting option text.
  * @csspart help - Supporting text.
  * @csspart error - Error description.
- * @fires {CustomEvent<SelectChangeDetail>} cosm-change - Proposes a selection or clear.
+ * @fires {CustomEvent<SelectChangeDetail>} cosm-change - Proposes a selection.
  * @cssprop --cosm-select-background - Control background.
  * @cssprop --cosm-select-color - Control and value text color.
  * @cssprop --cosm-select-placeholder - Placeholder text color.
  * @cssprop --cosm-select-border - Control boundary color.
  * @cssprop --cosm-select-focus - Visible keyboard focus indicator color.
  * @cssprop --cosm-select-radius - Control corner radius.
+ * @cssprop --cosm-select-trigger-min-height - Custom minimum trigger height.
  * @cssprop --cosm-select-option-selected-background - Selected option background.
  * @cssprop --cosm-select-option-selected-color - Selected option text color.
  */
@@ -277,14 +250,13 @@ export class CosmSelect extends CosmElement {
     value: { attribute: false, noAccessor: true },
     defaultValue: { attribute: false },
     placeholder: { type: String },
+    variant: { reflect: true },
     size: { reflect: true },
     disabled: { type: Boolean, reflect: true },
     required: { type: Boolean, reflect: true },
     invalid: { type: Boolean, reflect: true },
     helpText: { type: String, attribute: 'help-text' },
     errorText: { type: String, attribute: 'error-text' },
-    clearable: { type: Boolean, reflect: true },
-    clearLabel: { type: String, attribute: 'clear-label' },
     name: { type: String, reflect: true },
   };
   static override styles = [boxSizing, focusRing, styles];
@@ -293,14 +265,13 @@ export class CosmSelect extends CosmElement {
   declare items: Props['items'];
   declare defaultValue: Props['defaultValue'] | undefined;
   declare placeholder: Props['placeholder'];
+  declare variant: Variant;
   declare size: Size;
   declare disabled: Props['disabled'];
   declare required: Props['required'];
   declare invalid: Props['invalid'];
   declare helpText: Props['helpText'];
   declare errorText: Props['errorText'];
-  declare clearable: Props['clearable'];
-  declare clearLabel: Props['clearLabel'];
   declare name: Props['name'] | undefined;
 
   /** Set by adapters to distinguish a bound value, including null, from autonomous state. */
@@ -335,14 +306,13 @@ export class CosmSelect extends CosmElement {
     this.items = [];
     this.defaultValue = undefined;
     this.placeholder = '';
+    this.variant = props.variant.default as Variant;
     this.size = props.size.default as Size;
     this.disabled = props.disabled.default;
     this.required = props.required.default;
     this.invalid = props.invalid.default;
     this.helpText = '';
     this.errorText = '';
-    this.clearable = props.clearable.default;
-    this.clearLabel = '';
     this.name = undefined;
     this.#internals =
       typeof this.attachInternals === 'function' ? this.attachInternals() : undefined;
@@ -415,6 +385,9 @@ export class CosmSelect extends CosmElement {
     if (typeof this.placeholder !== 'string' || !this.placeholder.trim()) {
       throw new TypeError('Select requires a non-empty placeholder.');
     }
+    if (!['outlined', 'filled'].includes(this.variant)) {
+      throw new TypeError('Select variant must be outlined or filled.');
+    }
     if (!['sm', 'md', 'lg'].includes(this.size)) {
       throw new TypeError('Select size must be sm, md, or lg.');
     }
@@ -422,29 +395,19 @@ export class CosmSelect extends CosmElement {
       ['disabled', this.disabled],
       ['required', this.required],
       ['invalid', this.invalid],
-      ['clearable', this.clearable],
     ] as const) {
       if (typeof value !== 'boolean') throw new TypeError(`Select ${name} must be a boolean.`);
     }
     if (
       typeof this.helpText !== 'string' ||
       typeof this.errorText !== 'string' ||
-      (typeof this.name !== 'string' && this.name !== undefined) ||
-      typeof this.clearLabel !== 'string'
+      (typeof this.name !== 'string' && this.name !== undefined)
     ) {
-      throw new TypeError('Select helpText, errorText, name and clearLabel must be strings.');
-    }
-    if (this.clearable && !this.clearLabel.trim()) {
-      throw new TypeError('Select requires a non-empty clearLabel when clearable.');
+      throw new TypeError('Select helpText, errorText and name must be strings.');
     }
 
     const options = getListboxOptions(this.items);
     if (options.length === 0) throw new TypeError('Select requires at least one option.');
-    for (const option of options) {
-      if (option.icon !== undefined && !isIconDefinition(option.icon)) {
-        throw new TypeError('Select option icon requires a valid IconDefinition.');
-      }
-    }
     validateSelectValue(this.value, options, 'value');
     validateSelectValue(this.defaultValue ?? null, options, 'defaultValue');
 
@@ -530,28 +493,27 @@ export class CosmSelect extends CosmElement {
   }
 
   #onTriggerKeyDown = (event: KeyboardEvent): void => {
-    if (
-      this.disabled ||
-      this.#formDisabled ||
-      this.#open ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.metaKey
-    ) {
-      return;
-    }
-    if (!['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) return;
-    event.preventDefault();
-    const options = getListboxOptions(this.items);
-    this.#activeValue = getListboxInitialActive(options, this.value ? [this.value] : []);
-    this.#openPopup(true);
-  };
-
-  #onListboxKeyDown = (event: KeyboardEvent): void => {
     if (this.disabled || this.#formDisabled || event.altKey || event.ctrlKey || event.metaKey) {
       return;
     }
     const options = getListboxOptions(this.items);
+    if (!this.#open) {
+      if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+        event.preventDefault();
+        this.#activeValue = getListboxInitialActive(options, this.value ? [this.value] : []);
+        this.#openPopup();
+        return;
+      }
+      if (event.key.length === 1 && event.key.trim()) {
+        const match = this.#findTypeaheadMatch(event.key, options);
+        if (match) {
+          event.preventDefault();
+          this.#activeValue = match;
+          this.#openPopup();
+        }
+      }
+      return;
+    }
     if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
       event.preventDefault();
       this.#setActive(
@@ -574,32 +536,28 @@ export class CosmSelect extends CosmElement {
       return;
     }
     if (event.key.length === 1 && event.key.trim() && event.key !== ' ') {
-      const now = Date.now();
-      this.#typeahead =
-        now - this.#typeaheadAt > typeaheadInterval ? event.key : `${this.#typeahead}${event.key}`;
-      this.#typeaheadAt = now;
-      const match = findListboxMatch(
-        options,
-        this.#activeValue,
-        this.#typeahead,
-        this.closest('[lang]')?.getAttribute('lang') || undefined
-      );
+      const match = this.#findTypeaheadMatch(event.key, options);
       if (match) this.#setActive(match);
       event.preventDefault();
     }
   };
 
+  #findTypeaheadMatch(key: string, options: readonly ListboxOption[]): string | null {
+    const now = Date.now();
+    this.#typeahead =
+      now - this.#typeaheadAt > typeaheadInterval ? key : `${this.#typeahead}${key}`;
+    this.#typeaheadAt = now;
+    return findListboxMatch(
+      options,
+      this.#activeValue,
+      this.#typeahead,
+      this.closest('[lang]')?.getAttribute('lang') || undefined
+    );
+  }
+
   #setActive(value: string | null): void {
     this.#activeValue = value;
     this.requestUpdate();
-    void this.updateComplete.then(() => this.#focusActiveOption());
-  }
-
-  #focusActiveOption(): void {
-    if (!this.#open || !this.#activeValue) return;
-    [...this.renderRoot.querySelectorAll<HTMLElement>('[role="option"]')]
-      .find(option => option.dataset.value === this.#activeValue)
-      ?.focus();
   }
 
   #select(value: string): void {
@@ -609,21 +567,11 @@ export class CosmSelect extends CosmElement {
     this.#closePopup(true);
   }
 
-  #clear = (event: Event): void => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (this.disabled || this.#formDisabled || this.value === null) return;
-    this.#proposeValue(null);
-    this.#closePopup(false);
-    void this.updateComplete.then(() => this.#trigger()?.focus());
-  };
-
-  #openPopup = (focus: boolean): void => {
+  #openPopup = (): void => {
     if (this.#open || this.disabled || this.#formDisabled) return;
     this.#open = true;
     this.requestUpdate();
     document.addEventListener('pointerdown', this.#onDocumentPointerDown, true);
-    document.addEventListener('keydown', this.#onDocumentKeyDown, true);
     window.addEventListener('resize', this.#positionPopup);
     window.addEventListener('scroll', this.#positionPopup, true);
     void this.updateComplete.then(() => {
@@ -634,7 +582,6 @@ export class CosmSelect extends CosmElement {
         this.#nativePopoverOpen = true;
       }
       this.#positionPopup();
-      if (focus) this.#focusActiveOption();
       if (typeof ResizeObserver !== 'undefined') {
         this.#resizeObserver = new ResizeObserver(this.#positionPopup);
         this.#resizeObserver.observe(popup);
@@ -650,7 +597,6 @@ export class CosmSelect extends CosmElement {
     this.#resizeObserver?.disconnect();
     this.#resizeObserver = undefined;
     document.removeEventListener('pointerdown', this.#onDocumentPointerDown, true);
-    document.removeEventListener('keydown', this.#onDocumentKeyDown, true);
     window.removeEventListener('resize', this.#positionPopup);
     window.removeEventListener('scroll', this.#positionPopup, true);
     const popup = this.#popup();
@@ -665,12 +611,6 @@ export class CosmSelect extends CosmElement {
   #onDocumentPointerDown = (event: PointerEvent): void => {
     if (event.composedPath().includes(this)) return;
     this.#closePopup(false);
-  };
-
-  #onDocumentKeyDown = (event: KeyboardEvent): void => {
-    if (event.key !== 'Escape' || event.defaultPrevented) return;
-    event.preventDefault();
-    this.#closePopup(true);
   };
 
   #positionPopup = (): void => {
@@ -698,41 +638,26 @@ export class CosmSelect extends CosmElement {
     popup.style.left = `${left}px`;
   };
 
-  #renderOption(option: ListboxOption<IconDefinition>) {
+  #renderOption(option: SelectOption, index: number) {
     const selected = option.value === this.value;
     const active = option.value === this.#activeValue;
     const disabled = Boolean(option.disabled);
-    const descriptionId = option.description
-      ? `${this.#id}-description-${option.value}`
-      : undefined;
     return html`
       <div
         part="option"
         class="option"
         role="option"
-        id="${this.#id}-option-${option.value}"
+        id="${this.#id}-option-${index}"
         data-value=${option.value}
         data-selected=${String(selected)}
         data-active=${String(active)}
         data-disabled=${String(disabled)}
         aria-selected=${String(selected)}
         aria-disabled=${disabled ? 'true' : nothing}
-        aria-describedby=${descriptionId ?? nothing}
-        tabindex=${active && !disabled ? '0' : '-1'}
         @click=${() => this.#select(option.value)}
       >
-        ${
-          option.icon
-            ? html`<cosm-icon part="icon" class="option-icon" aria-hidden="true" .icon=${option.icon}></cosm-icon>`
-            : nothing
-        }
         <span part="content" class="option-content">
           <span part="option-label" class="option-label">${option.label}</span>
-          ${
-            option.description
-              ? html`<span part="description" class="description" id=${descriptionId}>${option.description}</span>`
-              : nothing
-          }
         </span>
         ${
           selected
@@ -748,23 +673,16 @@ export class CosmSelect extends CosmElement {
     const invalid = this.invalid || Boolean(this.errorText) || this.#showNativeError;
     const options = getListboxOptions(this.items);
     const selected = options.find(option => option.value === this.value);
+    const activeIndex = options.findIndex(
+      option => option.value === this.#activeValue && !option.disabled
+    );
     const describedBy = [
       this.helpText ? `${this.#id}-help` : '',
       this.errorText || this.#showNativeError ? `${this.#id}-error` : '',
     ]
       .filter(Boolean)
       .join(' ');
-    let optionIndex = 0;
-    const items = this.items.map(item => {
-      if ('options' in item) {
-        const groupId = `${this.#id}-group-${optionIndex++}`;
-        return html`<div part="group" role="group" aria-labelledby=${groupId}>
-          <div part="group-label" class="group-label" id=${groupId}>${item.label}</div>
-          ${item.options.map(option => this.#renderOption(option))}
-        </div>`;
-      }
-      return this.#renderOption(item);
-    });
+    const items = options.map((option, index) => this.#renderOption(option, index));
     return html`
       <div part="base" class="base" data-disabled=${String(effectiveDisabled)}>
         <label part="label" class="label" id="${this.#id}-label" for="${this.#id}-trigger">
@@ -781,6 +699,9 @@ export class CosmSelect extends CosmElement {
             aria-controls="${this.#id}-listbox"
             aria-haspopup="listbox"
             aria-expanded=${String(this.#open)}
+            aria-activedescendant=${
+              this.#open && activeIndex >= 0 ? `${this.#id}-option-${activeIndex}` : nothing
+            }
             aria-required=${this.required ? 'true' : 'false'}
             aria-invalid=${invalid ? 'true' : 'false'}
             aria-describedby=${describedBy || nothing}
@@ -792,7 +713,7 @@ export class CosmSelect extends CosmElement {
                 return;
               }
               this.#activeValue = getListboxInitialActive(options, this.value ? [this.value] : []);
-              this.#openPopup(true);
+              this.#openPopup();
             }}
           >
             <span
@@ -802,25 +723,12 @@ export class CosmSelect extends CosmElement {
             >${selected?.label ?? this.placeholder}</span>
             <cosm-icon class="trigger-icon" aria-hidden="true" .icon=${chevronDown}></cosm-icon>
           </button>
-          ${
-            this.clearable && this.value !== null
-              ? html`<button
-                part="clear-button"
-                class="clear-button"
-                type="button"
-                aria-label=${this.clearLabel}
-                ?disabled=${effectiveDisabled}
-                @click=${this.#clear}
-              ><cosm-icon aria-hidden="true" .icon=${x}></cosm-icon></button>`
-              : nothing
-          }
         </div>
         <div
           part="popup"
           class="popup"
           popover="manual"
           data-open=${String(this.#open)}
-          @keydown=${this.#onListboxKeyDown}
         >
           <div
             part="listbox"

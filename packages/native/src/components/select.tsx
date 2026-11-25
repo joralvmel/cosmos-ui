@@ -1,20 +1,19 @@
 import {
   type ContractProps,
   getListboxOptions,
-  type ListboxItem,
   type ListboxSelectionChangeDetail,
   type SelectChangeDetail,
+  type SelectItems,
   type SelectValue,
   selectContract,
   validateSelectValue,
 } from '@joralvmel/cosmos-core';
-import type { IconDefinition } from '@joralvmel/cosmos-icons';
 import { chevronDown } from '@joralvmel/cosmos-icons/chevron-down';
-import { x } from '@joralvmel/cosmos-icons/x';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Pressable,
   type StyleProp,
+  StyleSheet,
   Text,
   type TextStyle,
   View,
@@ -29,7 +28,7 @@ type ContractSelectProps = ContractProps<
   typeof selectContract,
   'native',
   {
-    ListboxItems: readonly ListboxItem<IconDefinition>[];
+    SelectItems: SelectItems;
     SelectValue: SelectValue;
   }
 >;
@@ -38,6 +37,7 @@ export interface SelectProps extends ContractSelectProps {
   onValueChange?: (detail: SelectChangeDetail) => void;
   style?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
+  triggerStyle?: StyleProp<ViewStyle>;
   testID?: string;
 }
 
@@ -48,36 +48,36 @@ export const selectPropNames = [
   'value',
   'defaultValue',
   'placeholder',
+  'variant',
   'size',
   'disabled',
   'required',
   'invalid',
   'helpText',
   'errorText',
-  'clearable',
-  'clearLabel',
 ] as const satisfies readonly (keyof ContractSelectProps)[];
 
 const sizes = ['sm', 'md', 'lg'] as const;
+const MIN_TOUCH_TARGET = 44;
 
-/** Selects one value from grouped options using Cosmos popup and listbox behavior. */
+/** Selects one value from flat options using Cosmos popup and listbox behavior. */
 export function Select({
   label,
   items,
   value,
   defaultValue = null,
   placeholder,
+  variant = selectContract.props.variant.default,
   size = selectContract.props.size.default,
   disabled = selectContract.props.disabled.default,
   required = selectContract.props.required.default,
   invalid = selectContract.props.invalid.default,
   helpText,
   errorText,
-  clearable = selectContract.props.clearable.default,
-  clearLabel,
   onValueChange,
   style,
   labelStyle,
+  triggerStyle,
   testID,
 }: SelectProps) {
   const theme = useTheme();
@@ -96,11 +96,11 @@ export function Select({
   if (typeof placeholder !== 'string' || !placeholder.trim()) {
     throw new TypeError('Select requires a non-empty placeholder.');
   }
+  if (!['outlined', 'filled'].includes(variant)) {
+    throw new TypeError('Select variant must be outlined or filled.');
+  }
   if (!sizes.includes(size)) throw new TypeError('Select size must be sm, md, or lg.');
   if (options.length === 0) throw new TypeError('Select requires at least one option.');
-  if (clearable && !clearLabel?.trim()) {
-    throw new TypeError('Select requires a non-empty clearLabel when clearable.');
-  }
   validateSelectValue(currentValue, options, 'value');
   validateSelectValue(defaultValue, options, 'defaultValue');
 
@@ -115,16 +115,17 @@ export function Select({
     popover.current?.requestClose();
   };
 
-  const clearValue = () => {
-    changeValue(null);
-    popover.current?.requestClose();
-  };
-
   useEffect(() => {
     if (disabled && expanded) popover.current?.requestClose();
   }, [disabled, expanded]);
 
-  const controlHeight = Math.max(44, theme.control[size]);
+  const controlHeight = Math.max(MIN_TOUCH_TARGET, theme.control[size]);
+  const customTriggerStyle = StyleSheet.flatten(triggerStyle);
+  const customMinHeight = customTriggerStyle?.minHeight;
+  if (customMinHeight !== undefined && typeof customMinHeight !== 'number') {
+    throw new TypeError('Select triggerStyle.minHeight must be a number.');
+  }
+  const triggerMinHeight = Math.max(MIN_TOUCH_TARGET, controlHeight, customMinHeight ?? 0);
   const textSize = theme.text[size];
   const description = errorText || helpText;
   const optionValues = currentValue === null ? [] : [currentValue];
@@ -176,20 +177,28 @@ export function Select({
                       : !disabled && hovered
                         ? theme.colors.primary
                         : theme.colors['border-strong'];
-                  return {
-                    minHeight: controlHeight,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: theme.space.sm,
-                    paddingHorizontal: theme.space.md,
-                    paddingVertical: theme.space.xs,
-                    borderWidth: 1,
-                    borderColor,
-                    borderRadius: theme.radius.md,
-                    backgroundColor: expanded ? theme.colors['primary-subtle'] : theme.colors.bg,
-                    opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
-                  };
+                  return [
+                    {
+                      minHeight: controlHeight,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: theme.space.sm,
+                      paddingHorizontal: theme.space.md,
+                      paddingVertical: theme.space.xs,
+                      borderWidth: 1,
+                      borderColor,
+                      borderRadius: theme.radius.md,
+                      backgroundColor: expanded
+                        ? theme.colors['primary-subtle']
+                        : variant === 'filled'
+                          ? theme.colors['surface-raised']
+                          : theme.colors.bg,
+                      opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
+                    },
+                    triggerStyle,
+                    { minHeight: triggerMinHeight },
+                  ];
                 }}
               >
                 <Text
@@ -225,26 +234,6 @@ export function Select({
             />
           </Popover>
         </View>
-        {clearable && selected ? (
-          <Pressable
-            testID={testID ? `${testID}-clear` : undefined}
-            disabled={disabled}
-            onPress={clearValue}
-            accessibilityRole="button"
-            accessibilityLabel={clearLabel}
-            accessibilityState={{ disabled }}
-            style={({ pressed }) => ({
-              width: 44,
-              height: 44,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: theme.radius.sm,
-              opacity: disabled ? 0.55 : pressed ? 0.7 : 1,
-            })}
-          >
-            <Icon icon={x} stroke={theme.colors['fg-muted']} size={18} />
-          </Pressable>
-        ) : null}
       </View>
       {description ? (
         <Text

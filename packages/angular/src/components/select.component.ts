@@ -12,19 +12,18 @@ import {
 import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type {
   ContractProps,
-  ListboxItem,
   SelectChangeDetail,
+  SelectItems,
   SelectValue,
   selectContract,
 } from '@joralvmel/cosmos-core';
 import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
-import type { IconDefinition } from '@joralvmel/cosmos-icons';
 import '@joralvmel/cosmos-elements/select';
 
 type Props = ContractProps<
   typeof selectContract,
   'angular',
-  { ListboxItems: readonly ListboxItem<IconDefinition>[]; SelectValue: SelectValue }
+  { SelectItems: SelectItems; SelectValue: SelectValue }
 >;
 
 /**
@@ -74,6 +73,9 @@ export class CosmSelectComponent implements ControlValueAccessor {
   @Input({ required: true }) set placeholder(value: Props['placeholder']) {
     this.element.placeholder = value;
   }
+  @Input() set variant(value: Props['variant']) {
+    this.element.variant = value ?? 'outlined';
+  }
   @Input() set size(value: Props['size']) {
     this.element.size = value ?? 'md';
   }
@@ -91,12 +93,6 @@ export class CosmSelectComponent implements ControlValueAccessor {
   }
   @Input() set errorText(value: Props['errorText']) {
     this.element.errorText = value ?? '';
-  }
-  @Input({ transform: booleanAttribute }) set clearable(value: boolean) {
-    this.element.clearable = value;
-  }
-  @Input() set clearLabel(value: Props['clearLabel']) {
-    this.element.clearLabel = value ?? '';
   }
   @Input() set name(value: Props['name']) {
     this.element.name = value;

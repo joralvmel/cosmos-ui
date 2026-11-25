@@ -33,6 +33,7 @@ export {
   radioGroupValueExamples,
   type SnippetChild,
   type SnippetTarget,
+  selectItemExamples,
   selectValueExamples,
   snippetTargets,
   supportsTarget,
@@ -236,6 +237,7 @@ export {
 export {
   type SelectChangeDetail,
   type SelectItems,
+  type SelectOption,
   type SelectReferences,
   type SelectValue,
   selectContract,

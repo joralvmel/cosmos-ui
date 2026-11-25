@@ -704,30 +704,29 @@ Selects one option from a labeled collection, with optional selection and native
 
 ### `select` (`<cosm-select>`)
 
-Selects one option from an accessible collection, with grouped items and native Web form behavior.
+Selects one option from an accessible collection, with native Web form behavior.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `label` | string | Required | Required visible accessible name for the control. |
-| `items` | ListboxItems | Required | Readonly options or named groups. Each option has a unique nonempty value and label, and may include a description, decorative IconDefinition, or disabled state. |
+| `items` | SelectItems | Required | Readonly flat options with unique nonempty values, nonempty labels, and optional disabled state. |
 | `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
 | `defaultValue` | SelectValue | — | Initial autonomous selection; null by default. |
 | `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Outlined or filled trigger appearance. |
 | `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
 | `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
 | `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
 | `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
 | `helpText` | string | — | Optional supporting text associated with the control. |
 | `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
-| `clearable` | boolean | `false` | Shows a separate clear action when a value is selected. |
-| `clearLabel` | string | — | Consumer-localized accessible name for the clear action; required when clearable. |
 | `name` | string | — | Web form field name; React Native has no HTML form association. |
 
 **Events**
 
 | DOM | React | Angular | React Native | Detail | Description |
 | --- | --- | --- | --- | --- | --- |
-| `cosm-change` | `onChange` | `(valueChange)` | `onValueChange` | `SelectChangeDetail` | Proposes a selected or cleared value after user activation; autonomous state commits and controlled state waits for the owner. |
+| `cosm-change` | `onChange` | `(valueChange)` | `onValueChange` | `SelectChangeDetail` | Proposes a selected value after user activation; autonomous state commits and controlled state waits for the owner. |
 
 **CSS parts**
 
@@ -738,16 +737,11 @@ Selects one option from an accessible collection, with grouped items and native 
 | `trigger` | Select-only combobox trigger. |
 | `value` | Selected option text. |
 | `placeholder` | Text displayed when no option is selected. |
-| `clear-button` | Optional accessible action that clears the selection. |
 | `popup` | Anchored popup surface. |
 | `listbox` | Single-selection option collection. |
-| `group` | Named option group. |
-| `group-label` | Noninteractive group heading. |
 | `option` | Selectable row with selected, active, and disabled states. |
-| `icon` | Decorative leading option icon. |
 | `content` | Option text wrapper. |
 | `option-label` | Primary option text. |
-| `description` | Optional supporting option text. |
 | `help` | Supporting text associated with the control. |
 | `error` | Error description associated with the control. |
 
@@ -761,6 +755,7 @@ Selects one option from an accessible collection, with grouped items and native 
 | `--cosm-select-border` | Control boundary color. |
 | `--cosm-select-focus` | Visible keyboard focus indicator color. |
 | `--cosm-select-radius` | Control corner radius. |
+| `--cosm-select-trigger-min-height` | Custom minimum trigger height. |
 | `--cosm-select-option-selected-background` | Selected option background. |
 | `--cosm-select-option-selected-color` | Selected option text color. |
 
@@ -769,11 +764,11 @@ Selects one option from an accessible collection, with grouped items and native 
 | Keys | Action |
 | --- | --- |
 | `Tab`, `Shift+Tab` | Moves focus to or from the enabled combobox trigger. |
-| `Enter`, `Space`, `ArrowDown`, `ArrowUp` | Opens the popup; arrows move the active option without changing the selection. |
-| `ArrowDown`, `ArrowUp`, `Home`, `End` | Moves active focus among enabled options without changing the selected value. |
-| `Printable characters` | Moves active focus to a matching option using locale-aware typeahead without filtering. |
-| `Enter`, `Space` | Selects the active enabled option. |
-| `Escape` | Closes the popup without changing the selected value. |
+| `Enter`, `Space`, `ArrowDown`, `ArrowUp` | On Web, opens the popup; arrows move the active option without changing selection. |
+| `ArrowDown`, `ArrowUp`, `Home`, `End` | On Web, moves the active option without changing the selected value. |
+| `Printable characters` | On Web and React Native Web, moves to a matching option using locale-aware typeahead. Native iOS/Android use touch and platform accessibility navigation; React Native core does not expose hardware key events on this control. |
+| `Enter`, `Space` | On Web, selects the active enabled option. |
+| `Escape` | On Web, closes the popup without changing the selected value. |
 
 
 ## Rules for AI assistants

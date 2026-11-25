@@ -64,9 +64,7 @@ describe('Select: shared scenarios', () => {
 
       for (const action of scenario.actions) {
         if (action.type === 'select') optionOf(element, action.value)?.click();
-        else if (action.type === 'clear') {
-          element.shadowRoot?.querySelector<HTMLButtonElement>('[part="clear-button"]')?.click();
-        } else {
+        else {
           props = { ...props, value: action.value };
           element = await rerender(props);
         }
@@ -74,6 +72,7 @@ describe('Select: shared scenarios', () => {
       }
 
       expect(element.value).toBe(scenario.expected.value);
+      if (scenario.props.variant) expect(element.variant).toBe(scenario.props.variant);
       expect(onChange.mock.calls.map(([event]) => event.detail.value)).toEqual(
         scenario.expected.changes
       );

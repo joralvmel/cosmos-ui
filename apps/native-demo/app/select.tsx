@@ -4,20 +4,9 @@ import { useState } from 'react';
 import { ScrollView, Text } from 'react-native';
 
 const fruitItems = [
-  {
-    label: 'Fruit',
-    options: [
-      { value: 'apple', label: 'Apple', description: 'Crisp and sweet.' },
-      { value: 'cherry', label: 'Cherry', description: 'Available in summer.' },
-    ],
-  },
-  {
-    label: 'Vegetables',
-    options: [
-      { value: 'carrot', label: 'Carrot' },
-      { value: 'broccoli', label: 'Broccoli', disabled: true },
-    ],
-  },
+  { value: 'apple', label: 'Apple' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'lime', label: 'Lime', disabled: true },
 ];
 
 export default function SelectScreen() {
@@ -33,9 +22,8 @@ export default function SelectScreen() {
         placeholder="Choose a fruit"
         value={fruit}
         onValueChange={({ value }) => setFruit(value)}
-        clearable
-        clearLabel="Clear fruit"
         required
+        helpText="Select one available fruit."
       />
       <Text style={label}>Selected value: {fruit ?? 'none'}</Text>
       <Select
@@ -43,8 +31,9 @@ export default function SelectScreen() {
         items={fruitItems}
         placeholder="Choose a fruit"
         defaultValue="cherry"
+        variant="filled"
         size="sm"
-        helpText="Options are grouped by food type."
+        triggerStyle={{ minHeight: 56, borderColor: theme.colors.primary }}
       />
       <Select
         label="Unavailable selection"

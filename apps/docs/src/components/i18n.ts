@@ -76,13 +76,12 @@ const strings = {
       radioGroupLabel: 'Contact method',
       selectLabel: 'Fruit',
       selectPlaceholder: 'Choose a fruit',
-      selectClearLabel: 'Clear fruit',
       selectValues: {
         none: 'No selection',
         apple: 'Apple',
         cherry: 'Cherry',
       },
-      selectInvalid: 'Use a non-empty label, placeholder, and clear label when clearable.',
+      selectInvalid: 'Use a non-empty label and placeholder.',
       radioGroupExamples: {
         'contact-methods': 'Contact methods',
         plans: 'Plans',
@@ -249,14 +248,12 @@ const strings = {
       radioGroupLabel: 'Método de contacto',
       selectLabel: 'Fruta',
       selectPlaceholder: 'Elige una fruta',
-      selectClearLabel: 'Quitar fruta',
       selectValues: {
         none: 'Sin selección',
         apple: 'Manzana',
         cherry: 'Cereza',
       },
-      selectInvalid:
-        'Usa una etiqueta y un marcador no vacíos, y una etiqueta de limpieza si aplica.',
+      selectInvalid: 'Usa una etiqueta y un marcador no vacíos.',
       radioGroupExamples: {
         'contact-methods': 'Métodos de contacto',
         plans: 'Planes',

@@ -1,10 +1,14 @@
 import { defineContract } from '../contract.js';
-import type { ListboxItem } from './listbox.js';
 
 export type SelectValue = string | null;
-export type SelectItems = readonly ListboxItem[];
+export interface SelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+export type SelectItems = readonly SelectOption[];
 export type SelectReferences = {
-  ListboxItems: SelectItems;
+  SelectItems: SelectItems;
   SelectValue: SelectValue;
 };
 
@@ -13,14 +17,13 @@ export interface SelectChangeDetail {
 }
 
 /**
- * Selects one value from a labeled, grouped collection using a select-only combobox and a
+ * Selects one value from a labeled collection using a select-only combobox and a
  * form-associated custom popup on the Web.
  */
 export const selectContract = defineContract({
   name: 'select',
   tag: 'cosm-select',
-  description:
-    'Selects one option from an accessible collection, with grouped items and native Web form behavior.',
+  description: 'Selects one option from an accessible collection, with native Web form behavior.',
   role: 'combobox',
   pattern: 'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/',
   props: {
@@ -31,12 +34,12 @@ export const selectContract = defineContract({
     },
     items: {
       type: 'reference',
-      reference: 'ListboxItems',
+      reference: 'SelectItems',
       required: true,
-      options: ['flat', 'grouped'],
-      example: 'grouped',
+      options: ['flat'],
+      example: 'flat',
       description:
-        'Readonly options or named groups. Each option has a unique nonempty value and label, and may include a description, decorative IconDefinition, or disabled state.',
+        'Readonly flat options with unique nonempty values, nonempty labels, and optional disabled state.',
     },
     value: {
       type: 'reference',
@@ -56,6 +59,13 @@ export const selectContract = defineContract({
       type: 'string',
       required: true,
       description: 'Consumer-localized text shown when no value is selected.',
+    },
+    variant: {
+      type: 'enum',
+      values: ['outlined', 'filled'],
+      default: 'outlined',
+      reflect: true,
+      description: 'Outlined or filled trigger appearance.',
     },
     size: {
       type: 'enum',
@@ -92,17 +102,6 @@ export const selectContract = defineContract({
       description:
         'Optional consumer-localized error text; a nonempty value also exposes invalid state.',
     },
-    clearable: {
-      type: 'boolean',
-      default: false,
-      reflect: true,
-      description: 'Shows a separate clear action when a value is selected.',
-    },
-    clearLabel: {
-      type: 'string',
-      description:
-        'Consumer-localized accessible name for the clear action; required when clearable.',
-    },
     name: {
       type: 'string',
       reflect: true,
@@ -113,7 +112,7 @@ export const selectContract = defineContract({
   events: {
     change: {
       description:
-        'Proposes a selected or cleared value after user activation; autonomous state commits and controlled state waits for the owner.',
+        'Proposes a selected value after user activation; autonomous state commits and controlled state waits for the owner.',
       detail: 'SelectChangeDetail',
       names: {
         dom: 'cosm-change',
@@ -131,16 +130,11 @@ export const selectContract = defineContract({
     trigger: 'Select-only combobox trigger.',
     value: 'Selected option text.',
     placeholder: 'Text displayed when no option is selected.',
-    'clear-button': 'Optional accessible action that clears the selection.',
     popup: 'Anchored popup surface.',
     listbox: 'Single-selection option collection.',
-    group: 'Named option group.',
-    'group-label': 'Noninteractive group heading.',
     option: 'Selectable row with selected, active, and disabled states.',
-    icon: 'Decorative leading option icon.',
     content: 'Option text wrapper.',
     'option-label': 'Primary option text.',
-    description: 'Optional supporting option text.',
     help: 'Supporting text associated with the control.',
     error: 'Error description associated with the control.',
   },
@@ -151,6 +145,7 @@ export const selectContract = defineContract({
     '--cosm-select-border': 'Control boundary color.',
     '--cosm-select-focus': 'Visible keyboard focus indicator color.',
     '--cosm-select-radius': 'Control corner radius.',
+    '--cosm-select-trigger-min-height': 'Custom minimum trigger height.',
     '--cosm-select-option-selected-background': 'Selected option background.',
     '--cosm-select-option-selected-color': 'Selected option text color.',
   },
@@ -158,18 +153,18 @@ export const selectContract = defineContract({
     { keys: ['Tab', 'Shift+Tab'], action: 'Moves focus to or from the enabled combobox trigger.' },
     {
       keys: ['Enter', 'Space', 'ArrowDown', 'ArrowUp'],
-      action: 'Opens the popup; arrows move the active option without changing the selection.',
+      action: 'On Web, opens the popup; arrows move the active option without changing selection.',
     },
     {
       keys: ['ArrowDown', 'ArrowUp', 'Home', 'End'],
-      action: 'Moves active focus among enabled options without changing the selected value.',
+      action: 'On Web, moves the active option without changing the selected value.',
     },
     {
       keys: ['Printable characters'],
       action:
-        'Moves active focus to a matching option using locale-aware typeahead without filtering.',
+        'On Web and React Native Web, moves to a matching option using locale-aware typeahead. Native iOS/Android use touch and platform accessibility navigation; React Native core does not expose hardware key events on this control.',
     },
-    { keys: ['Enter', 'Space'], action: 'Selects the active enabled option.' },
-    { keys: ['Escape'], action: 'Closes the popup without changing the selected value.' },
+    { keys: ['Enter', 'Space'], action: 'On Web, selects the active enabled option.' },
+    { keys: ['Escape'], action: 'On Web, closes the popup without changing the selected value.' },
   ],
 });
