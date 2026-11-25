@@ -11,6 +11,7 @@ import {
   toAttribute,
   validateListboxSize,
   validateListboxValues,
+  validatePaginationNumber,
   validateSize,
 } from '@joralvmel/cosmos-core';
 import '@joralvmel/cosmos-elements/button';
@@ -81,6 +82,16 @@ export interface PlaygroundLabels {
   selectPlaceholder?: string;
   selectValues?: Readonly<Record<string, string>>;
   selectInvalid?: string;
+  paginationDefaults?: {
+    label: string;
+    previousLabel: string;
+    nextLabel: string;
+    firstLabel: string;
+    lastLabel: string;
+    pageLabel: string;
+    summaryLabel: string;
+  };
+  paginationInvalid?: string;
   listboxSelected?: string;
   listboxProposal?: string;
   listboxResetNote?: string;
@@ -226,6 +237,10 @@ export function initPlayground(
   if (contract.name === 'select') {
     values.label = labels.selectLabel ?? 'Fruit';
     values.placeholder = labels.selectPlaceholder ?? 'Choose a fruit';
+  }
+  if (contract.name === 'pagination') {
+    values.totalPages = 20;
+    Object.assign(values, labels.paginationDefaults ?? { label: 'Results' });
   }
   if (target) {
     for (const [name, spec] of Object.entries(contract.props)) {
@@ -1114,6 +1129,29 @@ export function initPlayground(
         }
         referenceStatus.textContent = '';
       }
+      if (contract.name === 'pagination') {
+        try {
+          if (name === 'totalPages' || name === 'page' || name === 'defaultPage') {
+            if (value !== undefined || name === 'totalPages')
+              validatePaginationNumber(value, name, name === 'totalPages' ? 0 : 1);
+          }
+          if (name.toLowerCase().endsWith('label')) {
+            if (
+              typeof value !== 'string' ||
+              !value.trim() ||
+              (name === 'pageLabel' && !value.includes('{page}')) ||
+              (name === 'summaryLabel' && (!value.includes('{page}') || !value.includes('{total}')))
+            )
+              throw new TypeError('Invalid pagination label.');
+          }
+          if (name === 'locale' && typeof value === 'string') new Intl.NumberFormat(value);
+        } catch (error) {
+          if (!(error instanceof TypeError || error instanceof RangeError)) throw error;
+          referenceStatus.textContent = labels.paginationInvalid ?? error.message;
+          return;
+        }
+        referenceStatus.textContent = '';
+      }
       if (contract.name === 'select') {
         const next = { ...values, [name]: value };
         const label = name === 'label' ? value : next.label;
@@ -1174,7 +1212,8 @@ export function initPlayground(
           (contract.name === 'listbox' &&
             (name === 'selectionMode' || name === 'defaultSelectedValues')) ||
           (contract.name === 'radio-group' && (name === 'defaultValue' || name === 'options')) ||
-          (contract.name === 'select' && name === 'items'))
+          (contract.name === 'select' && name === 'items') ||
+          (contract.name === 'pagination' && name === 'defaultPage'))
       ) {
         const replacement = document.createElement(contract.tag);
         for (const attribute of target.attributes) {

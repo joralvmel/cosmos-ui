@@ -43,6 +43,7 @@ describe('contract helpers', () => {
       disabled: false,
       loading: false,
       fullWidth: false,
+      currentPage: false,
     });
   });
 

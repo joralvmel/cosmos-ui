@@ -85,6 +85,8 @@ asigna a `pressed`.
   Native Web usa `aria-pressed` para los botones de alternancia.
   Su área táctil mide al menos 44 por 44 puntos lógicos, incluso con tamaño visual pequeño.
   Las dimensiones web usan los tokens de controles, no el tamaño del área táctil nativa.
+- `style` nativo conserva valores numéricos mayores de `minHeight`/`minWidth`, pero nunca
+  permite objetivos menores de 44 puntos por dimensión. No cambia la geometría del icono.
 - No comuniques peligro ni estado activado solo mediante el color. `label` proporciona un
   nombre accesible, no un tooltip; el componente no incluye tooltip.
 

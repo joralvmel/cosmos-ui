@@ -65,6 +65,17 @@ describe('Button (native): contract drift', () => {
 });
 
 describe('Button (native)', () => {
+  it('exposes current-page semantics and a focusable composition ref', async () => {
+    const ref = { current: null };
+    const button = await render(
+      <Button currentPage ref={ref}>
+        2
+      </Button>
+    );
+    expect(button.getAttribute('aria-current')).toBe('page');
+    expect(button.hasAttribute('aria-pressed')).toBe(false);
+    expect(ref.current).toBe(button);
+  });
   it('exposes the button role and accessible label', async () => {
     const button = await render(<Button label="Close">×</Button>);
     expect(button.getAttribute('data-role')).toBe('button');

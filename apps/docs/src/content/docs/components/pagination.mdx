@@ -1,0 +1,106 @@
+---
+title: Pagination
+description: Localized button navigation for a known number of pages.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import Preview from '../../../components/Preview.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="pagination" />
+
+`<cosm-pagination>` navigates a known, finite collection of pages with Cosmos Button and
+IconButton controls. Use it for in-place results, not URL navigation. It follows ordinary
+[navigation landmark](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/) semantics;
+there is no special pagination keyboard pattern.
+
+## Playground
+
+<Playground name="pagination" />
+
+The empty `page` control selects autonomous ownership. Set `page` to preview a controlled
+proposal: the component emits a change but waits for the application to update that prop.
+Changing `defaultPage` remounts the playground example; it is otherwise initial-only.
+
+## Variants
+
+The current page supports `solid` (default), `soft` and `outline`; other controls are ghost.
+Sizes are `sm`, `md` (default) and `lg`. Presentation is explicit, never changed by a breakpoint.
+
+<Preview>
+  <cosm-pagination label="Solid results" total-pages="20" default-page="5"></cosm-pagination>
+  <cosm-pagination label="Soft results" total-pages="20" default-page="5" variant="soft" size="sm"></cosm-pagination>
+  <cosm-pagination label="Outline results" total-pages="20" default-page="5" variant="outline" size="lg" show-first-last></cosm-pagination>
+  <cosm-pagination label="Compact results" total-pages="20" default-page="5" presentation="compact"></cosm-pagination>
+</Preview>
+
+The numbered range includes first/last and the current page with one neighbor on each side.
+A single missing page is filled; larger gaps are decorative ellipses, never menus.
+First/last action buttons are optional and off by default.
+
+Customize the shared theme tokens, exported parts or CSS variables. For example, set
+`--cosm-pagination-min-height: 56px` and `--cosm-pagination-radius: 999px` on the host.
+Current-page colors have dedicated hooks; normal Button hover, active and focus behavior
+remains in use. React Native accepts `style` for the container and `controlStyle` for controls;
+numeric minimum dimensions are never smaller than 44 points.
+
+<Preview>
+  <cosm-pagination label="Custom results" total-pages="12" default-page="4" style="--cosm-pagination-min-height: 56px; --cosm-pagination-radius: 999px;"></cosm-pagination>
+</Preview>
+
+## States
+
+Provide a nonnegative safe integer `totalPages` and a non-empty localized `label`.
+Pages are one-based safe integers. Invalid types, fractions and negative counts throw.
+Valid out-of-range pages clamp to the available range; zero pages retain an anchor of one.
+Zero or one page renders no navigation.
+
+Autonomous state starts at `defaultPage` (default 1), then commits user selections and clamps
+permanently if totals shrink. Controlled `page` retains the application's requested value:
+if totals grow again, it can become visible again. Prop corrections emit no change event.
+Activating the current page, a boundary or any disabled control emits nothing.
+
+<Preview>
+  <cosm-pagination label="First results page" total-pages="10" show-first-last></cosm-pagination>
+  <cosm-pagination label="Unavailable results" total-pages="10" default-page="5" disabled></cosm-pagination>
+</Preview>
+
+There is no loading state. The application owns fetching, result announcements and moving
+focus into new content. Page-size selection, jump input, links, unknown totals and infinite
+scroll are intentionally outside this component.
+
+## Accessibility
+
+- The web landmark uses the required `label`. Buttons are `type="button"`, not form submits.
+- Tab/Shift+Tab moves through enabled buttons; Enter/Space activates. Arrow keys are not intercepted.
+- The internal native web button exposes [`aria-current="page"`](https://www.w3.org/TR/wai-aria-1.2/#aria-current),
+  not `aria-pressed`. React Native exposes selected state; Expo Web also exposes `aria-current`.
+- Ellipses are hidden from assistive technology. Compact mode replaces numbers with a plain summary,
+  not an automatic live region.
+- All visible content and accessible names are localizable. `pageLabel` needs `{page}`;
+  `summaryLabel` needs `{page}` and `{total}`. `locale` formats numbers only: it does not translate labels.
+- Set `direction="rtl"` explicitly to reverse layout and directional icons. For Arabic-Indic digits,
+  a locale such as `ar-EG-u-nu-arab` requests the numbering system explicitly.
+- Native touch targets are at least 44 points. Browser controls retain Button focus rings and
+  reduced-motion behavior. Browser and native screen-reader output may differ.
+
+<Preview>
+  <cosm-pagination label="Resultados" total-pages="12" default-page="3" locale="es" presentation="compact" previous-label="Página anterior" next-label="Página siguiente" page-label="Página {page}" summary-label="Página {page} de {total}"></cosm-pagination>
+  <cosm-pagination label="RTL results" total-pages="12" default-page="5" direction="rtl" locale="ar-EG-u-nu-arab"></cosm-pagination>
+</Preview>
+
+## API
+
+<ApiTable name="pagination" />
+
+## Events by platform
+
+<EventsTable name="pagination" />
+
+The change detail is `{ page: number }`. In controlled mode, assign the proposed value back:
+HTML uses `event.detail.page`, React uses `onChange={event => setPage(event.detail.page)}`,
+Angular uses `(pageChange)="page = $event.detail.page"`, and React Native uses
+`onPageChange={({ page }) => setPage(page)}`. The Playground generates complete imports
+and platform syntax; add your application's state update rather than only logging the proposal.

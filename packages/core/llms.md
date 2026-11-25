@@ -28,6 +28,7 @@ Triggers an action or submits a form.
 | `fullWidth` | boolean | `false` | Stretches the button to the width of its container. |
 | `type` | 'button' \| 'submit' \| 'reset' | `button` | Form behavior of the button. |
 | `label` | string | — | Accessible name when the visible content is not descriptive (icon-only buttons). |
+| `currentPage` | boolean | `false` | Identifies this action as the current page in a composed pagination control; not a toggle. |
 
 **Events**
 
@@ -769,6 +770,65 @@ Selects one option from an accessible collection, with native Web form behavior.
 | `Printable characters` | On Web and React Native Web, moves to a matching option using locale-aware typeahead. Native iOS/Android use touch and platform accessibility navigation; React Native core does not expose hardware key events on this control. |
 | `Enter`, `Space` | On Web, selects the active enabled option. |
 | `Escape` | On Web, closes the popup without changing the selected value. |
+
+### `pagination` (`<cosm-pagination>`)
+
+Navigates a known number of pages using buttons.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `totalPages` | number | Required | Required nonnegative safe integer page count. |
+| `page` | number | — | Controlled one-based safe integer page; out-of-range values are displayed clamped. |
+| `defaultPage` | number | `1` | Initial one-based page for autonomous state. |
+| `label` | string | Required | Required localized navigation landmark label. |
+| `previousLabel` | string | `Previous page` | Previous button label. |
+| `nextLabel` | string | `Next page` | Next button label. |
+| `firstLabel` | string | `First page` | First button label. |
+| `lastLabel` | string | `Last page` | Last button label. |
+| `pageLabel` | string | `Page {page}` | Page button label template; {page} is replaced with the localized number. |
+| `summaryLabel` | string | `Page {page} of {total}` | Compact summary template with {page} and {total} placeholders. |
+| `locale` | string | — | Locale for formatted page numbers. |
+| `direction` | 'ltr' \| 'rtl' | `ltr` | Layout and directional icon direction. |
+| `presentation` | 'numbered' \| 'compact' | `numbered` | Show numbered buttons or a compact summary. |
+| `variant` | 'solid' \| 'soft' \| 'outline' | `solid` | Selected page emphasis. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Control size. |
+| `showFirstLast` | boolean | `false` | Show first and last page controls. |
+| `disabled` | boolean | `false` | Disable all controls. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-change` | `onChange` | `(pageChange)` | `onPageChange` | `PaginationChangeDetail` | Proposes a different page after enabled user activation. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Navigation landmark. |
+| `control` | Navigation control. |
+| `page` | Page control. |
+| `current` | Current page control. |
+| `ellipsis` | Decorative omitted-page indicator. |
+| `summary` | Compact summary. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-pagination-gap` | Gap between controls. |
+| `--cosm-pagination-min-height` | Minimum control height. |
+| `--cosm-pagination-radius` | Control corner radius. |
+| `--cosm-pagination-current-background` | Current page background. |
+| `--cosm-pagination-current-color` | Current page foreground. |
+| `--cosm-pagination-current-border` | Current page border color. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Moves between enabled controls. |
+| `Enter`, `Space` | Activates the focused control. |
 
 
 ## Rules for AI assistants

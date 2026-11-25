@@ -8,6 +8,7 @@ import {
   listboxContract,
   listboxItemExamples,
   listboxValueExamples,
+  paginationContract,
   popoverContract,
   radioGroupContract,
   radioGroupOptionsExamples,
@@ -21,6 +22,7 @@ import {
 } from '@joralvmel/cosmos-core';
 import type { CosmBadge } from '@joralvmel/cosmos-elements/badge';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
+import type { CosmPagination } from '@joralvmel/cosmos-elements/pagination';
 import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
 import type { CosmSwitch } from '@joralvmel/cosmos-elements/switch';
 import type { CosmTextField } from '@joralvmel/cosmos-elements/text-field';
@@ -38,6 +40,7 @@ import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
 import '@joralvmel/cosmos-elements/radio-group';
 import '@joralvmel/cosmos-elements/select';
+import '@joralvmel/cosmos-elements/pagination';
 import '@joralvmel/cosmos-elements/text-field';
 import '@joralvmel/cosmos-elements/textarea';
 import '@joralvmel/cosmos-elements/switch';
@@ -102,6 +105,37 @@ function mount(options: { storage?: Map<string, string>; nativeDemoUrl?: string 
     Record<string, unknown>;
   return { root, controller, store, writeText, target };
 }
+
+it('initializes pagination, rejects invalid totals/templates and remounts initial-only state', async () => {
+  const root = document.createElement('div');
+  const target = document.createElement('cosm-pagination');
+  target.dataset.playgroundTarget = '';
+  root.append(target);
+  document.body.append(root);
+  try {
+    const controller = initPlayground(root, {
+      contract: paginationContract,
+      labels,
+      themes: [],
+      content: '',
+    });
+    await target.updateComplete;
+    expect(target.totalPages).toBe(20);
+    expect(target.label).toBe('Results');
+    controller.set('totalPages', -1);
+    expect(target.totalPages).toBe(20);
+    expect(root.querySelector('[role="status"]')?.textContent).not.toBe('');
+    controller.set('summaryLabel', 'Missing placeholders');
+    expect(target.summaryLabel).toBe('Page {page} of {total}');
+    controller.set('defaultPage', 5);
+    const replacement = root.querySelector<CosmPagination>('cosm-pagination');
+    await replacement?.updateComplete;
+    expect(replacement).not.toBe(target);
+    expect(replacement?.page).toBe(5);
+  } finally {
+    root.remove();
+  }
+});
 
 const tabs = (root: HTMLElement) => [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
 const visibleCode = (root: HTMLElement) =>

@@ -27,6 +27,7 @@ export {
   type ListboxProps,
   listboxPropNames,
 } from './components/listbox.js';
+export { Pagination, type PaginationProps, paginationPropNames } from './components/pagination.js';
 export {
   Popover,
   type PopoverHandle,

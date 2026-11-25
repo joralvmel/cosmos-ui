@@ -340,8 +340,11 @@ export const catalog: readonly CatalogEntry[] = [
     category: 'navigation',
     batch: 'D',
     priority: 1,
-    dependsOn: ['button', 'icon-button'],
+    dependsOn: ['button', 'icon-button', 'icon'],
     pattern: 'https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/',
+    notes: [
+      'Web, actual React/Angular mounts, Expo Web and Android export passed; Android device interaction is deferred with maintainer approval and remains unverified in docs/design/pagination.md.',
+    ],
   }),
   entry({
     name: 'steps',

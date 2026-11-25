@@ -5,9 +5,10 @@ import {
   getPressableState,
 } from '@joralvmel/cosmos-core';
 import type { NativeTheme } from '@joralvmel/cosmos-tokens/native';
-import type { ReactNode } from 'react';
+import type { ComponentRef, ReactNode, Ref } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   type PressableStateCallbackType,
   type StyleProp,
@@ -24,6 +25,7 @@ export interface ButtonProps extends ContractButtonProps {
   onPress?: (detail: ButtonPressDetail) => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
+  ref?: Ref<ComponentRef<typeof Pressable>>;
 }
 
 /** Props handled by the native button; checked against the contract by the drift test. */
@@ -35,6 +37,7 @@ export const buttonPropNames = [
   'loading',
   'fullWidth',
   'label',
+  'currentPage',
 ] as const satisfies readonly (keyof ContractButtonProps)[];
 
 const MIN_TOUCH_TARGET = 44;
@@ -66,10 +69,12 @@ export function Button({
   loading = buttonContract.props.loading.default,
   fullWidth = buttonContract.props.fullWidth.default,
   label,
+  currentPage = buttonContract.props.currentPage.default,
   children,
   onPress,
   style,
   testID,
+  ref,
 }: ButtonProps) {
   const theme = useTheme();
   const state = getPressableState({ disabled, loading });
@@ -101,10 +106,16 @@ export function Button({
 
   return (
     <Pressable
+      ref={ref}
       testID={testID}
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled: state.disabled, busy: state.busy }}
+      accessibilityState={{
+        disabled: state.disabled,
+        busy: state.busy,
+        ...(Platform.OS !== 'web' && currentPage ? { selected: true } : {}),
+      }}
+      aria-current={Platform.OS === 'web' && currentPage ? 'page' : undefined}
       disabled={!state.interactive}
       hitSlop={slop}
       onPress={state.interactive ? () => onPress?.({ source: 'pointer' }) : undefined}

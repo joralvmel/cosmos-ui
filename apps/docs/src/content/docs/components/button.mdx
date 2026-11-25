@@ -57,6 +57,9 @@ action.
 - Give icon-only buttons a `label`; it becomes the accessible name.
 - Use `tone="danger"` together with explicit text for destructive actions; color is never the only cue.
 - On React Native, small buttons extend their touch area to 44 points.
+- `currentPage` (`current-page` in HTML) marks a composed pagination control with
+  `aria-current="page"`; Native uses selected state. It is not a toggle or a visual variant.
+  Native Button also forwards a Pressable ref for composition and focus management.
 
 ## API
 

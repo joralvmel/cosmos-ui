@@ -24,6 +24,7 @@ export {
   type ListboxSize,
   type ListboxVariant,
 } from './components/listbox/cosm-listbox.js';
+export { CosmPagination } from './components/pagination/cosm-pagination.js';
 export { CosmPopover } from './components/popover/cosm-popover.js';
 export { CosmRadioGroup } from './components/radio-group/cosm-radio-group.js';
 export { CosmSelect } from './components/select/cosm-select.js';

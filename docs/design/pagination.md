@@ -1,0 +1,85 @@
+# Pagination: approved scope
+
+Pagination uses buttons, not links. It supports Lit, React, Angular and React Native.
+`totalPages` is required and is a nonnegative safe integer. `page` is controlled;
+`defaultPage` starts autonomous state at 1. Pages must be positive safe integers.
+Invalid values are rejected. Effective pages clamp to the available range; autonomous
+state commits a clamp on shrink (anchored at 1 for zero), while controlled state never
+mutates its owner and follows the supplied page again on regrowth. Input corrections,
+current-page activation, disabled actions and boundaries do not emit changes.
+
+Numbered presentation shows the first, last and current neighbours with decorative
+ellipses, filling a single missing page, in bounded work. Compact presentation shows a
+localized summary. Both hide for zero or one page. Previous and next controls are
+always available when visible; first and last are opt-in. The selected page supports
+solid, soft and outline variants; sizes are sm, md and lg. Tokens, theme emphasis,
+focus and hover states, custom height and native 44pt minimum targets apply.
+
+Provide a required navigation label, localized control labels, page and summary
+templates, locale-formatted numbers, and explicit RTL support. Icons are decorative
+per-icon Cosmos Lucide imports. Web uses a named navigation landmark, native buttons
+with `aria-current="page"`, ordinary Tab/Enter/Space and button type; native exposes
+selected and disabled semantics and React Native Web current-page semantics. Preserve
+focus during interaction without stealing it on unrelated prop changes. Composition
+uses stable Button/IconButton with the approved minimal typed current-page, focus and
+sizing extensions. Wrappers forward only.
+
+Excluded: links/routing, page-size selection, jump input, unknown totals, fetching,
+loading, infinite scrolling, automatic compact mode, custom content and extra tones.
+Applications own fetching, announcements and content focus.
+
+## Acceptance scenarios
+
+- Validate type, integer, safe range and lower bounds; test zero, one and huge totals.
+- Exercise controlled and autonomous changes, shrink and regrowth, boundaries and
+  disabled/current actions without spurious events.
+- Verify bounded page ranges, single-gap filling, both presentations, variants, sizes,
+  optional edge controls, localized labels, numerals and RTL.
+- Verify native button semantics, keyboard activation, focus restoration and style hooks,
+  including the native minimum target and composition regressions.
+- Exercise generated examples across all four frameworks.
+
+## Evidence matrix
+
+| Evidence | Status |
+| --- | --- |
+| Shared/unit and platform mock tests | Passed: range bounds, input validation, ownership, clamp/regrowth, localization, semantics, focus and minimum targets; four platform scenario/drift drivers |
+| Browser Web Component | Passed in Chromium: pointer, Enter/Space, boundaries and re-enabling, focus fallback to current page, controlled/autonomous Playground, invalid-input feedback, compact/numbered, RTL and 56px custom controls |
+| Actual React and Angular mounts | Passed: React state and Angular signals accept proposals, render subsequent pages, support keyboard activation and disable the last boundary; not mocked wrappers |
+| Theme and layout checks | Passed: Cosmos/Nebula light/dark computed colors, 375px/1280px widths without pagination overflow, reduced-motion transition duration 0s |
+| Expo Web interaction | Passed: controlled and autonomous selections, keyboard, first/last, compact, disabled, RTL, localized summary, controlled shrink/regrowth and measured 56px custom minimum |
+| Android export | Passed: Expo Android Hermes bundle and assets; export is not device execution |
+| Android device touch/runtime | Unavailable: adb reports no connected devices; deferred with maintainer approval |
+| iOS and manual screen readers | Optional; not verified |
+
+The browser checks caught two real integration defects now covered by regressions:
+derived `page` getters must not suppress a new controlled request, and the composed
+IconButton must schedule a follow-up render when the browser's form-disabled reaction
+runs during Lit attribute reflection. Normal IconButton fieldset updates retain their
+existing synchronous scheduling. Both boundary directions were exercised again in Chromium.
+
+Playground snippets are checked across HTML, React, Angular and React Native. Their generic
+event callbacks log proposals; controlled consumers must update their own state, as documented.
+Native mock assertions, Expo Web interaction and Android export are separate evidence; none
+is a claim of Android or iOS device testing. No new runtime dependency or copied library code.
+
+## Research and accepted decisions
+
+Required semantics come from the [HTML button definition](https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element),
+[navigation landmarks](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/) and
+[`aria-current`](https://www.w3.org/TR/wai-aria-1.2/#aria-current).
+There is no pagination-specific APG keyboard widget: ordinary buttons remain in the Tab order.
+The [React Native accessibility reference](https://reactnative.dev/docs/accessibility)
+informs native selected/disabled state rather than copying web-only landmark behavior.
+
+The reviewed public references were [GOV.UK Pagination](https://design-system.service.gov.uk/components/pagination/),
+[MUI Pagination](https://mui.com/material-ui/react-pagination/),
+[Chakra Pagination](https://www.chakra-ui.com/docs/components/pagination) and
+[React Native Paper DataTablePagination](https://github.com/callstack/react-native-paper/blob/main/src/components/DataTable/DataTablePagination.tsx).
+All four implementations use MIT licenses. They informed behavior only; Cosmos composes its
+own stable primitives and uses per-icon Lucide definitions under [ADR 0005](../adr/0005-icons-lucide.md).
+
+Recommended and accepted for the initial version: bounded numbered ranges, an explicit compact
+presentation, ownership semantics, localized templates/numerals and theme/custom-size hooks.
+Optional first/last controls were accepted, off by default. URL links, arbitrary content,
+page-size selection and remote-data behavior were excluded rather than partially implemented.

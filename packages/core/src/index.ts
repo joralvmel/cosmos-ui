@@ -4,6 +4,7 @@ import { checkboxContract } from './specs/checkbox.js';
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
 import { listboxContract } from './specs/listbox.js';
+import { paginationContract } from './specs/pagination.js';
 import { popoverContract } from './specs/popover.js';
 import { radioGroupContract } from './specs/radio-group.js';
 import { selectContract } from './specs/select.js';
@@ -85,6 +86,13 @@ export {
   validateListboxValues,
 } from './headless/listbox.js';
 export {
+  effectivePaginationPage,
+  getPaginationView,
+  type PaginationItem,
+  paginationItems,
+  validatePaginationNumber,
+} from './headless/pagination.js';
+export {
   getPressableState,
   type PressableInput,
   type PressableState,
@@ -147,6 +155,7 @@ export const contracts = {
   textarea: textareaContract,
   'radio-group': radioGroupContract,
   select: selectContract,
+  pagination: paginationContract,
 } as const;
 export { badgeContract } from './specs/badge.js';
 export {
@@ -204,6 +213,12 @@ export {
   listboxScenarios,
   listboxScenariosFor,
 } from './specs/listbox.scenarios.js';
+export { type PaginationChangeDetail, paginationContract } from './specs/pagination.js';
+export {
+  type PaginationScenario,
+  paginationScenarios,
+  paginationScenariosFor,
+} from './specs/pagination.scenarios.js';
 export {
   type PopoverAlign,
   type PopoverCloseReason,

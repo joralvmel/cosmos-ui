@@ -1,0 +1,107 @@
+---
+title: Pagination
+description: Navegación con botones localizados para un número conocido de páginas.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import Preview from '../../../../components/Preview.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="pagination" />
+
+`<cosm-pagination>` permite recorrer páginas de resultados con Button e IconButton de Cosmos.
+Úsalo para actualizar contenido, no para navegar a otras URL. Sigue la semántica normal de una
+[región de navegación](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/);
+no existe un patrón de teclado específico para paginación.
+
+## Playground
+
+<Playground name="pagination" />
+
+Deja `page` vacío para el estado autónomo. Si lo defines, el componente propone cambios y espera
+a que la aplicación actualice esa propiedad. Cambiar `defaultPage` vuelve a montar este ejemplo;
+en una aplicación solo se utiliza al iniciar.
+
+## Variantes
+
+La página actual admite `solid` (predeterminada), `soft` y `outline`. Los demás controles son ghost.
+Los tamaños son `sm`, `md` (predeterminado) y `lg`. La presentación es explícita, sin cambios
+automáticos según el ancho de pantalla.
+
+<Preview>
+  <cosm-pagination label="Resultados sólidos" total-pages="20" default-page="5"></cosm-pagination>
+  <cosm-pagination label="Resultados suaves" total-pages="20" default-page="5" variant="soft" size="sm"></cosm-pagination>
+  <cosm-pagination label="Resultados delineados" total-pages="20" default-page="5" variant="outline" size="lg" show-first-last></cosm-pagination>
+  <cosm-pagination label="Resultados compactos" total-pages="20" default-page="5" presentation="compact"></cosm-pagination>
+</Preview>
+
+El rango incluye primera y última página, la actual y una vecina a cada lado. Si solo falta
+una página, se muestra; los huecos mayores usan puntos suspensivos decorativos, no menús.
+Los botones adicionales de primera/última página están desactivados de forma predeterminada.
+
+Personaliza tokens, partes exportadas o variables CSS. Por ejemplo,
+`--cosm-pagination-min-height: 56px` y `--cosm-pagination-radius: 999px` en el host.
+Hay variables específicas para los colores de la página actual; se conservan los estados
+hover, activo y foco de Button. En React Native, `style` personaliza el contenedor y
+`controlStyle` los controles; sus dimensiones mínimas numéricas nunca bajan de 44 puntos.
+
+<Preview>
+  <cosm-pagination label="Resultados personalizados" total-pages="12" default-page="4" style="--cosm-pagination-min-height: 56px; --cosm-pagination-radius: 999px;"></cosm-pagination>
+</Preview>
+
+## Estados
+
+`totalPages` es obligatorio: un entero seguro no negativo. `label` debe ser un texto localizado
+no vacío. Las páginas son enteros seguros desde 1. Tipos incorrectos, fracciones y totales
+negativos producen errores. Una página válida fuera del rango se limita al rango disponible;
+con cero páginas se mantiene el anclaje en 1. Con cero o una página no se muestra navegación.
+
+El estado autónomo comienza en `defaultPage` (1 por defecto), conserva la selección del usuario
+y confirma el límite si disminuye el total. En modo controlado, se conserva la petición de la
+aplicación: si el total vuelve a crecer, aquella página puede reaparecer. Los ajustes por
+propiedades no emiten eventos. Pulsar la página actual, un límite o un botón deshabilitado tampoco.
+
+<Preview>
+  <cosm-pagination label="Primera página de resultados" total-pages="10" show-first-last></cosm-pagination>
+  <cosm-pagination label="Resultados no disponibles" total-pages="10" default-page="5" disabled></cosm-pagination>
+</Preview>
+
+La aplicación gestiona la carga, los anuncios de resultados y el foco del nuevo contenido.
+Se excluyen estado de carga, selector de tamaño de página, salto directo, enlaces, totales
+desconocidos y desplazamiento infinito.
+
+## Accesibilidad
+
+- En web, `label` nombra la región. Los botones son `type="button"`, no envían formularios.
+- Tab/Mayús+Tab recorre los botones habilitados; Intro/Espacio activa. No se interceptan las flechas.
+- El botón web interno usa [`aria-current="page"`](https://www.w3.org/TR/wai-aria-1.2/#aria-current),
+  nunca `aria-pressed`. Native expone estado seleccionado; Expo Web añade `aria-current`.
+- Los puntos suspensivos se ocultan a tecnologías de asistencia. El resumen compacto es texto
+  normal, no una región viva automática.
+- Traduce etiquetas y plantillas: `pageLabel` necesita `{page}` y `summaryLabel`, `{page}` y
+  `{total}`. `locale` solo formatea números, no traduce los textos.
+- `direction="rtl"` invierte explícitamente disposición e iconos. `ar-EG-u-nu-arab` solicita
+  numeración arábigo-índica sin depender del sistema de numeración predeterminado del entorno.
+- Native garantiza objetivos táctiles de al menos 44 puntos. Web conserva los indicadores de foco
+  y movimiento reducido de Button. La lectura puede variar entre web y dispositivos nativos.
+
+<Preview>
+  <cosm-pagination label="Resultados" total-pages="12" default-page="3" locale="es" presentation="compact" previous-label="Página anterior" next-label="Página siguiente" page-label="Página {page}" summary-label="Página {page} de {total}"></cosm-pagination>
+  <cosm-pagination label="Resultados RTL" total-pages="12" default-page="5" direction="rtl" locale="ar-EG-u-nu-arab"></cosm-pagination>
+</Preview>
+
+## API
+
+<ApiTable name="pagination" />
+
+## Eventos por plataforma
+
+<EventsTable name="pagination" />
+
+El detalle es `{ page: number }`. En modo controlado, asigna la propuesta al estado:
+HTML lee `event.detail.page`; React usa `onChange={event => setPage(event.detail.page)}`;
+Angular, `(pageChange)="page = $event.detail.page"`; React Native,
+`onPageChange={({ page }) => setPage(page)}`. El Playground genera imports y sintaxis por
+plataforma; sustituye el registro de la propuesta por la actualización del estado.
