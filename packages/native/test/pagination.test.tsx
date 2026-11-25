@@ -27,7 +27,7 @@ describe('Pagination (native): shared scenarios', () => {
       );
       await act(async () => target?.click());
       const current = container.querySelector('[aria-current="page"]');
-      expect(current?.textContent).toBe(String(scenario.expected.page));
+      expect(current?.getAttribute('aria-label')).toBe(`Page ${scenario.expected.page}`);
       expect(onPageChange.mock.calls.map(([event]) => event.page)).toEqual(
         scenario.expected.changes
       );
@@ -87,7 +87,9 @@ describe('Pagination (native)', () => {
     await render(10);
     await render(3);
     await render(10);
-    expect(container.querySelector('[aria-current="page"]')?.textContent).toBe('3');
+    expect(container.querySelector('[aria-current="page"]')?.getAttribute('aria-label')).toBe(
+      'Page 3'
+    );
     for (const button of container.querySelectorAll('button')) {
       expect(
         JSON.parse(button.getAttribute('data-style') ?? '{}').minHeight

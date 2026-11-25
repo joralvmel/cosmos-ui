@@ -31,13 +31,21 @@ Sizes are `sm`, `md` (default) and `lg`. Presentation is explicit, never changed
 
 <Preview>
   <cosm-pagination label="Solid results" total-pages="20" default-page="5"></cosm-pagination>
+</Preview>
+<Preview>
   <cosm-pagination label="Soft results" total-pages="20" default-page="5" variant="soft" size="sm"></cosm-pagination>
+</Preview>
+<Preview>
   <cosm-pagination label="Outline results" total-pages="20" default-page="5" variant="outline" size="lg" show-first-last></cosm-pagination>
+</Preview>
+<Preview>
   <cosm-pagination label="Compact results" total-pages="20" default-page="5" presentation="compact"></cosm-pagination>
 </Preview>
 
-The numbered range includes first/last and the current page with one neighbor on each side.
-A single missing page is filled; larger gaps are decorative ellipses, never menus.
+The numbered range keeps seven equal-width positions (or all pages for smaller totals), including
+first/last and the current page. Extra neighbors fill the range near either boundary.
+Ellipses occupy a full position, so changing pages does not move the navigation arrows.
+Larger gaps are decorative ellipses, never menus.
 First/last action buttons are optional and off by default.
 
 Customize the shared theme tokens, exported parts or CSS variables. For example, set

@@ -22,9 +22,17 @@ type Props = ContractProps<typeof paginationContract, 'web'>;
 const styles = css`
   :host {
     display: inline-block;
+    max-width: 100%;
     color: var(--cosm-fg, oklch(0.24 0.01 268));
     font-family: var(--cosm-font-sans, system-ui, sans-serif);
     font-size: var(--cosm-text-sm, 0.875rem);
+    --_control-height: var(--cosm-control-md, 2.5rem);
+    --_page-font-size: var(--cosm-text-sm, 0.875rem);
+  }
+  :host([size='sm']) { --_control-height: var(--cosm-control-sm, 2rem); }
+  :host([size='lg']) {
+    --_control-height: var(--cosm-control-lg, 3rem);
+    --_page-font-size: var(--cosm-text-md, 1rem);
   }
   nav {
     display: flex;
@@ -34,19 +42,9 @@ const styles = css`
   }
   cosm-button, cosm-icon-button { flex: 0 0 auto; }
   cosm-button::part(base), cosm-icon-button::part(base) {
-    min-height: var(--cosm-pagination-min-height, var(--cosm-control-md, 2.5rem));
-    min-width: var(--cosm-pagination-min-height, var(--cosm-control-md, 2.5rem));
+    min-height: var(--cosm-pagination-min-height, var(--_control-height));
+    min-width: var(--cosm-pagination-min-height, var(--_control-height));
     border-radius: var(--cosm-pagination-radius, var(--cosm-radius-md, 0.5rem));
-  }
-  :host([size='sm']) cosm-button::part(base),
-  :host([size='sm']) cosm-icon-button::part(base) {
-    min-height: var(--cosm-pagination-min-height, var(--cosm-control-sm, 2rem));
-    min-width: var(--cosm-pagination-min-height, var(--cosm-control-sm, 2rem));
-  }
-  :host([size='lg']) cosm-button::part(base),
-  :host([size='lg']) cosm-icon-button::part(base) {
-    min-height: var(--cosm-pagination-min-height, var(--cosm-control-lg, 3rem));
-    min-width: var(--cosm-pagination-min-height, var(--cosm-control-lg, 3rem));
   }
   cosm-button::part(base) { padding-inline: var(--cosm-space-sm, 0.5rem); }
   cosm-button[data-current]::part(base) {
@@ -56,7 +54,24 @@ const styles = css`
     border-color: var(--cosm-pagination-current-border, var(--_border));
   }
   [part='summary'] { padding-inline: var(--cosm-space-sm, 0.5rem); }
-  [part='ellipsis'] { padding-inline: var(--cosm-space-xs, 0.25rem); }
+  [part='ellipsis'] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--cosm-pagination-min-height, var(--_control-height));
+    min-width: var(--cosm-pagination-min-height, var(--_control-height));
+    padding-inline: var(--cosm-space-sm, 0.5rem);
+    border: 1px solid transparent;
+    font-size: var(--_page-font-size);
+    font-weight: var(--cosm-button-font-weight, var(--cosm-weight-semibold, 600));
+  }
+  .cell { display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+  .cell::before {
+    content: attr(data-total);
+    visibility: hidden;
+    grid-area: 1 / 1;
+  }
+  .cell > span { grid-area: 1 / 1; }
 `;
 
 /**
@@ -245,6 +260,8 @@ export class CosmPagination extends CosmElement {
   protected override render() {
     const view = this.#view;
     if (!view || this.totalPages <= 1) return nothing;
+    const cell = (content: string) =>
+      html`<span class="cell" data-total=${view.number(this.totalPages)}><span>${content}</span></span>`;
     return html`<nav part="base" aria-label=${this.label} dir=${this.direction}>
       ${this.showFirstLast ? this.#navigation('first') : nothing}
       ${this.#navigation('previous')}
@@ -256,7 +273,7 @@ export class CosmPagination extends CosmElement {
               (item, index) => (typeof item === 'number' ? item : `gap-${index}`),
               item =>
                 typeof item !== 'number'
-                  ? html`<span part="ellipsis" aria-hidden="true">…</span>`
+                  ? html`<span part="ellipsis" aria-hidden="true">${cell('…')}</span>`
                   : html`<cosm-button part=${item === this.page ? 'page current' : 'page'}
                 data-page=${item} ?data-current=${item === this.page}
                 ?data-unavailable=${this.disabled}
@@ -264,7 +281,7 @@ export class CosmPagination extends CosmElement {
                 .variant=${item === this.page ? this.variant : 'ghost'}
                 .size=${this.size} .disabled=${this.disabled} .type=${'button'}
                 @cosm-press=${(event: Event) => this.#activate(event, item)}
-              >${view.number(item)}</cosm-button>`
+              >${cell(view.number(item))}</cosm-button>`
             )
       }
       ${this.#navigation('next')}

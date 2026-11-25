@@ -789,7 +789,7 @@ Navigates a known number of pages using buttons.
 | `summaryLabel` | string | `Page {page} of {total}` | Compact summary template with {page} and {total} placeholders. |
 | `locale` | string | — | Locale for formatted page numbers. |
 | `direction` | 'ltr' \| 'rtl' | `ltr` | Layout and directional icon direction. |
-| `presentation` | 'numbered' \| 'compact' | `numbered` | Show numbered buttons or a compact summary. |
+| `presentation` | 'numbered' \| 'compact' | `numbered` | Show up to seven fixed-width numbered positions or a compact summary. |
 | `variant` | 'solid' \| 'soft' \| 'outline' | `solid` | Selected page emphasis. |
 | `size` | 'sm' \| 'md' \| 'lg' | `md` | Control size. |
 | `showFirstLast` | boolean | `false` | Show first and last page controls. |

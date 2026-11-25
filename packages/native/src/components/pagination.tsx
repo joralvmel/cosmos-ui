@@ -15,6 +15,7 @@ import {
   type StyleProp,
   StyleSheet,
   Text,
+  type TextStyle,
   View,
   type ViewStyle,
 } from 'react-native';
@@ -85,6 +86,24 @@ export function Pagination({
   const minHeight = Math.max(44, theme.control[view.size], customHeight ?? 0);
   const minWidth = Math.max(44, theme.control[view.size], customWidth ?? 0);
   const targetStyle: StyleProp<ViewStyle> = [controlStyle, { minHeight, minWidth }];
+  const pageStyle: StyleProp<ViewStyle> = [{ paddingHorizontal: theme.space.sm }, targetStyle];
+  const textStyle: TextStyle = {
+    fontSize: view.size === 'lg' ? theme.text.md : theme.text.sm,
+    fontWeight: theme.weight.semibold,
+    fontVariant: ['tabular-nums'],
+  };
+  const cell = (content: string, color: string) => (
+    <View
+      accessible={false}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      aria-hidden
+      style={{ alignItems: 'center', justifyContent: 'center' }}
+    >
+      <Text style={[textStyle, { opacity: 0 }]}>{view.number(view.totalPages)}</Text>
+      <Text style={[textStyle, { position: 'absolute', color }]}>{content}</Text>
+    </View>
+  );
 
   useLayoutEffect(() => {
     if (!controlled && ownedPage !== view.page) setOwnedPage(view.page);
@@ -199,20 +218,33 @@ export function Pagination({
               variant={item === view.page ? view.variant : 'ghost'}
               size={view.size}
               disabled={disabled}
-              style={targetStyle}
+              style={pageStyle}
               onPress={() => selectPage(item, `page-${item}`)}
             >
-              {view.number(item)}
+              {cell(
+                view.number(item),
+                item === view.page && view.variant === 'solid'
+                  ? theme.colors['primary-fg']
+                  : theme.colors['primary-text']
+              )}
             </Button>
           ) : (
-            <Text
+            <View
               key={`gap-after-${view.items[index - 1]}`}
               accessible={false}
               aria-hidden
-              style={{ color: theme.colors['fg-muted'] }}
+              style={[
+                pageStyle,
+                {
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1,
+                  borderColor: 'transparent',
+                },
+              ]}
             >
-              …
-            </Text>
+              {cell('…', theme.colors['fg-muted'])}
+            </View>
           )
         )
       )}

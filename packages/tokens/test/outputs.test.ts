@@ -12,6 +12,23 @@ import {
 const resolved = builtInThemes.map(resolveTheme);
 const repertoire = ['terra', 'supernova', 'aurora', 'solstice'] as const;
 
+it('keeps built-in corner geometry consistent in CSS, JSON and native outputs', () => {
+  const css = toCss(resolved);
+  const json = toJson(resolved);
+  const native = toNative(resolved);
+  for (const { definition } of resolved) {
+    const start = css.indexOf(`[data-theme="${definition.name}"]`);
+    const block = css.slice(start, css.indexOf('\n}', start));
+    for (const [size, value] of Object.entries(resolved[0]?.radius ?? {})) {
+      expect(block).toContain(`--cosm-radius-${size}: ${value};`);
+    }
+    expect(json.themes[definition.name]?.radius).toEqual(json.themes.cosmos?.radius);
+    for (const mode of ['light', 'dark'] as const) {
+      expect(native[definition.name]?.[mode].radius).toEqual(native.cosmos?.[mode].radius);
+    }
+  }
+});
+
 describe('toCss', () => {
   const css = toCss(resolved);
 

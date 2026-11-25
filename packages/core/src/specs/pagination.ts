@@ -63,7 +63,7 @@ export const paginationContract = defineContract({
       values: ['numbered', 'compact'],
       default: 'numbered',
       reflect: true,
-      description: 'Show numbered buttons or a compact summary.',
+      description: 'Show up to seven fixed-width numbered positions or a compact summary.',
     },
     variant: {
       type: 'enum',

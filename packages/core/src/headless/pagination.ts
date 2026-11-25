@@ -25,21 +25,19 @@ export function effectivePaginationPage(page: number, totalPages: number): numbe
 export function paginationItems(page: number, totalPages: number): PaginationItem[] {
   const current = effectivePaginationPage(page, totalPages);
   if (totalPages <= 1) return [];
-  const candidates = [1, current - 1, current, current + 1, totalPages].filter(
-    value => value >= 1 && value <= totalPages && Number.isSafeInteger(value)
-  );
-  const sorted = [...new Set(candidates)].sort((a, b) => a - b);
-  const result: PaginationItem[] = [];
-  for (const value of sorted) {
-    const previous = result[result.length - 1];
-    if (typeof previous === 'number') {
-      const gap = value - previous;
-      if (gap === 2) result.push(previous + 1);
-      else if (gap > 2) result.push('ellipsis');
-    }
-    result.push(value);
-  }
-  return result;
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, 'ellipsis', totalPages];
+  if (current >= totalPages - 3)
+    return [
+      1,
+      'ellipsis',
+      totalPages - 4,
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
+  return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', totalPages];
 }
 
 /** Shared validation and localization; state ownership stays with each renderer. */

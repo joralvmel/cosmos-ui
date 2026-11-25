@@ -9,7 +9,9 @@ mutates its owner and follows the supplied page again on regrowth. Input correct
 current-page activation, disabled actions and boundaries do not emit changes.
 
 Numbered presentation shows the first, last and current neighbours with decorative
-ellipses, filling a single missing page, in bounded work. Compact presentation shows a
+ellipses, keeping seven equal-width positions (or all pages for smaller totals).
+Near either boundary, extra neighbors fill the range so the navigation arrows do not move.
+Compact presentation shows a
 localized summary. Both hide for zero or one page. Previous and next controls are
 always available when visible; first and last are opt-in. The selected page supports
 solid, soft and outline variants; sizes are sm, md and lg. Tokens, theme emphasis,
@@ -33,7 +35,7 @@ Applications own fetching, announcements and content focus.
 - Validate type, integer, safe range and lower bounds; test zero, one and huge totals.
 - Exercise controlled and autonomous changes, shrink and regrowth, boundaries and
   disabled/current actions without spurious events.
-- Verify bounded page ranges, single-gap filling, both presentations, variants, sizes,
+- Verify bounded, constant-slot page ranges, equal ellipsis/page widths, both presentations, variants, sizes,
   optional edge controls, localized labels, numerals and RTL.
 - Verify native button semantics, keyboard activation, focus restoration and style hooks,
   including the native minimum target and composition regressions.
@@ -62,6 +64,24 @@ Playground snippets are checked across HTML, React, Angular and React Native. Th
 event callbacks log proposals; controlled consumers must update their own state, as documented.
 Native mock assertions, Expo Web interaction and Android export are separate evidence; none
 is a claim of Android or iOS device testing. No new runtime dependency or copied library code.
+
+### Layout refinement evidence
+
+The maintainer requested stationary numbered controls, separate documentation variant rows,
+and consistent theme geometry. Nebula was the only built-in theme using `soft` radii; with
+approval, it now uses `rounded` globally, matching the other built-in themes on web and native.
+
+- Chromium measurements passed for sm/md/lg with totals 6, 7, 8, 20, 100 and 1000:
+  page and ellipsis widths match, and arrow geometry stays identical across sampled
+  boundary and middle pages.
+- Cosmos/Nebula, light/dark and LTR/RTL passed stationary-arrow checks at viewport
+  widths 375px and 1280px; all pagination buttons resolve to an 8px corner radius.
+- Each documentation variant has its own vertically ordered preview.
+- Expo Web passed equal-cell and unchanged-position measurements at 375px and 1280px,
+  disabled/re-enabled controls and Enter activation. The custom example retains its
+  56px height and at least 44px width; the numbered cells were visually checked.
+- All 49 build/typecheck/test tasks, Biome and blocked-terms checks passed. The revised
+  native component also passed Android Hermes export; device limitations above still apply.
 
 ## Research and accepted decisions
 

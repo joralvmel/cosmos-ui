@@ -11,14 +11,14 @@ export const cosmos: ThemeDefinition = defineTheme({
   radius: 'rounded',
 });
 
-/** Magenta-violet primary with a cyan accent (split-complementary), softer corners. */
+/** Magenta-violet primary with a cyan accent (split-complementary). */
 export const nebula: ThemeDefinition = defineTheme({
   name: 'nebula',
   label: 'Nebula',
   seeds: { primary: 'oklch(0.56 0.21 318)', accent: 'oklch(0.7 0.13 205)' },
   harmony: 'split-complementary',
   neutral: { tint: 'primary', chroma: 0.014 },
-  radius: 'soft',
+  radius: 'rounded',
 });
 
 /** Terra pairs a leafy green brand with a fresh analogous accent and discreet green-tinted surfaces. */

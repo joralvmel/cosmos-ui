@@ -32,13 +32,21 @@ automáticos según el ancho de pantalla.
 
 <Preview>
   <cosm-pagination label="Resultados sólidos" total-pages="20" default-page="5"></cosm-pagination>
+</Preview>
+<Preview>
   <cosm-pagination label="Resultados suaves" total-pages="20" default-page="5" variant="soft" size="sm"></cosm-pagination>
+</Preview>
+<Preview>
   <cosm-pagination label="Resultados delineados" total-pages="20" default-page="5" variant="outline" size="lg" show-first-last></cosm-pagination>
+</Preview>
+<Preview>
   <cosm-pagination label="Resultados compactos" total-pages="20" default-page="5" presentation="compact"></cosm-pagination>
 </Preview>
 
-El rango incluye primera y última página, la actual y una vecina a cada lado. Si solo falta
-una página, se muestra; los huecos mayores usan puntos suspensivos decorativos, no menús.
+El rango conserva siete posiciones del mismo ancho (o todas las páginas si hay menos),
+incluyendo primera, última y actual. Cerca de los extremos se añaden páginas vecinas.
+Las elipsis ocupan una posición completa: las flechas no se desplazan al cambiar de página.
+Los huecos mayores usan puntos suspensivos decorativos, no menús.
 Los botones adicionales de primera/última página están desactivados de forma predeterminada.
 
 Personaliza tokens, partes exportadas o variables CSS. Por ejemplo,
