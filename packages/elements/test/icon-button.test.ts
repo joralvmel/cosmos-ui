@@ -70,6 +70,22 @@ describe('cosm-icon-button: contract drift', () => {
 });
 
 describe('cosm-icon-button', () => {
+  it('re-enables after a form-disabled reaction during disabled-attribute reflection', async () => {
+    const el = await fixture<CosmIconButton>(
+      '<cosm-icon-button label="Next" disabled></cosm-icon-button>'
+    );
+    el.formDisabledCallback(true);
+    await el.updateComplete;
+    const removeAttribute = el.removeAttribute.bind(el);
+    vi.spyOn(el, 'removeAttribute').mockImplementation(name => {
+      removeAttribute(name);
+      if (name === 'disabled') el.formDisabledCallback(false);
+    });
+    el.disabled = false;
+    await el.updateComplete;
+    await el.updateComplete;
+    expect(inner(el).disabled).toBe(false);
+  });
   it('uses a centered layout for decorative icon content', async () => {
     const el = await fixture<CosmIconButton>(
       '<cosm-icon-button label="Favorite"><svg width="20" height="20"></svg></cosm-icon-button>'

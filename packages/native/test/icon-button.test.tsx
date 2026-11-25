@@ -69,6 +69,14 @@ const lastAccessibility = () =>
     | undefined;
 
 describe('IconButton (native): shared scenarios', () => {
+  it('retains a custom larger target without allowing targets below 44 points', async () => {
+    let button = await render(<IconButton label="Next" style={{ minHeight: 64, minWidth: 56 }} />);
+    expect(styleOf(button).minHeight).toBe(64);
+    expect(styleOf(button).minWidth).toBe(56);
+    button = await rerender(<IconButton label="Next" style={{ minHeight: 12, minWidth: 8 }} />);
+    expect(styleOf(button).minHeight).toBe(44);
+    expect(styleOf(button).minWidth).toBe(44);
+  });
   for (const scenario of iconButtonScenariosFor('native')) {
     it(scenario.name, async () => {
       const onPress = vi.fn<(detail: ButtonPressDetail) => void>();

@@ -8,6 +8,7 @@ import {
   generateSnippets,
   iconButtonContract,
   listboxContract,
+  paginationContract,
   popoverContract,
   radioGroupContract,
   selectContract,
@@ -25,6 +26,28 @@ const defaults = Object.fromEntries(
 );
 
 describe('codegen', () => {
+  it('generates usable pagination numbers, localization templates and events without slot content', () => {
+    const snippets = generateSnippets(
+      paginationContract,
+      {
+        totalPages: 20,
+        defaultPage: 5,
+        label: 'Results',
+        summaryLabel: 'Page {page} / {total}',
+        presentation: 'compact',
+      },
+      'Not pagination content'
+    );
+    expect(snippets.html).toContain('total-pages="20"');
+    expect(snippets.react).toContain('totalPages={20}');
+    expect(snippets.angular).toContain('[totalPages]="20"');
+    expect(snippets.native).toContain('totalPages={20}');
+    expect(snippets.native).toContain('onPageChange=');
+    for (const source of Object.values(snippets)) {
+      expect(source).not.toContain('Not pagination content');
+      expect(source).toContain('Page {page} / {total}');
+    }
+  });
   it('declares listbox collections and selection arrays on every platform', () => {
     const snippets = generateSnippets(
       listboxContract,

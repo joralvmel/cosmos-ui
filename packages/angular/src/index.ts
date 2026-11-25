@@ -3,6 +3,7 @@ import { CosmCalendarComponent } from './components/calendar.component.js';
 import { CosmCheckboxComponent } from './components/checkbox.component.js';
 import { CosmIconButtonComponent } from './components/icon-button.component.js';
 import { CosmListboxComponent } from './components/listbox.component.js';
+import { CosmPaginationComponent } from './components/pagination.component.js';
 import { CosmPopoverComponent } from './components/popover.component.js';
 import { CosmRadioGroupComponent } from './components/radio-group.component.js';
 import { CosmSelectComponent } from './components/select.component.js';
@@ -41,12 +42,14 @@ export const COSMOS_COMPONENTS = [
   CosmTextareaComponent,
   CosmRadioGroupComponent,
   CosmSelectComponent,
+  CosmPaginationComponent,
 ] as const;
 export { CosmBadgeComponent } from './components/badge.component.js';
 export { CosmCalendarComponent } from './components/calendar.component.js';
 export { CosmCheckboxComponent } from './components/checkbox.component.js';
 export { CosmIconButtonComponent } from './components/icon-button.component.js';
 export { CosmListboxComponent } from './components/listbox.component.js';
+export { CosmPaginationComponent } from './components/pagination.component.js';
 export { CosmPopoverComponent } from './components/popover.component.js';
 export { CosmRadioGroupComponent } from './components/radio-group.component.js';
 export { CosmSelectComponent } from './components/select.component.js';

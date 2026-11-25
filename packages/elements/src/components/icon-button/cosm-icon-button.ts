@@ -166,8 +166,12 @@ export class CosmIconButton extends CosmElement {
     if (name === 'pressed' && value === null) this.pressedControlled = false;
   }
   formDisabledCallback(disabled: boolean): void {
+    if (this.#formDisabled === disabled) return;
     this.#formDisabled = disabled;
+    const pending = this.isUpdatePending;
     this.requestUpdate();
+    // Attribute reflection can invoke this callback during an ongoing Lit update.
+    if (pending) queueMicrotask(() => this.requestUpdate());
   }
   protected override willUpdate(changed: Map<PropertyKey, unknown>): void {
     if (changed.has('defaultPressed') && !this.pressedControlled && !this.#edited) {

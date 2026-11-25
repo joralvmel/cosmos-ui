@@ -82,6 +82,8 @@ it back to `pressed`.
   uses `aria-pressed` for toggles); the touch
   target is at least 44 by 44 logical points, even for the small visual size. Web dimensions
   use the control tokens instead of native touch-target sizing.
+- Native `style` preserves larger numeric `minHeight`/`minWidth` values, while keeping
+  each touch-target dimension at least 44 points. This changes the target, not the icon geometry.
 - Do not communicate destructive intent or pressed state through color alone. A label is an
   accessible name, not a tooltip; no tooltip is provided.
 

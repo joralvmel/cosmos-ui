@@ -15,6 +15,7 @@ export { Checkbox, type CheckboxProps, checkboxEvents } from './components/check
 export { Icon, type IconProps, iconEvents } from './components/icon.js';
 export { IconButton, type IconButtonProps, iconButtonEvents } from './components/icon-button.js';
 export { Listbox, type ListboxProps, listboxEvents } from './components/listbox.js';
+export { Pagination, type PaginationProps, paginationEvents } from './components/pagination.js';
 export { Popover, type PopoverProps, popoverEvents } from './components/popover.js';
 export { RadioGroup, type RadioGroupProps, radioGroupEvents } from './components/radio-group.js';
 export { Select, type SelectProps, selectEvents } from './components/select.js';

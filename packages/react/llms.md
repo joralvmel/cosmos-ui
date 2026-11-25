@@ -99,6 +99,7 @@ Triggers an action or submits a form.
 | `fullWidth` | boolean | `false` | Stretches the button to the width of its container. |
 | `type` | 'button' \| 'submit' \| 'reset' | `button` | Form behavior of the button. |
 | `label` | string | — | Accessible name when the visible content is not descriptive (icon-only buttons). |
+| `currentPage` | boolean | `false` | Identifies this action as the current page in a composed pagination control; not a toggle. |
 
 Events: `onPress` → `ButtonPressDetail`.
 
@@ -529,6 +530,45 @@ export function Example() {
       onChange={event => console.log(event.detail)}
     >
     </Select>
+  );
+}
+```
+### `Pagination`
+
+Navigates a known number of pages using buttons.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `totalPages` | number | Required | Required nonnegative safe integer page count. |
+| `page` | number | — | Controlled one-based safe integer page; out-of-range values are displayed clamped. |
+| `defaultPage` | number | `1` | Initial one-based page for autonomous state. |
+| `label` | string | Required | Required localized navigation landmark label. |
+| `previousLabel` | string | `Previous page` | Previous button label. |
+| `nextLabel` | string | `Next page` | Next button label. |
+| `firstLabel` | string | `First page` | First button label. |
+| `lastLabel` | string | `Last page` | Last button label. |
+| `pageLabel` | string | `Page {page}` | Page button label template; {page} is replaced with the localized number. |
+| `summaryLabel` | string | `Page {page} of {total}` | Compact summary template with {page} and {total} placeholders. |
+| `locale` | string | — | Locale for formatted page numbers. |
+| `direction` | 'ltr' \| 'rtl' | `ltr` | Layout and directional icon direction. |
+| `presentation` | 'numbered' \| 'compact' | `numbered` | Show up to seven fixed-width numbered positions or a compact summary. |
+| `variant` | 'solid' \| 'soft' \| 'outline' | `solid` | Selected page emphasis. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Control size. |
+| `showFirstLast` | boolean | `false` | Show first and last page controls. |
+| `disabled` | boolean | `false` | Disable all controls. |
+
+Events: `onChange` → `PaginationChangeDetail`.
+
+```tsx
+import { Pagination } from '@joralvmel/cosmos-react';
+
+export function Example() {
+  return (
+    <Pagination
+      label="Pagination"
+      onChange={event => console.log(event.detail)}
+    >
+    </Pagination>
   );
 }
 ```

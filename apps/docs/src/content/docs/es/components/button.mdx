@@ -58,6 +58,9 @@ acción principal.
 - Usa `tone="danger"` junto con un texto explícito en acciones destructivas; el color nunca es la única
   señal.
 - En React Native, los botones pequeños amplían su área táctil a 44 puntos.
+- `currentPage` (`current-page` en HTML) identifica la página actual al componer paginación:
+  web usa `aria-current="page"` y Native, estado seleccionado. No es un toggle ni una variante
+  visual. Button nativo también reenvía la referencia de Pressable para gestionar el foco.
 
 ## API
 

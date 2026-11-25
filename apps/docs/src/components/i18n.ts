@@ -75,6 +75,17 @@ const strings = {
       listboxLabel: 'Choose produce',
       radioGroupLabel: 'Contact method',
       selectLabel: 'Fruit',
+      paginationDefaults: {
+        label: 'Results',
+        previousLabel: 'Previous page',
+        nextLabel: 'Next page',
+        firstLabel: 'First page',
+        lastLabel: 'Last page',
+        pageLabel: 'Page {page}',
+        summaryLabel: 'Page {page} of {total}',
+      },
+      paginationInvalid:
+        'Use nonnegative whole page counts, positive whole pages and non-empty labels with the required placeholders.',
       selectPlaceholder: 'Choose a fruit',
       selectValues: {
         none: 'No selection',
@@ -247,6 +258,17 @@ const strings = {
       listboxLabel: 'Elige productos',
       radioGroupLabel: 'Método de contacto',
       selectLabel: 'Fruta',
+      paginationDefaults: {
+        label: 'Resultados',
+        previousLabel: 'Página anterior',
+        nextLabel: 'Página siguiente',
+        firstLabel: 'Primera página',
+        lastLabel: 'Última página',
+        pageLabel: 'Página {page}',
+        summaryLabel: 'Página {page} de {total}',
+      },
+      paginationInvalid:
+        'Usa totales enteros no negativos, páginas enteras positivas y etiquetas no vacías con los marcadores requeridos.',
       selectPlaceholder: 'Elige una fruta',
       selectValues: {
         none: 'Sin selección',

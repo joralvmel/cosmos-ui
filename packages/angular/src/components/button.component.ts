@@ -60,6 +60,9 @@ export class CosmButtonComponent {
   @Input() set label(value: string | undefined) {
     this.element.label = value;
   }
+  @Input({ transform: booleanAttribute }) set currentPage(value: boolean) {
+    this.element.currentPage = value;
+  }
 
   @Output() readonly press = new EventEmitter<CustomEvent<ButtonPressDetail>>();
 }

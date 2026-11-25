@@ -41,4 +41,5 @@ export const screens = [
     description: 'Single selection, orientation, validation and controlled state.',
   },
   { route: '/select', title: 'Select', description: 'Choose one option from a grouped list.' },
+  { route: '/pagination', title: 'Pagination', description: 'TODO(generator): short description.' },
 ] as const;

@@ -81,6 +81,7 @@ describe('Button: contract drift', () => {
       fullWidth: true,
       type: 'submit',
       label: 'Delete',
+      currentPage: true,
     };
     expect(Object.keys(values).sort()).toEqual(propNames(buttonContract, 'react').sort());
     const el = await render(values as ButtonProps);

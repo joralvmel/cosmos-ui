@@ -12,6 +12,7 @@ import {
   Pressable,
   type PressableStateCallbackType,
   type StyleProp,
+  StyleSheet,
   View,
   type ViewStyle,
 } from 'react-native';
@@ -98,6 +99,15 @@ export function IconButton({
     variant === 'solid' ? colors.solid : variant === 'soft' ? colors.subtle : 'transparent';
   const foreground = variant === 'solid' ? colors.onSolid : colors.text;
   const dimension = theme.control[size];
+  const customStyle = StyleSheet.flatten(style);
+  const minHeight = Math.max(
+    MIN_TOUCH_TARGET,
+    typeof customStyle?.minHeight === 'number' ? customStyle.minHeight : 0
+  );
+  const minWidth = Math.max(
+    MIN_TOUCH_TARGET,
+    typeof customStyle?.minWidth === 'number' ? customStyle.minWidth : 0
+  );
   const active = !disabled;
   const accessibility =
     Platform.OS === 'web'
@@ -120,8 +130,8 @@ export function IconButton({
   }: PressableStateCallbackType): StyleProp<ViewStyle> => [
     style,
     {
-      minWidth: MIN_TOUCH_TARGET,
-      minHeight: MIN_TOUCH_TARGET,
+      minWidth,
+      minHeight,
       alignItems: 'center',
       justifyContent: 'center',
       opacity: disabled ? 0.5 : isPressed ? 0.85 : 1,

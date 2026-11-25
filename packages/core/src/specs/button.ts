@@ -69,6 +69,12 @@ export const buttonContract = defineContract({
       description:
         'Accessible name when the visible content is not descriptive (icon-only buttons).',
     },
+    currentPage: {
+      type: 'boolean',
+      default: false,
+      description:
+        'Identifies this action as the current page in a composed pagination control; not a toggle.',
+    },
   },
   events: {
     press: {

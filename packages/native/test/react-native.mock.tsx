@@ -109,6 +109,7 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
             : Boolean(props['aria-selected'])
         }
         aria-describedby={props['aria-describedby'] as string}
+        aria-current={props['aria-current'] as 'page' | undefined}
         data-testid={props.testID as string}
         data-role={props.accessibilityRole as string}
         aria-label={props.accessibilityLabel as string}

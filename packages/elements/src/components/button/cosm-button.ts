@@ -182,6 +182,7 @@ export class CosmButton extends CosmElement {
     fullWidth: { type: Boolean, reflect: true, attribute: 'full-width' },
     type: {},
     label: {},
+    currentPage: { type: Boolean, attribute: 'current-page' },
   };
 
   static override styles = [boxSizing, focusRing, styles];
@@ -194,6 +195,7 @@ export class CosmButton extends CosmElement {
   declare fullWidth: boolean;
   declare type: ButtonType;
   declare label: string | undefined;
+  declare currentPage: boolean;
 
   readonly #internals: ElementInternals | undefined;
   #nextSource: PressSource | undefined;
@@ -209,6 +211,7 @@ export class CosmButton extends CosmElement {
     this.fullWidth = props.fullWidth.default;
     this.type = props.type.default;
     this.label = undefined;
+    this.currentPage = props.currentPage.default;
     this.#internals =
       typeof this.attachInternals === 'function' ? this.attachInternals() : undefined;
   }
@@ -258,6 +261,7 @@ export class CosmButton extends CosmElement {
       aria-disabled=${state.busy ? 'true' : nothing}
       aria-busy=${state.busy ? 'true' : nothing}
       aria-label=${this.label || nothing}
+      aria-current=${this.currentPage ? 'page' : nothing}
       @pointerdown=${this.#onPointerDown}
       @keydown=${this.#onKeyDown}
       @click=${this.#onClick}
