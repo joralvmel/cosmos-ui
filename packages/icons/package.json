@@ -47,6 +47,6 @@
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "devDependencies": {
-    "@lucide/icons": "1.72.0"
+    "@lucide/icons": "1.77.0"
   }
 }
