@@ -9,6 +9,7 @@ import { chevronRight } from '@joralvmel/cosmos-icons/chevron-right';
 import { chevronsLeft } from '@joralvmel/cosmos-icons/chevrons-left';
 import { chevronsRight } from '@joralvmel/cosmos-icons/chevrons-right';
 import { css, html, LitElement, nothing } from 'lit';
+import { keyed } from 'lit/directives/keyed.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { CosmElement } from '../../internal/cosm-element.js';
 import { define } from '../../internal/define.js';
@@ -77,17 +78,26 @@ const styles = css`
     visibility: hidden;
     grid-area: 1 / 1;
   }
-  .cell > span {
-    grid-area: 1 / 1;
+  .cell > span { grid-area: 1 / 1; }
+  .entering {
     animation: page-enter var(--cosm-duration-normal, 200ms) var(--cosm-easing-standard, ease);
+  }
+  .leaving {
+    pointer-events: none;
+    animation: page-exit var(--cosm-duration-normal, 200ms) var(--cosm-easing-standard, ease) forwards;
   }
   @keyframes page-enter {
     from { opacity: 0; }
     to { opacity: 1; }
   }
+  @keyframes page-exit {
+    from { opacity: 1; visibility: visible; }
+    to { opacity: 0; visibility: hidden; }
+  }
   @media (prefers-reduced-motion: reduce) {
     cosm-button::part(base) { transition: none; }
     .cell > span { animation: none; }
+    .leaving { display: none; }
   }
 `;
 
@@ -154,7 +164,9 @@ export class CosmPagination extends CosmElement {
   #effective = 1;
   #initialized = false;
   #view: ReturnType<typeof getPaginationView> | undefined;
+  #previousView: ReturnType<typeof getPaginationView> | undefined;
   #restoreFocus = false;
+  #focusedPage: string | null = null;
 
   constructor() {
     super();
@@ -178,11 +190,14 @@ export class CosmPagination extends CosmElement {
   }
 
   protected override willUpdate(): void {
-    if (this.shadowRoot?.activeElement) this.#restoreFocus = true;
+    const focused = this.shadowRoot?.activeElement;
+    if (focused) this.#restoreFocus = true;
+    this.#focusedPage = focused?.getAttribute('data-page') ?? null;
     if (!this.#initialized) {
       this.#owned = this.defaultPage;
       this.#initialized = true;
     }
+    this.#previousView = this.#view;
     this.#view = getPaginationView(
       {
         totalPages: this.totalPages,
@@ -212,6 +227,7 @@ export class CosmPagination extends CosmElement {
   protected override async updated(): Promise<void> {
     if (!this.#restoreFocus) return;
     this.#restoreFocus = false;
+    const focusedPage = this.#focusedPage;
     const controls = [
       ...this.renderRoot.querySelectorAll<HTMLElement>('cosm-button, cosm-icon-button'),
     ];
@@ -225,11 +241,23 @@ export class CosmPagination extends CosmElement {
     )
       return;
     const focused = this.shadowRoot?.activeElement;
-    if (focused && !focused.hasAttribute('data-unavailable')) return;
+    if (
+      focused &&
+      !focused.hasAttribute('data-unavailable') &&
+      (focusedPage === null || focused.getAttribute('data-page') === focusedPage)
+    )
+      return;
     const target =
       controls.find(
+        control =>
+          focusedPage !== null &&
+          control.getAttribute('data-page') === focusedPage &&
+          !control.hasAttribute('data-unavailable')
+      ) ??
+      controls.find(
         control => control.hasAttribute('data-current') && !control.hasAttribute('data-unavailable')
-      ) ?? controls.find(control => !control.hasAttribute('data-unavailable'));
+      ) ??
+      controls.find(control => !control.hasAttribute('data-unavailable'));
     target?.focus({ preventScroll: true });
   }
 
@@ -277,8 +305,27 @@ export class CosmPagination extends CosmElement {
   protected override render() {
     const view = this.#view;
     if (!view || this.totalPages <= 1) return nothing;
-    const cell = (content: string) =>
-      html`<span class="cell" data-total=${view.number(this.totalPages)}><span>${content}</span></span>`;
+    const cell = (content: string, index: number) => {
+      const previous = this.#previousView;
+      const oldItem =
+        previous?.totalPages === view.totalPages && previous.presentation === 'numbered'
+          ? previous.items[index]
+          : undefined;
+      const oldContent =
+        typeof oldItem === 'number'
+          ? previous?.number(oldItem)
+          : oldItem === 'ellipsis'
+            ? '…'
+            : undefined;
+      return html`<span class="cell" data-total=${view.number(this.totalPages)}>${keyed(
+        content,
+        html`${
+          oldContent !== undefined && oldContent !== content
+            ? html`<span class="leaving" aria-hidden="true">${oldContent}</span>`
+            : nothing
+        }<span class="entering">${content}</span>`
+      )}</span>`;
+    };
     return html`<nav part="base" aria-label=${this.label} dir=${this.direction}>
       ${this.showFirstLast ? this.#navigation('first') : nothing}
       ${this.#navigation('previous')}
@@ -287,10 +334,10 @@ export class CosmPagination extends CosmElement {
           ? html`<span part="summary">${view.summary}</span>`
           : repeat(
               view.items,
-              (item, index) => (typeof item === 'number' ? item : `gap-${index}`),
-              item =>
+              (_, index) => index,
+              (item, index) =>
                 typeof item !== 'number'
-                  ? html`<span part="ellipsis" aria-hidden="true">${cell('…')}</span>`
+                  ? html`<span part="ellipsis" aria-hidden="true">${cell('…', index)}</span>`
                   : html`<cosm-button part=${item === this.page ? 'page current' : 'page'}
                 data-page=${item} ?data-current=${item === this.page}
                 ?data-unavailable=${this.disabled}
@@ -298,7 +345,7 @@ export class CosmPagination extends CosmElement {
                 .variant=${item === this.page ? this.variant : 'ghost'}
                 .size=${this.size} .disabled=${this.disabled} .type=${'button'}
                 @cosm-press=${(event: Event) => this.#activate(event, item)}
-              >${cell(view.number(item))}</cosm-button>`
+              >${cell(view.number(item), index)}</cosm-button>`
             )
       }
       ${this.#navigation('next')}

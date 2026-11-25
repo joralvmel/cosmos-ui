@@ -56,6 +56,40 @@ describe('cosm-pagination: contract drift', () => {
 });
 
 describe('cosm-pagination', () => {
+  it('keeps the centered control while crossfading intermediate page numbers', async () => {
+    const el = await fixture<CosmPagination>(
+      '<cosm-pagination label="Results" total-pages="20" default-page="10"></cosm-pagination>'
+    );
+    await settle(el);
+    const center = pageButton(el, 10);
+    const change = vi.fn();
+    el.addEventListener('cosm-change', change);
+    pageButton(el, 11)?.focus();
+    pageButton(el, 11)?.click();
+    await settle(el);
+    expect(pageButton(el, 11)).toBe(center);
+    expect(pageButton(el, 11)?.label).toBe('Page 11');
+    expect(pageButton(el, 11)?.currentPage).toBe(true);
+    expect(pageButton(el, 11)?.querySelector('[aria-hidden="true"]')?.textContent).toBe('10');
+    expect(el.shadowRoot?.activeElement).toBe(pageButton(el, 11));
+    expect(change).toHaveBeenCalledOnce();
+    expect(change.mock.calls[0]?.[0].detail.page).toBe(11);
+  });
+
+  it('keeps focus on the same logical page when its slot changes', async () => {
+    const el = await fixture<CosmPagination>(
+      '<cosm-pagination label="Results" total-pages="20" page="10"></cosm-pagination>'
+    );
+    await settle(el);
+    pageButton(el, 10)?.focus();
+    el.page = 11;
+    await settle(el);
+    expect(el.shadowRoot?.activeElement).toBe(pageButton(el, 10));
+    el.page = 12;
+    await settle(el);
+    expect(el.shadowRoot?.activeElement).toBe(pageButton(el, 12));
+  });
+
   it('renders independent controlled updates after the previous render has completed', async () => {
     const el = await fixture<CosmPagination>(
       '<cosm-pagination label="Results" total-pages="20" page="5"></cosm-pagination>'

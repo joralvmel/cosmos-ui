@@ -93,6 +93,16 @@ and keyboard activation. Reduced-motion mode disables both effects. Browser medi
 was restored to its default after testing. React and Angular share this web renderer; native
 motion is unchanged. All 49 validation tasks and lint/blocked-terms checks passed again.
 
+The subsequent centered-range refinement keeps numbered controls keyed by their physical slot,
+not the page number. A 10-to-11 selection therefore retains the central selected control while
+crossfading its old and new numerals. Outgoing text is decorative and hidden from accessibility;
+focus follows the original logical page if it remains visible, otherwise the existing fallback
+applies. Unit regressions cover central-control identity, outgoing text semantics, single-event
+delivery and focus across reused slots. Chromium verified an actual overlapping 10-to-11
+crossfade, pointer focus, and stable center/arrow geometry across 36 combinations of viewport
+width (375/1280), direction, size and variant. Reduced motion hides outgoing text immediately,
+disables the animations, and browser media emulation is restored after the checks.
+
 ## Research and accepted decisions
 
 Required semantics come from the [HTML button definition](https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element),

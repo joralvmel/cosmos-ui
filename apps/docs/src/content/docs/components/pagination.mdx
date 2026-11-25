@@ -47,9 +47,11 @@ first/last and the current page. Extra neighbors fill the range near either boun
 Ellipses occupy a full position, so changing pages does not move the navigation arrows.
 Larger gaps are decorative ellipses, never menus.
 First/last action buttons are optional and off by default.
-On the web (including React and Angular), selection colors transition smoothly and newly
-inserted numbers fade in using the normal-duration theme token. Controls stay in place,
-interaction is immediate, and reduced-motion preferences disable these effects.
+On the web (including React and Angular), selection colors transition smoothly and changing
+numbers crossfade in fixed slots using the normal-duration theme token. In the middle range,
+the selected control stays centered instead of moving a different button into its place.
+Interaction is immediate, focus follows the logical page, and reduced-motion preferences
+disable these effects.
 
 Customize the shared theme tokens, exported parts or CSS variables. For example, set
 `--cosm-pagination-min-height: 56px` and `--cosm-pagination-radius: 999px` on the host.
