@@ -84,9 +84,12 @@ No reference implementation code or assets are copied.
   checked in the browser.
 - A React wrapper was mounted in the browser. Keyboard selection emitted the expected `onChange`
   proposal while the controlled `null` value remained unchanged.
-- The Android Expo bundle export passed. No Android device/emulator interaction was performed.
-  React and Angular wrapper tests passed. A separate Angular browser mount was unavailable because
-  the docs Vite harness did not provide Angular's JIT compiler. Native device interaction remains
-  unverified; iOS and manual screen-reader checks are optional and unverified.
-- The component inventory remains `in-progress` while the required platform runtime evidence is
+- The Angular wrapper was mounted in a browser with Reactive Forms. Selecting Cherry synchronized
+  `FormControl.value` and `cosm-select.value` to `cherry`; the control was valid.
+- The Android Expo bundle export passed. An installed API 35 AVD (`Pixel_9_API_35`) was present,
+  but no emulator became available in `adb devices`, so the demo was not installed or interacted
+  with. Native Android touch selection and Back dismissal remain unverified.
+- React and Angular wrapper tests and React Native Web checks passed. iOS and manual screen-reader
+  checks are optional and unverified.
+- The component inventory remains `in-progress` because required Android runtime evidence is
   incomplete.
