@@ -1,0 +1,76 @@
+---
+import Preview from './Preview.astro';
+
+interface Props {
+  kind: 'variants' | 'states';
+}
+
+const { kind } = Astro.props;
+const examples =
+  kind === 'variants'
+    ? [
+        { name: 'outlined', label: 'Outlined', variant: 'outlined', value: 'apple' },
+        { name: 'filled', label: 'Filled', variant: 'filled', value: 'cherry' },
+        { name: 'small', label: 'Small', size: 'sm', value: 'apple' },
+        { name: 'custom-height', label: 'Custom minimum height', value: 'cherry' },
+      ]
+    : [
+        { name: 'help', label: 'With help text', helpText: 'Choose one seasonal fruit.' },
+        {
+          name: 'error',
+          label: 'Invalid',
+          invalid: true,
+          errorText: 'Choose a fruit before continuing.',
+        },
+        { name: 'disabled', label: 'Disabled', disabled: true, value: 'apple' },
+      ];
+---
+
+<Preview>
+  <div class="select-examples">
+    {examples.map(example => <div data-select-example={example.name} />)}
+  </div>
+</Preview>
+
+<script>
+  import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
+  import { selectItemExamples } from '@joralvmel/cosmos-core';
+  import '@joralvmel/cosmos-elements/select';
+
+  const items = selectItemExamples.flat ?? [];
+  for (const host of document.querySelectorAll<HTMLElement>('[data-select-example]')) {
+    const select = document.createElement('cosm-select') as CosmSelect;
+    Object.assign(select, {
+      label: host.dataset.selectExample ?? 'Fruit',
+      placeholder: 'Choose a fruit',
+      items,
+      ...{
+        ...(host.dataset.selectExample === 'outlined'
+          ? { variant: 'outlined', value: 'apple', valueControlled: true }
+          : {}),
+        ...(host.dataset.selectExample === 'filled'
+          ? { variant: 'filled', value: 'cherry', valueControlled: true }
+          : {}),
+        ...(host.dataset.selectExample === 'small'
+          ? { size: 'sm', value: 'apple', valueControlled: true }
+          : {}),
+        ...(host.dataset.selectExample === 'custom-height'
+          ? { value: 'cherry', valueControlled: true }
+          : {}),
+        ...(host.dataset.selectExample === 'help'
+          ? { helpText: 'Choose one seasonal fruit.' }
+          : {}),
+        ...(host.dataset.selectExample === 'error'
+          ? { invalid: true, errorText: 'Choose a fruit before continuing.' }
+          : {}),
+        ...(host.dataset.selectExample === 'disabled'
+          ? { disabled: true, value: 'apple', valueControlled: true }
+          : {}),
+      },
+    });
+    if (host.dataset.selectExample === 'custom-height') {
+      select.style.setProperty('--cosm-select-trigger-min-height', '56px');
+    }
+    host.append(select);
+  }
+</script>

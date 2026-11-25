@@ -39,6 +39,7 @@ export {
   usePopoverHost,
 } from './components/popover.js';
 export { RadioGroup, type RadioGroupProps, radioGroupPropNames } from './components/radio-group.js';
+export { Select, type SelectProps, selectPropNames } from './components/select.js';
 export { Switch, type SwitchProps, switchPropNames } from './components/switch.js';
 export { TextField, type TextFieldProps, textFieldPropNames } from './components/text-field.js';
 export {

@@ -74,6 +74,14 @@ const strings = {
       switchInvalid: 'Use a non-empty label and a positive size.',
       listboxLabel: 'Choose produce',
       radioGroupLabel: 'Contact method',
+      selectLabel: 'Fruit',
+      selectPlaceholder: 'Choose a fruit',
+      selectValues: {
+        none: 'No selection',
+        apple: 'Apple',
+        cherry: 'Cherry',
+      },
+      selectInvalid: 'Use a non-empty label and placeholder.',
       radioGroupExamples: {
         'contact-methods': 'Contact methods',
         plans: 'Plans',
@@ -238,6 +246,14 @@ const strings = {
       switchInvalid: 'Usa una etiqueta no vacía y un tamaño positivo.',
       listboxLabel: 'Elige productos',
       radioGroupLabel: 'Método de contacto',
+      selectLabel: 'Fruta',
+      selectPlaceholder: 'Elige una fruta',
+      selectValues: {
+        none: 'Sin selección',
+        apple: 'Manzana',
+        cherry: 'Cereza',
+      },
+      selectInvalid: 'Usa una etiqueta y un marcador no vacíos.',
       radioGroupExamples: {
         'contact-methods': 'Métodos de contacto',
         plans: 'Planes',

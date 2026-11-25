@@ -84,6 +84,10 @@
       "types": "./dist/components/radio-group/cosm-radio-group.d.ts",
       "default": "./dist/components/radio-group/cosm-radio-group.js"
     },
+    "./select": {
+      "types": "./dist/components/select/cosm-select.d.ts",
+      "default": "./dist/components/select/cosm-select.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

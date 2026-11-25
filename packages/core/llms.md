@@ -702,6 +702,74 @@ Selects one option from a labeled collection, with optional selection and native
 | `Space` | Selects the focused enabled option. |
 | `ArrowRight`, `ArrowDown`, `ArrowLeft`, `ArrowUp` | Moves focus and selection through enabled options with wrapping. |
 
+### `select` (`<cosm-select>`)
+
+Selects one option from an accessible collection, with native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the control. |
+| `items` | SelectItems | Required | Readonly flat options with unique nonempty values, nonempty labels, and optional disabled state. |
+| `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | SelectValue | — | Initial autonomous selection; null by default. |
+| `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Outlined or filled trigger appearance. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the control. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-change` | `onChange` | `(valueChange)` | `onValueChange` | `SelectChangeDetail` | Proposes a selected value after user activation; autonomous state commits and controlled state waits for the owner. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `base` | Field wrapper. |
+| `label` | Visible accessible label. |
+| `trigger` | Select-only combobox trigger. |
+| `value` | Selected option text. |
+| `placeholder` | Text displayed when no option is selected. |
+| `popup` | Anchored popup surface. |
+| `listbox` | Single-selection option collection. |
+| `option` | Selectable row with selected, active, and disabled states. |
+| `content` | Option text wrapper. |
+| `option-label` | Primary option text. |
+| `help` | Supporting text associated with the control. |
+| `error` | Error description associated with the control. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-select-background` | Control background. |
+| `--cosm-select-color` | Control and value text color. |
+| `--cosm-select-placeholder` | Placeholder text color. |
+| `--cosm-select-border` | Control boundary color. |
+| `--cosm-select-focus` | Visible keyboard focus indicator color. |
+| `--cosm-select-radius` | Control corner radius. |
+| `--cosm-select-trigger-min-height` | Custom minimum trigger height. |
+| `--cosm-select-option-selected-background` | Selected option background. |
+| `--cosm-select-option-selected-color` | Selected option text color. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Tab`, `Shift+Tab` | Moves focus to or from the enabled combobox trigger. |
+| `Enter`, `Space`, `ArrowDown`, `ArrowUp` | On Web, opens the popup; arrows move the active option without changing selection. |
+| `ArrowDown`, `ArrowUp`, `Home`, `End` | On Web, moves the active option without changing the selected value. |
+| `Printable characters` | On Web and React Native Web, moves to a matching option using locale-aware typeahead. Native iOS/Android use touch and platform accessibility navigation; React Native core does not expose hardware key events on this control. |
+| `Enter`, `Space` | On Web, selects the active enabled option. |
+| `Escape` | On Web, closes the popup without changing the selected value. |
+
 
 ## Rules for AI assistants
 

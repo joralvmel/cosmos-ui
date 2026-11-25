@@ -5,7 +5,9 @@ Framework-agnostic Web Components (Lit) of Cosmos UI. Use them in plain HTML or 
 Checkbox and Text Field use themed hover borders on enabled valid controls; checked/mixed
 Checkbox uses `primary-hover`. Text Field adds `primary-subtle` while its input or actions have
 focus. Existing component background/border/focus hooks retain priority over theme defaults.
-Disabled controls do not react to hover; invalid hover borders retain danger. No new props or tokens.
+Select uses a themed hover border, a persistent expanded appearance, and a rotating chevron while
+open; enabled active options use the Listbox neutral surface. Disabled controls do not react to
+hover; invalid hover borders retain danger. No new props or tokens.
 
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 
@@ -426,6 +428,42 @@ Events: `cosm-change` → `RadioGroupChangeDetail`.
 
   const element = document.querySelector('cosm-radio-group');
   element.options = contactMethods;
+  element.addEventListener('cosm-change', event => console.log(event.detail));
+</script>
+```
+### `<cosm-select>`
+
+Selects one option from an accessible collection, with native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the control. |
+| `items` | SelectItems | Required | Readonly flat options with unique nonempty values, nonempty labels, and optional disabled state. |
+| `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` (`default-value`) | SelectValue | — | Initial autonomous selection; null by default. |
+| `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Outlined or filled trigger appearance. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` (`help-text`) | string | — | Optional supporting text associated with the control. |
+| `errorText` (`error-text`) | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+| `name` | string | — | Web form field name; React Native has no HTML form association. |
+
+Events: `cosm-change` → `SelectChangeDetail`.
+
+```html
+<cosm-select label="Select" placeholder="Select"></cosm-select>
+
+<script type="module">
+  import '@joralvmel/cosmos-elements/select';
+  const flat = [{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry"},{"value":"lime","label":"Lime","disabled":true}];
+  const none = null;
+
+  const element = document.querySelector('cosm-select');
+  element.items = flat;
+  element.defaultValue = none;
   element.addEventListener('cosm-change', event => console.log(event.detail));
 </script>
 ```

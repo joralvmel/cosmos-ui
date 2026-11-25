@@ -40,4 +40,5 @@ export const screens = [
     title: 'Radio Group',
     description: 'Single selection, orientation, validation and controlled state.',
   },
+  { route: '/select', title: 'Select', description: 'Choose one option from a grouped list.' },
 ] as const;

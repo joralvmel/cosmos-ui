@@ -1,0 +1,152 @@
+---
+title: Select
+description: Choose one option from a compact, labeled collection.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import SelectExamples from '../../../components/SelectExamples.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="select" />
+
+Select lets a person choose one value from a compact collection without keeping every option
+visible. Use Listbox when choices should remain on the page, or wait for the planned Combobox when
+people need to search or filter a long collection.
+
+## Playground
+
+<Playground name="select" />
+
+The playground demonstrates flat options, autonomous and controlled values, variants, sizes, and a
+custom trigger height. Each option has a stable value and visible label; disabled options remain
+visible but cannot be selected.
+
+## Variants
+
+Select supports outlined (default) and filled variants, plus `sm`, `md` (default), and `lg` sizes.
+Set `--cosm-select-trigger-min-height` to customize the Web trigger's minimum height. Use Cosmos
+theme tokens and the documented `--cosm-select-*` hooks or CSS parts for other Web appearance
+customization.
+
+<SelectExamples kind="variants" />
+
+## States
+
+`defaultValue` initializes an autonomous selection. Supplying `value`, including `null`, makes the
+selection controlled: the component emits a proposal and waits for its owner to update the value.
+`disabled` prevents opening and selection; disabled options remain visible but cannot be selected.
+Triggers highlight on pointer hover and while expanded; the chevron rotates as the popup opens.
+
+Web, React, and Angular use the same form-associated Web Component. It supports `name`, required
+validity, disabled fieldsets, and form reset. React Native has no HTML form lifecycle; provide
+localized help or error text directly.
+
+<SelectExamples kind="states" />
+
+### Web
+
+```html
+<cosm-select
+  id="fruit"
+  label="Fruit"
+  placeholder="Choose a fruit"
+  name="fruit"
+  variant="filled"
+  required
+></cosm-select>
+<script type="module">
+  import '@joralvmel/cosmos-elements/select';
+
+  document.querySelector('#fruit').items = [
+    { value: 'apple', label: 'Apple' },
+    { value: 'cherry', label: 'Cherry' },
+    { value: 'lime', label: 'Lime', disabled: true },
+  ];
+</script>
+```
+
+### React
+
+```tsx
+import { Select } from '@joralvmel/cosmos-react';
+
+<Select
+  label="Fruit"
+  items={fruitItems}
+  placeholder="Choose a fruit"
+  variant="filled"
+  value={fruit}
+  onChange={event => setFruit(event.detail.value)}
+/>;
+```
+
+### Angular
+
+```html
+<cosm-select
+  label="Fruit"
+  [items]="fruitItems"
+  placeholder="Choose a fruit"
+  variant="filled"
+  [(ngModel)]="fruit"
+  name="fruit"
+></cosm-select>
+```
+
+Angular Forms integrates through `ControlValueAccessor`. Without Forms, listen to `valueChange`;
+it forwards the original DOM `CustomEvent`, so read the proposed value from `$event.detail.value`.
+
+### React Native
+
+```tsx
+import { Select } from '@joralvmel/cosmos-native';
+
+<Select
+  label="Fruit"
+  items={fruitItems}
+  placeholder="Choose a fruit"
+  variant="filled"
+  value={fruit}
+  onValueChange={({ value }) => setFruit(value)}
+  triggerStyle={{ minHeight: 56 }}
+/>;
+```
+
+The native app must mount Select under the app-level `PopoverProvider`. Its popup uses Cosmos
+Popover and Listbox behavior, with platform-appropriate placement and dismissal. The `style` prop
+styles the field wrapper, `labelStyle` styles its label, and `triggerStyle` customizes the trigger;
+the trigger's minimum height remains at least 44 logical points.
+
+## Accessibility
+
+- Provide a visible, nonempty label. Placeholder text indicates an empty value; it does not name
+  the control. Localize the label, placeholder, option text, and help/error text.
+- On Web, Tab reaches the combobox trigger; Enter, Space, or an arrow key opens the listbox.
+  The combobox keeps DOM focus while `aria-activedescendant` identifies the active option. Arrow
+  keys and Home/End move the active option without committing it; printable characters use
+  type-ahead, Enter/Space selects, and Escape closes without changing the value.
+- The Web popup exposes combobox, listbox, option, expanded, selected, disabled, required, and
+  invalid semantics. Focus remains distinct from selection, and disabled options cannot be
+  selected. The keyboard interaction follows the
+  [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/).
+- React and Angular forward the Web component's events and accessibility behavior. React Native
+  exposes platform-supported combobox/listbox semantics and touch-sized controls. React Native Web
+  supports keyboard type-ahead through Listbox; native iOS/Android use touch and platform
+  accessibility navigation because React Native core does not expose hardware key events on this
+  control. Native `required` is descriptive; validation and error timing belong to the consumer.
+- Keep focus, selected, invalid, and disabled states distinguishable when customizing colors.
+- Web, React, and Angular use native form association and browser constraint validation. React
+  Native does not provide HTML form submission or browser constraint validation.
+- Search/filtering, multiselect, asynchronous loading, virtualization, groups, option descriptions
+  and icons, clear action, tree options, arbitrary interactive option content, and platform-native
+  picker UI are deferred.
+
+## API
+
+<ApiTable name="select" />
+
+## Events by platform
+
+<EventsTable name="select" />

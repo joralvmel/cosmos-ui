@@ -11,10 +11,11 @@ Its `appearance` accepts `startIconColor`, `startIconFocusColor`, `endIconColor`
 `iconFocusScope` is `control` (input and action buttons, default) or `input`; action icons,
 affixes and editable text retain their own colors.
 
-Checkbox and TextField highlight enabled valid borders on pointer hover without simulating touch
-hover. Checked/mixed Checkbox uses `primary-hover`; invalid borders keep danger. TextField input
-or action focus adds `primary-subtle`, unless overridden through `appearance.background` or caller
-styles. Disabled controls do not react, and existing appearance/style customization keeps priority.
+Checkbox, TextField and Select highlight enabled valid controls on pointer hover without simulating
+touch hover. Checked/mixed Checkbox uses `primary-hover`; invalid borders keep danger. TextField
+input or action focus adds `primary-subtle`. Select keeps its trigger active and rotates its
+chevron while expanded. Disabled controls do not react, and existing appearance/style customization
+keeps priority.
 
 <!-- generated:start (npm run llms, do not edit this block by hand) -->
 
@@ -454,6 +455,45 @@ export function Example() {
       onValueChange={detail => console.log(detail)}
     >
     </RadioGroup>
+  );
+}
+```
+### `Select`
+
+Selects one option from an accessible collection, with native Web form behavior.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | string | Required | Required visible accessible name for the control. |
+| `items` | SelectItems | Required | Readonly flat options with unique nonempty values, nonempty labels, and optional disabled state. |
+| `value` | SelectValue | — | Controlled selected value; null means no selection, and a supplied null remains controlled. |
+| `defaultValue` | SelectValue | — | Initial autonomous selection; null by default. |
+| `placeholder` | string | Required | Consumer-localized text shown when no value is selected. |
+| `variant` | 'outlined' \| 'filled' | `outlined` | Outlined or filled trigger appearance. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Small, medium, or large control size. |
+| `disabled` | boolean | `false` | Prevents interaction and excludes the value from Web form submission. |
+| `required` | boolean | `false` | Requires a selection in Web form validation; Native exposes descriptive semantics. |
+| `invalid` | boolean | `false` | Externally supplied invalid presentation state. |
+| `helpText` | string | — | Optional supporting text associated with the control. |
+| `errorText` | string | — | Optional consumer-localized error text; a nonempty value also exposes invalid state. |
+
+Events: `onValueChange` → `SelectChangeDetail`.
+
+```tsx
+import { Select } from '@joralvmel/cosmos-native';
+const flat = [{"value":"apple","label":"Apple"},{"value":"cherry","label":"Cherry"},{"value":"lime","label":"Lime","disabled":true}] as const;
+const none = null as const;
+
+export function Example() {
+  return (
+    <Select
+      label="Select"
+      items={flat}
+      defaultValue={none}
+      placeholder="Select"
+      onValueChange={detail => console.log(detail)}
+    >
+    </Select>
   );
 }
 ```

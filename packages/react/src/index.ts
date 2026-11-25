@@ -17,6 +17,7 @@ export { IconButton, type IconButtonProps, iconButtonEvents } from './components
 export { Listbox, type ListboxProps, listboxEvents } from './components/listbox.js';
 export { Popover, type PopoverProps, popoverEvents } from './components/popover.js';
 export { RadioGroup, type RadioGroupProps, radioGroupEvents } from './components/radio-group.js';
+export { Select, type SelectProps, selectEvents } from './components/select.js';
 export { Switch, type SwitchProps, switchEvents } from './components/switch.js';
 export { TextField, type TextFieldProps, textFieldEvents } from './components/text-field.js';
 export { Textarea, type TextareaProps, textareaEvents } from './components/textarea.js';

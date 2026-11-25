@@ -5,6 +5,7 @@ import { CosmIconButtonComponent } from './components/icon-button.component.js';
 import { CosmListboxComponent } from './components/listbox.component.js';
 import { CosmPopoverComponent } from './components/popover.component.js';
 import { CosmRadioGroupComponent } from './components/radio-group.component.js';
+import { CosmSelectComponent } from './components/select.component.js';
 import { CosmSwitchComponent } from './components/switch.component.js';
 import { CosmTextFieldComponent } from './components/text-field.component.js';
 import { CosmTextareaComponent } from './components/textarea.component.js';
@@ -39,6 +40,7 @@ export const COSMOS_COMPONENTS = [
   CosmCalendarComponent,
   CosmTextareaComponent,
   CosmRadioGroupComponent,
+  CosmSelectComponent,
 ] as const;
 export { CosmBadgeComponent } from './components/badge.component.js';
 export { CosmCalendarComponent } from './components/calendar.component.js';
@@ -47,6 +49,7 @@ export { CosmIconButtonComponent } from './components/icon-button.component.js';
 export { CosmListboxComponent } from './components/listbox.component.js';
 export { CosmPopoverComponent } from './components/popover.component.js';
 export { CosmRadioGroupComponent } from './components/radio-group.component.js';
+export { CosmSelectComponent } from './components/select.component.js';
 export { CosmSwitchComponent } from './components/switch.component.js';
 export { CosmTextFieldComponent } from './components/text-field.component.js';
 export { CosmTextareaComponent } from './components/textarea.component.js';
