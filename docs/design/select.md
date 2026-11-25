@@ -89,7 +89,10 @@ No reference implementation code or assets are copied.
 - The Android Expo bundle export passed. An installed API 35 AVD (`Pixel_9_API_35`) was present,
   but no emulator became available in `adb devices`, so the demo was not installed or interacted
   with. Native Android touch selection and Back dismissal remain unverified.
-- React and Angular wrapper tests and React Native Web checks passed. iOS and manual screen-reader
-  checks are optional and unverified.
+- Expo Web (React Native Web) mounted the native demo in a browser. Selecting Cherry updated the
+  displayed value; Lime exposed its disabled state; Escape closed the listbox. This does not verify
+  native Android touch or Back behavior.
+- React and Angular wrapper tests passed. iOS and manual screen-reader checks are optional and
+  unverified.
 - The component inventory remains `in-progress` because required Android runtime evidence is
   incomplete.
