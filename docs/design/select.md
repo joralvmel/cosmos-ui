@@ -88,11 +88,12 @@ No reference implementation code or assets are copied.
   `FormControl.value` and `cosm-select.value` to `cherry`; the control was valid.
 - The Android Expo bundle export passed. An installed API 35 AVD (`Pixel_9_API_35`) was present,
   but no emulator became available in `adb devices`, so the demo was not installed or interacted
-  with. Native Android touch selection and Back dismissal remain unverified.
+  with. Native Android touch selection and Back dismissal remain unverified and were explicitly
+  deferred by the maintainer on 2026-11-25.
 - Expo Web (React Native Web) mounted the native demo in a browser. Selecting Cherry updated the
   displayed value; Lime exposed its disabled state; Escape closed the listbox. This does not verify
   native Android touch or Back behavior.
 - React and Angular wrapper tests passed. iOS and manual screen-reader checks are optional and
   unverified.
-- The component inventory remains `in-progress` because required Android runtime evidence is
-  incomplete.
+- The component inventory is `stable` with the maintainer-approved Android runtime deferral.
+  This readiness decision does not claim that native Android interaction was verified.
