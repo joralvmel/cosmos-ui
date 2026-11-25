@@ -19,9 +19,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
-    "@astrojs/starlight": "^0.42.11",
+    "@astrojs/starlight": "^0.43.1",
     "@joralvmel/cosmos-tools": "^0.0.0",
-    "astro": "^7.4.11",
+    "astro": "^7.4.13",
     "shiki": "^4.6.0"
   }
 }
