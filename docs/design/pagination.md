@@ -83,6 +83,16 @@ approval, it now uses `rounded` globally, matching the other built-in themes on 
 - All 49 build/typecheck/test tasks, Biome and blocked-terms checks passed. The revised
   native component also passed Android Hermes export; device limitations above still apply.
 
+### Web motion refinement
+
+Numbered web controls now transition background, border and foreground with the normal-duration
+theme token (200ms by default); newly inserted numbers fade in without moving hit targets.
+Chromium verified actual running transitions and entry animations for solid/soft/outline,
+immediate state and single-event delivery, unchanged arrow coordinates through pages 1-7,
+and keyboard activation. Reduced-motion mode disables both effects. Browser media emulation
+was restored to its default after testing. React and Angular share this web renderer; native
+motion is unchanged. All 49 validation tasks and lint/blocked-terms checks passed again.
+
 ## Research and accepted decisions
 
 Required semantics come from the [HTML button definition](https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element),

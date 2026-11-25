@@ -46,7 +46,13 @@ const styles = css`
     min-width: var(--cosm-pagination-min-height, var(--_control-height));
     border-radius: var(--cosm-pagination-radius, var(--cosm-radius-md, 0.5rem));
   }
-  cosm-button::part(base) { padding-inline: var(--cosm-space-sm, 0.5rem); }
+  cosm-button::part(base) {
+    padding-inline: var(--cosm-space-sm, 0.5rem);
+    transition:
+      background-color var(--cosm-duration-normal, 200ms) var(--cosm-easing-standard, ease),
+      border-color var(--cosm-duration-normal, 200ms) var(--cosm-easing-standard, ease),
+      color var(--cosm-duration-normal, 200ms) var(--cosm-easing-standard, ease);
+  }
   cosm-button[data-current]::part(base) {
     /* Resolve the composed Button's state colors when no pagination hook is supplied. */
     background: var(--cosm-pagination-current-background, var(--_bg));
@@ -71,7 +77,18 @@ const styles = css`
     visibility: hidden;
     grid-area: 1 / 1;
   }
-  .cell > span { grid-area: 1 / 1; }
+  .cell > span {
+    grid-area: 1 / 1;
+    animation: page-enter var(--cosm-duration-normal, 200ms) var(--cosm-easing-standard, ease);
+  }
+  @keyframes page-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    cosm-button::part(base) { transition: none; }
+    .cell > span { animation: none; }
+  }
 `;
 
 /**
