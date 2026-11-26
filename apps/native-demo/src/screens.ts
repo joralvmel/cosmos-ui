@@ -42,4 +42,5 @@ export const screens = [
   },
   { route: '/select', title: 'Select', description: 'Choose one option from a grouped list.' },
   { route: '/pagination', title: 'Pagination', description: 'TODO(generator): short description.' },
+  { route: '/dialog', title: 'Dialog', description: 'Modal, responsive, movable and accessible.' },
 ] as const;

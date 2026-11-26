@@ -92,6 +92,10 @@
       "types": "./dist/components/pagination/cosm-pagination.d.ts",
       "default": "./dist/components/pagination/cosm-pagination.js"
     },
+    "./dialog": {
+      "types": "./dist/components/dialog/cosm-dialog.d.ts",
+      "default": "./dist/components/dialog/cosm-dialog.js"
+    },
     "./custom-elements.json": "./dist/custom-elements.json",
     "./llms.md": "./llms.md",
     "./package.json": "./package.json"

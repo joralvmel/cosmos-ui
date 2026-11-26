@@ -3,6 +3,8 @@ import {
   badgeContract,
   buttonContract,
   checkboxContract,
+  dialogContract,
+  generateSnippets,
   iconButtonContract,
   iconContract,
   listboxContract,
@@ -35,6 +37,7 @@ import { star } from '@joralvmel/cosmos-icons/star';
 import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/badge';
 import '@joralvmel/cosmos-elements/checkbox';
+import '@joralvmel/cosmos-elements/dialog';
 import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
@@ -165,6 +168,233 @@ afterEach(() => {
 });
 
 describe('Playground', () => {
+  it('runs the generated HTML Dialog example in autonomous and controlled modes', async () => {
+    for (const open of [undefined, false]) {
+      const source = generateSnippets(dialogContract, { open }, 'Details').html;
+      if (!source) throw new Error('Missing HTML example');
+      const script = /<script type="module">([\s\S]*)<\/script>/.exec(source)?.[1];
+      if (!script) throw new Error('Missing HTML example script');
+      const markup = source.slice(0, source.indexOf('<script'));
+      const container = document.createElement('div');
+      container.innerHTML = markup;
+      document.body.append(container);
+      const run = new Function('document', 'console', script.replace(/^\s*import .*;$/gm, ''));
+      run(document, { log: vi.fn() });
+      const dialog = container.querySelector('cosm-dialog');
+      const opener = container.querySelector<HTMLElementTagNameMap['cosm-button']>('#open-dialog');
+      const action = container.querySelector<HTMLElementTagNameMap['cosm-button']>('#done');
+      if (!dialog || !opener || !action) throw new Error('Missing generated Dialog controls');
+      await dialog.updateComplete;
+      await Promise.all([opener.updateComplete, action.updateComplete]);
+      opener.click();
+      await dialog.updateComplete;
+      expect(dialog.open).toBe(true);
+      action.click();
+      await dialog.updateComplete;
+      expect(dialog.open).toBe(false);
+      container.remove();
+    }
+  });
+
+  it('exercises Dialog ownership, cancellation, focus targets and remounts', async () => {
+    const root = document.createElement('div');
+    const opener = document.createElement('cosm-button');
+    opener.dataset.dialogOpen = '';
+    const dialog = document.createElement('cosm-dialog');
+    dialog.dataset.playgroundTarget = '';
+    const title = document.createElement('span');
+    title.slot = 'title';
+    title.textContent = 'Review';
+    const body = document.createElement('p');
+    body.dataset.dialogBody = '';
+    body.textContent = 'Details';
+    const initial = document.createElement('cosm-button');
+    initial.dataset.dialogInitial = '';
+    const action = document.createElement('cosm-button');
+    action.slot = 'actions';
+    action.dataset.dialogAction = '';
+    dialog.append(title, body, initial, action);
+    root.append(opener, dialog);
+    document.body.append(root);
+    const controller = initPlayground(root, {
+      contract: dialogContract,
+      content: 'Details',
+      labels,
+      themes: [],
+    });
+    await dialog.updateComplete;
+    await Promise.all([opener.updateComplete, initial.updateComplete, action.updateComplete]);
+    expect(dialog.initialFocusTarget).toBe(initial);
+    expect(dialog.returnFocusTarget).toBe(opener);
+    expect(root.querySelector('[data-prop="initialFocusTarget"]')).toBeNull();
+    opener.click();
+    await dialog.updateComplete;
+    expect(dialog.open).toBe(true);
+    const veto = root.querySelector<HTMLInputElement>('[data-dialog-veto]');
+    if (!veto) throw new Error('Missing veto control');
+    veto.checked = true;
+    veto.dispatchEvent(new Event('change'));
+    action.click();
+    await dialog.updateComplete;
+    expect(dialog.open).toBe(true);
+    expect(root.querySelector('[data-dialog-proposal]')?.textContent).toContain('action');
+    const allowClose = root.querySelector<HTMLElementTagNameMap['cosm-button']>(
+      '[data-dialog-allow-close]'
+    );
+    if (!allowClose) throw new Error('Missing allow-close action');
+    await allowClose.updateComplete;
+    expect(allowClose.hidden).toBe(false);
+    allowClose.click();
+    expect(veto.checked).toBe(false);
+    action.click();
+    await dialog.updateComplete;
+    expect(dialog.open).toBe(false);
+    controller.set('open', false);
+    controller.set('presentation', 'fullscreen');
+    controller.set('maxWidth', 480);
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      const code = controller.code(platform);
+      expect(code).toContain('fullscreen');
+      expect(code).toContain('480');
+      expect(code).toContain('requestOpen()');
+      expect(code).toContain('requestClose()');
+    }
+    expect(controller.code('html')).toContain('slot="title"');
+    expect(controller.code('native')).toContain('title="Review details"');
+    opener.click();
+    await dialog.updateComplete;
+    expect(dialog.open).toBe(true);
+    expect(controller.values.open).toBe(true);
+    expect(root.querySelector<HTMLSelectElement>('[data-prop="open"]')?.value).toBe('true');
+    action.click();
+    await dialog.updateComplete;
+    expect(dialog.open).toBe(false);
+    controller.set('open', undefined);
+    controller.set('defaultOpen', true);
+    const replacement = root.querySelector('cosm-dialog');
+    if (!replacement) throw new Error('Missing remounted dialog');
+    await replacement.updateComplete;
+    expect(replacement).not.toBe(dialog);
+    expect(replacement.open).toBe(true);
+    expect(replacement.returnFocusTarget).toBe(opener);
+    expect(replacement.initialFocusTarget).toBe(initial);
+    controller.set('maxWidth', -1);
+    expect(replacement.maxWidth).toBe(480);
+    controller.set('closeLabel', ' ');
+    expect(replacement.closeLabel).toBe('Close');
+    const long = root.querySelector<HTMLInputElement>('[data-dialog-long]');
+    if (!long) throw new Error('Missing long-content control');
+    long.checked = true;
+    long.dispatchEvent(new Event('change'));
+    expect(body.textContent?.length).toBeGreaterThan(100);
+  });
+
+  it('localizes Dialog movement and exercises sizing and composed examples', async () => {
+    const root = document.createElement('div');
+    root.innerHTML = `<cosm-button data-dialog-open>Abrir</cosm-button>
+      <cosm-dialog data-playground-target>
+        <span slot="title">Título</span><span slot="description">Descripción</span>
+        <p data-dialog-body>Detalles</p><cosm-button data-dialog-initial>Foco</cosm-button>
+        <cosm-button slot="actions" data-dialog-action type="button">Listo</cosm-button>
+      </cosm-dialog>`;
+    document.body.append(root);
+    const target = root.querySelector('cosm-dialog');
+    const opener = root.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-dialog-open]');
+    if (!target || !opener) throw new Error('Missing Dialog preview');
+    const controller = initPlayground(root, {
+      contract: dialogContract,
+      content: 'Detalles',
+      labels: {
+        ...labels,
+        dialogTitle: 'Título',
+        dialogFormTitle: 'Editar datos',
+        dialogFormField: 'Nombre visible',
+        dialogFormAction: 'Guardar',
+        dialogConfirmationTitle: 'Confirmar cambio',
+        dialogConfirmationAction: 'Confirmar',
+        dialogCancel: 'Cancelar',
+        dialogMovement: {
+          moveControlsLabel: 'Mover diálogo',
+          moveUpLabel: 'Mover arriba',
+          moveDownLabel: 'Mover abajo',
+          moveLeftLabel: 'Mover a la izquierda',
+          moveRightLabel: 'Mover a la derecha',
+          moveCenterLabel: 'Centrar diálogo',
+        },
+      },
+      themes: [],
+    });
+    await target.updateComplete;
+    await opener.updateComplete;
+    expect(target.moveControlsLabel).toBe('Mover diálogo');
+    expect(target.moveUpLabel).toBe('Mover arriba');
+    expect(target.maxWidth).toBeUndefined();
+    controller.set('size', 'lg');
+    controller.set('fullWidth', true);
+    controller.set('responsiveFullscreen', true);
+    controller.set('movable', true);
+    controller.set('maxWidth', 520);
+    await target.updateComplete;
+    expect(target.size).toBe('lg');
+    expect(target.fullWidth).toBe(true);
+    expect(target.responsiveFullscreen).toBe(true);
+    expect(target.movable).toBe(true);
+    for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+      expect(controller.code(platform)).toContain('Mover arriba');
+      expect(controller.code(platform)).toContain('520');
+    }
+    controller.set('maxWidth', undefined);
+    await target.updateComplete;
+    expect(target.maxWidth).toBeUndefined();
+    expect(root.querySelector<HTMLInputElement>('[data-prop="maxWidth"]')?.value).toBe('');
+    controller.set('moveUpLabel', ' ');
+    expect(target.moveUpLabel).toBe('Mover arriba');
+
+    const sample = root.querySelector<HTMLSelectElement>('[data-dialog-sample]');
+    if (!sample) throw new Error('Missing example selector');
+    sample.value = 'form';
+    sample.dispatchEvent(new Event('change'));
+    const form = target.querySelector<HTMLFormElement>('[data-dialog-form]');
+    const field = target.querySelector<HTMLInputElement>('[data-dialog-field]');
+    const action = target.querySelector<HTMLElementTagNameMap['cosm-button']>(
+      '[data-dialog-action]:not([data-dialog-cancel])'
+    );
+    if (!form || !field || !action) throw new Error('Missing form controls');
+    await action.updateComplete;
+    expect(form.hidden).toBe(false);
+    expect(field.required).toBe(true);
+    expect(target.initialFocusTarget).toBe(field);
+    expect(target.querySelector('[slot="title"]')?.textContent).toBe('Editar datos');
+    expect(action.textContent).toBe('Guardar');
+    opener.click();
+    await target.updateComplete;
+    field.value = 'Alex';
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await target.updateComplete;
+    expect(target.open).toBe(false);
+
+    sample.value = 'confirmation';
+    sample.dispatchEvent(new Event('change'));
+    expect(form.hidden).toBe(true);
+    expect(target.querySelector('[slot="title"]')?.textContent).toBe('Confirmar cambio');
+    expect(action.textContent).toBe('Confirmar');
+    const cancel =
+      target.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-dialog-cancel]');
+    if (!cancel) throw new Error('Missing cancel action');
+    await cancel.updateComplete;
+    expect(cancel.hidden).toBe(false);
+    opener.click();
+    await target.updateComplete;
+    cancel.click();
+    await target.updateComplete;
+    expect(target.open).toBe(false);
+
+    sample.value = 'basic';
+    sample.dispatchEvent(new Event('change'));
+    expect(cancel.hidden).toBe(true);
+    expect(target.querySelector('[slot="title"]')?.textContent).toBe('Título');
+  });
+
   it('initializes Textarea with a required localized label and validates rows and lengths', async () => {
     const root = document.createElement('div');
     const target = document.createElement('cosm-textarea') as CosmTextarea;

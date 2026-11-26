@@ -114,6 +114,7 @@ export function IconButton({
       ? {
           accessibilityRole: 'button' as const,
           accessibilityState: { disabled, ...accessibilityState },
+          'aria-expanded': accessibilityState?.expanded,
           'aria-pressed': mode === 'toggle' ? currentPressed : undefined,
         }
       : {

@@ -1,6 +1,7 @@
 import { badgeContract } from './specs/badge.js';
 import { calendarContract } from './specs/calendar.js';
 import { checkboxContract } from './specs/checkbox.js';
+import { dialogContract } from './specs/dialog.js';
 import { iconContract } from './specs/icon.js';
 import { iconButtonContract } from './specs/icon-button.js';
 import { listboxContract } from './specs/listbox.js';
@@ -156,6 +157,7 @@ export const contracts = {
   'radio-group': radioGroupContract,
   select: selectContract,
   pagination: paginationContract,
+  dialog: dialogContract,
 } as const;
 export { badgeContract } from './specs/badge.js';
 export {
@@ -181,6 +183,24 @@ export {
   checkboxScenarios,
   checkboxScenariosFor,
 } from './specs/checkbox.scenarios.js';
+export {
+  type DialogCloseReason,
+  type DialogHandle,
+  type DialogOpenChangeDetail,
+  type DialogReferences,
+  type DialogSize,
+  dialogContract,
+} from './specs/dialog.js';
+export {
+  type DialogAction,
+  type DialogLayoutScenario,
+  type DialogMovementScenario,
+  type DialogScenario,
+  dialogLayoutScenarios,
+  dialogMovementScenarios,
+  dialogScenarios,
+  dialogScenariosFor,
+} from './specs/dialog.scenarios.js';
 export { iconContract } from './specs/icon.js';
 export {
   type IconScenario,

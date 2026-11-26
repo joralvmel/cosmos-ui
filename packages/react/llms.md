@@ -572,6 +572,59 @@ export function Example() {
   );
 }
 ```
+### `Dialog`
+
+Modal content with a title, actions and cancelable close requests.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | boolean | `false` | Committed visibility; supplying this prop, including false, controls state. |
+| `defaultOpen` | boolean | `false` | Initial autonomous visibility; subsequent changes do not reset state. |
+| `presentation` | 'standard' \| 'fullscreen' | `standard` | Centered standard surface or fullscreen surface. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Maximum standard width: sm 400, md 640, lg 960 pixels or logical points. |
+| `maxWidth` | number | — | Optional positive finite numeric maximum, overriding size in CSS pixels or native logical points; ignored in fullscreen. |
+| `fullWidth` | boolean | `false` | Fill available standard width up to the effective maximum. |
+| `responsiveFullscreen` | boolean | `false` | Use fullscreen when available viewport width is below 640 pixels or logical points. |
+| `movable` | boolean | `false` | Enable header dragging and an expandable movement control in standard presentation only. |
+| `moveControlsLabel` | string | `Move dialog` | Localized accessible name of the movement button and control group. |
+| `moveUpLabel` | string | `Move up` | Localized name for moving upward. |
+| `moveDownLabel` | string | `Move down` | Localized name for moving downward. |
+| `moveLeftLabel` | string | `Move left` | Localized name for moving left. |
+| `moveRightLabel` | string | `Move right` | Localized name for moving right. |
+| `moveCenterLabel` | string | `Center dialog` | Localized name for centering the dialog. |
+| `closeLabel` | string | `Close` | Non-empty localized accessible name of the built-in close button. |
+| `closeOnEscape` | boolean | `true` | Request closure on unhandled Escape on web. |
+| `closeOnBackdropPress` | boolean | `false` | Request closure when the backdrop itself is pressed. |
+| `initialFocusTarget` | DialogFocusTarget | — | Optional platform focus target used on committed opening; it must be inside the dialog. |
+| `returnFocusTarget` | DialogFocusTarget | — | Optional platform focus target used after committed closure. |
+
+Events: `onOpenChange` → `DialogOpenChangeDetail`.
+
+```tsx
+import { useRef } from 'react';
+import { Button, Dialog } from '@joralvmel/cosmos-react';
+import type { CosmDialog } from '@joralvmel/cosmos-elements/dialog';
+
+export function Example() {
+  const dialog = useRef<CosmDialog>(null);
+  return (
+    <>
+      <Button onPress={() => dialog.current?.requestOpen()}>Open dialog</Button>
+      <Dialog
+        ref={dialog}
+        onOpenChange={event => {
+          const detail = event.detail;
+          console.log(detail);
+        }}
+      >
+        <h2 slot="title">Review details</h2>
+        <p>Dialog</p>
+        <Button slot="actions" onPress={() => dialog.current?.requestClose()}>Done</Button>
+      </Dialog>
+    </>
+  );
+}
+```
 
 ## Themes
 

@@ -5,6 +5,7 @@ import {
   buttonContract,
   type ComponentContract,
   defineContract,
+  dialogContract,
   generateSnippets,
   iconButtonContract,
   listboxContract,
@@ -26,6 +27,52 @@ const defaults = Object.fromEntries(
 );
 
 describe('codegen', () => {
+  it('generates openable, named Dialog examples with controlled state across platforms', () => {
+    const snippets = generateSnippets(
+      dialogContract,
+      {
+        open: false,
+        presentation: 'fullscreen',
+        size: 'lg',
+        maxWidth: 480,
+        fullWidth: true,
+        responsiveFullscreen: true,
+        movable: true,
+      },
+      'Details <carefully>'
+    );
+    for (const source of Object.values(snippets)) {
+      expect(source).toContain('Review details');
+      expect(source).toContain('requestOpen()');
+      expect(source).toContain('requestClose()');
+      expect(source).toContain('fullscreen');
+      expect(source).toContain('480');
+      expect(source).toContain('movable');
+    }
+    expect(snippets.html).toContain('slot="title"');
+    expect(snippets.html).toContain('<cosm-button');
+    expect(snippets.html).toContain("addEventListener('cosm-press'");
+    expect(snippets.html).toContain('dialog.open = false;');
+    expect(snippets.html).toContain('dialog.open = event.detail.open;');
+    expect(snippets.html).toContain('Details &lt;carefully>');
+    expect(snippets.react).toContain('open={open}');
+    expect(snippets.react).toContain('size="lg"');
+    expect(snippets.react).toContain('responsiveFullscreen');
+    expect(snippets.react).toContain('setOpen(detail.open)');
+    expect(snippets.angular).toContain('[open]="isOpen"');
+    expect(snippets.angular).toContain('this.isOpen = event.detail.open');
+    expect(snippets.native).toContain('title="Review details"');
+    expect(snippets.native).toContain('returnFocusTarget={opener}');
+    expect(snippets.native).toContain('<Button ref={opener}');
+    expect(snippets.native).toContain('<Text>{"Details <carefully>"}</Text>');
+    expect(snippets.native).toContain('setOpen(detail.open)');
+
+    const autonomous = generateSnippets(dialogContract, {}, 'Content');
+    expect(autonomous.react).not.toContain('open={open}');
+    expect(autonomous.native).not.toContain('open={open}');
+    expect(autonomous.angular).not.toContain('[open]="isOpen"');
+  });
+
   it('generates usable pagination numbers, localization templates and events without slot content', () => {
     const snippets = generateSnippets(
       paginationContract,

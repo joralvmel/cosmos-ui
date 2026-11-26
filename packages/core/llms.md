@@ -830,6 +830,90 @@ Navigates a known number of pages using buttons.
 | `Tab`, `Shift+Tab` | Moves between enabled controls. |
 | `Enter`, `Space` | Activates the focused control. |
 
+### `dialog` (`<cosm-dialog>`)
+
+Modal content with a title, actions and cancelable close requests.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | boolean | `false` | Committed visibility; supplying this prop, including false, controls state. |
+| `defaultOpen` | boolean | `false` | Initial autonomous visibility; subsequent changes do not reset state. |
+| `presentation` | 'standard' \| 'fullscreen' | `standard` | Centered standard surface or fullscreen surface. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Maximum standard width: sm 400, md 640, lg 960 pixels or logical points. |
+| `maxWidth` | number | — | Optional positive finite numeric maximum, overriding size in CSS pixels or native logical points; ignored in fullscreen. |
+| `fullWidth` | boolean | `false` | Fill available standard width up to the effective maximum. |
+| `responsiveFullscreen` | boolean | `false` | Use fullscreen when available viewport width is below 640 pixels or logical points. |
+| `movable` | boolean | `false` | Enable header dragging and an expandable movement control in standard presentation only. |
+| `moveControlsLabel` | string | `Move dialog` | Localized accessible name of the movement button and control group. |
+| `moveUpLabel` | string | `Move up` | Localized name for moving upward. |
+| `moveDownLabel` | string | `Move down` | Localized name for moving downward. |
+| `moveLeftLabel` | string | `Move left` | Localized name for moving left. |
+| `moveRightLabel` | string | `Move right` | Localized name for moving right. |
+| `moveCenterLabel` | string | `Center dialog` | Localized name for centering the dialog. |
+| `closeLabel` | string | `Close` | Non-empty localized accessible name of the built-in close button. |
+| `closeOnEscape` | boolean | `true` | Request closure on unhandled Escape on web. |
+| `closeOnAndroidBack` | boolean | `true` | Request closure on Android Back; consume Back even if the request is canceled. |
+| `closeOnBackdropPress` | boolean | `false` | Request closure when the backdrop itself is pressed. |
+| `initialFocusTarget` | DialogFocusTarget | — | Optional platform focus target used on committed opening; it must be inside the dialog. |
+| `returnFocusTarget` | DialogFocusTarget | — | Optional platform focus target used after committed closure. |
+
+**Events**
+
+| DOM | React | Angular | React Native | Detail | Description |
+| --- | --- | --- | --- | --- | --- |
+| `cosm-open-change` | `onOpenChange` | `(openChange)` | `onOpenChange` | `DialogOpenChangeDetail` | Proposes opening or closing; only closing is synchronously cancelable. (cancelable) |
+
+**Slots**
+
+| Name | Description |
+| --- | --- |
+| `title` | Required accessible title content. |
+| `description` | Optional short accessible description. |
+| `(default)` | Scrollable body content. |
+| `actions` | Consumer-supplied actions. |
+
+**CSS parts**
+
+| Name | Description |
+| --- | --- |
+| `backdrop` | Modal backdrop. |
+| `base` | Dialog surface. |
+| `header` | Title and close control area. |
+| `title` | Title container. |
+| `description` | Description container. |
+| `body` | Scrollable body. |
+| `actions` | Actions container. |
+| `close` | Close IconButton. |
+| `move-trigger` | Button that reveals or hides the movement controls. |
+| `move-controls` | Movement button group. |
+| `move-up` | Move up button. |
+| `move-down` | Move down button. |
+| `move-left` | Move left button. |
+| `move-right` | Move right button. |
+| `move-center` | Center button. |
+
+**CSS custom properties**
+
+| Name | Description |
+| --- | --- |
+| `--cosm-dialog-z-index` | Modal stacking level. |
+| `--cosm-dialog-max-width` | Standard surface maximum width. |
+| `--cosm-dialog-backdrop` | Backdrop background. |
+| `--cosm-dialog-surface` | Surface background. |
+| `--cosm-dialog-border` | Surface border. |
+| `--cosm-dialog-radius` | Surface radius. |
+| `--cosm-dialog-shadow` | Surface shadow. |
+| `--cosm-dialog-padding` | Section spacing. |
+
+**Keyboard**
+
+| Keys | Action |
+| --- | --- |
+| `Escape` | On web request close unless handled by a child or disabled. |
+| `Tab`, `Shift+Tab` | Keep keyboard focus inside the modal. |
+| `Enter`, `Space` | Activate a focused movement button. |
+| `Android Back` | On Android request close unless disabled. |
+
 
 ## Rules for AI assistants
 

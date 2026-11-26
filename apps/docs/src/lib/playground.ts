@@ -66,6 +66,34 @@ export interface PlaygroundLabels {
   iconButtonInvalid?: string;
   popoverCloseLabel?: string;
   popoverInvalid?: string;
+  dialogLong?: string;
+  dialogVeto?: string;
+  dialogAllowClose?: string;
+  dialogInvalid?: string;
+  dialogProposal?: string;
+  dialogTitle?: string;
+  dialogDescription?: string;
+  dialogAction?: string;
+  dialogSampleLabel?: string;
+  dialogSampleBasic?: string;
+  dialogSampleForm?: string;
+  dialogSampleConfirmation?: string;
+  dialogFormTitle?: string;
+  dialogFormDescription?: string;
+  dialogFormField?: string;
+  dialogFormAction?: string;
+  dialogConfirmationTitle?: string;
+  dialogConfirmationDescription?: string;
+  dialogConfirmationAction?: string;
+  dialogCancel?: string;
+  dialogMovement?: {
+    moveControlsLabel: string;
+    moveUpLabel: string;
+    moveDownLabel: string;
+    moveLeftLabel: string;
+    moveRightLabel: string;
+    moveCenterLabel: string;
+  };
   checkboxLabel?: string;
   textareaLabel?: string;
   textareaInvalid?: string;
@@ -218,6 +246,10 @@ export function initPlayground(
   }
   if (contract.name === 'popover') {
     values.closeLabel = labels.popoverCloseLabel ?? 'Close';
+  }
+  if (contract.name === 'dialog') {
+    values.closeLabel = labels.popoverCloseLabel ?? 'Close';
+    Object.assign(values, labels.dialogMovement);
   }
   if (contract.name === 'checkbox') {
     values.label = labels.checkboxLabel ?? 'Accept terms';
@@ -378,6 +410,8 @@ export function initPlayground(
     container.append(control);
   };
   for (const [name, spec] of Object.entries(contract.props)) {
+    // The sample focus targets are actual DOM nodes, not serializable reference names.
+    if (contract.name === 'dialog' && spec.type === 'reference') continue;
     if (iconToolbar && name === 'size') continue;
     const paintLabel =
       contract.name === 'icon' && name === 'stroke'
@@ -763,12 +797,24 @@ export function initPlayground(
       ] as const) {
         control.append(element('option', { value }, text));
       }
+      const stateControl = control;
+      refreshControls.push(() => {
+        stateControl.value = values[name] === undefined ? '' : String(values[name]);
+      });
     } else {
       control = element('input', { type: spec.type === 'number' ? 'number' : 'text' });
       if (values[name] !== undefined) control.value = String(values[name]);
       if (contract.name === 'icon' && name === 'strokeWidth') {
         control.min = '0';
         control.step = 'any';
+      }
+      if (contract.name === 'dialog' && name === 'maxWidth') {
+        control.min = '0';
+        control.step = 'any';
+        const widthControl = control;
+        refreshControls.push(() => {
+          widthControl.value = values[name] === undefined ? '' : String(values[name]);
+        });
       }
     }
     control.dataset.prop = name;
@@ -814,6 +860,144 @@ export function initPlayground(
   customHeight.addEventListener('input', () => {
     controller.set('size', Number(customHeight.value));
   });
+  if (contract.name === 'dialog') {
+    const sample = select(
+      labels.dialogSampleLabel ?? 'Example',
+      [
+        ['basic', labels.dialogSampleBasic ?? 'Basic'],
+        ['form', labels.dialogSampleForm ?? 'Form'],
+        ['confirmation', labels.dialogSampleConfirmation ?? 'Confirmation'],
+      ],
+      'basic'
+    );
+    sample.control.dataset.dialogSample = '';
+    const longLabel = element('label', { class: 'cosm-playground-checkbox-control' });
+    const long = element('input', { type: 'checkbox', 'data-dialog-long': '' });
+    longLabel.append(long, document.createTextNode(labels.dialogLong ?? 'Show long content'));
+    const vetoLabel = element('label', { class: 'cosm-playground-checkbox-control' });
+    const veto = element('input', { type: 'checkbox', 'data-dialog-veto': '' });
+    vetoLabel.append(veto, document.createTextNode(labels.dialogVeto ?? 'Prevent close requests'));
+    const proposal = element('output', { 'data-dialog-proposal': '', 'aria-live': 'polite' });
+    fieldset.append(sample.wrapper, longLabel, vetoLabel, proposal);
+    const opener = root.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-dialog-open]');
+    const title = target?.querySelector('[slot="title"]');
+    const description = target?.querySelector('[slot="description"]');
+    const body = target?.querySelector('[data-dialog-body]');
+    const initial = target?.querySelector<HTMLElement>('[data-dialog-initial]');
+    const action =
+      target?.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-dialog-action]');
+    const form = element('form', { id: `${id}-dialog-form`, 'data-dialog-form': '' });
+    const fieldLabel = element('label');
+    const field = element('input', { type: 'text', required: '', 'data-dialog-field': '' });
+    fieldLabel.append(document.createTextNode(labels.dialogFormField ?? 'Display name'), field);
+    form.append(fieldLabel);
+    form.hidden = true;
+    if (initial) initial.before(form);
+    const cancel = element(
+      'cosm-button',
+      {
+        type: 'button',
+        variant: 'soft',
+        tone: 'neutral',
+        slot: 'actions',
+        'data-dialog-action': '',
+        'data-dialog-cancel': '',
+      },
+      labels.dialogCancel ?? 'Cancel'
+    );
+    cancel.hidden = true;
+    action?.before(cancel);
+    const allowClose = element(
+      'cosm-button',
+      {
+        type: 'button',
+        variant: 'outline',
+        tone: 'neutral',
+        slot: 'actions',
+        'data-dialog-allow-close': '',
+      },
+      labels.dialogAllowClose ?? 'Allow close requests'
+    );
+    allowClose.hidden = true;
+    action?.before(allowClose);
+    veto.addEventListener('change', () => {
+      allowClose.hidden = !veto.checked;
+    });
+    allowClose.addEventListener('cosm-press', () => {
+      veto.checked = false;
+      allowClose.hidden = true;
+    });
+    const prepareFocus = () => {
+      if (!target) return;
+      Reflect.set(
+        target,
+        'initialFocusTarget',
+        sample.control.value === 'form' ? field : target.querySelector('[data-dialog-initial]')
+      );
+      Reflect.set(target, 'returnFocusTarget', opener);
+    };
+    const updateSample = () => {
+      const current = sample.control.value;
+      const isForm = current === 'form';
+      const isConfirmation = current === 'confirmation';
+      if (title)
+        title.textContent = isForm
+          ? (labels.dialogFormTitle ?? 'Edit details')
+          : isConfirmation
+            ? (labels.dialogConfirmationTitle ?? 'Confirm change')
+            : (labels.dialogTitle ?? 'Review details');
+      if (description)
+        description.textContent = isForm
+          ? (labels.dialogFormDescription ?? 'Enter a display name.')
+          : isConfirmation
+            ? (labels.dialogConfirmationDescription ?? 'Would you like to continue?')
+            : (labels.dialogDescription ?? 'Check the information before continuing.');
+      if (body)
+        body.textContent = long.checked
+          ? Array(24).fill(options.content).join(' ')
+          : options.content;
+      form.hidden = !isForm;
+      if (initial) initial.hidden = isForm;
+      cancel.hidden = !isForm && !isConfirmation;
+      if (action) {
+        action.textContent = isForm
+          ? (labels.dialogFormAction ?? 'Save')
+          : isConfirmation
+            ? (labels.dialogConfirmationAction ?? 'Confirm')
+            : (labels.dialogAction ?? 'Done');
+        action.type = isForm ? 'submit' : 'button';
+        if (isForm) action.setAttribute('form', form.id);
+        else action.removeAttribute('form');
+      }
+      prepareFocus();
+    };
+    prepareFocus();
+    opener?.addEventListener('cosm-press', () => {
+      if (target) Reflect.apply(Reflect.get(target, 'requestOpen'), target, []);
+    });
+    root.addEventListener('cosm-press', event => {
+      if (
+        target &&
+        (event.target === cancel || (action && event.target === action && action.type !== 'submit'))
+      ) {
+        Reflect.apply(Reflect.get(target, 'requestClose'), target, []);
+      }
+    });
+    root.addEventListener('submit', event => {
+      if (event.target !== form || !target) return;
+      event.preventDefault();
+      Reflect.apply(Reflect.get(target, 'requestClose'), target, []);
+    });
+    sample.control.addEventListener('change', updateSample);
+    long.addEventListener('change', updateSample);
+    root.addEventListener('cosm-open-change', event => {
+      if (event.target !== target) return;
+      const detail = (event as CustomEvent<{ open: boolean; reason: string }>).detail;
+      proposal.textContent = `${labels.dialogProposal ?? 'Last proposal'}: open=${detail.open} (${detail.reason})`;
+      if (!detail.open && veto.checked) event.preventDefault();
+      if (!event.defaultPrevented && values.open !== undefined) controller.set('open', detail.open);
+    });
+  }
   if (contract.name === 'text-field') fieldset.append(advanced);
   let autonomousSelection: readonly string[] = [];
   let lastProposal: readonly string[] = [];
@@ -1032,6 +1216,21 @@ export function initPlayground(
           return;
         }
       }
+      if (contract.name === 'dialog') {
+        const invalidWidth =
+          name === 'maxWidth' &&
+          value !== undefined &&
+          !(typeof value === 'number' && Number.isFinite(value) && value > 0);
+        const invalidLabel =
+          (name === 'closeLabel' ||
+            /^move(?:Controls|Up|Down|Left|Right|Center)Label$/.test(name)) &&
+          (typeof value !== 'string' || !value.trim());
+        if (invalidWidth || invalidLabel) {
+          referenceStatus.textContent =
+            labels.dialogInvalid ?? 'Use a positive maximum width and a non-empty close label.';
+          return;
+        }
+      }
       if (contract.name === 'text-field' || contract.name === 'switch') {
         const invalidSize =
           name === 'size' &&
@@ -1208,7 +1407,7 @@ export function initPlayground(
       }
       if (
         target &&
-        ((contract.name === 'popover' && name === 'defaultOpen') ||
+        (((contract.name === 'popover' || contract.name === 'dialog') && name === 'defaultOpen') ||
           (contract.name === 'listbox' &&
             (name === 'selectionMode' || name === 'defaultSelectedValues')) ||
           (contract.name === 'radio-group' && (name === 'defaultValue' || name === 'options')) ||
@@ -1230,6 +1429,16 @@ export function initPlayground(
         }
         target.replaceWith(replacement);
         target = replacement;
+        if (contract.name === 'dialog') {
+          Reflect.set(
+            target,
+            'initialFocusTarget',
+            target.querySelector<HTMLFormElement>('[data-dialog-form]')?.hidden === false
+              ? target.querySelector('[data-dialog-field]')
+              : target.querySelector('[data-dialog-initial]')
+          );
+          Reflect.set(target, 'returnFocusTarget', root.querySelector('[data-dialog-open]'));
+        }
         if (contract.name === 'listbox') {
           autonomousSelection =
             typeof values.defaultSelectedValues === 'string'
