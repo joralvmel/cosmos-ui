@@ -38,6 +38,7 @@ import '@joralvmel/cosmos-elements/button';
 import '@joralvmel/cosmos-elements/badge';
 import '@joralvmel/cosmos-elements/checkbox';
 import '@joralvmel/cosmos-elements/dialog';
+import '@joralvmel/cosmos-elements/text-field';
 import '@joralvmel/cosmos-elements/icon-button';
 import '@joralvmel/cosmos-elements/listbox';
 import '@joralvmel/cosmos-elements/popover';
@@ -355,14 +356,18 @@ describe('Playground', () => {
     sample.value = 'form';
     sample.dispatchEvent(new Event('change'));
     const form = target.querySelector<HTMLFormElement>('[data-dialog-form]');
-    const field = target.querySelector<HTMLInputElement>('[data-dialog-field]');
+    const field =
+      target.querySelector<HTMLElementTagNameMap['cosm-text-field']>('[data-dialog-field]');
     const action = target.querySelector<HTMLElementTagNameMap['cosm-button']>(
       '[data-dialog-action]:not([data-dialog-cancel])'
     );
     if (!form || !field || !action) throw new Error('Missing form controls');
+    await field.updateComplete;
     await action.updateComplete;
     expect(form.hidden).toBe(false);
     expect(field.required).toBe(true);
+    expect(field.label).toBe('Nombre visible');
+    expect(field.name).toBe('displayName');
     expect(target.initialFocusTarget).toBe(field);
     expect(target.querySelector('[slot="title"]')?.textContent).toBe('Editar datos');
     expect(action.textContent).toBe('Guardar');

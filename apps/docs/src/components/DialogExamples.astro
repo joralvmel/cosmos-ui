@@ -1,0 +1,125 @@
+---
+import Preview from './Preview.astro';
+
+interface Props {
+  section: 'variants' | 'states';
+  locale?: string;
+}
+
+const { section, locale } = Astro.props;
+const es = locale === 'es';
+const examples =
+  section === 'variants'
+    ? [
+        {
+          kind: 'standard',
+          label: es ? 'Estándar' : 'Standard',
+          description: es
+            ? 'Una superficie compacta para tareas breves.'
+            : 'A compact surface for a short task.',
+          title: es ? 'Detalles de la reserva' : 'Booking details',
+        },
+        {
+          kind: 'fullscreen',
+          label: es ? 'Pantalla completa' : 'Fullscreen',
+          description: es ? 'Más espacio para tareas extensas.' : 'More room for an extended task.',
+          title: es ? 'Revisar la reserva' : 'Review your booking',
+        },
+      ]
+    : [
+        {
+          kind: 'autonomous',
+          label: es ? 'Autónomo' : 'Autonomous',
+          description: es
+            ? 'El diálogo gestiona su apertura y cierre.'
+            : 'The dialog manages its own visibility.',
+          title: es ? 'Cambios guardados' : 'Changes saved',
+        },
+        {
+          kind: 'controlled',
+          label: es ? 'Controlado con veto' : 'Controlled with veto',
+          description: es
+            ? 'El cierre se rechaza hasta confirmar.'
+            : 'Closing is rejected until you confirm.',
+          title: es ? 'Cambios pendientes' : 'Unsaved changes',
+        },
+      ];
+---
+
+<Preview>
+  {examples.map(example => (
+    <div class="dialog-example" data-dialog-example={example.kind}>
+      <div>
+        <strong>{example.label}</strong>
+        <p>{example.description}</p>
+      </div>
+      <cosm-button variant="outline" data-example-open>
+        {es ? `Abrir: ${example.label}` : `Open: ${example.label}`}
+      </cosm-button>
+      <cosm-dialog
+        presentation={example.kind === 'fullscreen' ? 'fullscreen' : 'standard'}
+        close-label={es ? 'Cerrar diálogo' : 'Close dialog'}
+        data-example-dialog
+      >
+        <span {...{ slot: 'title' }}>{example.title}</span>
+        <p class="dialog-example-body">
+          {example.kind === 'controlled'
+            ? (es ? 'Prueba a cerrar el diálogo y después confirma para salir.' : 'Try closing the dialog, then confirm to leave.')
+            : (es ? 'El contenido y las acciones se adaptan al espacio disponible.' : 'Content and actions adapt to the available space.')}
+        </p>
+        <output data-example-status aria-live="polite"></output>
+        <cosm-button {...{ slot: 'actions' }} data-example-close>
+          {example.kind === 'controlled' ? (es ? 'Confirmar salida' : 'Confirm exit') : (es ? 'Listo' : 'Done')}
+        </cosm-button>
+      </cosm-dialog>
+    </div>
+  ))}
+</Preview>
+
+<style>
+  .dialog-example {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: var(--cosm-space-md);
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+  .dialog-example p { margin: var(--cosm-space-xs) 0 0; color: var(--cosm-fg-muted); }
+  .dialog-example .dialog-example-body { margin: 0; color: inherit; }
+  output:not(:empty) { display: block; margin-top: var(--cosm-space-md); }
+  output:empty { display: none; }
+</style>
+
+<script>
+  import '@joralvmel/cosmos-elements';
+
+  for (const example of document.querySelectorAll<HTMLElement>('[data-dialog-example]')) {
+    const dialog = example.querySelector<HTMLElementTagNameMap['cosm-dialog']>('[data-example-dialog]');
+    const opener = example.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-example-open]');
+    const close = example.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-example-close]');
+    const status = example.querySelector<HTMLOutputElement>('[data-example-status]');
+    if (!dialog || !opener || !close || !status) continue;
+
+    const controlled = example.dataset.dialogExample === 'controlled';
+    const isSpanish = document.documentElement.lang.startsWith('es');
+    let allowClose = false;
+    if (controlled) dialog.open = false;
+    opener.addEventListener('cosm-press', () => {
+      allowClose = false;
+      status.textContent = '';
+      dialog.requestOpen();
+    });
+    close.addEventListener('cosm-press', () => {
+      allowClose = true;
+      dialog.requestClose();
+    });
+    dialog.addEventListener('cosm-open-change', event => {
+      if (!event.detail.open && controlled && !allowClose) {
+        event.preventDefault();
+        status.textContent = isSpanish ? 'Cierre cancelado.' : 'Close canceled.';
+      }
+      if (controlled && !event.defaultPrevented) dialog.open = event.detail.open;
+    });
+  }
+</script>

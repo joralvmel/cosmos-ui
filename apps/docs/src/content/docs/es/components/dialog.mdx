@@ -4,6 +4,7 @@ description: Contenido modal con título, cuerpo y acciones.
 ---
 
 import ApiTable from '../../../../components/ApiTable.astro';
+import DialogExamples from '../../../../components/DialogExamples.astro';
 import EventsTable from '../../../../components/EventsTable.astro';
 import Playground from '../../../../components/Playground.astro';
 import StatusBadge from '../../../../components/StatusBadge.astro';
@@ -28,6 +29,8 @@ el ejemplo básico. Si se veta una solicitud de cierre, usa la acción dentro de
 permitir de nuevo las solicitudes de cierre.
 
 ## Variantes
+
+<DialogExamples section="variants" locale="es" />
 
 `presentation` permite elegir entre `standard` y `fullscreen`. La presentación estándar se adapta
 al contenido, con el límite del espacio disponible y de `size`: `sm` hasta 400, `md` (por defecto)
@@ -59,6 +62,8 @@ para el IconButton de cierre integrado; su X es decorativa. En nativo, `title`, 
 `actions` aceptan contenido, y `style` personaliza la superficie.
 
 ## Estados
+
+<DialogExamples section="states" locale="es" />
 
 Omite `open` para usar estado autónomo y utiliza `defaultOpen` para el valor inicial. Al
 proporcionar `open`, incluso con `false`, el propietario decide si acepta las propuestas de

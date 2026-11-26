@@ -203,6 +203,18 @@
   margin: 0;
 }
 
+.cosm-playground [data-dialog-body] {
+  margin: 0 0 var(--cosm-space-lg);
+}
+
+.cosm-playground [data-dialog-form] {
+  inline-size: min(100%, 20rem);
+}
+
+.cosm-playground [data-dialog-field] {
+  inline-size: 100%;
+}
+
 .cosm-playground-toolbar {
   display: flex;
   flex-wrap: wrap;

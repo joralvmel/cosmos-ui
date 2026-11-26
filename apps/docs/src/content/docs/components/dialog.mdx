@@ -4,6 +4,7 @@ description: Modal content with a title, body and actions.
 ---
 
 import ApiTable from '../../../components/ApiTable.astro';
+import DialogExamples from '../../../components/DialogExamples.astro';
 import EventsTable from '../../../components/EventsTable.astro';
 import Playground from '../../../components/Playground.astro';
 import StatusBadge from '../../../components/StatusBadge.astro';
@@ -27,6 +28,8 @@ veto affect the preview only; generated snippets show the basic example. If a cl
 vetoed, use the action inside the dialog to allow close requests again.
 
 ## Variants
+
+<DialogExamples section="variants" />
 
 `presentation` selects `standard` or `fullscreen`. Standard sizes to its content, constrained by
 the available space and `size`: `sm` caps at 400, `md` (the default) at 640, and `lg` at 960 CSS
@@ -55,6 +58,8 @@ the built-in close IconButton; its X is decorative. On native, `title`, `descrip
 `actions` accept content, and `style` customizes the surface.
 
 ## States
+
+<DialogExamples section="states" />
 
 Omit `open` for autonomous state and use `defaultOpen` for its initial value. Supplying `open`,
 including `false`, makes the owner responsible for accepting visibility proposals. Use

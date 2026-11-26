@@ -887,10 +887,13 @@ export function initPlayground(
     const action =
       target?.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-dialog-action]');
     const form = element('form', { id: `${id}-dialog-form`, 'data-dialog-form': '' });
-    const fieldLabel = element('label');
-    const field = element('input', { type: 'text', required: '', 'data-dialog-field': '' });
-    fieldLabel.append(document.createTextNode(labels.dialogFormField ?? 'Display name'), field);
-    form.append(fieldLabel);
+    const field = element('cosm-text-field', {
+      label: labels.dialogFormField ?? 'Display name',
+      name: 'displayName',
+      required: '',
+      'data-dialog-field': '',
+    });
+    form.append(field);
     form.hidden = true;
     if (initial) initial.before(form);
     const cancel = element(
