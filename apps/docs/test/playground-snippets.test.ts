@@ -1,5 +1,6 @@
 import {
   buttonContract,
+  dialogContract,
   generateSnippets,
   iconButtonContract,
   iconContract,
@@ -20,6 +21,42 @@ describe('composed playground snippets', () => {
     expect(playgroundSnippets(buttonContract, {}, 'Save')).toEqual(
       generateSnippets(buttonContract, {}, 'Save')
     );
+  });
+
+  describe('Dialog playground snippets', () => {
+    it('generates named, openable examples with valid platform syntax', () => {
+      for (const controlled of [undefined, false, true]) {
+        const snippets = playgroundSnippets(
+          dialogContract,
+          { open: controlled, presentation: 'fullscreen', maxWidth: 480 },
+          'Review the details.'
+        );
+        for (const platform of ['html', 'react', 'angular', 'native'] as const) {
+          const source = snippets[platform];
+          if (!source) throw new Error(`Missing ${platform} example`);
+          expect(source).toContain(
+            platform === 'native' ? 'title="Review details"' : 'slot="title"'
+          );
+          expect(source).toContain('requestOpen()');
+          expect(source).toContain('requestClose()');
+          const input =
+            platform === 'html'
+              ? (/<script type="module">([\s\S]*)<\/script>/.exec(source)?.[1] ?? '')
+              : source;
+          const result = ts.transpileModule(input, {
+            fileName: platform === 'react' || platform === 'native' ? 'example.tsx' : 'example.ts',
+            compilerOptions: {
+              target: ts.ScriptTarget.ESNext,
+              module: ts.ModuleKind.ESNext,
+              jsx: ts.JsxEmit.ReactJSX,
+              experimentalDecorators: true,
+            },
+            reportDiagnostics: true,
+          });
+          expect(result.diagnostics, platform).toEqual([]);
+        }
+      }
+    });
   });
 
   it('keeps icon imports, default-slot children, events and platform-specific props', () => {

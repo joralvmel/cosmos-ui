@@ -284,6 +284,17 @@ describe('IconButton (native)', () => {
     expect(button?.getAttribute('aria-label')).toBe('Favorite');
   });
 
+  it('exposes expanded state on RN Web for composed controls', async () => {
+    runtime.nativeWeb = true;
+    await render(<IconButton label="Move" accessibilityState={{ expanded: false }} />);
+    const button = container?.querySelector<HTMLElement>('[role="button"]');
+    expect(vi.mocked(Pressable).mock.lastCall?.[0]['aria-expanded']).toBe(false);
+    expect(button?.getAttribute('aria-expanded')).toBe('false');
+    await rerender(<IconButton label="Move" accessibilityState={{ expanded: true }} />);
+    expect(vi.mocked(Pressable).mock.lastCall?.[0]['aria-expanded']).toBe(true);
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+  });
+
   it('keeps RN Web controlled false unchanged until its owner accepts, and omits pressed in action mode', async () => {
     runtime.nativeWeb = true;
     const onPressedChange = vi.fn();

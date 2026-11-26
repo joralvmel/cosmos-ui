@@ -589,6 +589,58 @@ export class ExampleComponent {
   }
 }
 ```
+### `CosmDialogComponent` (`<cosm-dialog>`)
+
+Modal content with a title, actions and cancelable close requests.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | boolean | `false` | Committed visibility; supplying this prop, including false, controls state. |
+| `defaultOpen` | boolean | `false` | Initial autonomous visibility; subsequent changes do not reset state. |
+| `presentation` | 'standard' \| 'fullscreen' | `standard` | Centered standard surface or fullscreen surface. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Maximum standard width: sm 400, md 640, lg 960 pixels or logical points. |
+| `maxWidth` | number | — | Optional positive finite numeric maximum, overriding size in CSS pixels or native logical points; ignored in fullscreen. |
+| `fullWidth` | boolean | `false` | Fill available standard width up to the effective maximum. |
+| `responsiveFullscreen` | boolean | `false` | Use fullscreen when available viewport width is below 640 pixels or logical points. |
+| `movable` | boolean | `false` | Enable header dragging and an expandable movement control in standard presentation only. |
+| `moveControlsLabel` | string | `Move dialog` | Localized accessible name of the movement button and control group. |
+| `moveUpLabel` | string | `Move up` | Localized name for moving upward. |
+| `moveDownLabel` | string | `Move down` | Localized name for moving downward. |
+| `moveLeftLabel` | string | `Move left` | Localized name for moving left. |
+| `moveRightLabel` | string | `Move right` | Localized name for moving right. |
+| `moveCenterLabel` | string | `Center dialog` | Localized name for centering the dialog. |
+| `closeLabel` | string | `Close` | Non-empty localized accessible name of the built-in close button. |
+| `closeOnEscape` | boolean | `true` | Request closure on unhandled Escape on web. |
+| `closeOnBackdropPress` | boolean | `false` | Request closure when the backdrop itself is pressed. |
+| `initialFocusTarget` | DialogFocusTarget | — | Optional platform focus target used on committed opening; it must be inside the dialog. |
+| `returnFocusTarget` | DialogFocusTarget | — | Optional platform focus target used after committed closure. |
+
+Events: `(openChange)` → `DialogOpenChangeDetail`.
+
+```ts
+import { Component, ViewChild } from '@angular/core';
+import { CosmButtonComponent, CosmDialogComponent } from '@joralvmel/cosmos-angular';
+import type { DialogOpenChangeDetail } from '@joralvmel/cosmos-core';
+
+@Component({
+  selector: 'app-example',
+  imports: [CosmButtonComponent, CosmDialogComponent],
+  template: `
+    <cosm-button type="button" (press)="dialog?.requestOpen()">Open dialog</cosm-button>
+    <cosm-dialog (openChange)="onOpenChange($event)">
+      <h2 slot="title">Review details</h2>
+      <p>Dialog</p>
+      <cosm-button slot="actions" type="button" (press)="dialog?.requestClose()">Done</cosm-button>
+    </cosm-dialog>
+  `,
+})
+export class ExampleComponent {
+  @ViewChild(CosmDialogComponent) dialog?: CosmDialogComponent;
+  onOpenChange(event: CustomEvent<DialogOpenChangeDetail>) {
+    console.log(event.detail);
+  }
+}
+```
 
 ## Themes
 

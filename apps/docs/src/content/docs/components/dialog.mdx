@@ -1,0 +1,96 @@
+---
+title: Dialog
+description: Modal content with a title, body and actions.
+---
+
+import ApiTable from '../../../components/ApiTable.astro';
+import DialogExamples from '../../../components/DialogExamples.astro';
+import EventsTable from '../../../components/EventsTable.astro';
+import Playground from '../../../components/Playground.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+
+<StatusBadge name="dialog" />
+
+Dialog presents content above an inert background. Use it when a task needs the user's attention
+before they return to the rest of the interface. Supply a meaningful title, body and actions;
+forms and confirmations are composed as content rather than separate dialog variants.
+
+## Playground
+
+<Playground name="dialog" content="Review the details before continuing." />
+
+Use the open button to request opening. Choose an autonomous or controlled `open` value, and try
+the basic, form and confirmation examples, long-content and close-veto controls before opening.
+In controlled mode the preview owner accepts uncanceled proposals. Changing `defaultOpen`
+remounts the preview. Initial focus goes to the form field in the form example and to the body
+button otherwise; return focus goes to the opening button. Example selection, long content and
+veto affect the preview only; generated snippets show the basic example. If a close request is
+vetoed, use the action inside the dialog to allow close requests again.
+
+## Variants
+
+<DialogExamples section="variants" />
+
+`presentation` selects `standard` or `fullscreen`. Standard sizes to its content, constrained by
+the available space and `size`: `sm` caps at 400, `md` (the default) at 640, and `lg` at 960 CSS
+pixels or native logical points. An explicitly supplied positive `maxWidth` overrides `size`;
+clear it in the Playground to use the named size again. `fullWidth` fills the available width up
+to that maximum.
+
+Fullscreen uses the available viewport or native safe area. `responsiveFullscreen` switches to
+fullscreen below 640 CSS pixels or logical points; explicit fullscreen takes precedence. Long
+content scrolls in the body; the title and actions remain visible when space permits.
+
+With `movable`, drag a standard dialog by non-interactive header space, or open the compact
+movement controls to move or center it without dragging. Movement stays within the available
+viewport or safe area. Fullscreen is fixed; reopening, entering fullscreen or disabling movement
+centers the dialog. Localize the movement group and button labels, as well as `closeLabel`.
+
+On each axis, reachable offsets are multiples of 16 CSS pixels or logical points from center,
+plus the exact bounds. Dragging previews free movement; release snaps to the nearest reachable
+offset, choosing the lower offset on a tie. Direction buttons advance to the next reachable
+offset, including a boundary; the center button selects zero clamped to the bounds. Changes to
+the viewport, safe area or surface re-snap the position. Canceling a drag restores its starting
+position; on web, Escape during a drag cancels the drag without closing the dialog.
+
+The web surface exposes parts and CSS custom properties listed below. Localize `closeLabel` for
+the built-in close IconButton; its X is decorative. On native, `title`, `description` and
+`actions` accept content, and `style` customizes the surface.
+
+## States
+
+<DialogExamples section="states" />
+
+Omit `open` for autonomous state and use `defaultOpen` for its initial value. Supplying `open`,
+including `false`, makes the owner responsible for accepting visibility proposals. Use
+`requestOpen()` and `requestClose()` to request changes from an application action; they do not
+override a controlled owner.
+
+Closing can be vetoed synchronously with `preventDefault()`. A rejected close leaves the dialog
+open and does not restore focus. Close requests distinguish the close button, Escape, Android
+Back, backdrop and application actions. Escape and Android Back are enabled by default; backdrop
+presses do not dismiss by default. On web, cancel the original event or call
+`event.detail.preventDefault()`; native receives the detail directly.
+
+## Accessibility
+
+- Provide a descriptive title and use the optional description for short explanatory text.
+  Supply accessible names for interactive content and localize the built-in close and movement
+  controls. The movement buttons provide a non-drag alternative.
+- On web, focus enters the modal and Tab and Shift+Tab remain inside it. On closure, focus returns
+  to the invoking control or an available logical fallback. Initial and return focus targets can
+  be customized.
+- On native, pass a usable `returnFocusTarget` to restore accessibility focus. React Native does
+  not expose the current invoker for the dialog to discover automatically. Native focus and
+  accessibility use platform mechanisms; DOM keyboard behavior is not assumed.
+  Native hardware-keyboard Escape and iOS swipe dismissal are not supported. Guaranteed
+  coordination of nested dialogs is outside the component's scope.
+- See the [WAI-ARIA modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## API
+
+<ApiTable name="dialog" />
+
+## Events by platform
+
+<EventsTable name="dialog" />

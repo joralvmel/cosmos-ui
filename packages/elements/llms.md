@@ -504,6 +504,52 @@ Events: `cosm-change` → `PaginationChangeDetail`.
   element.addEventListener('cosm-change', event => console.log(event.detail));
 </script>
 ```
+### `<cosm-dialog>`
+
+Modal content with a title, actions and cancelable close requests.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | boolean | `false` | Committed visibility; supplying this prop, including false, controls state. |
+| `defaultOpen` (`default-open`) | boolean | `false` | Initial autonomous visibility; subsequent changes do not reset state. |
+| `presentation` | 'standard' \| 'fullscreen' | `standard` | Centered standard surface or fullscreen surface. |
+| `size` | 'sm' \| 'md' \| 'lg' | `md` | Maximum standard width: sm 400, md 640, lg 960 pixels or logical points. |
+| `maxWidth` (`max-width`) | number | — | Optional positive finite numeric maximum, overriding size in CSS pixels or native logical points; ignored in fullscreen. |
+| `fullWidth` (`full-width`) | boolean | `false` | Fill available standard width up to the effective maximum. |
+| `responsiveFullscreen` (`responsive-fullscreen`) | boolean | `false` | Use fullscreen when available viewport width is below 640 pixels or logical points. |
+| `movable` | boolean | `false` | Enable header dragging and an expandable movement control in standard presentation only. |
+| `moveControlsLabel` (`move-controls-label`) | string | `Move dialog` | Localized accessible name of the movement button and control group. |
+| `moveUpLabel` (`move-up-label`) | string | `Move up` | Localized name for moving upward. |
+| `moveDownLabel` (`move-down-label`) | string | `Move down` | Localized name for moving downward. |
+| `moveLeftLabel` (`move-left-label`) | string | `Move left` | Localized name for moving left. |
+| `moveRightLabel` (`move-right-label`) | string | `Move right` | Localized name for moving right. |
+| `moveCenterLabel` (`move-center-label`) | string | `Center dialog` | Localized name for centering the dialog. |
+| `closeLabel` (`close-label`) | string | `Close` | Non-empty localized accessible name of the built-in close button. |
+| `closeOnEscape` (`close-on-escape`) | boolean | `true` | Request closure on unhandled Escape on web. |
+| `closeOnBackdropPress` (`close-on-backdrop-press`) | boolean | `false` | Request closure when the backdrop itself is pressed. |
+| `initialFocusTarget` (`initial-focus-target`) | DialogFocusTarget | — | Optional platform focus target used on committed opening; it must be inside the dialog. |
+| `returnFocusTarget` (`return-focus-target`) | DialogFocusTarget | — | Optional platform focus target used after committed closure. |
+
+Events: `cosm-open-change` → `DialogOpenChangeDetail`.
+
+```html
+<cosm-button type="button" id="open-dialog">Open dialog</cosm-button>
+<cosm-dialog>
+  <h2 slot="title">Review details</h2>
+  <p>Dialog</p>
+  <cosm-button slot="actions" type="button" id="done">Done</cosm-button>
+</cosm-dialog>
+<script type="module">
+  import '@joralvmel/cosmos-elements/dialog';
+  import '@joralvmel/cosmos-elements/button';
+  const dialog = document.querySelector('cosm-dialog');
+  document.querySelector('#open-dialog').addEventListener('cosm-press', () => dialog.requestOpen());
+  document.querySelector('#done').addEventListener('cosm-press', () => dialog.requestClose());
+  dialog.addEventListener('cosm-open-change', event => {
+    console.log(event.detail);
+  });
+</script>
+```
 
 ## Themes
 

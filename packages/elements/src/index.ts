@@ -17,6 +17,7 @@ export {
 } from './components/button/cosm-button.js';
 export { CosmCalendar } from './components/calendar/cosm-calendar.js';
 export { CosmCheckbox } from './components/checkbox/cosm-checkbox.js';
+export { CosmDialog } from './components/dialog/cosm-dialog.js';
 export { CosmIcon, type CosmIconSize } from './components/icon/cosm-icon.js';
 export { CosmIconButton } from './components/icon-button/cosm-icon-button.js';
 export {

@@ -10,19 +10,42 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 type AnyProps = Record<string, unknown> & { children?: ReactNode };
 
 let colorScheme: 'light' | 'dark' | null = 'light';
+let reducedMotion = false;
+let windowSize = { width: 320, height: 640 };
+const layoutOverrides = new Map<string, { x: number; y: number; width: number; height: number }>();
+const responderHandlers = new Map<
+  string,
+  Record<string, (event: unknown, gesture: GestureState) => unknown>
+>();
 export const __setColorScheme = (value: 'light' | 'dark' | null) => {
   colorScheme = value;
+};
+export const __setReducedMotion = (value: boolean) => {
+  reducedMotion = value;
 };
 export const useColorScheme = () => colorScheme;
 export const Platform = { OS: 'web' as string };
 export const __setPlatformOS = (value: string) => {
   Platform.OS = value;
 };
+export const __setWindowDimensions = (value?: typeof windowSize) => {
+  windowSize = value ?? { width: 320, height: 640 };
+};
+export const __setLayoutForTest = (
+  testID: string,
+  layout?: { x: number; y: number; width: number; height: number }
+) => {
+  if (layout) layoutOverrides.set(testID, layout);
+  else layoutOverrides.delete(testID);
+};
+export const __resetLayouts = () => layoutOverrides.clear();
 export const processColor = (value: string) => value;
 export const unstable_createElement = createElement;
 const focusNodes = new Map<number, HTMLElement>();
@@ -32,7 +55,54 @@ export const findNodeHandle = (node: HTMLElement) => {
   return tag;
 };
 export const I18nManager = { isRTL: false };
-export const useWindowDimensions = () => ({ width: 320, height: 640, scale: 1, fontScale: 1 });
+export const useWindowDimensions = () => ({
+  ...windowSize,
+  scale: 1,
+  fontScale: 1,
+});
+
+interface GestureState {
+  dx: number;
+  dy: number;
+}
+
+interface PanResponderConfig {
+  onStartShouldSetPanResponder?: (event: unknown, gesture: GestureState) => boolean;
+  onMoveShouldSetPanResponder?: (event: unknown, gesture: GestureState) => boolean;
+  onPanResponderGrant?: (event: unknown, gesture: GestureState) => void;
+  onPanResponderMove?: (event: unknown, gesture: GestureState) => void;
+  onPanResponderRelease?: (event: unknown, gesture: GestureState) => void;
+  onPanResponderTerminate?: (event: unknown, gesture: GestureState) => void;
+  onPanResponderTerminationRequest?: (event: unknown, gesture: GestureState) => boolean;
+}
+
+export const PanResponder = {
+  create: (config: PanResponderConfig) => ({
+    panHandlers: {
+      onStartShouldSetResponder: (event: unknown, gesture: GestureState) =>
+        config.onStartShouldSetPanResponder?.(event, gesture) ?? false,
+      onMoveShouldSetResponder: (event: unknown, gesture: GestureState) =>
+        config.onMoveShouldSetPanResponder?.(event, gesture) ?? false,
+      onResponderGrant: (event: unknown, gesture: GestureState) =>
+        config.onPanResponderGrant?.(event, gesture),
+      onResponderMove: (event: unknown, gesture: GestureState) =>
+        config.onPanResponderMove?.(event, gesture),
+      onResponderRelease: (event: unknown, gesture: GestureState) =>
+        config.onPanResponderRelease?.(event, gesture),
+      onResponderTerminate: (event: unknown, gesture: GestureState) =>
+        config.onPanResponderTerminate?.(event, gesture),
+      onResponderTerminationRequest: (event: unknown, gesture: GestureState) =>
+        config.onPanResponderTerminationRequest?.(event, gesture) ?? true,
+    },
+  }),
+};
+
+export const __dispatchPanResponder = (
+  testID: string,
+  phase: string,
+  gesture: GestureState = { dx: 0, dy: 0 }
+) => responderHandlers.get(testID)?.[phase]?.({ nativeEvent: {} }, gesture);
+export const __resetPanResponder = () => responderHandlers.clear();
 const backPressListeners = new Set<() => boolean>();
 export const BackHandler = {
   addEventListener: (_eventName: string, listener: () => boolean) => {
@@ -43,12 +113,18 @@ export const BackHandler = {
   __reset: () => backPressListeners.clear(),
 };
 export const __accessibilityFocusCalls: number[] = [];
+export const __accessibilityFocusedNodes: HTMLElement[] = [];
 export const __accessibilityAnnouncements: string[] = [];
 export const AccessibilityInfo = {
+  isReduceMotionEnabled: () => Promise.resolve(reducedMotion),
+  addEventListener: (_eventName: string, _listener: (value: boolean) => void) => ({
+    remove: () => {},
+  }),
   setAccessibilityFocus: (tag: number) => {
     __accessibilityFocusCalls.push(tag);
     const node = focusNodes.get(tag);
     if (node?.isConnected) {
+      __accessibilityFocusedNodes.push(node);
       (node.querySelector<HTMLElement>('button, input, [tabindex]') ?? node).focus();
     }
     return Promise.resolve();
@@ -56,6 +132,10 @@ export const AccessibilityInfo = {
   announceForAccessibility: (announcement: string) => {
     __accessibilityAnnouncements.push(announcement);
   },
+};
+const modalCloseHandlers = new Set<() => void>();
+export const __dispatchModalRequestClose = () => {
+  [...modalCloseHandlers].at(-1)?.();
 };
 
 const flatten = (style: unknown, state = { pressed: false }): Record<string, unknown> => {
@@ -101,8 +181,14 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
         }}
         onPointerLeave={props.onHoverOut as PointerEventHandler<HTMLButtonElement>}
         id={(props.id ?? props.nativeID) as string}
-        role={(props.role as string) ?? (props.accessibilityRole as string)}
-        tabIndex={props.tabIndex as number}
+        role={
+          props.accessibilityRole === 'none' || props.accessible === false
+            ? undefined
+            : ((props.role as string) ?? (props.accessibilityRole as string) ?? 'button')
+        }
+        tabIndex={
+          (props.tabIndex as number | undefined) ?? (props.accessible === false ? -1 : undefined)
+        }
         aria-selected={
           props['aria-selected'] === undefined
             ? Boolean((accessibilityState as { selected?: boolean })?.selected) || undefined
@@ -113,13 +199,17 @@ export const Pressable = forwardRef<HTMLButtonElement, AnyProps>(
         data-testid={props.testID as string}
         data-role={props.accessibilityRole as string}
         aria-label={props.accessibilityLabel as string}
+        aria-hidden={props['aria-hidden'] ? 'true' : undefined}
         aria-checked={ariaChecked(
           props['aria-checked'] ?? (accessibilityState as { checked?: boolean | 'mixed' })?.checked
         )}
         aria-required={props['aria-required'] ? 'true' : undefined}
         aria-invalid={props['aria-invalid'] ? 'true' : undefined}
         aria-description={props.accessibilityHint as string}
-        aria-expanded={(accessibilityState as { expanded?: boolean })?.expanded ? 'true' : 'false'}
+        aria-expanded={
+          (props['aria-expanded'] as boolean | undefined) ??
+          (accessibilityState as { expanded?: boolean })?.expanded
+        }
         aria-busy={(accessibilityState as { busy?: boolean })?.busy ? 'true' : undefined}
         aria-disabled={
           props['aria-disabled']
@@ -158,11 +248,38 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
   const state = props.accessibilityState as { disabled?: boolean; busy?: boolean } | undefined;
   const identifier = props.testID;
   const rect =
-    flatten(props.style).flex === 1
-      ? { x: 0, y: 0, width: 320, height: 640 }
+    (typeof identifier === 'string' ? layoutOverrides.get(identifier) : undefined) ??
+    (flatten(props.style).flex === 1
+      ? { x: 0, y: 0, width: windowSize.width, height: windowSize.height }
       : identifier === 'panel'
         ? { x: 0, y: 50, width: 100, height: 80 }
-        : { x: 0, y: 0, width: 100, height: 44 };
+        : { x: 0, y: 0, width: 100, height: 44 });
+  const isDialogLayoutTarget =
+    props.accessibilityRole === 'dialog' ||
+    props.role === 'dialog' ||
+    (typeof props.nativeID === 'string' && props.nativeID.endsWith('-surface')) ||
+    identifier === 'panel' ||
+    (typeof identifier === 'string' && identifier.endsWith('-viewport'));
+  if (typeof identifier === 'string') {
+    const handlers = Object.fromEntries(
+      [
+        'onStartShouldSetResponder',
+        'onMoveShouldSetResponder',
+        'onResponderGrant',
+        'onResponderMove',
+        'onResponderRelease',
+        'onResponderTerminate',
+        'onResponderTerminationRequest',
+      ]
+        .map(name => [name, props[name]])
+        .filter(
+          (entry): entry is [string, (event: unknown, gesture: GestureState) => unknown] =>
+            typeof entry[1] === 'function'
+        )
+    );
+    if (Object.keys(handlers).length) responderHandlers.set(identifier, handlers);
+    else responderHandlers.delete(identifier);
+  }
   useImperativeHandle(ref, () =>
     Object.assign(node.current as HTMLDivElement, {
       measureInWindow: (callback: (x: number, y: number, width: number, height: number) => void) =>
@@ -170,26 +287,27 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
     })
   );
   useEffect(() => {
-    if (props.testID === 'panel' && typeof props.onLayout === 'function') {
-      (props.onLayout as (event: unknown) => void)({
-        nativeEvent: { layout: { width: 100, height: 80 } },
-      });
+    if (isDialogLayoutTarget && typeof props.onLayout === 'function') {
+      (props.onLayout as (event: unknown) => void)({ nativeEvent: { layout: rect } });
     }
-  }, [props.testID, props.onLayout]);
+  }, [isDialogLayoutTarget, props.onLayout, rect]);
   return createElement(
     'div',
     {
       ref: node,
       tabIndex: props.tabIndex,
+      id: props.nativeID,
       'data-testid': props.testID,
       'data-role': props.accessibilityRole as string,
       role: (props.role as string) ?? (props.accessibilityRole as string),
       'aria-label': props.accessibilityLabel as string,
       'aria-labelledby': props['aria-labelledby'] as string,
+      'aria-describedby': props['aria-describedby'] as string,
+      'aria-modal': props['aria-modal'] ? 'true' : undefined,
+      'data-accessibility-modal': props.accessibilityViewIsModal,
       'aria-readonly': props['aria-readonly'] ? 'true' : undefined,
       'aria-required': props['aria-required'] ? 'true' : undefined,
       'aria-invalid': props['aria-invalid'] ? 'true' : undefined,
-      'aria-describedby': props['aria-describedby'] as string,
       'aria-disabled': props['aria-disabled'] ? 'true' : state?.disabled ? 'true' : undefined,
       'data-popover-host': flatten(props.style).flex === 1 ? 'true' : undefined,
       'aria-busy': state?.busy ? 'true' : undefined,
@@ -214,6 +332,55 @@ export const View = forwardRef<HTMLDivElement, AnyProps>((props, ref) => {
 });
 
 export const ScrollView = View;
+export const SafeAreaView = View;
+
+export function Modal(props: AnyProps) {
+  const visible = Boolean(props.visible);
+  const onRequestClose = props.onRequestClose as (() => void) | undefined;
+  const onShow = props.onShow as (() => void) | undefined;
+  const [portal, setPortal] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!visible) return;
+    const host = document.createElement('div');
+    host.dataset.nativeModalPortal = 'true';
+    document.body.append(host);
+    setPortal(host);
+    if (onRequestClose) modalCloseHandlers.add(onRequestClose);
+    const requestEscapeClose = (event: KeyboardEvent) => {
+      if (Platform.OS === 'web' && event.key === 'Escape') {
+        event.stopPropagation();
+        onRequestClose?.();
+      }
+    };
+    document.addEventListener('keyup', requestEscapeClose);
+    return () => {
+      document.removeEventListener('keyup', requestEscapeClose);
+      if (onRequestClose) modalCloseHandlers.delete(onRequestClose);
+      setPortal(null);
+      host.remove();
+    };
+  }, [visible, onRequestClose]);
+  useEffect(() => {
+    if (visible && portal) onShow?.();
+  }, [onShow, portal, visible]);
+  if (!visible || !portal) return null;
+  return createPortal(
+    createElement(
+      'div',
+      {
+        'data-modal': 'true',
+        'data-testid': props.testID,
+        'data-animation-type': props.animationType,
+        role: Platform.OS === 'web' ? 'dialog' : undefined,
+        'aria-modal': Platform.OS === 'web' ? 'true' : undefined,
+        'aria-labelledby': props['aria-labelledby'],
+        'aria-describedby': props['aria-describedby'],
+      },
+      props.children as ReactNode
+    ),
+    portal
+  );
+}
 
 export const TextInput = forwardRef<HTMLInputElement, AnyProps>((props, ref) => {
   const state = props.accessibilityState as { disabled?: boolean } | undefined;
@@ -338,4 +505,9 @@ export function Svg({ children, accessibilityLabel, accessibilityRole, ...props 
   );
 }
 
-export const StyleSheet = { create: <T,>(styles: T) => styles, flatten };
+export const StyleSheet = {
+  create: <T,>(styles: T) => styles,
+  flatten,
+  hairlineWidth: 1,
+  absoluteFill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+};

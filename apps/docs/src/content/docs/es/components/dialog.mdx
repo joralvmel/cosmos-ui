@@ -1,0 +1,101 @@
+---
+title: Dialog
+description: Contenido modal con título, cuerpo y acciones.
+---
+
+import ApiTable from '../../../../components/ApiTable.astro';
+import DialogExamples from '../../../../components/DialogExamples.astro';
+import EventsTable from '../../../../components/EventsTable.astro';
+import Playground from '../../../../components/Playground.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+
+<StatusBadge name="dialog" />
+
+Dialog presenta contenido sobre un fondo inerte. Úsalo cuando una tarea necesite la atención de
+la persona antes de volver al resto de la interfaz. Proporciona un título significativo, cuerpo y
+acciones; los formularios y las confirmaciones se componen como contenido, no como variantes.
+
+## Playground
+
+<Playground name="dialog" content="Revisa los detalles antes de continuar." />
+
+Usa el botón para solicitar la apertura. Elige un valor de `open` autónomo o controlado y prueba
+los ejemplos básico, formulario y confirmación, así como el contenido largo y el veto, antes de
+abrir. En modo controlado, el propietario de la vista previa acepta las propuestas no canceladas.
+Al cambiar `defaultOpen`, la vista se vuelve a montar. El foco inicial va al campo del formulario
+en ese ejemplo y al botón del cuerpo en los demás; vuelve al botón de apertura. La selección de
+ejemplo, el contenido largo y el veto solo afectan a la vista previa; el código generado muestra
+el ejemplo básico. Si se veta una solicitud de cierre, usa la acción dentro del diálogo para
+permitir de nuevo las solicitudes de cierre.
+
+## Variantes
+
+<DialogExamples section="variants" locale="es" />
+
+`presentation` permite elegir entre `standard` y `fullscreen`. La presentación estándar se adapta
+al contenido, con el límite del espacio disponible y de `size`: `sm` hasta 400, `md` (por defecto)
+hasta 640 y `lg` hasta 960 píxeles CSS o unidades lógicas nativas. Un `maxWidth` positivo
+proporcionado explícitamente prevalece sobre `size`; borra su valor en el Playground para volver al
+tamaño nominal. `fullWidth` ocupa la anchura disponible hasta ese máximo.
+
+La presentación a pantalla completa ocupa la ventana disponible o el área segura nativa.
+`responsiveFullscreen` cambia a pantalla completa por debajo de 640 píxeles CSS o unidades
+lógicas; la pantalla completa explícita tiene prioridad. El cuerpo largo se desplaza; el título y
+las acciones permanecen visibles cuando el espacio lo permite.
+
+Con `movable`, arrastra un diálogo estándar desde el espacio no interactivo de la cabecera o abre
+los controles compactos de movimiento para desplazarlo o centrarlo sin arrastrar. El movimiento
+queda dentro de la ventana disponible o del área segura. En pantalla completa no se mueve; al
+volver a abrir, entrar en pantalla completa o desactivar el movimiento se centra. Traduce las
+etiquetas del grupo y de sus botones, además de `closeLabel`.
+
+En cada eje, las posiciones alcanzables son múltiplos de 16 píxeles CSS o unidades lógicas desde
+el centro, además de los límites exactos. Durante el arrastre el movimiento es libre; al soltar,
+la posición se ajusta al valor alcanzable más cercano y, en caso de empate, al menor. Los botones
+de dirección avanzan al siguiente valor alcanzable, incluidos los límites; el botón de centrado
+elige cero limitado a los extremos. Al cambiar la ventana, el área segura o la superficie se
+vuelve a ajustar la posición. Cancelar un arrastre restaura la posición inicial; en web, Escape
+durante el arrastre lo cancela sin cerrar el diálogo.
+
+La superficie web ofrece las partes y propiedades CSS indicadas más abajo. Traduce `closeLabel`
+para el IconButton de cierre integrado; su X es decorativa. En nativo, `title`, `description` y
+`actions` aceptan contenido, y `style` personaliza la superficie.
+
+## Estados
+
+<DialogExamples section="states" locale="es" />
+
+Omite `open` para usar estado autónomo y utiliza `defaultOpen` para el valor inicial. Al
+proporcionar `open`, incluso con `false`, el propietario decide si acepta las propuestas de
+visibilidad. Usa `requestOpen()` y `requestClose()` para solicitar cambios desde una acción de la
+aplicación; no sustituyen la decisión del propietario en modo controlado.
+
+El cierre puede cancelarse de forma síncrona con `preventDefault()`. Si se rechaza, el diálogo
+permanece abierto y no se restaura el foco. Las solicitudes distinguen el botón de cierre, Escape,
+Atrás en Android, el fondo y las acciones de la aplicación. Escape y Atrás en Android están
+habilitados por defecto; pulsar el fondo no cierra el diálogo por defecto. En web, cancela el
+evento original o llama a `event.detail.preventDefault()`; en nativo se recibe el detalle
+directamente.
+
+## Accesibilidad
+
+- Proporciona un título descriptivo y usa la descripción opcional para texto explicativo breve.
+  Pon nombres accesibles a los controles y traduce los controles integrados de cierre y
+  movimiento. Los botones de movimiento ofrecen una alternativa sin arrastre.
+- En web, el foco entra en el diálogo y Tab y Shift+Tab permanecen dentro. Al cerrar, vuelve al
+  control que lo abrió o a una alternativa lógica disponible. Se pueden personalizar los destinos
+  del foco inicial y de retorno.
+- En nativo, proporciona un `returnFocusTarget` válido para restaurar el foco de accesibilidad.
+  React Native no expone el control que abrió el diálogo para descubrirlo automáticamente. Se usan
+  los mecanismos de foco y accesibilidad de cada plataforma; no se presupone el comportamiento de
+  teclado del DOM. No se admiten Escape en teclados físicos nativos ni el cierre
+  por deslizamiento en iOS. La coordinación garantizada de diálogos anidados queda fuera del alcance.
+- Consulta el [patrón de diálogo modal de WAI-ARIA](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+## API
+
+<ApiTable name="dialog" />
+
+## Eventos por plataforma
+
+<EventsTable name="dialog" />

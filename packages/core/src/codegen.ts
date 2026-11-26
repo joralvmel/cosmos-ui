@@ -304,6 +304,160 @@ function example(importLine: string, element: string[], body: string[] = []) {
   ].join('\n');
 }
 
+function dialogExample(
+  contract: ComponentContract,
+  values: ControlValues,
+  content: string,
+  target: SnippetTarget
+) {
+  const props = activeProps(contract, values, platformOf[target]).filter(
+    prop => prop.name !== 'open'
+  );
+  if (props.some(({ spec }) => spec.type === 'reference')) {
+    throw new Error('Dialog focus targets must be assigned as platform-specific references.');
+  }
+  const controlled = typeof values.open === 'boolean';
+  const initialOpen = values.open === true;
+  const body = content || 'Review the details before continuing.';
+
+  if (target === 'html') {
+    const attributes = props
+      .filter(({ spec, value }) => spec.type !== 'reference' && value !== false)
+      .map(({ name, value }) =>
+        value === true
+          ? toAttribute(name)
+          : `${toAttribute(name)}="${escapeAttribute(String(value))}"`
+      );
+    const properties = props.filter(
+      ({ spec, value }) => spec.type === 'reference' || value === false
+    );
+    return [
+      '<cosm-button type="button" id="open-dialog">Open dialog</cosm-button>',
+      `<cosm-dialog${attributes.length ? ` ${attributes.join(' ')}` : ''}>`,
+      '  <h2 slot="title">Review details</h2>',
+      `  <p>${escapeText(body)}</p>`,
+      '  <cosm-button slot="actions" type="button" id="done">Done</cosm-button>',
+      '</cosm-dialog>',
+      '<script type="module">',
+      "  import '@joralvmel/cosmos-elements/dialog';",
+      "  import '@joralvmel/cosmos-elements/button';",
+      ...referenceImports(properties, '  ', false),
+      "  const dialog = document.querySelector('cosm-dialog');",
+      ...properties.map(
+        ({ name, spec, value }) =>
+          `  dialog.${name} = ${spec.type === 'reference' ? referenceBinding(String(value)) : 'false'};`
+      ),
+      ...(controlled ? [`  dialog.open = ${initialOpen};`] : []),
+      "  document.querySelector('#open-dialog').addEventListener('cosm-press', () => dialog.requestOpen());",
+      "  document.querySelector('#done').addEventListener('cosm-press', () => dialog.requestClose());",
+      "  dialog.addEventListener('cosm-open-change', event => {",
+      ...(controlled ? ['    if (!event.defaultPrevented) dialog.open = event.detail.open;'] : []),
+      '    console.log(event.detail);',
+      '  });',
+      '</script>',
+    ].join('\n');
+  }
+
+  if (target === 'angular') {
+    const attributes = props.map(({ name, spec, value }) =>
+      spec.type === 'reference'
+        ? `[${name}]="${referenceBinding(String(value))}"`
+        : spec.type === 'boolean' && value === false
+          ? `[${name}]="false"`
+          : value === true
+            ? name
+            : typeof value === 'number'
+              ? `[${name}]="${value}"`
+              : `${name}="${escapeAttribute(String(value))}"`
+    );
+    return [
+      "import { Component, ViewChild } from '@angular/core';",
+      "import { CosmButtonComponent, CosmDialogComponent } from '@joralvmel/cosmos-angular';",
+      "import type { DialogOpenChangeDetail } from '@joralvmel/cosmos-core';",
+      ...referenceImports(props),
+      '',
+      '@Component({',
+      "  selector: 'app-example',",
+      '  imports: [CosmButtonComponent, CosmDialogComponent],',
+      '  template: `',
+      '    <cosm-button type="button" (press)="dialog?.requestOpen()">Open dialog</cosm-button>',
+      `    <cosm-dialog${attributes.length ? ` ${attributes.join(' ')}` : ''}${controlled ? ' [open]="isOpen"' : ''} (openChange)="onOpenChange($event)">`,
+      '      <h2 slot="title">Review details</h2>',
+      `      <p>${escapeText(body).replaceAll('`', '\\`')}</p>`,
+      '      <cosm-button slot="actions" type="button" (press)="dialog?.requestClose()">Done</cosm-button>',
+      '    </cosm-dialog>',
+      '  `,',
+      '})',
+      'export class ExampleComponent {',
+      '  @ViewChild(CosmDialogComponent) dialog?: CosmDialogComponent;',
+      ...(controlled ? [`  isOpen = ${initialOpen};`] : []),
+      ...props
+        .filter(({ spec }) => spec.type === 'reference')
+        .map(
+          ({ value }) =>
+            `  readonly ${referenceBinding(String(value))} = ${referenceBinding(String(value))};`
+        ),
+      '  onOpenChange(event: CustomEvent<DialogOpenChangeDetail>) {',
+      ...(controlled ? ['    if (!event.defaultPrevented) this.isOpen = event.detail.open;'] : []),
+      '    console.log(event.detail);',
+      '  }',
+      '}',
+    ].join('\n');
+  }
+
+  const isNative = target === 'native';
+  const attributes = jsxAttributes(props);
+  return [
+    `import { ${isNative ? 'type ComponentRef, ' : ''}useRef${controlled ? ', useState' : ''} } from 'react';`,
+    isNative
+      ? "import { Button, Dialog, type DialogHandle } from '@joralvmel/cosmos-native';"
+      : "import { Button, Dialog } from '@joralvmel/cosmos-react';",
+    ...(isNative
+      ? ["import { type Pressable, Text } from 'react-native';"]
+      : ["import type { CosmDialog } from '@joralvmel/cosmos-elements/dialog';"]),
+    ...referenceImports(props),
+    '',
+    'export function Example() {',
+    `  const dialog = useRef<${isNative ? 'DialogHandle' : 'CosmDialog'}>(null);`,
+    ...(isNative ? ['  const opener = useRef<ComponentRef<typeof Pressable>>(null);'] : []),
+    ...(controlled ? [`  const [open, setOpen] = useState(${initialOpen});`] : []),
+    '  return (',
+    '    <>',
+    isNative
+      ? '      <Button ref={opener} onPress={() => dialog.current?.requestOpen()}>Open dialog</Button>'
+      : '      <Button onPress={() => dialog.current?.requestOpen()}>Open dialog</Button>',
+    '      <Dialog',
+    '        ref={dialog}',
+    ...(isNative ? ['        title="Review details"', '        returnFocusTarget={opener}'] : []),
+    ...attributes.map(attribute => `        ${attribute}`),
+    ...(controlled ? ['        open={open}'] : []),
+    `        onOpenChange={${isNative ? 'detail' : 'event'} => {`,
+    ...(!isNative ? ['          const detail = event.detail;'] : []),
+    ...(controlled
+      ? [
+          `          if (${isNative ? 'detail.open || !detail.defaultPrevented' : '!event.defaultPrevented'}) setOpen(detail.open);`,
+        ]
+      : []),
+    '          console.log(detail);',
+    '        }}',
+    ...(isNative
+      ? ['        actions={<Button onPress={() => dialog.current?.requestClose()}>Done</Button>}']
+      : []),
+    '      >',
+    ...(!isNative ? ['        <h2 slot="title">Review details</h2>'] : []),
+    isNative ? `        <Text>${jsxText(body)}</Text>` : `        <p>${jsxText(body)}</p>`,
+    ...(!isNative
+      ? [
+          '        <Button slot="actions" onPress={() => dialog.current?.requestClose()}>Done</Button>',
+        ]
+      : []),
+    '      </Dialog>',
+    '    </>',
+    '  );',
+    '}',
+  ].join('\n');
+}
+
 function react(contract: ComponentContract, values: ControlValues, content: string) {
   content = contentFor(contract, content);
   const component = pascalCase(contract.name);
@@ -487,7 +641,10 @@ export function generateSnippets(
   const result: Partial<Record<SnippetTarget, string>> = {};
   for (const target of snippetTargets) {
     if (supportsTarget(contract, target)) {
-      result[target] = builders[target](contract, sampleValues, content);
+      result[target] =
+        contract.name === 'dialog'
+          ? dialogExample(contract, sampleValues, content, target)
+          : builders[target](contract, sampleValues, content);
     }
   }
   return result;

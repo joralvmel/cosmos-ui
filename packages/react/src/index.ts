@@ -12,6 +12,7 @@ export { Badge, type BadgeProps, badgeEvents } from './components/badge.js';
 export { Button, type ButtonProps, buttonEvents } from './components/button.js';
 export { Calendar, type CalendarProps, calendarEvents } from './components/calendar.js';
 export { Checkbox, type CheckboxProps, checkboxEvents } from './components/checkbox.js';
+export { Dialog, type DialogProps, dialogEvents } from './components/dialog.js';
 export { Icon, type IconProps, iconEvents } from './components/icon.js';
 export { IconButton, type IconButtonProps, iconButtonEvents } from './components/icon-button.js';
 export { Listbox, type ListboxProps, listboxEvents } from './components/listbox.js';
