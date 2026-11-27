@@ -24,6 +24,7 @@ import {
 } from '@joralvmel/cosmos-core';
 import type { CosmBadge } from '@joralvmel/cosmos-elements/badge';
 import type { CosmButton } from '@joralvmel/cosmos-elements/button';
+import type { CosmCheckbox } from '@joralvmel/cosmos-elements/checkbox';
 import type { CosmPagination } from '@joralvmel/cosmos-elements/pagination';
 import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
 import type { CosmSwitch } from '@joralvmel/cosmos-elements/switch';
@@ -56,6 +57,7 @@ import {
   SITE_THEME_KEY,
   TAB_STORAGE_KEY,
 } from '../src/lib/playground';
+import { SELECT_NONE_VALUE } from '../src/lib/select-control';
 import { applySiteTheme } from '../src/lib/theme';
 
 const labels: PlaygroundLabels = {
@@ -161,6 +163,21 @@ async function activateSwitch(control: CosmSwitch) {
   await control.updateComplete;
 }
 
+function proposeSelect(control: CosmSelect, value: string | null) {
+  control.dispatchEvent(
+    new CustomEvent('cosm-change', { detail: { value }, bubbles: true, composed: true })
+  );
+}
+
+async function setCheckbox(control: CosmCheckbox, checked: boolean) {
+  await control.updateComplete;
+  const input = control.shadowRoot?.querySelector<HTMLInputElement>('[part="input"]');
+  if (!input) throw new Error('Missing checkbox input');
+  input.checked = checked;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  await control.updateComplete;
+}
+
 beforeEach(() => {
   document.documentElement.removeAttribute('data-theme');
 });
@@ -231,10 +248,9 @@ describe('Playground', () => {
     opener.click();
     await dialog.updateComplete;
     expect(dialog.open).toBe(true);
-    const veto = root.querySelector<HTMLInputElement>('[data-dialog-veto]');
+    const veto = root.querySelector<CosmCheckbox>('[data-dialog-veto]');
     if (!veto) throw new Error('Missing veto control');
-    veto.checked = true;
-    veto.dispatchEvent(new Event('change'));
+    await setCheckbox(veto, true);
     action.click();
     await dialog.updateComplete;
     expect(dialog.open).toBe(true);
@@ -266,7 +282,7 @@ describe('Playground', () => {
     await dialog.updateComplete;
     expect(dialog.open).toBe(true);
     expect(controller.values.open).toBe(true);
-    expect(root.querySelector<HTMLSelectElement>('[data-prop="open"]')?.value).toBe('true');
+    expect(root.querySelector<CosmSelect>('[data-prop="open"]')?.value).toBe('true');
     action.click();
     await dialog.updateComplete;
     expect(dialog.open).toBe(false);
@@ -283,10 +299,9 @@ describe('Playground', () => {
     expect(replacement.maxWidth).toBe(480);
     controller.set('closeLabel', ' ');
     expect(replacement.closeLabel).toBe('Close');
-    const long = root.querySelector<HTMLInputElement>('[data-dialog-long]');
+    const long = root.querySelector<CosmCheckbox>('[data-dialog-long]');
     if (!long) throw new Error('Missing long-content control');
-    long.checked = true;
-    long.dispatchEvent(new Event('change'));
+    await setCheckbox(long, true);
     expect(body.textContent?.length).toBeGreaterThan(100);
   });
 
@@ -351,10 +366,9 @@ describe('Playground', () => {
     controller.set('moveUpLabel', ' ');
     expect(target.moveUpLabel).toBe('Mover arriba');
 
-    const sample = root.querySelector<HTMLSelectElement>('[data-dialog-sample]');
+    const sample = root.querySelector<CosmSelect>('[data-dialog-sample]');
     if (!sample) throw new Error('Missing example selector');
-    sample.value = 'form';
-    sample.dispatchEvent(new Event('change'));
+    proposeSelect(sample, 'form');
     const form = target.querySelector<HTMLFormElement>('[data-dialog-form]');
     const field =
       target.querySelector<HTMLElementTagNameMap['cosm-text-field']>('[data-dialog-field]');
@@ -378,8 +392,7 @@ describe('Playground', () => {
     await target.updateComplete;
     expect(target.open).toBe(false);
 
-    sample.value = 'confirmation';
-    sample.dispatchEvent(new Event('change'));
+    proposeSelect(sample, 'confirmation');
     expect(form.hidden).toBe(true);
     expect(target.querySelector('[slot="title"]')?.textContent).toBe('Confirmar cambio');
     expect(action.textContent).toBe('Confirmar');
@@ -394,8 +407,7 @@ describe('Playground', () => {
     await target.updateComplete;
     expect(target.open).toBe(false);
 
-    sample.value = 'basic';
-    sample.dispatchEvent(new Event('change'));
+    proposeSelect(sample, 'basic');
     expect(cancel.hidden).toBe(true);
     expect(target.querySelector('[slot="title"]')?.textContent).toBe('Título');
   });
@@ -456,10 +468,10 @@ describe('Playground', () => {
     });
 
     await target.updateComplete;
-    const control = root.querySelector<HTMLSelectElement>('[data-prop="startIcon"]');
+    const control = root.querySelector<CosmSelect>('[data-prop="startIcon"]');
     if (!control) throw new Error('Missing Badge startIcon control');
-    expect(control.options[0]?.textContent).toBe('None');
-    expect(control.value).toBe('');
+    expect(control.placeholder).toBe('None');
+    expect(control.items.every(item => item.value !== '')).toBe(true);
     expect(target.startIcon).toBeUndefined();
     for (const platform of ['html', 'react', 'angular', 'native'] as const) {
       expect(controller.code(platform)).not.toContain('cosmos-icons/');
@@ -467,8 +479,7 @@ describe('Playground', () => {
       expect(controller.code(platform)).toContain('>Badge</');
     }
 
-    control.value = 'heart';
-    control.dispatchEvent(new Event('input'));
+    proposeSelect(control, 'heart');
     await target.updateComplete;
     expect(target.startIcon).toBe(heart);
     for (const [platform, expected] of [
@@ -483,8 +494,7 @@ describe('Playground', () => {
     }
     expect(controller.code('native')).not.toContain('<Text>Badge</Text>');
 
-    control.value = '';
-    control.dispatchEvent(new Event('input'));
+    proposeSelect(control, SELECT_NONE_VALUE);
     await target.updateComplete;
     expect(controller.values.startIcon).toBeUndefined();
     expect(target.startIcon).toBeUndefined();
@@ -613,10 +623,9 @@ describe('Playground', () => {
         RadioGroupValue: radioGroupValueExamples,
       },
     });
-    const size = root.querySelector<HTMLSelectElement>('[data-prop="size"]');
+    const size = root.querySelector<CosmSelect>('[data-prop="size"]');
     if (!size) throw new Error('Missing indicator size control');
-    size.value = 'custom';
-    size.dispatchEvent(new Event('input'));
+    proposeSelect(size, 'custom');
     const custom = root.querySelector<HTMLInputElement>('[data-radio-group-custom-size]');
     if (!custom) throw new Error('Missing custom size control');
     custom.value = '27.5';
@@ -638,10 +647,11 @@ describe('Playground', () => {
     expect(frequency?.defaultValue).toBeUndefined();
     expect(frequency?.size).toBe(27.5);
     expect(frequency?.getAttribute('size')).toBe('27.5');
-    expect(root.querySelector('[data-prop="value"] option[value="premium"]')).toHaveProperty(
-      'disabled',
-      true
-    );
+    expect(
+      root
+        .querySelector<CosmSelect>('[data-prop="value"]')
+        ?.items.some(item => item.value === 'premium')
+    ).toBe(false);
     expect(controller.code('native')).toContain('options={frequency}');
     expect(controller.code('native')).toContain('size={27.5}');
   });
@@ -722,8 +732,9 @@ describe('Playground', () => {
     expect(target.value).toBe('cherry');
     expect(target.valueControlled).toBe(true);
     expect(
-      root.querySelector<HTMLSelectElement>('[data-prop="value"] option[value="cherry"]')
-        ?.textContent
+      root
+        .querySelector<CosmSelect>('[data-prop="value"]')
+        ?.items.find(item => item.value === 'cherry')?.label
     ).toBe('Cereza');
 
     for (const platform of ['html', 'react', 'angular', 'native'] as const) {
@@ -808,15 +819,13 @@ describe('Playground', () => {
       themes: [],
       storage: { getItem: () => null, setItem: () => {} },
     });
-    const open = root.querySelector<HTMLSelectElement>('[data-prop="open"]');
+    const open = root.querySelector<CosmSelect>('[data-prop="open"]');
     if (!open) throw new Error('Missing open control');
     expect(controller.values.open).toBeUndefined();
-    open.value = 'false';
-    open.dispatchEvent(new Event('input'));
+    proposeSelect(open, 'false');
     expect(controller.values.open).toBe(false);
     expect(controller.code('react')).toContain('open={false}');
-    open.value = '';
-    open.dispatchEvent(new Event('input'));
+    proposeSelect(open, SELECT_NONE_VALUE);
     expect(controller.values.open).toBeUndefined();
     expect(controller.code('react')).not.toContain('open={false}');
   });
@@ -843,17 +852,16 @@ describe('Playground', () => {
     });
     expect(controller.values.label).toBe('Favorito');
     expect(controller.values.pressed).toBeUndefined();
-    expect(root.querySelector('[data-prop="pressed"] option')?.textContent).toBe('Autónomo');
+    expect(root.querySelector<CosmSelect>('[data-prop="pressed"]')?.placeholder).toBe('Autónomo');
     for (const name of Object.keys(iconButtonContract.props)) {
       expect(root.querySelector(`[data-prop="${name}"]`), name).not.toBeNull();
     }
     controller.set('label', ' ');
     expect(controller.values.label).toBe('Favorito');
     controller.set('mode', 'toggle');
-    const pressed = root.querySelector<HTMLSelectElement>('[data-prop="pressed"]');
+    const pressed = root.querySelector<CosmSelect>('[data-prop="pressed"]');
     if (!pressed) throw new Error('Missing pressed control');
-    pressed.value = 'false';
-    pressed.dispatchEvent(new Event('input'));
+    proposeSelect(pressed, 'false');
     await target.updateComplete;
     expect(controller.values.pressed).toBe(false);
     expect(target.pressedControlled).toBe(true);
@@ -910,40 +918,33 @@ describe('Playground', () => {
       clipboard: { writeText },
       storage: { getItem: key => (key === SITE_THEME_KEY ? 'nebula' : null), setItem: () => {} },
     });
-    const category = root.querySelector<HTMLSelectElement>('[data-icon-category]');
+    const category = root.querySelector<CosmSelect>('[data-icon-category]');
     const searchInput = root.querySelector<CosmTextField>('[data-icon-search]');
-    const size = root.querySelector<HTMLSelectElement>('[data-icon-size]');
-    const style = root.querySelector<HTMLSelectElement>('[data-icon-style]');
+    const size = root.querySelector<CosmSelect>('[data-icon-size]');
+    const style = root.querySelector<CosmSelect>('[data-icon-style]');
     if (!category || !searchInput || !size || !style) throw new Error('Missing catalog controls');
     const gallery = root.querySelector<HTMLElement>('.cosm-icon-gallery');
     if (!gallery) throw new Error('Missing gallery');
     expect(gallery.hasAttribute('data-cosm-preview')).toBe(true);
     expect(gallery.dataset.theme).toBe('cosmos');
     expect(gallery.dataset.mode).toBe('light');
-    const [theme, mode] = root.querySelectorAll<HTMLSelectElement>(
-      '.cosm-playground-toolbar select'
-    );
+    const [theme, mode] = root.querySelectorAll<CosmSelect>('.cosm-playground-toolbar cosm-select');
     if (!theme || !mode) throw new Error('Missing theme controls');
-    theme.value = 'nebula';
-    theme.dispatchEvent(new Event('change'));
-    mode.value = 'dark';
-    mode.dispatchEvent(new Event('change'));
+    proposeSelect(theme, 'nebula');
+    proposeSelect(mode, 'dark');
     expect(gallery.dataset.theme).toBe(preview.dataset.theme);
     expect(gallery.dataset.mode).toBe(preview.dataset.mode);
     expect(gallery.hasAttribute('data-fixed')).toBe(true);
     expect(gallery.hasAttribute('data-fixed-mode')).toBe(true);
-    category.value = 'shapes';
-    category.dispatchEvent(new Event('change'));
+    proposeSelect(category, 'shapes');
     await vi.waitFor(() => expect(controller.values.icon).toBe('heart'));
     expect(root.querySelectorAll('[data-icon-name]')).toHaveLength(1);
     await editTextField(searchInput, 'house');
     expect(root.querySelectorAll('[data-icon-name]')).toHaveLength(0);
     expect(controller.values.icon).toBe('heart');
     await editTextField(searchInput, 'love');
-    size.value = '32';
-    size.dispatchEvent(new Event('change'));
-    style.value = 'filled';
-    style.dispatchEvent(new Event('change'));
+    proposeSelect(size, '32');
+    proposeSelect(style, 'filled');
     await vi.waitFor(() => expect(target.icon).toBe(heart));
     expect(target.size).toBe(32);
     expect(target.fill).toBe('currentColor');
@@ -960,8 +961,7 @@ describe('Playground', () => {
       expect(thumbnail?.size).toBe(32);
       expect(thumbnail?.fill).toBe('currentColor');
     });
-    size.value = 'custom';
-    size.dispatchEvent(new Event('change'));
+    proposeSelect(size, 'custom');
     expect(root.querySelector<HTMLInputElement>('[data-icon-custom-size]')?.hidden).toBe(false);
     controller.set('size', 37);
     controller.set('fill', 'none');
@@ -981,11 +981,10 @@ describe('Playground', () => {
       ['stroke', 'var(--cosm-primary)'],
       ['fill', 'var(--cosm-danger)'],
     ] as const) {
-      const control = root.querySelector<HTMLSelectElement>(`select[data-prop="${name}"]`);
+      const control = root.querySelector<CosmSelect>(`cosm-select[data-prop="${name}"]`);
       if (!control) throw new Error(`Missing ${name} control`);
       expect(control.closest('.cosm-icon-toolbar')).not.toBeNull();
-      control.value = color;
-      control.dispatchEvent(new Event('change'));
+      proposeSelect(control, color);
     }
     expect(style.value).toBe('filled');
     expect(target.stroke).toBe('var(--cosm-primary)');
@@ -1001,9 +1000,8 @@ describe('Playground', () => {
         technology === 'native' ? 'theme.colors.danger' : 'var(--cosm-danger)'
       );
     }
-    style.value = 'outline';
-    style.dispatchEvent(new Event('change'));
-    expect(root.querySelector<HTMLSelectElement>('[data-prop="fill"]')?.value).toBe('none');
+    proposeSelect(style, 'outline');
+    expect(root.querySelector<CosmSelect>('[data-prop="fill"]')?.value).toBe('none');
     expect(root.querySelector('details')).toBeNull();
     const width = root.querySelector<HTMLInputElement>(
       '.cosm-icon-toolbar [data-prop="strokeWidth"]'
@@ -1024,10 +1022,8 @@ describe('Playground', () => {
     expect(target.label).toBe('Favorite');
     expect(controller.code('html')).toContain('label="Favorite"');
     expect(target.decorative).toBe(false);
-    theme.value = '';
-    theme.dispatchEvent(new Event('change'));
-    mode.value = '';
-    mode.dispatchEvent(new Event('change'));
+    proposeSelect(theme, SELECT_NONE_VALUE);
+    proposeSelect(mode, SELECT_NONE_VALUE);
     expect(gallery.hasAttribute('data-fixed')).toBe(false);
     expect(gallery.hasAttribute('data-fixed-mode')).toBe(false);
     expect(gallery.dataset.theme).toBe('nebula');
@@ -1073,10 +1069,9 @@ describe('Playground', () => {
 
   it('updates the preview element and every snippet when a control changes', async () => {
     const { root, target } = mount();
-    const variant = root.querySelector<HTMLSelectElement>('[data-prop="variant"]');
+    const variant = root.querySelector<CosmSelect>('[data-prop="variant"]');
     if (!variant) throw new Error('missing control');
-    variant.value = 'outline';
-    variant.dispatchEvent(new Event('input'));
+    proposeSelect(variant, 'outline');
     const fullWidth = root.querySelector<CosmSwitch>('cosm-switch[data-prop="fullWidth"]');
     if (!fullWidth) throw new Error('missing control');
     await activateSwitch(fullWidth);
@@ -1112,9 +1107,7 @@ describe('Playground', () => {
 
   it('lets the preview use another theme and mode', () => {
     const { root } = mount();
-    const [theme, mode] = [
-      ...root.querySelectorAll<HTMLSelectElement>('.cosm-playground-toolbar select'),
-    ];
+    const [theme, mode] = root.querySelectorAll<CosmSelect>('.cosm-playground-toolbar cosm-select');
     const preview = root.querySelector<HTMLElement>('[data-playground-target]')?.parentElement;
     const controls = root.querySelector<HTMLElement>('.cosm-playground-controls');
     const copy = root.querySelector<HTMLElement>('.cosm-playground-copy');
@@ -1124,10 +1117,8 @@ describe('Playground', () => {
       throw new Error('missing toolbar');
     expect(controls.dataset.theme).toBe('cosmos');
     expect(controls.dataset.mode).toBe('light');
-    theme.value = 'nebula';
-    theme.dispatchEvent(new Event('change'));
-    mode.value = 'dark';
-    mode.dispatchEvent(new Event('change'));
+    proposeSelect(theme, 'nebula');
+    proposeSelect(mode, 'dark');
     expect(preview.dataset.theme).toBe('nebula');
     expect(preview.dataset.mode).toBe('dark');
     expect(preview.hasAttribute('data-fixed')).toBe(true);
@@ -1137,10 +1128,8 @@ describe('Playground', () => {
       expect(surface.hasAttribute('data-fixed')).toBe(true);
       expect(surface.hasAttribute('data-fixed-mode')).toBe(true);
     }
-    theme.value = '';
-    theme.dispatchEvent(new Event('change'));
-    mode.value = '';
-    mode.dispatchEvent(new Event('change'));
+    proposeSelect(theme, SELECT_NONE_VALUE);
+    proposeSelect(mode, SELECT_NONE_VALUE);
     expect(preview.hasAttribute('data-fixed-mode')).toBe(false);
     expect(preview.dataset.mode).toBe('light');
     for (const surface of [controls, copy, toolbar, header]) {
@@ -1153,14 +1142,10 @@ describe('Playground', () => {
 
   it('preserves local overrides and resumes site updates on every control surface', () => {
     const { root, store } = mount();
-    const [theme, mode] = root.querySelectorAll<HTMLSelectElement>(
-      '.cosm-playground-toolbar select'
-    );
+    const [theme, mode] = root.querySelectorAll<CosmSelect>('.cosm-playground-toolbar cosm-select');
     if (!theme || !mode) throw new Error('Missing theme controls');
-    theme.value = 'nebula';
-    theme.dispatchEvent(new Event('change'));
-    mode.value = 'dark';
-    mode.dispatchEvent(new Event('change'));
+    proposeSelect(theme, 'nebula');
+    proposeSelect(mode, 'dark');
     const storage = { getItem: (key: string) => store.get(key) ?? null };
     applySiteTheme(storage);
     const surfaces = root.querySelectorAll<HTMLElement>('[data-cosm-preview]');
@@ -1168,10 +1153,8 @@ describe('Playground', () => {
       expect(surface.dataset.theme).toBe('nebula');
       expect(surface.dataset.mode).toBe('dark');
     }
-    theme.value = '';
-    theme.dispatchEvent(new Event('change'));
-    mode.value = '';
-    mode.dispatchEvent(new Event('change'));
+    proposeSelect(theme, null);
+    proposeSelect(mode, null);
     store.set(SITE_THEME_KEY, 'nebula');
     document.documentElement.dataset.theme = 'dark';
     applySiteTheme(storage);
@@ -1226,10 +1209,9 @@ describe('Playground', () => {
     expect(controller.code('react')).toContain('decorative={false}');
     expect(controller.code('angular')).toContain('[decorative]="false"');
 
-    const icon = root.querySelector<HTMLSelectElement>('[data-prop="icon"]');
+    const icon = root.querySelector<CosmSelect>('[data-prop="icon"]');
     if (!icon) throw new Error('missing icon control');
-    icon.value = 'heart';
-    icon.dispatchEvent(new Event('input'));
+    proposeSelect(icon, 'heart');
     expect(target.icon).toBe(heart);
     expect(controller.code('native')).toContain("from '@joralvmel/cosmos-icons/heart'");
   });
@@ -1270,21 +1252,18 @@ describe('Playground', () => {
     for (const name of ['clearable', 'passwordReveal', 'required', 'disabled', 'readOnly']) {
       expect(root.querySelector<CosmSwitch>(`cosm-switch[data-prop="${name}"]`)?.label).toBe(name);
     }
-    const type = root.querySelector<HTMLSelectElement>('select[data-prop="type"]');
+    const type = root.querySelector<CosmSelect>('cosm-select[data-prop="type"]');
     if (!type) throw new Error('missing type select');
-    type.value = 'email';
-    type.dispatchEvent(new Event('input'));
+    proposeSelect(type, 'email');
     expect(target.type).toBe('email');
-    const keyboard = root.querySelector<HTMLSelectElement>('select[data-prop="inputMode"]');
+    const keyboard = root.querySelector<CosmSelect>('cosm-select[data-prop="inputMode"]');
     if (!keyboard) throw new Error('missing keyboard select');
-    keyboard.value = 'numeric';
-    keyboard.dispatchEvent(new Event('input'));
+    proposeSelect(keyboard, 'numeric');
     expect(target.inputMode).toBe('numeric');
 
-    const size = root.querySelector<HTMLSelectElement>('select[data-prop="size"]');
+    const size = root.querySelector<CosmSelect>('cosm-select[data-prop="size"]');
     if (!size) throw new Error('missing size select');
-    size.value = 'custom';
-    size.dispatchEvent(new Event('input'));
+    proposeSelect(size, 'custom');
     const height = root.querySelector<HTMLInputElement>('input[type="number"][step="any"]');
     if (!height) throw new Error('missing custom height');
     expect(height.parentElement?.hidden).toBe(false);
@@ -1295,23 +1274,20 @@ describe('Playground', () => {
     height.dispatchEvent(new Event('input'));
     expect(target.size).toBe(72);
     expect(root.textContent).toContain('valid positive size');
-    size.value = 'sm';
-    size.dispatchEvent(new Event('input'));
+    proposeSelect(size, 'sm');
     expect(height.parentElement?.hidden).toBe(true);
     expect(target.size).toBe('sm');
 
-    const icon = root.querySelector<HTMLSelectElement>('select[data-prop="startIcon"]');
+    const icon = root.querySelector<CosmSelect>('cosm-select[data-prop="startIcon"]');
     if (!icon) throw new Error('missing icon select');
-    expect(icon.options.length).toBeLessThanOrEqual(5);
+    expect(icon.items.length).toBeLessThanOrEqual(5);
     expect(root.querySelector('.cosm-icon-gallery')).toBeNull();
     expect(root.querySelector('input[type="search"]')).toBeNull();
     expect(controller.code('react')).not.toContain('cosmos-icons/');
-    icon.value = 'heart';
-    icon.dispatchEvent(new Event('input'));
+    proposeSelect(icon, 'heart');
     expect(target.startIcon).toBe(heart);
     expect(controller.code('react')).toContain('cosmos-icons/heart');
-    icon.value = '';
-    icon.dispatchEvent(new Event('input'));
+    proposeSelect(icon, null);
     expect(target.startIcon).toBeUndefined();
     expect(controller.code('react')).not.toContain('cosmos-icons/');
 

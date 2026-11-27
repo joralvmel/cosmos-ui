@@ -1,4 +1,5 @@
 ---
+import { SELECT_NONE_VALUE } from '../lib/select-control';
 import { t } from './i18n';
 
 const s = t(Astro.currentLocale).textFieldIcons;
@@ -26,24 +27,31 @@ const colors = [
   <div class="color-controls">
     {
       hooks.map(([hook, label]) => (
-        <label>
-          {label}
-          <select data-icon-color={hook}>
-            <option value="">{s.fallback}</option>
-            {colors.map(([token, name]) => (
-              <option value={`var(--cosm-${token}-text)`}>{name}</option>
-            ))}
-          </select>
-        </label>
+        <div
+          data-icon-color={hook}
+          data-label={label}
+          data-placeholder={s.fallback}
+          data-items={JSON.stringify(
+            [
+              { value: SELECT_NONE_VALUE, label: s.fallback },
+              ...colors.map(([token, name]) => ({
+                value: `var(--cosm-${token}-text)`,
+                label: name,
+              })),
+            ]
+          )}
+        />
       ))
     }
-    <label>
-      {s.scope}
-      <select data-icon-focus-scope>
-        <option value="control">{s.control}</option>
-        <option value="input">{s.input}</option>
-      </select>
-    </label>
+    <div
+      data-icon-focus-scope
+      data-label={s.scope}
+      data-placeholder={s.control}
+      data-items={JSON.stringify([
+        { value: 'control', label: s.control },
+        { value: 'input', label: s.input },
+      ])}
+    />
   </div>
   <cosm-text-field
     label={s.label}
@@ -59,27 +67,59 @@ const colors = [
 
 <script>
   import '@joralvmel/cosmos-elements/text-field';
+  import '@joralvmel/cosmos-elements/select';
+  import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
   import { heart } from '@joralvmel/cosmos-icons/heart';
   import { search } from '@joralvmel/cosmos-icons/search';
+  import { normalizeSelectValue } from '../lib/select-control';
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-icon-colors-demo]')) {
     const field = root.querySelector('cosm-text-field');
     if (!field) throw new Error('Icon color demo requires a text field.');
     field.startIcon = search;
     field.endIcon = heart;
-    for (const control of root.querySelectorAll<HTMLSelectElement>('[data-icon-color]')) {
-      control.addEventListener('change', () => {
+    const createSelect = (placeholder: HTMLElement) => {
+      const control = document.createElement('cosm-select') as CosmSelect;
+      control.label = placeholder.dataset.label ?? '';
+      control.placeholder = placeholder.dataset.placeholder ?? '';
+      control.items = JSON.parse(placeholder.dataset.items ?? '[]');
+      if (placeholder.dataset.iconColor !== undefined)
+        control.dataset.iconColor = placeholder.dataset.iconColor;
+      if (placeholder.hasAttribute('data-icon-focus-scope')) {
+        control.dataset.iconFocusScope = '';
+        control.value = 'control';
+      } else {
+        control.value = null;
+      }
+      placeholder.replaceWith(control);
+      return control;
+    };
+    for (const placeholder of root.querySelectorAll<HTMLElement>('[data-icon-color]')) {
+      const control = createSelect(placeholder);
+      control.addEventListener('cosm-change', event => {
+        const value = normalizeSelectValue(
+          (event as CustomEvent<{ value: string | null }>).detail.value
+        );
+        control.value = value;
         const property = `--cosm-text-field-${control.dataset.iconColor}`;
-        if (control.value) field.style.setProperty(property, control.value);
+        if (value) field.style.setProperty(property, value);
         else field.style.removeProperty(property);
       });
     }
-    root.querySelector<HTMLSelectElement>('[data-icon-focus-scope]')?.addEventListener(
-      'change',
+    const focusScopePlaceholder = root.querySelector<HTMLElement>('[data-icon-focus-scope]');
+    if (!focusScopePlaceholder)
+      throw new Error('Icon color demo requires a focus-scope selector.');
+    const focusScope = createSelect(focusScopePlaceholder);
+    focusScope.value = 'control';
+    focusScope.addEventListener(
+      'cosm-change',
       event => {
-        const value = (event.currentTarget as HTMLSelectElement).value;
+        const value = normalizeSelectValue(
+          (event as CustomEvent<{ value: string | null }>).detail.value
+        );
         if (value !== 'control' && value !== 'input')
           throw new TypeError('Unknown icon focus scope.');
+        focusScope.value = value;
         field.iconFocusScope = value;
       }
     );
@@ -99,16 +139,8 @@ const colors = [
     flex-wrap: wrap;
     gap: var(--cosm-space-md);
   }
-  label {
-    display: grid;
-    gap: var(--cosm-space-xs);
-    font-size: var(--cosm-text-sm);
-  }
-  select {
-    padding: var(--cosm-space-xs);
-    color: var(--cosm-fg);
-    background: var(--cosm-bg);
-    border: 1px solid var(--cosm-border);
-    border-radius: var(--cosm-radius-sm);
+  .color-controls cosm-select {
+    flex: 1 1 12rem;
+    min-inline-size: min(100%, 12rem);
   }
 </style>
