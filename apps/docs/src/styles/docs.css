@@ -34,7 +34,7 @@
   font-weight: 600;
 }
 
-.cosm-playground :is(input:not([type="checkbox"]), select) {
+.cosm-playground input:not([type="checkbox"]) {
   min-inline-size: 0;
   max-inline-size: 100%;
   min-block-size: 2.5rem;
@@ -55,7 +55,7 @@
   border-radius: var(--cosm-radius-md);
 }
 
-.cosm-playground-controls :is(input:not([type="checkbox"]), select) {
+.cosm-playground-controls input:not([type="checkbox"]) {
   border-color: var(--cosm-border-strong);
   background: var(--cosm-bg);
   color: var(--cosm-fg);
@@ -86,20 +86,6 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: var(--sl-text-sm);
-}
-
-.cosm-playground-controls label.cosm-playground-checkbox-control {
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  min-block-size: 2.5rem;
-  cursor: pointer;
-}
-
-.cosm-playground-checkbox-control input {
-  inline-size: 1rem;
-  block-size: 1rem;
-  flex: none;
 }
 
 .cosm-playground-boolean-control {

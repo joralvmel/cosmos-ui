@@ -15,10 +15,14 @@ import {
   validateSize,
 } from '@joralvmel/cosmos-core';
 import '@joralvmel/cosmos-elements/button';
+import '@joralvmel/cosmos-elements/checkbox';
+import '@joralvmel/cosmos-elements/select';
 import '@joralvmel/cosmos-elements/switch';
 import '@joralvmel/cosmos-elements/text-field';
+import type { CosmSelect } from '@joralvmel/cosmos-elements/select';
 import { semanticColors } from '@joralvmel/cosmos-tokens';
 import { type PlaygroundChild, playgroundSnippets } from './playground-snippets';
+import { normalizeSelectValue, SELECT_NONE_VALUE } from './select-control';
 import { SITE_THEME_KEY } from './theme';
 
 export { SITE_THEME_KEY } from './theme';
@@ -197,17 +201,33 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
-function select(label: string, options: [string, string][], value: string) {
-  const wrapper = element('label');
-  wrapper.append(element('span', {}, label));
-  const control = element('select');
-  for (const [optionValue, optionLabel] of options) {
-    const option = element('option', { value: optionValue }, optionLabel);
-    option.selected = optionValue === value;
-    control.append(option);
-  }
-  wrapper.append(control);
-  return { wrapper, control };
+function select(
+  label: string,
+  options: readonly [string, string][],
+  value: string,
+  placeholder = 'Select an option'
+) {
+  const control = element('cosm-select') as CosmSelect;
+  const emptyOption = options.find(([optionValue]) => optionValue === '');
+  control.label = label;
+  control.placeholder = emptyOption?.[1] ?? placeholder;
+  control.items = options.map(([optionValue, optionLabel]) => ({
+    value: optionValue || SELECT_NONE_VALUE,
+    label: optionLabel,
+  }));
+  control.value = value || null;
+  control.addEventListener('cosm-change', event => {
+    control.value = normalizeSelectValue(
+      (event as CustomEvent<{ value: string | null }>).detail.value
+    );
+  });
+  return { wrapper: control, control };
+}
+
+function isCosmSelect(
+  control: HTMLInputElement | HTMLSelectElement | CosmSelect
+): control is CosmSelect {
+  return control.localName === 'cosm-select';
 }
 
 /**
@@ -310,7 +330,9 @@ export function initPlayground(
       labels.theme,
       [
         ['', labels.followSite],
-        ...options.themes.map(item => [item.name, item.label] as [string, string]),
+        ...(options.themes.length > 0 ? options.themes : [{ name: 'cosmos', label: 'Cosmos' }]).map(
+          item => [item.name, item.label] as [string, string]
+        ),
       ],
       ''
     );
@@ -323,22 +345,30 @@ export function initPlayground(
       ],
       ''
     );
-    theme.control.addEventListener('change', () => {
+    theme.control.addEventListener('cosm-change', event => {
+      const value = normalizeSelectValue(
+        (event as CustomEvent<{ value: string | null }>).detail.value
+      );
+      theme.control.value = value;
       for (const surface of root.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
-        if (theme.control.value) {
+        if (value) {
           surface.setAttribute('data-fixed', '');
-          surface.dataset.theme = theme.control.value;
+          surface.dataset.theme = value;
         } else {
           surface.removeAttribute('data-fixed');
           surface.dataset.theme = storage?.getItem(SITE_THEME_KEY) ?? options.themes[0]?.name ?? '';
         }
       }
     });
-    mode.control.addEventListener('change', () => {
+    mode.control.addEventListener('cosm-change', event => {
+      const value = normalizeSelectValue(
+        (event as CustomEvent<{ value: string | null }>).detail.value
+      );
+      mode.control.value = value;
       for (const surface of root.querySelectorAll<HTMLElement>('[data-cosm-preview]')) {
-        if (mode.control.value) {
+        if (value) {
           surface.setAttribute('data-fixed-mode', '');
-          surface.dataset.mode = mode.control.value;
+          surface.dataset.mode = value;
         } else {
           surface.removeAttribute('data-fixed-mode');
           surface.dataset.mode =
@@ -429,15 +459,20 @@ export function initPlayground(
             token => [`var(--cosm-${token})`, `--cosm-${token}`] as [string, string]
           ),
         ],
-        String(values[name])
+        String(values[name]),
+        labels.none ?? 'None'
       );
       color.control.dataset.prop = name;
       color.control.title = spec.description;
-      color.control.addEventListener('change', () => controller.set(name, color.control.value));
+      color.control.addEventListener('cosm-change', event => {
+        const { value } = (event as CustomEvent<{ value: string | null }>).detail;
+        if (value !== null) controller.set(name, value);
+      });
       refreshControls.push(() => {
         const value = String(values[name]);
-        if (![...color.control.options].some(option => option.value === value))
-          color.control.append(element('option', { value }, value));
+        if (!color.control.items.some(option => option.value === value)) {
+          color.control.items = [...color.control.items, { value, label: value }];
+        }
         color.control.value = value;
       });
       iconToolbar.append(color.wrapper);
@@ -493,9 +528,8 @@ export function initPlayground(
     }
     const label = element('label');
     label.append(element('span', {}, paintLabel));
-    let control: HTMLInputElement | HTMLSelectElement;
+    let control: HTMLInputElement | HTMLSelectElement | CosmSelect;
     if (spec.type === 'enum' || spec.type === 'reference' || fieldSize || enumUnion) {
-      control = element('select');
       const catalog =
         spec.type === 'reference' ? options.referenceCatalogs?.[spec.reference] : undefined;
       if (catalog?.preview) label.hidden = true;
@@ -510,52 +544,68 @@ export function initPlayground(
             : unionChoices;
       const stateReference =
         spec.type === 'reference' && contract.states.some(state => state.prop === name);
+      const choicesWithLabels: [string, string][] = [];
       if (
         (spec.type === 'reference' && !spec.required && !stateReference) ||
         (contract.name === 'text-field' && enumUnion)
       ) {
-        control.append(element('option', { value: '' }, labels.none ?? 'None'));
+        choicesWithLabels.push(['', labels.none ?? 'None']);
       }
       if (stateReference) {
-        control.append(element('option', { value: '' }, labels.autonomous ?? 'Autonomous'));
+        choicesWithLabels.push(['', labels.autonomous ?? 'Autonomous']);
       }
       for (const value of choices) {
-        const option = element(
-          'option',
-          { value },
+        choicesWithLabels.push([
+          value,
           contract.name === 'radio-group'
             ? (labels.radioGroupExamples?.[value] ?? value)
             : contract.name === 'select' &&
                 spec.type === 'reference' &&
                 spec.reference === 'SelectValue'
               ? (labels.selectValues?.[value] ?? value)
-              : value
-        );
-        option.selected = value === values[name];
-        control.append(option);
+              : value,
+        ]);
       }
       if (fieldSize) {
-        control.append(element('option', { value: 'custom' }, labels.customSize ?? 'Custom'));
+        choicesWithLabels.push(['custom', labels.customSize ?? 'Custom']);
       }
-      control.value = values[name] === undefined ? '' : String(values[name]);
+      if (catalog) {
+        const nativeSelect = element('select');
+        for (const [value, text] of choicesWithLabels) {
+          nativeSelect.append(element('option', { value }, text));
+        }
+        nativeSelect.value = values[name] === undefined ? '' : String(values[name]);
+        control = nativeSelect;
+      } else {
+        const placeholder =
+          choicesWithLabels.find(([value]) => value === '')?.[1] ?? labels.none ?? 'None';
+        control = select(
+          paintLabel,
+          choicesWithLabels,
+          values[name] === undefined ? '' : String(values[name]),
+          placeholder
+        ).control;
+      }
       if (
         contract.name === 'radio-group' &&
         spec.type === 'reference' &&
         spec.reference === 'RadioGroupValue'
       ) {
-        const valueControl = control;
+        const valueControl = control as CosmSelect;
         refreshControls.push(() => {
           const sample = options.referenceValues?.RadioGroupOptions?.[String(values.options)] as
             | readonly { value: string; label: string; disabled?: boolean }[]
             | undefined;
-          for (const choice of valueControl.options) {
-            if (!choice.value || choice.value === 'none') continue;
-            const option = sample?.find(entry => entry.value === choice.value && !entry.disabled);
-            choice.hidden = !option;
-            choice.disabled = !option;
-            if (option) choice.textContent = option.label;
-          }
-          valueControl.value = String(values[name] ?? '');
+          const available = new Map(
+            (sample ?? []).filter(entry => !entry.disabled).map(entry => [entry.value, entry.label])
+          );
+          valueControl.items = choicesWithLabels
+            .filter(([value]) => !value || value === 'none' || available.has(value))
+            .map(([value, label]) => ({
+              value: value || SELECT_NONE_VALUE,
+              label: value && value !== 'none' ? (available.get(value) ?? label) : label,
+            }));
+          valueControl.value = values[name] === undefined ? null : String(values[name]);
         });
       }
       if (
@@ -563,26 +613,23 @@ export function initPlayground(
         spec.type === 'reference' &&
         spec.reference === 'SelectValue'
       ) {
-        const valueControl = control;
+        const valueControl = control as CosmSelect;
         refreshControls.push(() => {
           const sample = options.referenceValues?.SelectItems?.[String(values.items)] as
             | readonly ListboxItem[]
             | undefined;
           const available = sample ? getListboxOptions(sample) : [];
-          for (const choice of valueControl.options) {
-            if (!choice.value || choice.value === 'none') continue;
-            const option = available?.find(
-              entry => entry.value === choice.value && !entry.disabled
-            );
-            choice.hidden = !option;
-            choice.disabled = !option;
-          }
+          valueControl.items = choicesWithLabels
+            .filter(
+              ([value]) =>
+                !value ||
+                value === 'none' ||
+                available.some(entry => entry.value === value && !entry.disabled)
+            )
+            .map(([value, label]) => ({ value: value || SELECT_NONE_VALUE, label }));
           const current = String(values[name] ?? '');
-          valueControl.value = [...valueControl.options].some(
-            option => option.value === current && !option.disabled
-          )
-            ? current
-            : '';
+          valueControl.value =
+            valueControl.items.some(option => option.value === current) && current ? current : null;
         });
       }
       if (catalog) {
@@ -605,7 +652,7 @@ export function initPlayground(
           `${choices.length} ${labels.iconResults ?? 'icons found'}`
         );
         searchInput.helpText = results.textContent ?? '';
-        const iconSelect = control;
+        const iconSelect = control as HTMLSelectElement;
         const gallery = element('div', {
           class: 'cosm-icon-gallery',
           'data-cosm-preview': '',
@@ -697,24 +744,24 @@ export function initPlayground(
           const value = String(previewSize());
           const custom =
             size.control.value === 'custom' ||
-            ![...size.control.options].some(option => option.value === value);
+            !size.control.items.some(option => option.value === value);
           size.control.value = custom ? 'custom' : value;
           customSize.hidden = !custom;
           if (custom) customSize.value = value;
           style.control.value = values.fill === 'none' ? 'outline' : 'filled';
           paintPreviews();
         });
-        size.control.addEventListener('change', () => {
-          controller.set(
-            'size',
-            Number(size.control.value === 'custom' ? customSize.value : size.control.value)
-          );
+        size.control.addEventListener('cosm-change', event => {
+          const value = (event as CustomEvent<{ value: string | null }>).detail.value;
+          if (value === null) return;
+          controller.set('size', Number(value === 'custom' ? customSize.value : value));
         });
         customSize.addEventListener('input', () => {
           controller.set('size', Number(customSize.value));
         });
-        style.control.addEventListener('change', () => {
-          controller.set('fill', style.control.value === 'filled' ? 'currentColor' : 'none');
+        style.control.addEventListener('cosm-change', event => {
+          const value = (event as CustomEvent<{ value: string | null }>).detail.value;
+          if (value !== null) controller.set('fill', value === 'filled' ? 'currentColor' : 'none');
         });
         const appendPreviews = () => {
           const next = matches.slice(shown, shown + 24);
@@ -770,8 +817,8 @@ export function initPlayground(
           }
         };
         searchInput.addEventListener('cosm-change', filter);
-        category.control.addEventListener('change', filter);
-        catalogControls.append(searchInput, category.wrapper, sizeGroup, style.wrapper);
+        category.control.addEventListener('cosm-change', filter);
+        catalogControls.append(searchInput, category.control, sizeGroup, style.control);
         fieldset.append(
           catalogControls,
           results,
@@ -789,17 +836,19 @@ export function initPlayground(
         }
       }
     } else if (spec.type === 'boolean' && contract.states.some(state => state.prop === name)) {
-      control = element('select');
-      for (const [value, text] of [
-        ['', labels.autonomous ?? 'Autonomous'],
-        ['false', 'false'],
-        ['true', 'true'],
-      ] as const) {
-        control.append(element('option', { value }, text));
-      }
-      const stateControl = control;
+      control = select(
+        paintLabel,
+        [
+          ['', labels.autonomous ?? 'Autonomous'],
+          ['false', 'false'],
+          ['true', 'true'],
+        ],
+        values[name] === undefined ? '' : String(values[name]),
+        labels.autonomous ?? 'Autonomous'
+      ).control;
+      const stateControl = control as CosmSelect;
       refreshControls.push(() => {
-        stateControl.value = values[name] === undefined ? '' : String(values[name]);
+        stateControl.value = values[name] === undefined ? null : String(values[name]);
       });
     } else {
       control = element('input', { type: spec.type === 'number' ? 'number' : 'text' });
@@ -819,42 +868,83 @@ export function initPlayground(
     }
     control.dataset.prop = name;
     control.title = spec.description;
-    control.addEventListener('input', () => {
-      const input = control;
-      if (fieldSize) {
-        customHeightLabel.hidden = control.value !== 'custom';
-        controller.set(
-          name,
-          control.value === 'custom' ? Number(customHeight.value) : control.value
+    if (isCosmSelect(control)) {
+      control.addEventListener('cosm-change', event => {
+        const selected = normalizeSelectValue(
+          (event as CustomEvent<{ value: string | null }>).detail.value
         );
-        return;
-      }
-      const value =
-        spec.type === 'boolean' && contract.states.some(state => state.prop === name)
-          ? input.value === ''
+        if (fieldSize) {
+          customHeightLabel.hidden = selected !== 'custom';
+          controller.set(
+            name,
+            selected === 'custom' ? Number(customHeight.value) : (selected ?? undefined)
+          );
+          return;
+        }
+        const value =
+          selected === null
             ? undefined
-            : input.value === 'true'
-          : input.type === 'number'
+            : spec.type === 'boolean' && contract.states.some(state => state.prop === name)
+              ? selected === 'true'
+              : spec.type === 'union' && selected.trim() !== '' && Number.isFinite(Number(selected))
+                ? Number(selected)
+                : selected;
+        controller.set(name, value);
+      });
+      refreshControls.push(() => {
+        if (fieldSize) {
+          const current = String(values[name] ?? '');
+          control.value = control.items.some(option => option.value === current)
+            ? current
+            : 'custom';
+          customHeightLabel.hidden = control.value !== 'custom';
+          if (control.value === 'custom' && values[name] !== undefined)
+            customHeight.value = String(values[name]);
+          return;
+        }
+        const current = String(values[name] ?? '');
+        control.value =
+          control.items.some(option => option.value === current) && current ? current : null;
+      });
+      appendControl(name, control);
+    } else {
+      control.addEventListener('input', () => {
+        const input = control;
+        if (fieldSize) {
+          customHeightLabel.hidden = control.value !== 'custom';
+          controller.set(
+            name,
+            control.value === 'custom' ? Number(customHeight.value) : control.value
+          );
+          return;
+        }
+        const value =
+          spec.type === 'boolean' && contract.states.some(state => state.prop === name)
             ? input.value === ''
               ? undefined
-              : Number(input.value)
-            : spec.type === 'union' &&
-                control.value.trim() !== '' &&
-                Number.isFinite(Number(control.value))
-              ? Number(control.value)
-              : ((spec.type === 'reference' &&
-                    (!spec.required || contract.states.some(state => state.prop === name))) ||
-                    (contract.name === 'text-field' && enumUnion)) &&
-                  control.value === ''
+              : input.value === 'true'
+            : input.type === 'number'
+              ? input.value === ''
                 ? undefined
-                : control.value;
-      controller.set(name, value);
-    });
-    label.append(control);
-    if (contract.name === 'text-field' && !basicFieldProps.has(name))
-      advancedControls.append(label);
-    else if (iconToolbar && name !== 'icon') iconToolbar.append(label);
-    else fieldset.append(label);
+                : Number(input.value)
+              : spec.type === 'union' &&
+                  control.value.trim() !== '' &&
+                  Number.isFinite(Number(control.value))
+                ? Number(control.value)
+                : ((spec.type === 'reference' &&
+                      (!spec.required || contract.states.some(state => state.prop === name))) ||
+                      (contract.name === 'text-field' && enumUnion)) &&
+                    control.value === ''
+                  ? undefined
+                  : control.value;
+        controller.set(name, value);
+      });
+      label.append(control);
+      if (contract.name === 'text-field' && !basicFieldProps.has(name))
+        advancedControls.append(label);
+      else if (iconToolbar && name !== 'icon') iconToolbar.append(label);
+      else fieldset.append(label);
+    }
     if (fieldSize) fieldset.append(customHeightLabel);
   }
   customHeight.addEventListener('input', () => {
@@ -871,14 +961,14 @@ export function initPlayground(
       'basic'
     );
     sample.control.dataset.dialogSample = '';
-    const longLabel = element('label', { class: 'cosm-playground-checkbox-control' });
-    const long = element('input', { type: 'checkbox', 'data-dialog-long': '' });
-    longLabel.append(long, document.createTextNode(labels.dialogLong ?? 'Show long content'));
-    const vetoLabel = element('label', { class: 'cosm-playground-checkbox-control' });
-    const veto = element('input', { type: 'checkbox', 'data-dialog-veto': '' });
-    vetoLabel.append(veto, document.createTextNode(labels.dialogVeto ?? 'Prevent close requests'));
+    const long = element('cosm-checkbox', { 'data-dialog-long': '' });
+    long.label = labels.dialogLong ?? 'Show long content';
+    long.checked = false;
+    const veto = element('cosm-checkbox', { 'data-dialog-veto': '' });
+    veto.label = labels.dialogVeto ?? 'Prevent close requests';
+    veto.checked = false;
     const proposal = element('output', { 'data-dialog-proposal': '', 'aria-live': 'polite' });
-    fieldset.append(sample.wrapper, longLabel, vetoLabel, proposal);
+    fieldset.append(sample.control, long, veto, proposal);
     const opener = root.querySelector<HTMLElementTagNameMap['cosm-button']>('[data-dialog-open]');
     const title = target?.querySelector('[slot="title"]');
     const description = target?.querySelector('[slot="description"]');
@@ -923,8 +1013,9 @@ export function initPlayground(
     );
     allowClose.hidden = true;
     action?.before(allowClose);
-    veto.addEventListener('change', () => {
-      allowClose.hidden = !veto.checked;
+    veto.addEventListener('cosm-checked-change', event => {
+      veto.checked = event.detail.checked;
+      allowClose.hidden = !event.detail.checked;
     });
     allowClose.addEventListener('cosm-press', () => {
       veto.checked = false;
@@ -991,8 +1082,11 @@ export function initPlayground(
       event.preventDefault();
       Reflect.apply(Reflect.get(target, 'requestClose'), target, []);
     });
-    sample.control.addEventListener('change', updateSample);
-    long.addEventListener('change', updateSample);
+    sample.control.addEventListener('cosm-change', updateSample);
+    long.addEventListener('cosm-checked-change', event => {
+      long.checked = event.detail.checked;
+      updateSample();
+    });
     root.addEventListener('cosm-open-change', event => {
       if (event.target !== target) return;
       const detail = (event as CustomEvent<{ open: boolean; reason: string }>).detail;
